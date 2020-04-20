@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_library"
+    tools:ignore="UnusedNavigation">
+
+    <fragment
+        android:id="@+id/nav_library"
+        android:name="com.fishhawk.driftinglibraryandroid.library.LibraryFragment"
+        android:label="@string/menu_library"
+        tools:layout="@layout/fragment_library">
+        <action
+            android:id="@+id/action_library_to_gallery"
+            app:destination="@id/nav_manga"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_manga"
+        android:name="com.fishhawk.driftinglibraryandroid.gallery.GalleryFragment"
+        tools:layout="@layout/fragment_gallery">
+        <action
+            android:id="@+id/action_gallery_to_reader"
+            app:destination="@id/nav_reader" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_reader"
+        android:name="com.fishhawk.driftinglibraryandroid.reader.ReaderFragment"
+        tools:layout="@layout/fragment_reader">
+<!--        <argument-->
+<!--            android:name="id"-->
+<!--            app:argType="string" />-->
+    </fragment>
+</navigation>
