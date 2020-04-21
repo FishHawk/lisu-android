@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -56,6 +57,7 @@ class GalleryFragment : Fragment() {
         thumbView.transitionName = arguments?.getString("id")
 
         viewModel.selectedMangaSummary.value?.let {
+            (activity as? AppCompatActivity)?.supportActionBar?.title = it.title
             val listener = object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?,

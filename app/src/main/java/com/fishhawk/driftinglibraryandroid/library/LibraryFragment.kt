@@ -1,17 +1,10 @@
 package com.fishhawk.driftinglibraryandroid.library
 
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.*
-import android.view.inputmethod.InputMethodManager
-import android.webkit.URLUtil
-import android.widget.EditText
-import android.widget.ImageView
-import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -21,10 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
 
 class LibraryFragment : Fragment() {
@@ -35,11 +25,31 @@ class LibraryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
         if (arguments != null) {
             mColumnCount = arguments!!.getInt(ARG_COLUMN_COUNT)
         }
         viewModel = activity?.run { ViewModelProvider(this)[LibraryViewModel::class.java] }
             ?: throw Exception("Invalid Activity")
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_library, menu);
+        val searchItem: MenuItem = menu.findItem(R.id.action_search);
+        val searchView: SearchView = searchItem.actionView as SearchView
+        searchView.queryHint = "Search"
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                filter = query ?: ""
+                viewModel.refresh(filter)
+                return false
+            }
+
+            override fun onQueryTextChange(query: String?): Boolean {
+                return true
+            }
+        })
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onCreateView(
@@ -50,65 +60,6 @@ class LibraryFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_library, container, false)
         val refreshLayout = view.findViewById<RefreshLayout>(R.id.refresh_layout)
         val recyclerView = refreshLayout.findViewById<RecyclerView>(R.id.list)
-        val fab = view.findViewById<FloatingActionButton>(R.id.fab)
-
-        val menuButton = view.findViewById<ImageView>(R.id.menu_button)
-        val clearButton = view.findViewById<ImageView>(R.id.clear_button)
-        val searchBar = view.findViewById<EditText>(R.id.search_bar)
-
-        menuButton.apply {
-            setOnClickListener {
-                val drawerLayout = activity?.findViewById<DrawerLayout>(R.id.drawer_layout)
-                drawerLayout?.openDrawer(GravityCompat.START)
-            }
-        }
-
-        clearButton.apply {
-            setOnClickListener {
-                filter = ""
-                searchBar.setText("")
-            }
-        }
-
-        searchBar.apply {
-            setOnEditorActionListener { _, _, _ ->
-                filter = searchBar.text.toString()
-                viewModel.refresh(filter)
-
-                searchBar.clearFocus()
-                (activity?.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager)
-                    .hideSoftInputFromWindow(windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
-                true
-            }
-        }
-
-        fab.apply {
-            setOnClickListener {
-                val input = EditText(context)
-                input.setText(Repository.getUrl())
-
-                AlertDialog.Builder(context!!, R.style.AlertDialogTheme)
-                    .setTitle("Set Library Address")
-                    .setView(input)
-                    .setPositiveButton("OK") { _, _ ->
-                        val url = input.text.toString()
-                        if (URLUtil.isNetworkUrl(url)) {
-                            Repository.setRemoteLibraryService(url)
-                            filter = ""
-                            searchBar.setText("")
-                            viewModel.refresh()
-                        } else {
-                            Snackbar.make(
-                                view, "Illegal url", Snackbar.LENGTH_LONG
-                            ).setAction("Action", null).show()
-                        }
-                    }
-                    .setNegativeButton("Cancel") { dialog, _ ->
-                        dialog.cancel();
-                    }
-                    .show()
-            }
-        }
 
         refreshLayout.apply {
             setOnRefreshListener(object : RefreshLayout.OnRefreshListener {
