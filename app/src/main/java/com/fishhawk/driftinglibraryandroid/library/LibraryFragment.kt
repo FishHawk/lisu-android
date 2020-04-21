@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.library
 
+import android.content.SharedPreferences
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.*
@@ -10,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,6 +24,13 @@ class LibraryFragment : Fragment() {
     private var mColumnCount = 3
     private lateinit var viewModel: LibraryViewModel
     private var filter: String = ""
+    private val listener: SharedPreferences.OnSharedPreferenceChangeListener =
+        SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+            if (key == "library_address") {
+                viewModel.setLibraryAddress(sharedPreferences.getString(key, null) ?: "")
+            }
+        }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,8 +38,14 @@ class LibraryFragment : Fragment() {
         if (arguments != null) {
             mColumnCount = arguments!!.getInt(ARG_COLUMN_COUNT)
         }
+
         viewModel = activity?.run { ViewModelProvider(this)[LibraryViewModel::class.java] }
             ?: throw Exception("Invalid Activity")
+
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+        val libraryAddress = sharedPreferences.getString("library_address", "") ?: ""
+        viewModel.setLibraryAddress(libraryAddress)
+        sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

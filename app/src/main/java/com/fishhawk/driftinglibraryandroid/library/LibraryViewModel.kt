@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.library
 
+import android.webkit.URLUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,10 +8,52 @@ import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
+import java.lang.IllegalArgumentException
 
 class LibraryViewModel : ViewModel() {
+    private var address: String = "http://192.168.0.103:8080/api/"
+    private var repository: Repository? = Repository(address)
+
+    fun getLibraryAddress(): String = address
+    fun setLibraryAddress(inputAddress: String) {
+        var newAddress = inputAddress
+        newAddress = if (URLUtil.isNetworkUrl(newAddress)) newAddress else "http://${inputAddress}"
+        newAddress = if (newAddress.last() == '/') newAddress else "$newAddress/"
+
+        val newRepository = try {
+            Repository(newAddress)
+        } catch (e: IllegalArgumentException) {
+            null
+        }
+
+        address = newAddress
+        repository = newRepository
+        refresh()
+    }
+
     private val _mangaList: MutableLiveData<List<MangaSummary>> = MutableLiveData()
     val mangaList: LiveData<List<MangaSummary>> = _mangaList
+
+    fun refresh(filter: String = "") {
+        repository?.getMangaList({ result ->
+            when (result) {
+                is Result.Success -> _mangaList.value = result.data
+                is Result.Error -> println(result.exception.message)
+            }
+        }, "", filter)
+    }
+
+    fun fetchMore(filter: String = "") {
+        val lastId = _mangaList.value?.last()?.id ?: ""
+        repository?.getMangaList({ result ->
+            when (result) {
+                is Result.Success -> {
+                    _mangaList.value = _mangaList.value?.plus(result.data) ?: result.data
+                }
+                is Result.Error -> println(result.exception.message)
+            }
+        }, lastId, filter)
+    }
 
     private val _selectedMangaSummary: MutableLiveData<MangaSummary> = MutableLiveData()
     val selectedMangaSummary: MutableLiveData<MangaSummary> = _selectedMangaSummary
@@ -28,34 +71,10 @@ class LibraryViewModel : ViewModel() {
     fun getSelectedCollectionTitle() = selectedCollectionTitle
     fun getSelectedChapterTitle() = selectedChapterTitle
 
-    fun refresh(filter: String = "") {
-        Repository.getMangaList({ result ->
-            when (result) {
-                is Result.Success -> _mangaList.value = result.data
-                is Result.Error -> println(result.exception.message)
-            }
-        }, "", filter)
-    }
-
-    fun fetchMore(filter: String = "") {
-        val lastId = _mangaList.value?.last()?.id ?: ""
-        Repository.getMangaList({ result ->
-            when (result) {
-                is Result.Success -> {
-                    _mangaList.value = _mangaList.value?.plus(result.data) ?: result.data
-                }
-                is Result.Error -> println(result.exception.message)
-            }
-        }, lastId, filter)
-    }
-
-    init {
-        refresh()
-    }
 
     fun openManga(selectedManga: MangaSummary) {
         _selectedMangaSummary.value = selectedManga
-        Repository.getMangaDetail({ result ->
+        repository?.getMangaDetail({ result ->
             when (result) {
                 is Result.Success -> _selectedMangaDetail.value = result.data
                 is Result.Error -> println(result.exception.message)
@@ -73,7 +92,7 @@ class LibraryViewModel : ViewModel() {
         selectedCollectionTitle = detail.collections[collectionIndex].title
         selectedChapterTitle = detail.collections[collectionIndex].chapters[chapterIndex]
 
-        Repository.getChapterContent({ result ->
+        repository?.getChapterContent({ result ->
             when (result) {
                 is Result.Success -> _selectedChapterContent.value = result.data
                 is Result.Error -> println(result.exception.message)

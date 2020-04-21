@@ -9,26 +9,15 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-object Repository {
-    private var url: String
-    private lateinit var remoteLibraryService: RemoteLibraryService
+class Repository(private val url: String) {
+    private val remoteLibraryService: RemoteLibraryService
 
-    fun setRemoteLibraryService(url: String) {
-        this.url = url
+    init {
         val retrofit = Retrofit.Builder()
             .baseUrl(url)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         remoteLibraryService = retrofit.create(RemoteLibraryService::class.java)
-    }
-
-    fun getUrl(): String {
-        return url
-    }
-
-    init {
-        url = "http://192.168.0.103:8080/api/"
-        setRemoteLibraryService(url)
     }
 
     fun getMangaList(
@@ -42,11 +31,12 @@ object Repository {
                     call: Call<List<MangaSummary>>,
                     response: Response<List<MangaSummary>>
                 ) {
-                    val list = response.body()!!
-                    for (s in list) {
-                        s.thumb = "$url/image/" + s.id + "/" + s.thumb
-                    }
-                    callback(Result.Success(list))
+                    response.body()?.let {
+                        for (s in it) {
+                            s.thumb = "${url}image/${s.id}/${s.thumb}"
+                        }
+                        callback(Result.Success(it))
+                    } ?: callback(Result.Error(UnknownError()))
                 }
 
                 override fun onFailure(call: Call<List<MangaSummary>>, t: Throwable) {
@@ -65,9 +55,10 @@ object Repository {
                     call: Call<MangaDetail?>,
                     response: Response<MangaDetail?>
                 ) {
-                    val detail: MangaDetail = response.body()!!
-                    detail.thumb = url + "/image/" + detail.id + "/" + detail.thumb
-                    callback(Result.Success(detail))
+                    response.body()?.let {
+                        it.thumb = "${url}image/${it.id}/${it.thumb}"
+                        callback(Result.Success(it))
+                    } ?: callback(Result.Error(UnknownError()))
                 }
 
                 override fun onFailure(call: Call<MangaDetail?>, t: Throwable) {
@@ -88,9 +79,10 @@ object Repository {
                     call: Call<List<String>>,
                     response: Response<List<String>>
                 ) {
-                    val content =
-                        response.body()!!.map { "$url/image/$id/$collection/$chapter/$it" }
-                    callback(Result.Success(content))
+                    response.body()?.let {
+                        val content = it.map { "${url}image/$id/$collection/$chapter/$it" }
+                        callback(Result.Success(content))
+                    } ?: callback(Result.Error(UnknownError()))
                 }
 
                 override fun onFailure(call: Call<List<String>>, t: Throwable) {
