@@ -86,6 +86,7 @@ class LibraryViewModel : ViewModel() {
         this.collectionIndex = collectionIndex
         this.chapterIndex = chapterIndex
         fromStart = true
+        _selectedChapterContent.value = emptyList()
 
         val detail = selectedMangaDetail.value!!
         val id = detail.id

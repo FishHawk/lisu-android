@@ -54,7 +54,7 @@ class ReaderFragment : Fragment() {
         val seekBar: SeekBar = root.findViewById(R.id.seek_bar)
         val hintTextView: TextView = root.findViewById(R.id.hint)
 
-        viewPager.offscreenPageLimit = 10
+        viewPager.offscreenPageLimit = 5
 
         viewModel.selectedChapterContent.observe(viewLifecycleOwner,
             Observer<List<String>> { images ->
@@ -63,6 +63,7 @@ class ReaderFragment : Fragment() {
                     if (!viewModel.fromStart) {
                         currentItem = adapter!!.count - 1
                     }
+                    clearOnPageChangeListeners()
                     addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
                         private var isEdge: Boolean = true
                         private var isFirstPage: Boolean = currentItem == 0
