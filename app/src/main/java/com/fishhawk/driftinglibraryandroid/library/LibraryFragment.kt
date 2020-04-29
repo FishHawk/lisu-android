@@ -36,7 +36,6 @@ class LibraryFragment : Fragment() {
             }
         }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -121,14 +120,11 @@ class LibraryFragment : Fragment() {
         }
 
         recyclerView.apply {
-            val context = recyclerView.context
-
             // set layout manager
-            if (mColumnCount <= 1) {
-                recyclerView.layoutManager = LinearLayoutManager(context)
-            } else {
-                recyclerView.layoutManager = GridLayoutManager(context, mColumnCount)
-            }
+            layoutManager =
+                if (mColumnCount <= 1) LinearLayoutManager(context)
+                else GridLayoutManager(context, mColumnCount)
+
             addItemDecoration(GridSpacingItemDecoration(mColumnCount, 16, true))
 
             // set adapter
@@ -136,8 +132,7 @@ class LibraryFragment : Fragment() {
                 viewModel.openManga(item)
                 val extras = FragmentNavigatorExtras(imageView to item.id)
                 val bundle = bundleOf("id" to item.id)
-                recyclerView.findNavController()
-                    .navigate(R.id.action_library_to_gallery, bundle, null, extras)
+                findNavController().navigate(R.id.action_library_to_gallery, bundle, null, extras)
             }
 
             // set transition
@@ -152,18 +147,11 @@ class LibraryFragment : Fragment() {
             when (result) {
                 is Result.Success -> {
                     recyclerView.adapter!!.let { (it as MangaListAdapter).update(result.data) }
-                    if (recyclerView.adapter!!.itemCount == 0) {
-                        multipleStatusView.showEmpty()
-                    } else {
-                        multipleStatusView.showContent()
-                    }
+                    if (recyclerView.adapter!!.itemCount == 0) multipleStatusView.showEmpty()
+                    else multipleStatusView.showContent()
                 }
-                is Result.Error -> {
-                    multipleStatusView.showError(result.exception.message)
-                }
-                is Result.Loading -> {
-                    multipleStatusView.showLoading()
-                }
+                is Result.Error -> multipleStatusView.showError(result.exception.message)
+                is Result.Loading -> multipleStatusView.showLoading()
             }
         })
         return view
@@ -191,7 +179,7 @@ class LibraryFragment : Fragment() {
                 outRect.right = (column + 1) * spacing / spanCount
 
                 if (position < spanCount) {
-                    outRect.top = spacing;
+                    outRect.top = spacing
                 }
                 outRect.bottom = spacing
             } else {

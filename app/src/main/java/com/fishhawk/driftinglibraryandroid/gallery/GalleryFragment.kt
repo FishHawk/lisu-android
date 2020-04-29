@@ -22,10 +22,9 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.library.LibraryViewModel
-import com.bumptech.glide.request.target.Target
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.google.android.flexbox.FlexboxLayout
@@ -90,14 +89,13 @@ class GalleryFragment : Fragment() {
                 .into(thumbView)
         }
 
-        viewModel.selectedMangaDetail.observe(viewLifecycleOwner,
-            Observer<MangaDetail> {
-                bindTags(it.tags, tagsLayout)
-                contentLayout.removeAllViews()
-                for ((index, collection) in it.collections.withIndex()) {
-                    bindCollection(collection, index, contentLayout)
-                }
-            })
+        viewModel.selectedMangaDetail.observe(viewLifecycleOwner, Observer {
+            bindTags(it.tags, tagsLayout)
+            contentLayout.removeAllViews()
+            for ((index, collection) in it.collections.withIndex()) {
+                bindCollection(collection, index, contentLayout)
+            }
+        })
         return root
     }
 
