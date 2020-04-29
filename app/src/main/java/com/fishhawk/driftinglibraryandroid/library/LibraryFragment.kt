@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.classic.common.MultipleStatusView
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
 import kotlinx.coroutines.Dispatchers
@@ -60,7 +61,7 @@ class LibraryFragment : Fragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 filter = query ?: ""
-                viewModel.load(filter)
+                viewModel.reload(filter)
                 return false
             }
 
@@ -80,8 +81,6 @@ class LibraryFragment : Fragment() {
         val multipleStatusView = view.findViewById<MultipleStatusView>(R.id.multiple_status_view)
         val refreshLayout = view.findViewById<RefreshLayout>(R.id.refresh_layout)
         val recyclerView = refreshLayout.findViewById<RecyclerView>(R.id.list)
-
-        multipleStatusView.showLoading()
 
         refreshLayout.apply {
             setOnRefreshListener(object : RefreshLayout.OnRefreshListener {
@@ -149,17 +148,24 @@ class LibraryFragment : Fragment() {
             }
         }
 
-        viewModel.mangaList.observe(viewLifecycleOwner,
-            Observer { data ->
-                refreshLayout.isHeaderRefreshing = false
-                recyclerView.adapter?.let { (it as MangaListAdapter).update(data) }
-                if (recyclerView.adapter?.itemCount == 0) {
-                    multipleStatusView.showEmpty()
-                } else {
-                    multipleStatusView.showContent()
+        viewModel.mangaList.observe(viewLifecycleOwner, Observer { result ->
+            when (result) {
+                is Result.Success -> {
+                    recyclerView.adapter!!.let { (it as MangaListAdapter).update(result.data) }
+                    if (recyclerView.adapter!!.itemCount == 0) {
+                        multipleStatusView.showEmpty()
+                    } else {
+                        multipleStatusView.showContent()
+                    }
+                }
+                is Result.Error -> {
+                    multipleStatusView.showError(result.exception.message)
+                }
+                is Result.Loading -> {
+                    multipleStatusView.showLoading()
                 }
             }
-        )
+        })
         return view
     }
 

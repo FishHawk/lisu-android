@@ -31,16 +31,17 @@ class LibraryViewModel : ViewModel() {
 
         address = newAddress
         repository = newRepository
-        load()
+        reload()
     }
 
-    private val _mangaList: MutableLiveData<List<MangaSummary>> = MutableLiveData()
-    val mangaList: LiveData<List<MangaSummary>> = _mangaList
+    private val _mangaList: MutableLiveData<Result<List<MangaSummary>>> = MutableLiveData()
+    val mangaList: LiveData<Result<List<MangaSummary>>> = _mangaList
 
-    fun load(filter: String = "") {
+    fun reload(filter: String = "") {
+        _mangaList.value = Result.Loading
         GlobalScope.launch(Dispatchers.Main) {
             when (val result = repository?.getMangaList("", filter)) {
-                is Result.Success -> _mangaList.value = result.data
+                is Result.Success -> _mangaList.value = result
                 is Result.Error -> println(result.exception.message)
             }
         }
@@ -50,7 +51,7 @@ class LibraryViewModel : ViewModel() {
         return repository?.getMangaList("", filter).let {
             when (it) {
                 is Result.Success -> {
-                    _mangaList.value = it.data
+                    _mangaList.value = it
                     null
                 }
                 is Result.Error -> it.exception.message
@@ -60,12 +61,16 @@ class LibraryViewModel : ViewModel() {
     }
 
     suspend fun fetchMore(filter: String = ""): String? {
-        val lastId = _mangaList.value?.last()?.id ?: ""
+        val lastId =
+            (_mangaList.value as Result.Success).data.let { if (it.isEmpty()) "" else it.last().id }
+
         return repository?.getMangaList(lastId, filter).let {
             when (it) {
                 is Result.Success -> {
                     if (it.data.isNotEmpty()) {
-                        _mangaList.value = _mangaList.value?.plus(it.data) ?: it.data
+                        _mangaList.value = (_mangaList.value as Result.Success).also { old ->
+                            old.data.plus(it.data)
+                        }
                         null
                     } else {
                         "没有更多了"
