@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".library.LibraryFragment">
 
-    <com.hippo.refreshlayout.RefreshLayout
-        android:id="@+id/refresh_layout"
+    <com.classic.common.MultipleStatusView
+        android:id="@+id/multiple_status_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/list"
-            android:name="com.fishhawk.driftinglibraryandroid.ui.library.LibraryFragment"
+        <com.hippo.refreshlayout.RefreshLayout
+            android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            tools:listitem="@layout/item_thumbnail_card" />
-    </com.hippo.refreshlayout.RefreshLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list"
+                android:name="com.fishhawk.driftinglibraryandroid.ui.library.LibraryFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                tools:listitem="@layout/item_thumbnail_card" />
+        </com.hippo.refreshlayout.RefreshLayout>
+    </com.classic.common.MultipleStatusView>
+
+</FrameLayout>

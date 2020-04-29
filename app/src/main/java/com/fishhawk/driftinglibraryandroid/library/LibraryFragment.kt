@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -15,8 +16,8 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.classic.common.MultipleStatusView
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
 import com.hippo.refreshlayout.RefreshLayout
 
 class LibraryFragment : Fragment() {
@@ -73,8 +74,11 @@ class LibraryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_library, container, false)
+        val multipleStatusView = view.findViewById<MultipleStatusView>(R.id.multiple_status_view)
         val refreshLayout = view.findViewById<RefreshLayout>(R.id.refresh_layout)
         val recyclerView = refreshLayout.findViewById<RecyclerView>(R.id.list)
+
+        multipleStatusView.showLoading()
 
         refreshLayout.apply {
             setOnRefreshListener(object : RefreshLayout.OnRefreshListener {
@@ -133,10 +137,15 @@ class LibraryFragment : Fragment() {
         }
 
         viewModel.mangaList.observe(viewLifecycleOwner,
-            Observer<List<MangaSummary>> { data ->
+            Observer { data ->
                 refreshLayout.isHeaderRefreshing = false
                 refreshLayout.isFooterRefreshing = false
                 recyclerView.adapter?.let { (it as MangaListAdapter).update(data) }
+                if (recyclerView.adapter?.itemCount == 0) {
+                    multipleStatusView.showEmpty()
+                } else {
+                    multipleStatusView.showContent()
+                }
             }
         )
         return view

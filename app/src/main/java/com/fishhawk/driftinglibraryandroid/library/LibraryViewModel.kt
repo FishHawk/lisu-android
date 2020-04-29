@@ -8,6 +8,9 @@ import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 
 class LibraryViewModel : ViewModel() {
@@ -35,24 +38,25 @@ class LibraryViewModel : ViewModel() {
     val mangaList: LiveData<List<MangaSummary>> = _mangaList
 
     fun refresh(filter: String = "") {
-        repository?.getMangaList({ result ->
-            when (result) {
+        GlobalScope.launch(Dispatchers.Main) {
+            when (val result = repository?.getMangaList("", filter)) {
                 is Result.Success -> _mangaList.value = result.data
                 is Result.Error -> println(result.exception.message)
             }
-        }, "", filter)
+        }
     }
 
     fun fetchMore(filter: String = "") {
         val lastId = _mangaList.value?.last()?.id ?: ""
-        repository?.getMangaList({ result ->
-            when (result) {
+
+        GlobalScope.launch(Dispatchers.Main) {
+            when (val result = repository?.getMangaList(lastId, filter)) {
                 is Result.Success -> {
                     _mangaList.value = _mangaList.value?.plus(result.data) ?: result.data
                 }
                 is Result.Error -> println(result.exception.message)
             }
-        }, lastId, filter)
+        }
     }
 
     private val _selectedMangaSummary: MutableLiveData<MangaSummary> = MutableLiveData()
@@ -74,12 +78,13 @@ class LibraryViewModel : ViewModel() {
 
     fun openManga(selectedManga: MangaSummary) {
         _selectedMangaSummary.value = selectedManga
-        repository?.getMangaDetail({ result ->
-            when (result) {
+
+        GlobalScope.launch(Dispatchers.Main) {
+            when (val result = repository?.getMangaDetail(selectedManga.id)) {
                 is Result.Success -> _selectedMangaDetail.value = result.data
                 is Result.Error -> println(result.exception.message)
             }
-        }, selectedManga.id)
+        }
     }
 
     fun openChapter(collectionIndex: Int, chapterIndex: Int) {
@@ -93,12 +98,13 @@ class LibraryViewModel : ViewModel() {
         selectedCollectionTitle = detail.collections[collectionIndex].title
         selectedChapterTitle = detail.collections[collectionIndex].chapters[chapterIndex]
 
-        repository?.getChapterContent({ result ->
-            when (result) {
+        GlobalScope.launch(Dispatchers.Main) {
+            when (val result =
+                repository?.getChapterContent(id, selectedCollectionTitle, selectedChapterTitle)) {
                 is Result.Success -> _selectedChapterContent.value = result.data
                 is Result.Error -> println(result.exception.message)
             }
-        }, id, selectedCollectionTitle, selectedChapterTitle)
+        }
     }
 
     fun openNextChapter(): Boolean {
