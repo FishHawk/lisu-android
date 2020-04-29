@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
-import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -18,7 +17,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.classic.common.MultipleStatusView
 import com.fishhawk.driftinglibraryandroid.R
+import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class LibraryFragment : Fragment() {
     private val ARG_COLUMN_COUNT = "column-count"
@@ -57,7 +60,7 @@ class LibraryFragment : Fragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 filter = query ?: ""
-                viewModel.refresh(filter)
+                viewModel.load(filter)
                 return false
             }
 
@@ -83,11 +86,21 @@ class LibraryFragment : Fragment() {
         refreshLayout.apply {
             setOnRefreshListener(object : RefreshLayout.OnRefreshListener {
                 override fun onHeaderRefresh() {
-                    viewModel.refresh(filter)
+                    GlobalScope.launch(Dispatchers.Main) {
+                        viewModel.refresh(filter)?.let {
+                            Snackbar.make(view, it, Snackbar.LENGTH_LONG).show()
+                        }
+                        isHeaderRefreshing = false
+                    }
                 }
 
                 override fun onFooterRefresh() {
-                    viewModel.fetchMore(filter)
+                    GlobalScope.launch(Dispatchers.Main) {
+                        viewModel.fetchMore(filter)?.let {
+                            Snackbar.make(view, it, Snackbar.LENGTH_LONG).show()
+                        }
+                        isFooterRefreshing = false
+                    }
                 }
             })
 
@@ -139,7 +152,6 @@ class LibraryFragment : Fragment() {
         viewModel.mangaList.observe(viewLifecycleOwner,
             Observer { data ->
                 refreshLayout.isHeaderRefreshing = false
-                refreshLayout.isFooterRefreshing = false
                 recyclerView.adapter?.let { (it as MangaListAdapter).update(data) }
                 if (recyclerView.adapter?.itemCount == 0) {
                     multipleStatusView.showEmpty()

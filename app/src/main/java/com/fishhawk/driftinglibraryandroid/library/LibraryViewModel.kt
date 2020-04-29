@@ -31,13 +31,13 @@ class LibraryViewModel : ViewModel() {
 
         address = newAddress
         repository = newRepository
-        refresh()
+        load()
     }
 
     private val _mangaList: MutableLiveData<List<MangaSummary>> = MutableLiveData()
     val mangaList: LiveData<List<MangaSummary>> = _mangaList
 
-    fun refresh(filter: String = "") {
+    fun load(filter: String = "") {
         GlobalScope.launch(Dispatchers.Main) {
             when (val result = repository?.getMangaList("", filter)) {
                 is Result.Success -> _mangaList.value = result.data
@@ -46,15 +46,33 @@ class LibraryViewModel : ViewModel() {
         }
     }
 
-    fun fetchMore(filter: String = "") {
-        val lastId = _mangaList.value?.last()?.id ?: ""
-
-        GlobalScope.launch(Dispatchers.Main) {
-            when (val result = repository?.getMangaList(lastId, filter)) {
+    suspend fun refresh(filter: String = ""): String? {
+        return repository?.getMangaList("", filter).let {
+            when (it) {
                 is Result.Success -> {
-                    _mangaList.value = _mangaList.value?.plus(result.data) ?: result.data
+                    _mangaList.value = it.data
+                    null
                 }
-                is Result.Error -> println(result.exception.message)
+                is Result.Error -> it.exception.message
+                else -> null
+            }
+        }
+    }
+
+    suspend fun fetchMore(filter: String = ""): String? {
+        val lastId = _mangaList.value?.last()?.id ?: ""
+        return repository?.getMangaList(lastId, filter).let {
+            when (it) {
+                is Result.Success -> {
+                    if (it.data.isNotEmpty()) {
+                        _mangaList.value = _mangaList.value?.plus(it.data) ?: it.data
+                        null
+                    } else {
+                        "没有更多了"
+                    }
+                }
+                is Result.Error -> it.exception.message
+                else -> null
             }
         }
     }
@@ -80,9 +98,11 @@ class LibraryViewModel : ViewModel() {
         _selectedMangaSummary.value = selectedManga
 
         GlobalScope.launch(Dispatchers.Main) {
-            when (val result = repository?.getMangaDetail(selectedManga.id)) {
-                is Result.Success -> _selectedMangaDetail.value = result.data
-                is Result.Error -> println(result.exception.message)
+            repository?.getMangaDetail(selectedManga.id).let {
+                when (it) {
+                    is Result.Success -> _selectedMangaDetail.value = it.data
+                    is Result.Error -> println(it.exception.message)
+                }
             }
         }
     }
@@ -99,10 +119,11 @@ class LibraryViewModel : ViewModel() {
         selectedChapterTitle = detail.collections[collectionIndex].chapters[chapterIndex]
 
         GlobalScope.launch(Dispatchers.Main) {
-            when (val result =
-                repository?.getChapterContent(id, selectedCollectionTitle, selectedChapterTitle)) {
-                is Result.Success -> _selectedChapterContent.value = result.data
-                is Result.Error -> println(result.exception.message)
+            repository?.getChapterContent(id, selectedCollectionTitle, selectedChapterTitle).let {
+                when (it) {
+                    is Result.Success -> _selectedChapterContent.value = it.data
+                    is Result.Error -> println(it.exception.message)
+                }
             }
         }
     }
