@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.widget.ViewPager2
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.library.LibraryViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -50,94 +50,73 @@ class ReaderFragment : Fragment() {
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_reader, container, false)
-        val viewPager: ViewPager = root.findViewById(R.id.view_pager)
+        val viewPager: ViewPager2 = root.findViewById(R.id.view_pager)
         val seekBar: SeekBar = root.findViewById(R.id.seek_bar)
         val hintTextView: TextView = root.findViewById(R.id.hint)
 
-        viewPager.offscreenPageLimit = 5
+        viewPager.apply {
+            offscreenPageLimit = 5
+//            layoutDirection = ViewPager2.LAYOUT_DIRECTION_RTL
+            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                private var isEdge: Boolean = true
+                private var isFirstPage: Boolean = false
+                private var isLastPage: Boolean = false
+
+                override fun onPageScrollStateChanged(state: Int) {
+                    when (state) {
+                        ViewPager2.SCROLL_STATE_IDLE -> {
+                            if (!isEdge && isFirstPage && !viewModel.openPrevChapter()) {
+                                Snackbar.make(
+                                    root, "没有了", Snackbar.LENGTH_LONG
+                                ).setAction("Action", null).show()
+                            } else if (!isEdge && isLastPage && !viewModel.openNextChapter()) {
+                                Snackbar.make(
+                                    root, "没有了", Snackbar.LENGTH_LONG
+                                ).setAction("Action", null).show()
+                            }
+                        }
+                        ViewPager2.SCROLL_STATE_DRAGGING -> isEdge = false
+                        ViewPager2.SCROLL_STATE_SETTLING -> isEdge = true
+                    }
+                }
+
+                override fun onPageScrolled(
+                    position: Int,
+                    positionOffset: Float,
+                    positionOffsetPixels: Int
+                ) {
+                }
+
+                override fun onPageSelected(position: Int) {
+                    isFirstPage = position == 0
+                    isLastPage = position == adapter?.itemCount?.minus(1) ?: false
+                    seekBar.progress = position
+                    hintTextView.text =
+                        "${viewModel.getSelectedChapterTitle()} ${viewPager.currentItem + 1}/${viewPager.adapter?.itemCount}"
+                }
+            })
+        }
+
+        seekBar.apply {
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}
+                override fun onStartTrackingTouch(seek: SeekBar) {}
+                override fun onStopTrackingTouch(seek: SeekBar) {
+                    viewPager.setCurrentItem(seek.progress, false)
+                }
+            })
+        }
+
 
         viewModel.selectedChapterContent.observe(viewLifecycleOwner, Observer { images ->
             viewPager.apply {
-                adapter = ImageListAdapter(childFragmentManager, images)
-                if (!viewModel.fromStart) {
-                    currentItem = adapter!!.count - 1
-                }
-                clearOnPageChangeListeners()
-                addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-                    private var isEdge: Boolean = true
-                    private var isFirstPage: Boolean = currentItem == 0
-                    private var isLastPage: Boolean = currentItem == adapter!!.count - 1
-                    private var hasJump: Boolean = false
-
-                    override fun onPageScrollStateChanged(state: Int) {
-                        when (state) {
-                            ViewPager.SCROLL_STATE_IDLE -> {
-                                if (!isEdge && !hasJump) {
-                                    if (isFirstPage) {
-                                        hasJump = viewModel.openPrevChapter()
-                                        if (!hasJump) {
-                                            Snackbar.make(
-                                                root, "没有了", Snackbar.LENGTH_LONG
-                                            ).setAction("Action", null).show()
-                                        }
-                                    } else if (isLastPage) {
-                                        hasJump = viewModel.openNextChapter()
-                                        if (!hasJump) {
-                                            Snackbar.make(
-                                                root, "没有了", Snackbar.LENGTH_LONG
-                                            ).setAction("Action", null).show()
-                                        }
-                                    }
-                                }
-                            }
-                            ViewPager.SCROLL_STATE_DRAGGING -> {
-                                isEdge = false
-                            }
-                            ViewPager.SCROLL_STATE_SETTLING -> {
-                                isEdge = true
-                            }
-                        }
-                    }
-
-                    override fun onPageScrolled(
-                        position: Int,
-                        positionOffset: Float,
-                        positionOffsetPixels: Int
-                    ) {
-                    }
-
-                    override fun onPageSelected(position: Int) {
-                        seekBar.progress = position
-                        isFirstPage = position == 0
-                        isLastPage = position == adapter!!.count - 1
-                        hintTextView.text =
-                            "${viewModel.getSelectedChapterTitle()} ${viewPager.currentItem + 1}/${viewPager.adapter?.count}"
-                    }
-                })
+                adapter = ImageListAdapter(context, images)
+                if (!viewModel.fromStart)
+                    viewPager.setCurrentItem(images.size - 1, false)
             }
 
-            hintTextView.text =
-                "${viewModel.getSelectedChapterTitle()} ${viewPager.currentItem + 1}/${viewPager.adapter?.count}"
-
-            seekBar.apply {
-                max = viewPager.adapter!!.count - 1
-                progress = viewPager.currentItem
-                setOnSeekBarChangeListener(object :
-                    SeekBar.OnSeekBarChangeListener {
-                    override fun onProgressChanged(
-                        seek: SeekBar,
-                        progress: Int,
-                        fromUser: Boolean
-                    ) {
-                    }
-
-                    override fun onStartTrackingTouch(seek: SeekBar) {}
-
-                    override fun onStopTrackingTouch(seek: SeekBar) {
-                        viewPager.setCurrentItem(seek.progress, false)
-                    }
-                })
-            }
+            seekBar.max = images.size
+            seekBar.progress = viewPager.currentItem
         })
         return root
     }
