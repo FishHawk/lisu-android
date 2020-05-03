@@ -17,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar
 class ReaderFragment : Fragment() {
     private lateinit var viewModel: LibraryViewModel
     private lateinit var binding: FragmentReaderBinding
+    private var isLoadingChapter: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,14 +80,14 @@ class ReaderFragment : Fragment() {
 //            layoutDirection = ViewPager2.LAYOUT_DIRECTION_RTL
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 private var isEdge: Boolean = true
-                private var isFirstPage: Boolean = false
-                private var isLastPage: Boolean = false
 
                 override fun onPageScrollStateChanged(state: Int) {
                     when (state) {
                         ViewPager2.SCROLL_STATE_IDLE -> {
-                            if (!isEdge && isFirstPage) toPrevChapter()
-                            else if (!isEdge && isLastPage) toNextChapter()
+                            if (!isEdge && !isLoadingChapter) {
+                                if (currentItem == 0) toPrevChapter()
+                                else if (currentItem == adapter!!.itemCount - 1) toNextChapter()
+                            }
                         }
                         ViewPager2.SCROLL_STATE_DRAGGING -> isEdge = false
                         ViewPager2.SCROLL_STATE_SETTLING -> isEdge = true
@@ -101,8 +102,6 @@ class ReaderFragment : Fragment() {
                 }
 
                 override fun onPageSelected(position: Int) {
-                    isFirstPage = position == 0
-                    isLastPage = position == adapter?.itemCount?.minus(1) ?: false
                     binding.seekBar.progress = position
                     binding.hint.text =
                         "${viewModel.getSelectedChapterTitle()} ${binding.viewPager.currentItem + 1}/${binding.viewPager.adapter?.itemCount}"
@@ -112,13 +111,7 @@ class ReaderFragment : Fragment() {
 
         binding.seekBar.apply {
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(
-                    seek: SeekBar,
-                    progress: Int,
-                    fromUser: Boolean
-                ) {
-                }
-
+                override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}
                 override fun onStartTrackingTouch(seek: SeekBar) {}
                 override fun onStopTrackingTouch(seek: SeekBar) {
                     binding.viewPager.setCurrentItem(seek.progress, false)
@@ -128,12 +121,12 @@ class ReaderFragment : Fragment() {
 
 
         viewModel.selectedChapterContent.observe(viewLifecycleOwner, Observer { images ->
+            isLoadingChapter = false
             binding.viewPager.apply {
                 adapter = ImageListAdapter(context, images)
                 if (!viewModel.fromStart)
                     binding.viewPager.setCurrentItem(images.size - 1, false)
             }
-
             binding.seekBar.max = images.size
             binding.seekBar.progress = binding.viewPager.currentItem
         })
@@ -141,12 +134,14 @@ class ReaderFragment : Fragment() {
 
 
     private fun toPrevChapter() {
+        isLoadingChapter = true
         if (!viewModel.openPrevChapter()) {
             view?.let { Snackbar.make(it, "没有了", Snackbar.LENGTH_LONG).show() }
         }
     }
 
     private fun toNextChapter() {
+        isLoadingChapter = true
         if (!viewModel.openNextChapter()) {
             view?.let { Snackbar.make(it, "没有了", Snackbar.LENGTH_LONG).show() }
         }
