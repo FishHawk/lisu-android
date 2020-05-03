@@ -3,23 +3,24 @@ package com.fishhawk.driftinglibraryandroid.reader
 import android.os.Bundle
 import android.view.*
 import android.widget.SeekBar
-import android.widget.TextView
+import androidx.viewpager2.widget.ViewPager2
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.viewpager2.widget.ViewPager2
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.databinding.FragmentReaderBinding
 import com.fishhawk.driftinglibraryandroid.library.LibraryViewModel
 import com.google.android.material.snackbar.Snackbar
 
 
 class ReaderFragment : Fragment() {
     private lateinit var viewModel: LibraryViewModel
-    private lateinit var viewPager: ViewPager2
+    private lateinit var binding: FragmentReaderBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = FragmentReaderBinding.inflate(layoutInflater)
         viewModel = activity?.run { ViewModelProvider(this)[LibraryViewModel::class.java] }
             ?: throw Exception("Invalid Activity")
     }
@@ -46,55 +47,26 @@ class ReaderFragment : Fragment() {
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
     }
 
-    private fun toPrevChapter() {
-        if (!viewModel.openPrevChapter()) {
-            view?.let { Snackbar.make(it, "没有了", Snackbar.LENGTH_LONG).show() }
-        }
-    }
-
-    private fun toNextChapter() {
-        if (!viewModel.openNextChapter()) {
-            view?.let { Snackbar.make(it, "没有了", Snackbar.LENGTH_LONG).show() }
-        }
-    }
-
-    private fun toPrevPage() {
-        viewPager.apply {
-            if (adapter != null) {
-                if (currentItem == 0) toPrevChapter()
-                else setCurrentItem(currentItem - 1, false)
-            }
-        }
-    }
-
-    private fun toNextPage() {
-        viewPager.apply {
-            if (adapter != null) {
-                if (currentItem == adapter!!.itemCount - 1) toNextChapter()
-                else setCurrentItem(currentItem + 1, false)
-            }
-        }
-    }
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_reader, container, false)
-        viewPager = root.findViewById(R.id.view_pager)
-        val seekBar: SeekBar = root.findViewById(R.id.seek_bar)
-        val hintTextView: TextView = root.findViewById(R.id.hint)
+        return binding.root
+    }
 
-        (root as ReaderLayout).apply {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        (binding.root as ReaderLayout).apply {
             onClickLeftAreaListener = {
-                when (viewPager.layoutDirection) {
+                when (binding.viewPager.layoutDirection) {
                     ViewPager2.LAYOUT_DIRECTION_LTR -> toPrevPage()
                     ViewPager2.LAYOUT_DIRECTION_RTL -> toNextPage()
                 }
             }
             onClickRightAreaListener = {
-                when (viewPager.layoutDirection) {
+                when (binding.viewPager.layoutDirection) {
                     ViewPager2.LAYOUT_DIRECTION_LTR -> toNextPage()
                     ViewPager2.LAYOUT_DIRECTION_RTL -> toPrevPage()
                 }
@@ -102,7 +74,7 @@ class ReaderFragment : Fragment() {
             onClickCenterAreaListener = { println("center") }
         }
 
-        viewPager.apply {
+        binding.viewPager.apply {
             offscreenPageLimit = 5
 //            layoutDirection = ViewPager2.LAYOUT_DIRECTION_RTL
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -113,16 +85,8 @@ class ReaderFragment : Fragment() {
                 override fun onPageScrollStateChanged(state: Int) {
                     when (state) {
                         ViewPager2.SCROLL_STATE_IDLE -> {
-
-                            if (!isEdge && isFirstPage && !viewModel.openPrevChapter()) {
-                                Snackbar.make(
-                                    root, "没有了", Snackbar.LENGTH_LONG
-                                ).setAction("Action", null).show()
-                            } else if (!isEdge && isLastPage && !viewModel.openNextChapter()) {
-                                Snackbar.make(
-                                    root, "没有了", Snackbar.LENGTH_LONG
-                                ).setAction("Action", null).show()
-                            }
+                            if (!isEdge && isFirstPage) toPrevChapter()
+                            else if (!isEdge && isLastPage) toNextChapter()
                         }
                         ViewPager2.SCROLL_STATE_DRAGGING -> isEdge = false
                         ViewPager2.SCROLL_STATE_SETTLING -> isEdge = true
@@ -139,14 +103,14 @@ class ReaderFragment : Fragment() {
                 override fun onPageSelected(position: Int) {
                     isFirstPage = position == 0
                     isLastPage = position == adapter?.itemCount?.minus(1) ?: false
-                    seekBar.progress = position
-                    hintTextView.text =
-                        "${viewModel.getSelectedChapterTitle()} ${viewPager.currentItem + 1}/${viewPager.adapter?.itemCount}"
+                    binding.seekBar.progress = position
+                    binding.hint.text =
+                        "${viewModel.getSelectedChapterTitle()} ${binding.viewPager.currentItem + 1}/${binding.viewPager.adapter?.itemCount}"
                 }
             })
         }
 
-        seekBar.apply {
+        binding.seekBar.apply {
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(
                     seek: SeekBar,
@@ -157,22 +121,52 @@ class ReaderFragment : Fragment() {
 
                 override fun onStartTrackingTouch(seek: SeekBar) {}
                 override fun onStopTrackingTouch(seek: SeekBar) {
-                    viewPager.setCurrentItem(seek.progress, false)
+                    binding.viewPager.setCurrentItem(seek.progress, false)
                 }
             })
         }
 
 
         viewModel.selectedChapterContent.observe(viewLifecycleOwner, Observer { images ->
-            viewPager.apply {
+            binding.viewPager.apply {
                 adapter = ImageListAdapter(context, images)
                 if (!viewModel.fromStart)
-                    viewPager.setCurrentItem(images.size - 1, false)
+                    binding.viewPager.setCurrentItem(images.size - 1, false)
             }
 
-            seekBar.max = images.size
-            seekBar.progress = viewPager.currentItem
+            binding.seekBar.max = images.size
+            binding.seekBar.progress = binding.viewPager.currentItem
         })
-        return root
+    }
+
+
+    private fun toPrevChapter() {
+        if (!viewModel.openPrevChapter()) {
+            view?.let { Snackbar.make(it, "没有了", Snackbar.LENGTH_LONG).show() }
+        }
+    }
+
+    private fun toNextChapter() {
+        if (!viewModel.openNextChapter()) {
+            view?.let { Snackbar.make(it, "没有了", Snackbar.LENGTH_LONG).show() }
+        }
+    }
+
+    private fun toPrevPage() {
+        binding.viewPager.apply {
+            if (adapter != null) {
+                if (currentItem == 0) toPrevChapter()
+                else setCurrentItem(currentItem - 1, false)
+            }
+        }
+    }
+
+    private fun toNextPage() {
+        binding.viewPager.apply {
+            if (adapter != null) {
+                if (currentItem == adapter!!.itemCount - 1) toNextChapter()
+                else setCurrentItem(currentItem + 1, false)
+            }
+        }
     }
 }
