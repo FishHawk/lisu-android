@@ -16,6 +16,7 @@ import com.google.android.material.snackbar.Snackbar
 
 class ReaderFragment : Fragment() {
     private lateinit var viewModel: LibraryViewModel
+    private lateinit var viewPager: ViewPager2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,14 +46,61 @@ class ReaderFragment : Fragment() {
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
     }
 
+    private fun toPrevChapter() {
+        if (!viewModel.openPrevChapter()) {
+            view?.let { Snackbar.make(it, "没有了", Snackbar.LENGTH_LONG).show() }
+        }
+    }
+
+    private fun toNextChapter() {
+        if (!viewModel.openNextChapter()) {
+            view?.let { Snackbar.make(it, "没有了", Snackbar.LENGTH_LONG).show() }
+        }
+    }
+
+    private fun toPrevPage() {
+        viewPager.apply {
+            if (adapter != null) {
+                if (currentItem == 0) toPrevChapter()
+                else setCurrentItem(currentItem - 1, false)
+            }
+        }
+    }
+
+    private fun toNextPage() {
+        viewPager.apply {
+            if (adapter != null) {
+                if (currentItem == adapter!!.itemCount - 1) toNextChapter()
+                else setCurrentItem(currentItem + 1, false)
+            }
+        }
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         val root = inflater.inflate(R.layout.fragment_reader, container, false)
-        val viewPager: ViewPager2 = root.findViewById(R.id.view_pager)
+        viewPager = root.findViewById(R.id.view_pager)
         val seekBar: SeekBar = root.findViewById(R.id.seek_bar)
         val hintTextView: TextView = root.findViewById(R.id.hint)
+
+        (root as ReaderLayout).apply {
+            onClickLeftAreaListener = {
+                when (viewPager.layoutDirection) {
+                    ViewPager2.LAYOUT_DIRECTION_LTR -> toPrevPage()
+                    ViewPager2.LAYOUT_DIRECTION_RTL -> toNextPage()
+                }
+            }
+            onClickRightAreaListener = {
+                when (viewPager.layoutDirection) {
+                    ViewPager2.LAYOUT_DIRECTION_LTR -> toNextPage()
+                    ViewPager2.LAYOUT_DIRECTION_RTL -> toPrevPage()
+                }
+            }
+            onClickCenterAreaListener = { println("center") }
+        }
 
         viewPager.apply {
             offscreenPageLimit = 5
@@ -65,6 +113,7 @@ class ReaderFragment : Fragment() {
                 override fun onPageScrollStateChanged(state: Int) {
                     when (state) {
                         ViewPager2.SCROLL_STATE_IDLE -> {
+
                             if (!isEdge && isFirstPage && !viewModel.openPrevChapter()) {
                                 Snackbar.make(
                                     root, "没有了", Snackbar.LENGTH_LONG
@@ -99,7 +148,13 @@ class ReaderFragment : Fragment() {
 
         seekBar.apply {
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}
+                override fun onProgressChanged(
+                    seek: SeekBar,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
+                }
+
                 override fun onStartTrackingTouch(seek: SeekBar) {}
                 override fun onStopTrackingTouch(seek: SeekBar) {
                     viewPager.setCurrentItem(seek.progress, false)
