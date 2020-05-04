@@ -1,6 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.library
 
-import android.webkit.URLUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,14 +11,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class LibraryViewModel : ViewModel() {
-    fun setLibraryAddress(inputAddress: String) {
-        var newAddress = inputAddress
-        newAddress = if (URLUtil.isNetworkUrl(newAddress)) newAddress else "http://${inputAddress}"
-        newAddress = if (newAddress.last() == '/') newAddress else "$newAddress/"
-        Repository.setUrl(newAddress)
-        reload()
-    }
-
     var filter: String = ""
 
     private val _mangaList: MutableLiveData<Result<List<MangaSummary>>> = MutableLiveData()

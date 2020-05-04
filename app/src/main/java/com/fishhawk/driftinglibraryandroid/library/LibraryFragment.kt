@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.FragmentLibraryBinding
+import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
@@ -30,7 +31,8 @@ class LibraryFragment : Fragment() {
     private val listener: SharedPreferences.OnSharedPreferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
             if (key == "library_address") {
-                viewModel.setLibraryAddress(sharedPreferences.getString(key, null) ?: "")
+                viewModel.filter = ""
+                viewModel.reload()
             }
         }
 
@@ -41,9 +43,11 @@ class LibraryFragment : Fragment() {
         setHasOptionsMenu(true)
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
-        val libraryAddress = sharedPreferences.getString("library_address", "") ?: ""
-        viewModel.setLibraryAddress(libraryAddress)
+        val address = sharedPreferences.getString("library_address", null)
+        val defaultAddress = "192.168.0.101:8080"
+        Repository.setUrl(address ?: defaultAddress)
         sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
+        viewModel.reload()
     }
 
     override fun onCreateView(
@@ -86,7 +90,6 @@ class LibraryFragment : Fragment() {
                 if (mColumnCount <= 1) LinearLayoutManager(context)
                 else GridLayoutManager(context, mColumnCount)
 
-//            if (itemDecorationCount)
             addItemDecoration(GridSpacingItemDecoration(mColumnCount, 16, true))
 
             // set adapter

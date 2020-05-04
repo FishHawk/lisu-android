@@ -1,22 +1,36 @@
 package com.fishhawk.driftinglibraryandroid.repository
 
+import android.webkit.URLUtil
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import com.fishhawk.driftinglibraryandroid.repository.service.RemoteLibraryService
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
+import java.lang.IllegalArgumentException
 
 object Repository {
     private lateinit var url: String
     private lateinit var remoteLibraryService: RemoteLibraryService
 
-    fun setUrl(url: String) {
-        this.url = url
-        val retrofit = Retrofit.Builder()
-            .baseUrl(url)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        remoteLibraryService = retrofit.create(RemoteLibraryService::class.java)
+    fun setUrl(inputUrl: String) : Boolean {
+        var newUrl = inputUrl
+        newUrl = if (URLUtil.isNetworkUrl(newUrl)) newUrl else "http://${inputUrl}"
+        newUrl = if (newUrl.last() == '/') newUrl else "$newUrl/"
+
+        val retrofit = try {
+            Retrofit.Builder()
+                .baseUrl(newUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+        } catch (e: IllegalArgumentException) {
+            null
+        }
+
+        retrofit?.let {
+            url = newUrl
+            remoteLibraryService = retrofit.create(RemoteLibraryService::class.java)
+        }
+        return retrofit != null
     }
 
     init {
