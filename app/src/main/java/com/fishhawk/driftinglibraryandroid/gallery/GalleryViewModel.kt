@@ -1,6 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.gallery
 
-
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,9 +10,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class GalleryViewModel: ViewModel() {
-    private val _selectedMangaDetail: MutableLiveData<MangaDetail> = MutableLiveData()
-    val selectedMangaDetail: LiveData<MangaDetail> = _selectedMangaDetail
+class GalleryViewModel : ViewModel() {
+    private val _mangaDetail: MutableLiveData<Result<MangaDetail>> = MutableLiveData()
+    val mangaDetail: LiveData<Result<MangaDetail>> = _mangaDetail
+
+    init {
+        _mangaDetail.value = Result.Loading
+    }
+
+    fun openManga(id: String) {
+        _mangaDetail.value = Result.Loading
+        GlobalScope.launch(Dispatchers.Main) {
+            _mangaDetail.value = Repository.getMangaDetail(id)
+        }
+    }
 
     private var collectionIndex: Int = 0
     private var chapterIndex: Int = 0
@@ -27,24 +37,13 @@ class GalleryViewModel: ViewModel() {
     fun getSelectedChapterTitle() = selectedChapterTitle
 
 
-    fun openManga(id: String) {
-        GlobalScope.launch(Dispatchers.Main) {
-            Repository.getMangaDetail(id).let {
-                when (it) {
-                    is Result.Success -> _selectedMangaDetail.value = it.data
-                    is Result.Error -> println(it.exception.message)
-                }
-            }
-        }
-    }
-
     fun openChapter(collectionIndex: Int, chapterIndex: Int) {
         this.collectionIndex = collectionIndex
         this.chapterIndex = chapterIndex
         fromStart = true
         _selectedChapterContent.value = emptyList()
 
-        val detail = selectedMangaDetail.value!!
+        val detail = (mangaDetail.value as Result.Success).data
         val id = detail.id
         selectedCollectionTitle = detail.collections[collectionIndex].title
         selectedChapterTitle = detail.collections[collectionIndex].chapters[chapterIndex]
@@ -60,7 +59,7 @@ class GalleryViewModel: ViewModel() {
     }
 
     fun openNextChapter(): Boolean {
-        val detail = selectedMangaDetail.value!!
+        val detail = (mangaDetail.value as Result.Success).data
         if (chapterIndex < detail.collections[collectionIndex].chapters.size - 1) {
             openChapter(collectionIndex, chapterIndex + 1)
             return true

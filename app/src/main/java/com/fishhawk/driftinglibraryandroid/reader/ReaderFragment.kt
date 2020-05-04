@@ -22,7 +22,6 @@ class ReaderFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = FragmentReaderBinding.inflate(layoutInflater)
         viewModel = activity?.run { ViewModelProvider(this)[GalleryViewModel::class.java] }
             ?: throw Exception("Invalid Activity")
     }
@@ -54,6 +53,7 @@ class ReaderFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        binding = FragmentReaderBinding.inflate(inflater, container, false)
         return binding.root
     }
 

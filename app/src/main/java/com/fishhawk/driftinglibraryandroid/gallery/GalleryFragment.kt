@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.GridLayout
-import android.widget.ImageView
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -24,81 +23,92 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.databinding.FragmentGalleryBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
+import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.google.android.flexbox.FlexboxLayout
 
 class GalleryFragment : Fragment() {
     private lateinit var viewModel: GalleryViewModel
+    private lateinit var binding: FragmentGalleryBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel = activity?.run { ViewModelProvider(this)[GalleryViewModel::class.java] }
+            ?: throw Exception("Invalid Activity")
+        viewModel.openManga(arguments?.getString("id")!!)
+
         sharedElementEnterTransition =
             TransitionInflater.from(context).inflateTransition(android.R.transition.move)
         sharedElementReturnTransition =
             TransitionInflater.from(context).inflateTransition(android.R.transition.move)
         activity?.supportPostponeEnterTransition()
-        viewModel = activity?.run { ViewModelProvider(this)[GalleryViewModel::class.java] }
-            ?: throw Exception("Invalid Activity")
-        viewModel.openManga(arguments?.getString("id")!!)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
-        container: ViewGroup?, savedInstanceState: Bundle?
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
-        val root = inflater.inflate(R.layout.fragment_gallery, container, false)
-        val titleView = root.findViewById<TextView>(R.id.title)
-        val thumbView = root.findViewById<ImageView>(R.id.thumb)
-        val tagsLayout = root.findViewById<LinearLayout>(R.id.tags)
-        val contentLayout = root.findViewById<LinearLayout>(R.id.content)
+        binding = FragmentGalleryBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val id: String? = arguments?.getString("id")
         val title: String? = arguments?.getString("title")
         val thumb: String? = arguments?.getString("thumb")
 
-        thumbView.transitionName = id
-
         (activity as? AppCompatActivity)?.supportActionBar?.title = title
-        val listener = object : RequestListener<Drawable> {
-            override fun onLoadFailed(
-                e: GlideException?,
-                model: Any?,
-                target: Target<Drawable>?,
-                isFirstResource: Boolean
-            ): Boolean {
-                activity?.supportStartPostponedEnterTransition()
-                return false
-            }
 
-            override fun onResourceReady(
-                resource: Drawable?,
-                model: Any?,
-                target: Target<Drawable>?,
-                dataSource: DataSource?,
-                isFirstResource: Boolean
-            ): Boolean {
-                activity?.supportStartPostponedEnterTransition()
-                return false
-            }
+        binding.title.text = title
+        binding.thumb.apply {
+            binding.thumb.transitionName = id
+            Glide.with(this).load(thumb)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .override(300, 400)
+                .apply(RequestOptions().dontTransform())
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        activity?.supportStartPostponedEnterTransition()
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        activity?.supportStartPostponedEnterTransition()
+                        return false
+                    }
+                })
+                .into(this)
         }
 
-        titleView.text = title
-        Glide.with(thumbView).load(thumb)
-            .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-            .override(300, 400)
-            .apply(RequestOptions().dontTransform())
-            .listener(listener)
-            .into(thumbView)
-
-        viewModel.selectedMangaDetail.observe(viewLifecycleOwner, Observer {
-            bindTags(it.tags, tagsLayout)
-            contentLayout.removeAllViews()
-            for ((index, collection) in it.collections.withIndex()) {
-                bindCollection(collection, index, contentLayout)
+        viewModel.mangaDetail.observe(viewLifecycleOwner, Observer { result ->
+            when (result) {
+                is Result.Success -> {
+                    bindTags(result.data.tags, binding.tags)
+                    binding.content.removeAllViews()
+                    for ((index, collection) in result.data.collections.withIndex()) {
+                        bindCollection(collection, index, binding.content)
+                    }
+                }
+                is Result.Error -> println()
+                is Result.Loading -> println()
             }
         })
-        return root
     }
 
     private fun bindCollection(

@@ -36,9 +36,7 @@ class LibraryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = FragmentLibraryBinding.inflate(layoutInflater)
-        viewModel = activity?.run { ViewModelProvider(this)[LibraryViewModel::class.java] }
-            ?: throw Exception("Invalid Activity")
+        viewModel = ViewModelProvider(this)[LibraryViewModel::class.java]
 
         setHasOptionsMenu(true)
 
@@ -53,6 +51,7 @@ class LibraryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        binding = FragmentLibraryBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -87,6 +86,7 @@ class LibraryFragment : Fragment() {
                 if (mColumnCount <= 1) LinearLayoutManager(context)
                 else GridLayoutManager(context, mColumnCount)
 
+//            if (itemDecorationCount)
             addItemDecoration(GridSpacingItemDecoration(mColumnCount, 16, true))
 
             // set adapter
