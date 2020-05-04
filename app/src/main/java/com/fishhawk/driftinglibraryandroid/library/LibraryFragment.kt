@@ -15,8 +15,8 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.classic.common.MultipleStatusView
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.databinding.FragmentLibraryBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
@@ -25,9 +25,11 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class LibraryFragment : Fragment() {
-    private val ARG_COLUMN_COUNT = "column-count"
     private var mColumnCount = 3
+
     private lateinit var viewModel: LibraryViewModel
+    private lateinit var binding: FragmentLibraryBinding
+
     private var filter: String = ""
     private val listener: SharedPreferences.OnSharedPreferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
@@ -38,13 +40,11 @@ class LibraryFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-        if (arguments != null) {
-            mColumnCount = arguments!!.getInt(ARG_COLUMN_COUNT)
-        }
-
+        binding = FragmentLibraryBinding.inflate(layoutInflater)
         viewModel = activity?.run { ViewModelProvider(this)[LibraryViewModel::class.java] }
             ?: throw Exception("Invalid Activity")
+
+        setHasOptionsMenu(true)
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
         val libraryAddress = sharedPreferences.getString("library_address", "") ?: ""
@@ -52,36 +52,18 @@ class LibraryFragment : Fragment() {
         sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_library, menu);
-        val searchItem: MenuItem = menu.findItem(R.id.action_search);
-        val searchView: SearchView = searchItem.actionView as SearchView
-        searchView.queryHint = "Search"
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                filter = query ?: ""
-                viewModel.reload(filter)
-                return false
-            }
-
-            override fun onQueryTextChange(query: String?): Boolean {
-                return true
-            }
-        })
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_library, container, false)
-        val multipleStatusView = view.findViewById<MultipleStatusView>(R.id.multiple_status_view)
-        val refreshLayout = view.findViewById<RefreshLayout>(R.id.refresh_layout)
-        val recyclerView = refreshLayout.findViewById<RecyclerView>(R.id.list)
+        return binding.root
+    }
 
-        refreshLayout.apply {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.refreshLayout.apply {
             setOnRefreshListener(object : RefreshLayout.OnRefreshListener {
                 override fun onHeaderRefresh() {
                     GlobalScope.launch(Dispatchers.Main) {
@@ -119,7 +101,7 @@ class LibraryFragment : Fragment() {
             )
         }
 
-        recyclerView.apply {
+        binding.list.apply {
             // set layout manager
             layoutManager =
                 if (mColumnCount <= 1) LinearLayoutManager(context)
@@ -129,9 +111,12 @@ class LibraryFragment : Fragment() {
 
             // set adapter
             adapter = MangaListAdapter(context, emptyList()) { item, imageView ->
-                viewModel.openManga(item)
                 val extras = FragmentNavigatorExtras(imageView to item.id)
-                val bundle = bundleOf("id" to item.id)
+                val bundle = bundleOf(
+                    "id" to item.id,
+                    "title" to item.title,
+                    "thumb" to item.thumb
+                )
                 findNavController().navigate(R.id.action_library_to_gallery, bundle, null, extras)
             }
 
@@ -146,15 +131,34 @@ class LibraryFragment : Fragment() {
         viewModel.mangaList.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is Result.Success -> {
-                    recyclerView.adapter!!.let { (it as MangaListAdapter).update(result.data) }
-                    if (recyclerView.adapter!!.itemCount == 0) multipleStatusView.showEmpty()
-                    else multipleStatusView.showContent()
+                    binding.list.adapter!!.let { (it as MangaListAdapter).update(result.data) }
+                    if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
+                    else binding.multipleStatusView.showContent()
                 }
-                is Result.Error -> multipleStatusView.showError(result.exception.message)
-                is Result.Loading -> multipleStatusView.showLoading()
+                is Result.Error -> binding.multipleStatusView.showError(result.exception.message)
+                is Result.Loading -> binding.multipleStatusView.showLoading()
             }
         })
-        return view
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        inflater.inflate(R.menu.menu_library, menu);
+        val searchItem: MenuItem = menu.findItem(R.id.action_search);
+        val searchView: SearchView = searchItem.actionView as SearchView
+        searchView.queryHint = "Search"
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                filter = query ?: ""
+                viewModel.reload(filter)
+                return false
+            }
+
+            override fun onQueryTextChange(query: String?): Boolean {
+                return true
+            }
+        })
     }
 
     inner class GridSpacingItemDecoration(
@@ -177,17 +181,12 @@ class LibraryFragment : Fragment() {
             if (includeEdge) {
                 outRect.left = spacing - column * spacing / spanCount
                 outRect.right = (column + 1) * spacing / spanCount
-
-                if (position < spanCount) {
-                    outRect.top = spacing
-                }
+                if (position < spanCount) outRect.top = spacing
                 outRect.bottom = spacing
             } else {
                 outRect.left = column * spacing / spanCount
                 outRect.right = spacing - (column + 1) * spacing / spanCount
-                if (position >= spanCount) {
-                    outRect.top = spacing
-                }
+                if (position >= spanCount) outRect.top = spacing
             }
         }
     }

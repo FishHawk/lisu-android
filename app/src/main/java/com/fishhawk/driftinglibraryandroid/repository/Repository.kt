@@ -6,15 +6,21 @@ import com.fishhawk.driftinglibraryandroid.repository.service.RemoteLibraryServi
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 
-class Repository(private val url: String) {
-    private val remoteLibraryService: RemoteLibraryService
+object Repository {
+    private lateinit var url: String
+    private lateinit var remoteLibraryService: RemoteLibraryService
 
-    init {
+    fun setUrl(url: String) {
+        this.url = url
         val retrofit = Retrofit.Builder()
             .baseUrl(url)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         remoteLibraryService = retrofit.create(RemoteLibraryService::class.java)
+    }
+
+    init {
+        setUrl("http://192.168.0.101:8080")
     }
 
     suspend fun getMangaList(lastId: String, filter: String): Result<List<MangaSummary>> {

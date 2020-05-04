@@ -10,19 +10,20 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.FragmentReaderBinding
+import com.fishhawk.driftinglibraryandroid.gallery.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.library.LibraryViewModel
 import com.google.android.material.snackbar.Snackbar
 
 
 class ReaderFragment : Fragment() {
-    private lateinit var viewModel: LibraryViewModel
+    private lateinit var viewModel: GalleryViewModel
     private lateinit var binding: FragmentReaderBinding
     private var isLoadingChapter: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = FragmentReaderBinding.inflate(layoutInflater)
-        viewModel = activity?.run { ViewModelProvider(this)[LibraryViewModel::class.java] }
+        viewModel = activity?.run { ViewModelProvider(this)[GalleryViewModel::class.java] }
             ?: throw Exception("Invalid Activity")
     }
 

@@ -24,13 +24,12 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.library.LibraryViewModel
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.google.android.flexbox.FlexboxLayout
 
 class GalleryFragment : Fragment() {
-    private lateinit var viewModel: LibraryViewModel
+    private lateinit var viewModel: GalleryViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,8 +38,9 @@ class GalleryFragment : Fragment() {
         sharedElementReturnTransition =
             TransitionInflater.from(context).inflateTransition(android.R.transition.move)
         activity?.supportPostponeEnterTransition()
-        viewModel = activity?.run { ViewModelProvider(this)[LibraryViewModel::class.java] }
+        viewModel = activity?.run { ViewModelProvider(this)[GalleryViewModel::class.java] }
             ?: throw Exception("Invalid Activity")
+        viewModel.openManga(arguments?.getString("id")!!)
     }
 
     override fun onCreateView(
@@ -53,41 +53,43 @@ class GalleryFragment : Fragment() {
         val tagsLayout = root.findViewById<LinearLayout>(R.id.tags)
         val contentLayout = root.findViewById<LinearLayout>(R.id.content)
 
-        thumbView.transitionName = arguments?.getString("id")
+        val id: String? = arguments?.getString("id")
+        val title: String? = arguments?.getString("title")
+        val thumb: String? = arguments?.getString("thumb")
 
-        viewModel.selectedMangaSummary.value?.let {
-            (activity as? AppCompatActivity)?.supportActionBar?.title = it.title
-            val listener = object : RequestListener<Drawable> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    activity?.supportStartPostponedEnterTransition()
-                    return false
-                }
+        thumbView.transitionName = id
 
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    dataSource: DataSource?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    activity?.supportStartPostponedEnterTransition()
-                    return false
-                }
+        (activity as? AppCompatActivity)?.supportActionBar?.title = title
+        val listener = object : RequestListener<Drawable> {
+            override fun onLoadFailed(
+                e: GlideException?,
+                model: Any?,
+                target: Target<Drawable>?,
+                isFirstResource: Boolean
+            ): Boolean {
+                activity?.supportStartPostponedEnterTransition()
+                return false
             }
 
-            titleView.text = it.title
-            Glide.with(thumbView).load(it.thumb)
-                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .override(300, 400)
-                .apply(RequestOptions().dontTransform())
-                .listener(listener)
-                .into(thumbView)
+            override fun onResourceReady(
+                resource: Drawable?,
+                model: Any?,
+                target: Target<Drawable>?,
+                dataSource: DataSource?,
+                isFirstResource: Boolean
+            ): Boolean {
+                activity?.supportStartPostponedEnterTransition()
+                return false
+            }
         }
+
+        titleView.text = title
+        Glide.with(thumbView).load(thumb)
+            .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+            .override(300, 400)
+            .apply(RequestOptions().dontTransform())
+            .listener(listener)
+            .into(thumbView)
 
         viewModel.selectedMangaDetail.observe(viewLifecycleOwner, Observer {
             bindTags(it.tags, tagsLayout)
