@@ -20,51 +20,45 @@ class LibraryViewModel : ViewModel() {
         reload()
     }
 
+    var filter: String = ""
+
     private val _mangaList: MutableLiveData<Result<List<MangaSummary>>> = MutableLiveData()
     val mangaList: LiveData<Result<List<MangaSummary>>> = _mangaList
 
-    fun reload(filter: String = "") {
+    fun reload() {
         _mangaList.value = Result.Loading
         GlobalScope.launch(Dispatchers.Main) {
-            when (val result = Repository.getMangaList("", filter)) {
-                is Result.Success -> _mangaList.value = result
-                is Result.Error -> println(result.exception.message)
-            }
+            _mangaList.value = Repository.getMangaList("", filter)
         }
     }
 
-    suspend fun refresh(filter: String = ""): String? {
-        return Repository.getMangaList("", filter).let {
-            when (it) {
-                is Result.Success -> {
-                    _mangaList.value = it
-                    null
-                }
-                is Result.Error -> it.exception.message
-                else -> null
-            }
+
+    private val _refreshResult: MutableLiveData<Result<List<MangaSummary>>> = MutableLiveData()
+    val refreshResult: LiveData<Result<List<MangaSummary>>> = _refreshResult
+
+    fun refresh() {
+        GlobalScope.launch(Dispatchers.Main) {
+            val result = Repository.getMangaList("", filter)
+            if (result is Result.Success) _mangaList.value = result
+            _refreshResult.value = result
         }
     }
 
-    suspend fun fetchMore(filter: String = ""): String? {
-        val lastId =
-            (_mangaList.value as Result.Success).data.let { if (it.isEmpty()) "" else it.last().id }
+    private val _fetchMoreResult: MutableLiveData<Result<List<MangaSummary>>> = MutableLiveData()
+    val fetchMoreResult: LiveData<Result<List<MangaSummary>>> = _fetchMoreResult
 
-        return Repository.getMangaList(lastId, filter).let {
-            when (it) {
-                is Result.Success -> {
-                    if (it.data.isNotEmpty()) {
-                        _mangaList.value = (_mangaList.value as Result.Success).also { old ->
-                            old.data.plus(it.data)
-                        }
-                        null
-                    } else {
-                        "没有更多了"
-                    }
+    fun fetchMore() {
+        val lastId = (_mangaList.value as Result.Success).data.let {
+            if (it.isEmpty()) "" else it.last().id
+        }
+
+        GlobalScope.launch(Dispatchers.Main) {
+            val result = Repository.getMangaList(lastId, filter)
+            if (result is Result.Success)
+                _mangaList.value = (_mangaList.value as Result.Success).also { old ->
+                    old.data.plus(result.data)
                 }
-                is Result.Error -> it.exception.message
-                else -> null
-            }
+            _fetchMoreResult.value = result
         }
     }
 }

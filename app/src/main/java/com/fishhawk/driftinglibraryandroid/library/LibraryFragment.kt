@@ -20,17 +20,13 @@ import com.fishhawk.driftinglibraryandroid.databinding.FragmentLibraryBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class LibraryFragment : Fragment() {
-    private var mColumnCount = 3
-
     private lateinit var viewModel: LibraryViewModel
     private lateinit var binding: FragmentLibraryBinding
 
-    private var filter: String = ""
+    private var mColumnCount = 3
+
     private val listener: SharedPreferences.OnSharedPreferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
             if (key == "library_address") {
@@ -65,26 +61,10 @@ class LibraryFragment : Fragment() {
 
         binding.refreshLayout.apply {
             setOnRefreshListener(object : RefreshLayout.OnRefreshListener {
-                override fun onHeaderRefresh() {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        viewModel.refresh(filter)?.let {
-                            Snackbar.make(view, it, Snackbar.LENGTH_LONG).show()
-                        }
-                        isHeaderRefreshing = false
-                    }
-                }
-
-                override fun onFooterRefresh() {
-                    GlobalScope.launch(Dispatchers.Main) {
-                        viewModel.fetchMore(filter)?.let {
-                            Snackbar.make(view, it, Snackbar.LENGTH_LONG).show()
-                        }
-                        isFooterRefreshing = false
-                    }
-                }
+                override fun onHeaderRefresh() = viewModel.refresh()
+                override fun onFooterRefresh() = viewModel.fetchMore()
             })
 
-            // set style
             setHeaderColorSchemeResources(
                 R.color.loading_indicator_red,
                 R.color.loading_indicator_purple,
@@ -139,19 +119,42 @@ class LibraryFragment : Fragment() {
                 is Result.Loading -> binding.multipleStatusView.showLoading()
             }
         })
+
+        viewModel.refreshResult.observe(viewLifecycleOwner, Observer { result ->
+            binding.refreshLayout.isHeaderRefreshing = false
+            when (result) {
+                is Result.Success -> if (result.data.isEmpty()) {
+                    Snackbar.make(view, "空的", Snackbar.LENGTH_LONG).show()
+                }
+                is Result.Error -> result.exception.message?.let {
+                    Snackbar.make(view, it, Snackbar.LENGTH_LONG).show()
+                }
+            }
+        })
+
+        viewModel.fetchMoreResult.observe(viewLifecycleOwner, Observer { result ->
+            binding.refreshLayout.isFooterRefreshing = false
+            when (result) {
+                is Result.Success -> if (result.data.isEmpty()) {
+                    Snackbar.make(view, "没有了", Snackbar.LENGTH_LONG).show()
+                }
+                is Result.Error -> result.exception.message?.let {
+                    Snackbar.make(view, it, Snackbar.LENGTH_LONG).show()
+                }
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
 
-        inflater.inflate(R.menu.menu_library, menu);
-        val searchItem: MenuItem = menu.findItem(R.id.action_search);
-        val searchView: SearchView = searchItem.actionView as SearchView
+        inflater.inflate(R.menu.menu_library, menu)
+        val searchView: SearchView = menu.findItem(R.id.action_search).actionView as SearchView
         searchView.queryHint = "Search"
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                filter = query ?: ""
-                viewModel.reload(filter)
+                viewModel.filter = query ?: ""
+                viewModel.reload()
                 return false
             }
 
