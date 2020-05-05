@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
     <EditTextPreference
         android:key="library_address"
-        android:summary=""
-        android:title="Library address" />
+        android:title="@string/settings_library_address" />
+
     <ListPreference
         android:key="reading_direction"
-        android:summary="%s"
         android:title="@string/settings_reading_direction"
+        android:summary="%s"
         android:entries="@array/reading_direction_entries"
         android:entryValues="@array/reading_direction_entry_values"/>
+
 </PreferenceScreen>

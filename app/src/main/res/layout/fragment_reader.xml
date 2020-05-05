@@ -27,6 +27,7 @@
             android:layout_gravity="center_horizontal"
             android:gravity="top"
             android:textColor="#222222" />
+
     </com.fishhawk.driftinglibraryandroid.reader.ReaderLayout>
 
     <FrameLayout
@@ -70,6 +71,9 @@
                 android:id="@+id/seek_bar"
                 android:layout_width="match_parent"
                 android:layout_height="30dp" />
+
         </LinearLayout>
+
     </FrameLayout>
+
 </FrameLayout>

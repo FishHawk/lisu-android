@@ -52,6 +52,7 @@
                 android:layout_gravity="center_horizontal"
                 android:text="@string/no_tags"
                 android:textColor="#ffe040fb" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -62,4 +63,5 @@
             android:padding="@dimen/keyline_margin" />
 
     </LinearLayout>
+
 </ScrollView>
