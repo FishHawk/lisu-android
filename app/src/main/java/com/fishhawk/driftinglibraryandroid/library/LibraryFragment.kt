@@ -1,6 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.library
 
-import android.content.SharedPreferences
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.*
@@ -28,26 +27,10 @@ class LibraryFragment : Fragment() {
 
     private var mColumnCount = 3
 
-    private val listener: SharedPreferences.OnSharedPreferenceChangeListener =
-        SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-            if (key == "library_address") {
-                viewModel.filter = ""
-                viewModel.reload()
-            }
-        }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[LibraryViewModel::class.java]
-
         setHasOptionsMenu(true)
-
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
-        val address = sharedPreferences.getString("library_address", null)
-        val defaultAddress = "192.168.0.101:8080"
-        Repository.setUrl(address ?: defaultAddress)
-        sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
-        viewModel.reload()
     }
 
     override fun onCreateView(
@@ -55,6 +38,13 @@ class LibraryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+        val address = sharedPreferences.getString("library_address", null)
+        val defaultAddress = "192.168.0.101:8080"
+        Repository.setUrl(address ?: defaultAddress)
+        viewModel.filter = ""
+        viewModel.reload()
+
         binding = FragmentLibraryBinding.inflate(inflater, container, false)
         return binding.root
     }

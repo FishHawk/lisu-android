@@ -42,8 +42,7 @@ class ReaderLayout : FrameLayout {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(ev: MotionEvent): Boolean {
-        return if (detector.onTouchEvent(ev)) true
-        else super.onTouchEvent(ev)
+        return detector.onTouchEvent(ev)
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {

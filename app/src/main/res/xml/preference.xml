@@ -4,4 +4,11 @@
         android:key="library_address"
         android:summary=""
         android:title="Library address" />
+    <ListPreference
+        android:key="reading_direction"
+        android:summary="%s"
+        android:title="Reading Direction"
+        android:entries="@array/reading_direction_entries"
+        android:entryValues="@array/reading_direction_values"/>
+
 </PreferenceScreen>

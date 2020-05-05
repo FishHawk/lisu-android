@@ -10,14 +10,14 @@ import com.bumptech.glide.request.target.Target
 import com.fishhawk.driftinglibraryandroid.R
 import com.github.chrisbanes.photoview.PhotoView
 
-class ImageListAdapter(
+class ImageHorizontalListAdapter(
     private val context: Context,
     private var data: List<String>
-) : RecyclerView.Adapter<ImageListAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<ImageHorizontalListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            LayoutInflater.from(context).inflate(R.layout.item_chapter_image, parent, false)
+            LayoutInflater.from(context).inflate(R.layout.item_chapter_image_horizontal, parent, false)
         )
     }
 

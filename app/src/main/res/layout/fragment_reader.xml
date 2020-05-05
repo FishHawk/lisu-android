@@ -1,30 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--<FrameLayout-->
-<com.fishhawk.driftinglibraryandroid.reader.ReaderLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".reader.ReaderFragment">
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager"
+    <com.fishhawk.driftinglibraryandroid.reader.ReaderLayout
+        android:id="@+id/reader_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/hint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:gravity="top"
-        android:textColor="#222222" />
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/content_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-    <SeekBar
-        android:id="@+id/seek_bar"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/content_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:id="@+id/hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="top"
+            android:textColor="#222222" />
+    </com.fishhawk.driftinglibraryandroid.reader.ReaderLayout>
+
+    <FrameLayout
+        android:id="@+id/menu_layout"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_gravity="bottom" />
+        android:layout_height="match_parent"
+        android:visibility="gone">
 
-</com.fishhawk.driftinglibraryandroid.reader.ReaderLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="vertical">
 
+            <RadioGroup
+                android:id="@+id/radio_group_direction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radio_ltr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="LTR" />
+
+                <RadioButton
+                    android:id="@+id/radio_rtl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="RTL" />
+
+                <RadioButton
+                    android:id="@+id/radio_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Vertical" />
+            </RadioGroup>
+
+            <SeekBar
+                android:id="@+id/seek_bar"
+                android:layout_width="match_parent"
+                android:layout_height="30dp" />
+        </LinearLayout>
+    </FrameLayout>
+</FrameLayout>
