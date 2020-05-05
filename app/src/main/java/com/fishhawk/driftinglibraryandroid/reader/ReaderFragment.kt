@@ -14,6 +14,7 @@ import com.fishhawk.driftinglibraryandroid.databinding.FragmentReaderBinding
 import com.fishhawk.driftinglibraryandroid.gallery.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.fragment_library.view.*
 
 class ReaderFragment : Fragment() {
     private lateinit var viewModel: GalleryViewModel
@@ -53,6 +54,7 @@ class ReaderFragment : Fragment() {
             }
             onClickCenterAreaListener = {
                 binding.menuLayout.visibility = View.VISIBLE
+                binding.hint.visibility = View.INVISIBLE
             }
         }
 
@@ -71,6 +73,7 @@ class ReaderFragment : Fragment() {
 
         binding.menuLayout.setOnClickListener {
             binding.menuLayout.visibility = View.GONE
+            binding.hint.visibility = View.VISIBLE
         }
 
         binding.contentHorizontal.apply {

@@ -26,9 +26,14 @@
         android:id="@+id/hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:gravity="top"
-        android:textColor="#222222" />
+        android:layout_gravity="bottom|end"
+        android:background="#AA000000"
+        android:gravity="end"
+        android:paddingStart="8dp"
+        android:paddingTop="1dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="1dp"
+        android:textColor="#ffffff" />
 
     <FrameLayout
         android:id="@+id/menu_layout"
