@@ -35,6 +35,7 @@ class ImageHorizontalListAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: String, position: Int) {
+            binding.content.setImageResource(android.R.color.transparent)
             binding.background.visibility = View.VISIBLE
             binding.progress.visibility = View.VISIBLE
             binding.errorHint.visibility = View.GONE
