@@ -18,6 +18,7 @@
     <string name="search_bar_hint">Search Library</string>
 
     <string name="settings_library_address">Library Address</string>
+    <string name="settings_library_address_error_hint">Illegal library address!</string>
 
     <string name="settings_reading_direction">Reading direction</string>
     <string name="settings_reading_direction_left_to_right">Left to right</string>

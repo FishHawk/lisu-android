@@ -2,7 +2,6 @@ package com.fishhawk.driftinglibraryandroid.setting
 
 import android.os.Bundle
 import androidx.preference.EditTextPreference
-import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.repository.Repository
@@ -13,7 +12,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val libraryAddressPreference: EditTextPreference = findPreference("library_address")!!
+        val libraryAddressPreference: EditTextPreference =
+            findPreference(resources.getString(R.string.settings_library_address))!!
         libraryAddressPreference.summary = libraryAddressPreference.text
         libraryAddressPreference.setOnPreferenceChangeListener { preference, newValue ->
             val address = newValue as String
@@ -22,15 +22,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 textPreference.summary = newValue
                 true
             } else {
-                view?.let { Snackbar.make(it, "格式错误", Snackbar.LENGTH_LONG).show() }
+                view?.let {
+                    Snackbar.make(
+                        it,
+                        resources.getString(R.string.settings_library_address_error_hint),
+                        Snackbar.LENGTH_LONG
+                    ).show()
+                }
                 false
             }
-        }
-
-        val readingDirectionPreference: ListPreference = findPreference("reading_direction")!!
-        readingDirectionPreference.setOnPreferenceChangeListener { _, newValue ->
-            println(newValue)
-            true
         }
     }
 

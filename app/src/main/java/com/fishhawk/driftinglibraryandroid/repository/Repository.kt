@@ -12,7 +12,14 @@ object Repository {
     private lateinit var url: String
     private lateinit var remoteLibraryService: RemoteLibraryService
 
-    fun setUrl(inputUrl: String) : Boolean {
+    fun matchUrl(inputUrl: String): Boolean {
+        var newUrl = inputUrl
+        newUrl = if (URLUtil.isNetworkUrl(newUrl)) newUrl else "http://${inputUrl}"
+        newUrl = if (newUrl.last() == '/') newUrl else "$newUrl/"
+        return newUrl == url
+    }
+
+    fun setUrl(inputUrl: String): Boolean {
         var newUrl = inputUrl
         newUrl = if (URLUtil.isNetworkUrl(newUrl)) newUrl else "http://${inputUrl}"
         newUrl = if (newUrl.last() == '/') newUrl else "$newUrl/"

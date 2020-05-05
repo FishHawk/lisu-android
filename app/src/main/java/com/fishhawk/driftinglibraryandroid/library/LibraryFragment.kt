@@ -18,6 +18,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.FragmentLibraryBinding
 import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
 
@@ -38,19 +39,22 @@ class LibraryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
-        val address = sharedPreferences.getString("library_address", null)
-        val defaultAddress = "192.168.0.101:8080"
-        Repository.setUrl(address ?: defaultAddress)
-        viewModel.filter = ""
-        viewModel.reload()
-
         binding = FragmentLibraryBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val libraryAddress = SettingsHelper.getLibraryAddress()
+        if (!Repository.matchUrl(libraryAddress)) {
+            Repository.setUrl(libraryAddress)
+            viewModel.filter = ""
+            viewModel.reload()
+        } else if (viewModel.mangaList.value !is Result.Success) {
+            viewModel.filter = ""
+            viewModel.reload()
+        }
 
         binding.refreshLayout.apply {
             setOnRefreshListener(object : RefreshLayout.OnRefreshListener {
