@@ -12,16 +12,22 @@
     <string name="menu_history">History</string>
     <string name="menu_setting">Setting</string>
 
-    <string name="gallery_no_tags_hint">No tags</string>
-    <string name="gallery_no_chapters_hint">No chapters</string>
-
+    <!-- library fragment -->
     <string name="library_search_hint">Search Library</string>
     <string name="library_reach_end_hint">No more mangas.</string>
     <string name="library_empty_hint">Library is empty.</string>
 
+    <!-- gallery fragment -->
+    <string name="gallery_no_tags_hint">No tags</string>
+    <string name="gallery_no_chapters_hint">No chapters</string>
+
+    <!-- reader fragment -->
     <string name="reader_no_prev_chapter_hint">Already at the beginning.</string>
     <string name="reader_no_next_chapter_hint">Already at the end.</string>
 
+    <string name="image_unknown_error_hint">Unknown error</string>
+
+    <!-- setting fragment -->
     <string name="settings_library_address">Library Address</string>
     <string name="settings_library_address_error_hint">Illegal library address!</string>
 
