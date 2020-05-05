@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="reading_direction_entries">
-        <item>Left to right</item>
-        <item>Right to left</item>
-        <item>Top to bottom</item>
+        <item>@string/settings_reading_direction_left_to_right</item>
+        <item>@string/settings_reading_direction_right_to_Left</item>
+        <item>@string/settings_reading_direction_vertical</item>
     </string-array>
-    <string-array name="reading_direction_values">
+    <string-array name="reading_direction_entry_values" translatable="false">
         <item>0</item>
         <item>1</item>
         <item>2</item>

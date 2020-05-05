@@ -48,22 +48,22 @@
                 android:orientation="horizontal">
 
                 <RadioButton
-                    android:id="@+id/radio_ltr"
+                    android:id="@+id/radio_left_to_right"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="LTR" />
+                    android:text="@string/settings_reading_direction_left_to_right" />
 
                 <RadioButton
-                    android:id="@+id/radio_rtl"
+                    android:id="@+id/radio_right_to_left"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="RTL" />
+                    android:text="@string/settings_reading_direction_right_to_Left" />
 
                 <RadioButton
                     android:id="@+id/radio_vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Vertical" />
+                    android:text="@string/settings_reading_direction_vertical" />
             </RadioGroup>
 
             <SeekBar

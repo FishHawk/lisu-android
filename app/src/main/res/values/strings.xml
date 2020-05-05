@@ -16,4 +16,9 @@
     <string name="no_tags">No tags</string>
     <string name="no_chapters">No Chapter</string>
     <string name="search_bar_hint">Search Library</string>
+
+    <string name="settings_reading_direction">Reading direction</string>
+    <string name="settings_reading_direction_left_to_right">Left to right</string>
+    <string name="settings_reading_direction_right_to_Left">Right to left</string>
+    <string name="settings_reading_direction_vertical">Vertical</string>
 </resources>

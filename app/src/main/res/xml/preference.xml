@@ -7,8 +7,7 @@
     <ListPreference
         android:key="reading_direction"
         android:summary="%s"
-        android:title="Reading Direction"
+        android:title="@string/settings_reading_direction"
         android:entries="@array/reading_direction_entries"
-        android:entryValues="@array/reading_direction_values"/>
-
+        android:entryValues="@array/reading_direction_entry_values"/>
 </PreferenceScreen>

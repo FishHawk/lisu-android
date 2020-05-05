@@ -1,27 +1,17 @@
 package com.fishhawk.driftinglibraryandroid.reader
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
 import android.widget.SeekBar
 import androidx.viewpager2.widget.ViewPager2
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.FragmentNavigatorExtras
-import androidx.preference.ListPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceManager
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.FragmentReaderBinding
 import com.fishhawk.driftinglibraryandroid.gallery.GalleryViewModel
-import com.fishhawk.driftinglibraryandroid.library.MangaListAdapter
-import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.google.android.material.snackbar.Snackbar
 
@@ -29,8 +19,6 @@ class ReaderFragment : Fragment() {
     private lateinit var viewModel: GalleryViewModel
     private lateinit var binding: FragmentReaderBinding
     private var isLoadingChapter: Boolean = true
-
-    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,12 +38,6 @@ class ReaderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        when (SettingsHelper.getReadingDirection()) {
-            0 -> setReadingDirectionLTR()
-            1 -> setReadingDirectionRTL()
-            2 -> setReadingDirectionVertical()
-        }
-
         binding.readerLayout.apply {
             onClickLeftAreaListener = {
                 when (binding.contentHorizontal.layoutDirection) {
@@ -74,10 +56,15 @@ class ReaderFragment : Fragment() {
             }
         }
 
-        binding.radioGroupDirection.setOnCheckedChangeListener { group, checkedId ->
+        when (SettingsHelper.getReadingDirection()) {
+            SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT -> setReadingDirectionLeftToRight()
+            SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT -> setReadingDirectionRightToLeft()
+            SettingsHelper.READING_DIRECTION_VERTICAL -> setReadingDirectionVertical()
+        }
+        binding.radioGroupDirection.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
-                R.id.radio_ltr -> setReadingDirectionLTR()
-                R.id.radio_rtl -> setReadingDirectionRTL()
+                R.id.radio_left_to_right -> setReadingDirectionLeftToRight()
+                R.id.radio_right_to_left -> setReadingDirectionRightToLeft()
                 R.id.radio_vertical -> setReadingDirectionVertical()
             }
         }
@@ -170,8 +157,9 @@ class ReaderFragment : Fragment() {
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
     }
 
-    private fun setReadingDirectionLTR() {
-        SettingsHelper.setReadingDirection(0)
+    private fun setReadingDirectionLeftToRight() {
+        SettingsHelper.setReadingDirection(SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT)
+        binding.radioLeftToRight.isChecked = true
         binding.contentHorizontal.visibility = View.VISIBLE
         binding.contentVertical.visibility = View.GONE
         binding.contentHorizontal.apply {
@@ -186,8 +174,9 @@ class ReaderFragment : Fragment() {
             setCurrentItem(index, false)
         }
     }
-    private fun setReadingDirectionRTL() {
-        SettingsHelper.setReadingDirection(1)
+    private fun setReadingDirectionRightToLeft() {
+        SettingsHelper.setReadingDirection(SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT)
+        binding.radioRightToLeft.isChecked = true
         binding.contentHorizontal.visibility = View.VISIBLE
         binding.contentVertical.visibility = View.GONE
         binding.contentHorizontal.apply {
@@ -203,7 +192,8 @@ class ReaderFragment : Fragment() {
         }
     }
     private fun setReadingDirectionVertical() {
-        SettingsHelper.setReadingDirection(2)
+        SettingsHelper.setReadingDirection(SettingsHelper.READING_DIRECTION_VERTICAL)
+        binding.radioVertical.isChecked = true
         binding.contentVertical.visibility = View.VISIBLE
         binding.contentHorizontal.visibility = View.GONE
     }
