@@ -13,7 +13,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         super.onCreate(savedInstanceState)
 
         val libraryAddressPreference: EditTextPreference =
-            findPreference(resources.getString(R.string.settings_library_address))!!
+            findPreference(getString(R.string.settings_library_address))!!
         libraryAddressPreference.summary = libraryAddressPreference.text
         libraryAddressPreference.setOnPreferenceChangeListener { preference, newValue ->
             val address = newValue as String
@@ -25,7 +25,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 view?.let {
                     Snackbar.make(
                         it,
-                        resources.getString(R.string.settings_library_address_error_hint),
+                        getString(R.string.settings_library_address_error_hint),
                         Snackbar.LENGTH_LONG
                     ).show()
                 }

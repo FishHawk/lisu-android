@@ -26,6 +26,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="10dp"
-        android:text="@string/no_chapters"
+        android:text="@string/gallery_no_chapters_hint"
         android:textColor="#ffe040fb" />
 </LinearLayout>

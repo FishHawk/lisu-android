@@ -10,7 +10,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -121,11 +120,9 @@ class LibraryFragment : Fragment() {
             binding.refreshLayout.isHeaderRefreshing = false
             when (result) {
                 is Result.Success -> if (result.data.isEmpty()) {
-                    Snackbar.make(view, "空的", Snackbar.LENGTH_LONG).show()
+                    makeSnakeBar(getString(R.string.library_empty_hint))
                 }
-                is Result.Error -> result.exception.message?.let {
-                    Snackbar.make(view, it, Snackbar.LENGTH_LONG).show()
-                }
+                is Result.Error -> result.exception.message?.let { makeSnakeBar(it) }
             }
         })
 
@@ -133,11 +130,9 @@ class LibraryFragment : Fragment() {
             binding.refreshLayout.isFooterRefreshing = false
             when (result) {
                 is Result.Success -> if (result.data.isEmpty()) {
-                    Snackbar.make(view, "没有了", Snackbar.LENGTH_LONG).show()
+                    makeSnakeBar(getString(R.string.library_reach_end_hint))
                 }
-                is Result.Error -> result.exception.message?.let {
-                    Snackbar.make(view, it, Snackbar.LENGTH_LONG).show()
-                }
+                is Result.Error -> result.exception.message?.let { makeSnakeBar(it) }
             }
         })
     }
@@ -147,7 +142,7 @@ class LibraryFragment : Fragment() {
 
         inflater.inflate(R.menu.menu_library, menu)
         val searchView: SearchView = menu.findItem(R.id.action_search).actionView as SearchView
-        searchView.queryHint = "Search"
+        searchView.queryHint = getString(R.string.library_search_hint)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 viewModel.filter = query ?: ""
@@ -159,6 +154,10 @@ class LibraryFragment : Fragment() {
                 return true
             }
         })
+    }
+
+    private fun makeSnakeBar(content: String) {
+        view?.let { Snackbar.make(it, content, Snackbar.LENGTH_SHORT).show() }
     }
 
     inner class GridSpacingItemDecoration(

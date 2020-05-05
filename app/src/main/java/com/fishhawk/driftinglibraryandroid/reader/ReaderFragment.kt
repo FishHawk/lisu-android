@@ -201,14 +201,14 @@ class ReaderFragment : Fragment() {
     private fun toPrevChapter() {
         isLoadingChapter = true
         if (!viewModel.openPrevChapter()) {
-            view?.let { Snackbar.make(it, "没有了", Snackbar.LENGTH_LONG).show() }
+            makeSnakeBar(getString(R.string.reader_no_prev_chapter_hint))
         }
     }
 
     private fun toNextChapter() {
         isLoadingChapter = true
         if (!viewModel.openNextChapter()) {
-            view?.let { Snackbar.make(it, "没有了", Snackbar.LENGTH_LONG).show() }
+            makeSnakeBar(getString(R.string.reader_no_next_chapter_hint))
         }
     }
 
@@ -228,5 +228,9 @@ class ReaderFragment : Fragment() {
                 else setCurrentItem(currentItem + 1, false)
             }
         }
+    }
+
+    private fun makeSnakeBar(content: String) {
+        view?.let { Snackbar.make(it, content, Snackbar.LENGTH_SHORT).show() }
     }
 }

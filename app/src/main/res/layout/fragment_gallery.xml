@@ -50,7 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/no_tags"
+                android:text="@string/gallery_no_tags_hint"
                 android:textColor="#ffe040fb" />
 
         </LinearLayout>
