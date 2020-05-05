@@ -18,17 +18,17 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/content_vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-        <TextView
-            android:id="@+id/hint"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:gravity="top"
-            android:textColor="#222222" />
+            android:layout_height="match_parent" />
 
     </com.fishhawk.driftinglibraryandroid.reader.ReaderLayout>
+
+    <TextView
+        android:id="@+id/hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="top"
+        android:textColor="#222222" />
 
     <FrameLayout
         android:id="@+id/menu_layout"
@@ -40,6 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
+            android:background="#AA000000"
             android:orientation="vertical">
 
             <RadioGroup
@@ -52,19 +53,25 @@
                     android:id="@+id/radio_left_to_right"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/settings_reading_direction_left_to_right" />
+                    android:buttonTint="@color/colorAccent"
+                    android:text="@string/settings_reading_direction_left_to_right"
+                    android:textColor="#ffffff" />
 
                 <RadioButton
                     android:id="@+id/radio_right_to_left"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/settings_reading_direction_right_to_Left" />
+                    android:buttonTint="@color/colorAccent"
+                    android:text="@string/settings_reading_direction_right_to_Left"
+                    android:textColor="#ffffff" />
 
                 <RadioButton
                     android:id="@+id/radio_vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/settings_reading_direction_vertical" />
+                    android:buttonTint="@color/colorAccent"
+                    android:text="@string/settings_reading_direction_vertical"
+                    android:textColor="#ffffff" />
             </RadioGroup>
 
             <SeekBar
