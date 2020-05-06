@@ -133,7 +133,7 @@ class ReaderFragment : Fragment() {
             binding.contentVertical.apply {
                 adapter = ImageVerticalListAdapter(context, images)
             }
-            binding.seekBar.max = images.size
+            binding.seekBar.max = images.size - 1
             binding.seekBar.progress = binding.contentHorizontal.currentItem
             binding.hint.text =
                 "${viewModel.getSelectedChapterTitle()} ${binding.contentHorizontal.currentItem + 1}/${binding.contentHorizontal.adapter?.itemCount}"
