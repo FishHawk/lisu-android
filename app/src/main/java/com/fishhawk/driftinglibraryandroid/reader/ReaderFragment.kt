@@ -179,6 +179,7 @@ class ReaderFragment : Fragment() {
             setCurrentItem(index, false)
         }
     }
+
     private fun setReadingDirectionRightToLeft() {
         SettingsHelper.setReadingDirection(SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT)
         binding.radioRightToLeft.isChecked = true
@@ -196,6 +197,7 @@ class ReaderFragment : Fragment() {
             setCurrentItem(index, false)
         }
     }
+
     private fun setReadingDirectionVertical() {
         SettingsHelper.setReadingDirection(SettingsHelper.READING_DIRECTION_VERTICAL)
         binding.radioVertical.isChecked = true
@@ -204,17 +206,13 @@ class ReaderFragment : Fragment() {
     }
 
     private fun toPrevChapter() {
-        isLoadingChapter = true
-        if (!viewModel.openPrevChapter()) {
-            makeSnakeBar(getString(R.string.reader_no_prev_chapter_hint))
-        }
+        if (!viewModel.openPrevChapter()) makeSnakeBar(getString(R.string.reader_no_prev_chapter_hint))
+        else isLoadingChapter = true
     }
 
     private fun toNextChapter() {
-        isLoadingChapter = true
-        if (!viewModel.openNextChapter()) {
-            makeSnakeBar(getString(R.string.reader_no_next_chapter_hint))
-        }
+        if (!viewModel.openNextChapter()) makeSnakeBar(getString(R.string.reader_no_next_chapter_hint))
+        else isLoadingChapter = true
     }
 
     private fun toPrevPage() {
