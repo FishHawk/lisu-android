@@ -135,6 +135,8 @@ class ReaderFragment : Fragment() {
             }
             binding.seekBar.max = images.size
             binding.seekBar.progress = binding.contentHorizontal.currentItem
+            binding.hint.text =
+                "${viewModel.getSelectedChapterTitle()} ${binding.contentHorizontal.currentItem + 1}/${binding.contentHorizontal.adapter?.itemCount}"
         })
     }
 

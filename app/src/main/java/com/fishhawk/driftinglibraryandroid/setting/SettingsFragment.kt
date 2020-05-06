@@ -12,8 +12,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val libraryAddressPreference: EditTextPreference =
-            findPreference(getString(R.string.settings_library_address))!!
+        val libraryAddressPreference: EditTextPreference = findPreference("library_address")!!
         libraryAddressPreference.summary = libraryAddressPreference.text
         libraryAddressPreference.setOnPreferenceChangeListener { preference, newValue ->
             val address = newValue as String
