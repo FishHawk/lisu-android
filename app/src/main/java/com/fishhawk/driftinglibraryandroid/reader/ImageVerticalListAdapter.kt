@@ -44,7 +44,7 @@ class ImageVerticalListAdapter(
             binding.progress.visibility = View.VISIBLE
             binding.errorHint.visibility = View.GONE
 
-            binding.number.text = position.toString()
+            binding.number.text = (position + 1).toString()
             Glide.with(context)
                 .asBitmap()
                 .load(item)
