@@ -29,10 +29,10 @@
         android:layout_gravity="bottom|end"
         android:background="#AA000000"
         android:gravity="end"
-        android:paddingStart="8dp"
-        android:paddingTop="1dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="1dp"
+        android:paddingStart="@dimen/baseline_8dp"
+        android:paddingTop="@dimen/baseline_4dp"
+        android:paddingEnd="@dimen/baseline_8dp"
+        android:paddingBottom="@dimen/baseline_4dp"
         android:textColor="#ffffff" />
 
     <FrameLayout
@@ -46,12 +46,14 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:background="#AA000000"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="@dimen/baseline_4dp">
 
             <RadioGroup
                 android:id="@+id/radio_group_direction"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="@dimen/baseline_4dp"
                 android:orientation="horizontal">
 
                 <RadioButton
@@ -79,10 +81,32 @@
                     android:textColor="#ffffff" />
             </RadioGroup>
 
-            <SeekBar
-                android:id="@+id/seek_bar"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="30dp" />
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/baseline_4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/seek_bar_left_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ffffff" />
+
+                <SeekBar
+                    android:id="@+id/seek_bar"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/seek_bar_right_hint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ffffff" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
