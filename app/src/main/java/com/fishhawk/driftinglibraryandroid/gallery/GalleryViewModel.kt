@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class GalleryViewModel : ViewModel()  {
+class GalleryViewModel : ViewModel() {
     private val _mangaDetail: MutableLiveData<Result<MangaDetail>> = MutableLiveData()
     val mangaDetail: LiveData<Result<MangaDetail>> = _mangaDetail
 
@@ -33,16 +33,15 @@ class GalleryViewModel : ViewModel()  {
     private var selectedCollectionTitle: String = ""
     var selectedChapterTitle: String = ""
     var fromStart: Boolean = true
-    private val _selectedChapterContent: MutableLiveData<List<String>> =
-        MutableLiveData(emptyList())
-    val selectedChapterContent: MutableLiveData<List<String>> = _selectedChapterContent
 
+    private val _openedChapterContent: MutableLiveData<Result<List<String>>> =
+        MutableLiveData(Result.Loading)
+    val openedChapterContent: MutableLiveData<Result<List<String>>> = _openedChapterContent
 
     fun openChapter(collectionIndex: Int, chapterIndex: Int) {
         this.collectionIndex = collectionIndex
         this.chapterIndex = chapterIndex
         fromStart = true
-        _selectedChapterContent.value = emptyList()
 
         val detail = (mangaDetail.value as Result.Success).data
         val id = detail.id
@@ -50,12 +49,8 @@ class GalleryViewModel : ViewModel()  {
         selectedChapterTitle = detail.collections[collectionIndex].chapters[chapterIndex]
 
         GlobalScope.launch(Dispatchers.Main) {
-            Repository.getChapterContent(id, selectedCollectionTitle, selectedChapterTitle).let {
-                when (it) {
-                    is Result.Success -> _selectedChapterContent.value = it.data
-                    is Result.Error -> println(it.exception.message)
-                }
-            }
+            _openedChapterContent.value =
+                Repository.getChapterContent(id, selectedCollectionTitle, selectedChapterTitle)
         }
     }
 
@@ -78,7 +73,12 @@ class GalleryViewModel : ViewModel()  {
     }
 
     val chapterPosition: MutableLiveData<Int> = MutableLiveData(0)
-    val chapterSize: LiveData<Int> = Transformations.map(selectedChapterContent) { it.size }
+    val chapterSize: LiveData<Int> = Transformations.map(openedChapterContent) {
+        when (it) {
+            is Result.Success -> it.data.size
+            else -> 0
+        }
+    }
 
     val readingDirection: MutableLiveData<Int> =
         MutableLiveData(SettingsHelper.getReadingDirection())

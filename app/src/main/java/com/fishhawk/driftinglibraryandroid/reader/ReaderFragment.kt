@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.databinding.FragmentReaderBinding
 import com.fishhawk.driftinglibraryandroid.gallery.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
@@ -107,19 +108,23 @@ class ReaderFragment : Fragment() {
             })
         }
 
-        viewModel.selectedChapterContent.observe(viewLifecycleOwner, Observer { images ->
+        viewModel.openedChapterContent.observe(viewLifecycleOwner, Observer { result ->
             isLoadingChapter = false
+            when (result) {
+                is Result.Success -> {
+                    binding.contentHorizontal.apply {
+                        adapter = ImageHorizontalListAdapter(context, result.data)
+                        if (!viewModel.fromStart)
+                            binding.contentHorizontal.setCurrentItem(result.data.size - 1, false)
+                    }
 
-            binding.contentHorizontal.apply {
-                adapter = ImageHorizontalListAdapter(context, images)
-                if (!viewModel.fromStart)
-                    binding.contentHorizontal.setCurrentItem(images.size - 1, false)
+                    binding.contentVertical.apply {
+                        adapter = ImageVerticalListAdapter(context, result.data)
+                    }
+                    viewModel.chapterPosition.value = binding.contentHorizontal.currentItem
+                }
+                is Result.Error -> makeSnakeBar(getString(R.string.image_unknown_error_hint))
             }
-
-            binding.contentVertical.apply {
-                adapter = ImageVerticalListAdapter(context, images)
-            }
-            viewModel.chapterPosition.value = binding.contentHorizontal.currentItem
         })
 
         viewModel.readingDirection.observe(viewLifecycleOwner, Observer {
