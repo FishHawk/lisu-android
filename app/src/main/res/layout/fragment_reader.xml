@@ -1,115 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".reader.ReaderFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.fishhawk.driftinglibraryandroid.reader.ReaderLayout
-        android:id="@+id/reader_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <data>
 
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/content_horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        <import type="android.view.View" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/content_vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </com.fishhawk.driftinglibraryandroid.reader.ReaderLayout>
-
-    <TextView
-        android:id="@+id/hint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:background="#AA000000"
-        android:gravity="end"
-        android:paddingStart="@dimen/baseline_8dp"
-        android:paddingTop="@dimen/baseline_4dp"
-        android:paddingEnd="@dimen/baseline_8dp"
-        android:paddingBottom="@dimen/baseline_4dp"
-        android:textColor="#ffffff" />
+        <variable
+            name="viewModel"
+            type="com.fishhawk.driftinglibraryandroid.gallery.GalleryViewModel" />
+    </data>
 
     <FrameLayout
-        android:id="@+id/menu_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
+        tools:context=".reader.ReaderFragment">
 
-        <LinearLayout
+        <com.fishhawk.driftinglibraryandroid.reader.ReaderLayout
+            android:id="@+id/reader_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:background="#AA000000"
-            android:orientation="vertical"
-            android:padding="@dimen/baseline_4dp">
+            android:layout_height="match_parent">
 
-            <RadioGroup
-                android:id="@+id/radio_group_direction"
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/content_horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/baseline_4dp"
-                android:orientation="horizontal">
+                android:layout_height="match_parent"
+                android:visibility="@{viewModel.isLayoutHorizontal ? View.VISIBLE : View.GONE}" />
 
-                <RadioButton
-                    android:id="@+id/radio_left_to_right"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:buttonTint="@color/colorAccent"
-                    android:text="@string/settings_reading_direction_left_to_right"
-                    android:textColor="#ffffff" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/content_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="@{!viewModel.isLayoutHorizontal ? View.VISIBLE : View.GONE}"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </com.fishhawk.driftinglibraryandroid.reader.ReaderLayout>
 
-                <RadioButton
-                    android:id="@+id/radio_right_to_left"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:buttonTint="@color/colorAccent"
-                    android:text="@string/settings_reading_direction_right_to_Left"
-                    android:textColor="#ffffff" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:background="#AA000000"
+            android:gravity="end"
+            android:paddingStart="@dimen/baseline_8dp"
+            android:paddingTop="@dimen/baseline_4dp"
+            android:paddingEnd="@dimen/baseline_8dp"
+            android:paddingBottom="@dimen/baseline_4dp"
+            android:text="@{String.format(`%s %s/%s`,viewModel.selectedChapterTitle, viewModel.chapterPosition+1, viewModel.chapterSize)}"
+            android:textColor="#ffffff"
+            android:visibility="@{!viewModel.isMenuVisible ? View.VISIBLE : View.GONE}" />
 
-                <RadioButton
-                    android:id="@+id/radio_vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:buttonTint="@color/colorAccent"
-                    android:text="@string/settings_reading_direction_vertical"
-                    android:textColor="#ffffff" />
-            </RadioGroup>
+        <FrameLayout
+            android:id="@+id/menu_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{viewModel.isMenuVisible ? View.VISIBLE : View.GONE}">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/baseline_4dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_gravity="bottom"
+                android:background="#AA000000"
+                android:orientation="vertical"
+                android:padding="@dimen/baseline_4dp">
 
-                <TextView
-                    android:id="@+id/seek_bar_left_hint"
-                    android:layout_width="wrap_content"
+                <RadioGroup
+                    android:id="@+id/radio_group_direction"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="#ffffff" />
+                    android:layout_margin="@dimen/baseline_4dp"
+                    android:orientation="horizontal">
 
-                <SeekBar
-                    android:id="@+id/seek_bar"
-                    android:layout_width="0dp"
-                    android:layout_height="28dp"
-                    android:layout_weight="1" />
+                    <RadioButton
+                        android:id="@+id/radio_left_to_right"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/colorAccent"
+                        android:checked="@{viewModel.readingDirection == 0}"
+                        android:text="@string/settings_reading_direction_left_to_right"
+                        android:textColor="#ffffff" />
 
-                <TextView
-                    android:id="@+id/seek_bar_right_hint"
-                    android:layout_width="wrap_content"
+                    <RadioButton
+                        android:id="@+id/radio_right_to_left"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:buttonTint="@color/colorAccent"
+                        android:checked="@{viewModel.readingDirection == 1}"
+                        android:text="@string/settings_reading_direction_right_to_Left"
+                        android:textColor="#ffffff" />
+
+                    <RadioButton
+                        android:id="@+id/radio_vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="@{viewModel.readingDirection == 2}"
+                        android:buttonTint="@color/colorAccent"
+                        android:text="@string/settings_reading_direction_vertical"
+                        android:textColor="#ffffff" />
+                </RadioGroup>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="#ffffff" />
+                    android:layout_margin="@dimen/baseline_4dp"
+                    android:gravity="center_vertical"
+                    android:layoutDirection="@{viewModel.layoutDirection}"
+                    android:orientation="horizontal">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{String.valueOf(viewModel.chapterSize)}"
+                        android:textColor="#ffffff" />
+
+                    <SeekBar
+                        android:id="@+id/seek_bar"
+                        android:layout_width="0dp"
+                        android:layout_height="28dp"
+                        android:layout_weight="1"
+                        android:max="@{viewModel.chapterSize - 1}"
+                        android:progress="@={viewModel.chapterPosition}" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{String.valueOf(viewModel.chapterPosition + 1)}"
+                        android:textColor="#ffffff" />
+                </LinearLayout>
             </LinearLayout>
-
-        </LinearLayout>
-
+        </FrameLayout>
     </FrameLayout>
-
-</FrameLayout>
+</layout>

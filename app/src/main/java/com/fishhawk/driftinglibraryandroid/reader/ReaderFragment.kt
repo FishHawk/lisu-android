@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.FragmentReaderBinding
 import com.fishhawk.driftinglibraryandroid.gallery.GalleryViewModel
@@ -37,6 +36,8 @@ class ReaderFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this.viewLifecycleOwner
 
         binding.readerLayout.apply {
             onClickLeftAreaListener = {
@@ -51,28 +52,18 @@ class ReaderFragment : Fragment() {
                     ViewPager2.LAYOUT_DIRECTION_RTL -> toPrevPage()
                 }
             }
-            onClickCenterAreaListener = {
-                binding.menuLayout.visibility = View.VISIBLE
-                binding.hint.visibility = View.INVISIBLE
-            }
+            onClickCenterAreaListener = { viewModel.isMenuVisible.value = true }
         }
 
-        when (SettingsHelper.getReadingDirection()) {
-            SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT -> setReadingDirectionLeftToRight()
-            SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT -> setReadingDirectionRightToLeft()
-            SettingsHelper.READING_DIRECTION_VERTICAL -> setReadingDirectionVertical()
-        }
+        binding.menuLayout.setOnClickListener { viewModel.isMenuVisible.value = false }
+
         binding.radioGroupDirection.setOnCheckedChangeListener { _, checkedId ->
-            when (checkedId) {
-                R.id.radio_left_to_right -> setReadingDirectionLeftToRight()
-                R.id.radio_right_to_left -> setReadingDirectionRightToLeft()
-                R.id.radio_vertical -> setReadingDirectionVertical()
+            viewModel.readingDirection.value = when (checkedId) {
+                R.id.radio_left_to_right -> SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT
+                R.id.radio_right_to_left -> SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT
+                R.id.radio_vertical -> SettingsHelper.READING_DIRECTION_VERTICAL
+                else -> SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT
             }
-        }
-
-        binding.menuLayout.setOnClickListener {
-            binding.menuLayout.visibility = View.INVISIBLE
-            binding.hint.visibility = View.VISIBLE
         }
 
         binding.contentHorizontal.apply {
@@ -101,13 +92,9 @@ class ReaderFragment : Fragment() {
                 }
 
                 override fun onPageSelected(position: Int) {
-                    binding.seekBar.progress = position
-                    updateHint()
+                    viewModel.chapterPosition.value = position
                 }
             })
-        }
-        binding.contentVertical.apply {
-            layoutManager = LinearLayoutManager(context)
         }
 
         binding.seekBar.apply {
@@ -120,20 +107,30 @@ class ReaderFragment : Fragment() {
             })
         }
 
-
         viewModel.selectedChapterContent.observe(viewLifecycleOwner, Observer { images ->
             isLoadingChapter = false
+
             binding.contentHorizontal.apply {
                 adapter = ImageHorizontalListAdapter(context, images)
                 if (!viewModel.fromStart)
                     binding.contentHorizontal.setCurrentItem(images.size - 1, false)
             }
+
             binding.contentVertical.apply {
                 adapter = ImageVerticalListAdapter(context, images)
             }
-            binding.seekBar.max = images.size - 1
-            binding.seekBar.progress = binding.contentHorizontal.currentItem
-            updateHint()
+            viewModel.chapterPosition.value = binding.contentHorizontal.currentItem
+        })
+
+        viewModel.readingDirection.observe(viewLifecycleOwner, Observer {
+            SettingsHelper.setReadingDirection(it)
+        })
+
+        viewModel.layoutDirection.observe(viewLifecycleOwner, Observer {
+            binding.contentHorizontal.apply {
+                viewModel.layoutDirection.value?.let { layoutDirection = it }
+                adapter?.notifyDataSetChanged()
+            }
         })
     }
 
@@ -159,69 +156,6 @@ class ReaderFragment : Fragment() {
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
     }
 
-    private fun updateHint() {
-        val size = binding.contentHorizontal.adapter?.itemCount ?: 0
-        val position = binding.contentHorizontal.currentItem + 1
-
-        binding.hint.text = "${viewModel.getSelectedChapterTitle()} ${position}/${size}"
-        when (binding.seekBar.layoutDirection) {
-            SeekBar.LAYOUT_DIRECTION_LTR -> {
-                binding.seekBarLeftHint.text = size.toString()
-                binding.seekBarRightHint.text = (position + 1).toString()
-            }
-            SeekBar.LAYOUT_DIRECTION_RTL -> {
-                binding.seekBarLeftHint.text = (position + 1).toString()
-                binding.seekBarRightHint.text = size.toString()
-            }
-        }
-    }
-
-    private fun setReadingDirectionLeftToRight() {
-        SettingsHelper.setReadingDirection(SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT)
-        binding.radioLeftToRight.isChecked = true
-        binding.seekBar.layoutDirection = SeekBar.LAYOUT_DIRECTION_LTR
-        binding.contentHorizontal.visibility = View.VISIBLE
-        binding.contentVertical.visibility = View.GONE
-        binding.contentHorizontal.apply {
-            layoutDirection = ViewPager2.LAYOUT_DIRECTION_LTR
-
-            val index = currentItem
-            adapter = ImageHorizontalListAdapter(
-                context,
-                viewModel.selectedChapterContent.value!!
-            )
-            setCurrentItem(index, false)
-        }
-        updateHint()
-    }
-
-    private fun setReadingDirectionRightToLeft() {
-        SettingsHelper.setReadingDirection(SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT)
-        binding.radioRightToLeft.isChecked = true
-        binding.seekBar.layoutDirection = SeekBar.LAYOUT_DIRECTION_RTL
-        binding.contentHorizontal.visibility = View.VISIBLE
-        binding.contentVertical.visibility = View.GONE
-        binding.contentHorizontal.apply {
-            layoutDirection = ViewPager2.LAYOUT_DIRECTION_RTL
-
-            val index = currentItem
-            adapter = ImageHorizontalListAdapter(
-                context,
-                viewModel.selectedChapterContent.value!!
-            )
-            setCurrentItem(index, false)
-        }
-        updateHint()
-    }
-
-    private fun setReadingDirectionVertical() {
-        SettingsHelper.setReadingDirection(SettingsHelper.READING_DIRECTION_VERTICAL)
-        binding.radioVertical.isChecked = true
-        binding.seekBar.layoutDirection = SeekBar.LAYOUT_DIRECTION_LTR
-        binding.contentVertical.visibility = View.VISIBLE
-        binding.contentHorizontal.visibility = View.GONE
-        updateHint()
-    }
 
     private fun toPrevChapter() {
         if (!viewModel.openPrevChapter()) makeSnakeBar(getString(R.string.reader_no_prev_chapter_hint))

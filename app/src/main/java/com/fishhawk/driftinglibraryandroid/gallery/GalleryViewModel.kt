@@ -1,16 +1,19 @@
 package com.fishhawk.driftinglibraryandroid.gallery
 
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class GalleryViewModel : ViewModel() {
+class GalleryViewModel : ViewModel()  {
     private val _mangaDetail: MutableLiveData<Result<MangaDetail>> = MutableLiveData()
     val mangaDetail: LiveData<Result<MangaDetail>> = _mangaDetail
 
@@ -28,13 +31,11 @@ class GalleryViewModel : ViewModel() {
     private var collectionIndex: Int = 0
     private var chapterIndex: Int = 0
     private var selectedCollectionTitle: String = ""
-    private var selectedChapterTitle: String = ""
+    var selectedChapterTitle: String = ""
     var fromStart: Boolean = true
-    private val _selectedChapterContent: MutableLiveData<List<String>> = MutableLiveData()
+    private val _selectedChapterContent: MutableLiveData<List<String>> =
+        MutableLiveData(emptyList())
     val selectedChapterContent: MutableLiveData<List<String>> = _selectedChapterContent
-
-    fun getSelectedCollectionTitle() = selectedCollectionTitle
-    fun getSelectedChapterTitle() = selectedChapterTitle
 
 
     fun openChapter(collectionIndex: Int, chapterIndex: Int) {
@@ -75,4 +76,24 @@ class GalleryViewModel : ViewModel() {
         }
         return false
     }
+
+    val chapterPosition: MutableLiveData<Int> = MutableLiveData(0)
+    val chapterSize: LiveData<Int> = Transformations.map(selectedChapterContent) { it.size }
+
+    val readingDirection: MutableLiveData<Int> =
+        MutableLiveData(SettingsHelper.getReadingDirection())
+    val layoutDirection: LiveData<Int> = Transformations.map(readingDirection) {
+        when (it) {
+            SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT -> View.LAYOUT_DIRECTION_RTL
+            else -> View.LAYOUT_DIRECTION_LTR
+        }
+    }
+    val isLayoutHorizontal: LiveData<Boolean> = Transformations.map(readingDirection) {
+        when (it) {
+            SettingsHelper.READING_DIRECTION_VERTICAL -> false
+            else -> true
+        }
+    }
+
+    val isMenuVisible: MutableLiveData<Boolean> = MutableLiveData(false)
 }
