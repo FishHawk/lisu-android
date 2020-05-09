@@ -69,15 +69,17 @@ class GalleryViewModel : ViewModel() {
         val collection = detail.collections[collectionIndex].title
         val chapter = detail.collections[collectionIndex].chapters[chapterIndex]
 
+        isLoading.value = true
         GlobalScope.launch(Dispatchers.Main) {
-            isLoading.value = true
             when (val result = Repository.getChapterContent(id, collection, chapter)) {
                 is Result.Success -> {
-                    if (readingDirection.value == SettingsHelper.READING_DIRECTION_VERTICAL)
-                        verticalReaderContent.value = result.data
-                    else {
-                        horizontalReaderContent.value = result.data
+                    if (readingDirection.value == SettingsHelper.READING_DIRECTION_VERTICAL) {
+
                         startPage = if (isFromStart) 0 else result.data.size - 1
+                        verticalReaderContent.value = result.data
+                    } else {
+                        startPage = if (isFromStart) 0 else result.data.size - 1
+                        horizontalReaderContent.value = result.data
                     }
 
                     collectionTitle.value = collection
@@ -99,7 +101,7 @@ class GalleryViewModel : ViewModel() {
 
     fun openPrevChapter(): Boolean {
         if (chapterIndex > 0) {
-            openChapter(collectionIndex, chapterIndex - 1)
+            openChapter(collectionIndex, chapterIndex - 1, isFromStart = false)
             return true
         }
         return false

@@ -59,7 +59,7 @@ class ReaderFragment : Fragment() {
                 viewModel.layoutDirection.value?.let { layoutDirection = it }
                 val temp = currentItem
                 adapter = adapter
-                gotoPage(temp)
+                setReaderPage(temp)
             }
         })
     }
@@ -89,28 +89,28 @@ class ReaderFragment : Fragment() {
     private fun setupReaderLayout() {
         val gotoPrevPage = {
             if (viewModel.chapterPosition.value!! == 0) openPrevChapter()
-            else gotoPage(viewModel.chapterPosition.value!! - 1)
+            else setHorizontalReaderPage(viewModel.chapterPosition.value!! - 1)
         }
         val gotoNextPage = {
-            if (viewModel.chapterPosition.value!! == viewModel.chapterSize.value!!) openNextChapter()
-            else gotoPage(viewModel.chapterPosition.value!! + 1)
+            if (viewModel.chapterPosition.value!! == viewModel.chapterSize.value!! - 1) openNextChapter()
+            else setHorizontalReaderPage(viewModel.chapterPosition.value!! + 1)
         }
 
-        binding.readerLayout.apply {
-            onClickLeftAreaListener = {
-                when (viewModel.readingDirection.value) {
-                    SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT -> gotoNextPage()
-                    else -> gotoPrevPage()
-                }
+        binding.readerLayout.onClickLeftAreaListener = {
+            when (viewModel.readingDirection.value) {
+                SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT -> gotoPrevPage()
+                SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT -> gotoNextPage()
+                SettingsHelper.READING_DIRECTION_VERTICAL -> viewModel.isMenuVisible.value = true
             }
-            onClickRightAreaListener = {
-                when (viewModel.readingDirection.value) {
-                    SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT -> gotoPrevPage()
-                    else -> gotoNextPage()
-                }
-            }
-            onClickCenterAreaListener = { viewModel.isMenuVisible.value = true }
         }
+        binding.readerLayout.onClickRightAreaListener = {
+            when (viewModel.readingDirection.value) {
+                SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT -> gotoNextPage()
+                SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT -> gotoPrevPage()
+                SettingsHelper.READING_DIRECTION_VERTICAL -> viewModel.isMenuVisible.value = true
+            }
+        }
+        binding.readerLayout.onClickCenterAreaListener = { viewModel.isMenuVisible.value = true }
     }
 
     private fun setupMenuLayout() {
@@ -131,7 +131,7 @@ class ReaderFragment : Fragment() {
             override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}
             override fun onStartTrackingTouch(seek: SeekBar) {}
             override fun onStopTrackingTouch(seek: SeekBar) {
-                gotoPage(seek.progress)
+                setReaderPage(seek.progress)
             }
         })
     }
@@ -164,7 +164,7 @@ class ReaderFragment : Fragment() {
         viewModel.horizontalReaderContent.observe(viewLifecycleOwner, Observer { content ->
             binding.horizontalReader.apply {
                 adapter = ImageHorizontalListAdapter(context, content)
-                gotoPage(viewModel.startPage)
+                setReaderPage(viewModel.startPage)
 
                 viewModel.chapterPosition.value = currentItem
                 viewModel.chapterSize.value = content.size
@@ -175,6 +175,31 @@ class ReaderFragment : Fragment() {
     private fun setupVerticalReader() {
         binding.verticalReader.apply {
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                private var isTopReached: Boolean = false
+                private var isBottomReached: Boolean = false
+
+                override fun onScrollStateChanged(recyclerView: RecyclerView, state: Int) {
+                    when (state) {
+                        RecyclerView.SCROLL_STATE_DRAGGING -> {
+                            isTopReached = !recyclerView.canScrollVertically(-1)
+                            isBottomReached = !recyclerView.canScrollVertically(1)
+                        }
+                        RecyclerView.SCROLL_STATE_SETTLING -> {
+                            isTopReached = isTopReached && !recyclerView.canScrollVertically(-1)
+                            isBottomReached = isBottomReached && !recyclerView.canScrollVertically(1)
+                        }
+                        RecyclerView.SCROLL_STATE_IDLE -> {
+                            isTopReached = isTopReached && !recyclerView.canScrollVertically(-1)
+                            isBottomReached = isBottomReached && !recyclerView.canScrollVertically(1)
+
+                            if (!viewModel.isLoading.value!!) {
+                                if (isTopReached) openPrevChapter()
+                                if (isBottomReached) openNextChapter()
+                            }
+                        }
+                    }
+                }
+
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     viewModel.chapterPosition.value =
                         (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
@@ -185,7 +210,7 @@ class ReaderFragment : Fragment() {
         viewModel.verticalReaderContent.observe(viewLifecycleOwner, Observer { content ->
             binding.verticalReader.apply {
                 adapter = ImageVerticalListAdapter(context, content)
-                gotoPage(viewModel.startPage)
+                setReaderPage(viewModel.startPage)
 
                 viewModel.chapterPosition.value =
                     (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
@@ -202,12 +227,18 @@ class ReaderFragment : Fragment() {
         if (!viewModel.openNextChapter()) makeSnakeBar(getString(R.string.reader_no_next_chapter_hint))
     }
 
-    private fun gotoPage(position: Int) {
-        if (viewModel.isHorizontalReaderEnable.value!!)
-            binding.horizontalReader.setCurrentItem(position, false)
-        else
-            (binding.verticalReader.layoutManager as LinearLayoutManager)
-                .scrollToPositionWithOffset(position, 0)
+    private fun setHorizontalReaderPage(position: Int) {
+        binding.horizontalReader.setCurrentItem(position, false)
+    }
+
+    private fun setVerticalReaderPage(position: Int) {
+        (binding.verticalReader.layoutManager as LinearLayoutManager)
+            .scrollToPositionWithOffset(position, 0)
+    }
+
+    private fun setReaderPage(position: Int) {
+        if (viewModel.isHorizontalReaderEnable.value!!) setHorizontalReaderPage(position)
+        else setVerticalReaderPage(position)
     }
 
     private fun makeSnakeBar(content: String) {
