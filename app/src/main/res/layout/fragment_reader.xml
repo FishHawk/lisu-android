@@ -23,16 +23,16 @@
             android:layout_height="match_parent">
 
             <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/content_horizontal"
+                android:id="@+id/horizontal_reader"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="@{viewModel.isLayoutHorizontal ? View.VISIBLE : View.GONE}" />
+                android:visibility="@{viewModel.isHorizontalReaderEnable ? View.VISIBLE : View.GONE}" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/content_vertical"
+                android:id="@+id/vertical_reader"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="@{!viewModel.isLayoutHorizontal ? View.VISIBLE : View.GONE}"
+                android:visibility="@{!viewModel.isHorizontalReaderEnable ? View.VISIBLE : View.GONE}"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
         </com.fishhawk.driftinglibraryandroid.reader.ReaderLayout>
 
@@ -46,7 +46,7 @@
             android:paddingTop="@dimen/baseline_4dp"
             android:paddingEnd="@dimen/baseline_8dp"
             android:paddingBottom="@dimen/baseline_4dp"
-            android:text="@{String.format(`%s %s/%s`,viewModel.selectedChapterTitle, viewModel.chapterPosition+1, viewModel.chapterSize)}"
+            android:text="@{String.format(`%s %s/%s`,viewModel.chapterTitle, viewModel.chapterPosition+1, viewModel.chapterSize)}"
             android:textColor="#ffffff"
             android:visibility="@{!viewModel.isMenuVisible ? View.VISIBLE : View.GONE}" />
 
@@ -119,7 +119,7 @@
                         android:layout_height="28dp"
                         android:layout_weight="1"
                         android:max="@{viewModel.chapterSize - 1}"
-                        android:progress="@={viewModel.chapterPosition}" />
+                        android:progress="@{viewModel.chapterPosition}" />
 
                     <TextView
                         android:layout_width="wrap_content"
