@@ -24,16 +24,18 @@ class ReaderFragment : Fragment() {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[ReaderViewModel::class.java]
 
-        val detail = arguments?.getParcelable<MangaDetail>("detail")!!
-        val collectionIndex: Int = arguments?.getInt("collectionIndex") ?: 0
-        val chapterIndex: Int = arguments?.getInt("chapterIndex") ?: 0
+        if (savedInstanceState == null) {
+            val detail = arguments?.getParcelable<MangaDetail>("detail")!!
+            val collectionIndex: Int = arguments?.getInt("collectionIndex") ?: 0
+            val chapterIndex: Int = arguments?.getInt("chapterIndex") ?: 0
 
-        viewModel.setup(
-            detail.id,
-            detail.collections[collectionIndex].title,
-            detail.collections[collectionIndex].chapters
-        )
-        viewModel.openChapter(chapterIndex)
+            viewModel.setup(
+                detail.id,
+                detail.collections[collectionIndex].title,
+                detail.collections[collectionIndex].chapters
+            )
+            viewModel.openChapter(chapterIndex)
+        }
     }
 
     override fun onCreateView(
@@ -55,21 +57,30 @@ class ReaderFragment : Fragment() {
         setupHorizontalReader()
         setupVerticalReader()
 
-        viewModel.isHorizontalReaderEnable.observe(viewLifecycleOwner, Observer {
+        viewModel.layoutDirection.observe(viewLifecycleOwner, Observer {
+            binding.horizontalReader.layoutDirection = it
             viewModel.startPage = viewModel.chapterPosition.value!!
-            if (it) {
-                viewModel.horizontalReaderContent.value = viewModel.verticalReaderContent.value
-            } else {
-                viewModel.verticalReaderContent.value = viewModel.horizontalReaderContent.value
-            }
+            viewModel.readerContent.value = viewModel.readerContent.value
         })
 
-        viewModel.layoutDirection.observe(viewLifecycleOwner, Observer {
-            binding.horizontalReader.apply {
-                viewModel.layoutDirection.value?.let { layoutDirection = it }
-                val temp = currentItem
-                adapter = adapter
-                setReaderPage(temp)
+        viewModel.readerContent.observe(viewLifecycleOwner, Observer { content ->
+            if (viewModel.isHorizontalReaderEnable.value!!) {
+                binding.horizontalReader.apply {
+                    adapter = ImageHorizontalListAdapter(context, content)
+                    setReaderPage(viewModel.startPage)
+
+                    viewModel.chapterPosition.value = currentItem
+                    viewModel.chapterSize.value = content.size
+                }
+            } else {
+                binding.verticalReader.apply {
+                    adapter = ImageVerticalListAdapter(context, content)
+                    setReaderPage(viewModel.startPage)
+
+                    viewModel.chapterPosition.value =
+                        (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                    viewModel.chapterSize.value = content.size
+                }
             }
         })
     }
@@ -140,9 +151,7 @@ class ReaderFragment : Fragment() {
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}
             override fun onStartTrackingTouch(seek: SeekBar) {}
-            override fun onStopTrackingTouch(seek: SeekBar) {
-                setReaderPage(seek.progress)
-            }
+            override fun onStopTrackingTouch(seek: SeekBar) = setReaderPage(seek.progress)
         })
     }
 
@@ -171,15 +180,7 @@ class ReaderFragment : Fragment() {
             })
         }
 
-        viewModel.horizontalReaderContent.observe(viewLifecycleOwner, Observer { content ->
-            binding.horizontalReader.apply {
-                adapter = ImageHorizontalListAdapter(context, content)
-                setReaderPage(viewModel.startPage)
 
-                viewModel.chapterPosition.value = currentItem
-                viewModel.chapterSize.value = content.size
-            }
-        })
     }
 
     private fun setupVerticalReader() {
@@ -196,13 +197,11 @@ class ReaderFragment : Fragment() {
                         }
                         RecyclerView.SCROLL_STATE_SETTLING -> {
                             isTopReached = isTopReached && !recyclerView.canScrollVertically(-1)
-                            isBottomReached =
-                                isBottomReached && !recyclerView.canScrollVertically(1)
+                            isBottomReached = isBottomReached && !recyclerView.canScrollVertically(1)
                         }
                         RecyclerView.SCROLL_STATE_IDLE -> {
                             isTopReached = isTopReached && !recyclerView.canScrollVertically(-1)
-                            isBottomReached =
-                                isBottomReached && !recyclerView.canScrollVertically(1)
+                            isBottomReached = isBottomReached && !recyclerView.canScrollVertically(1)
 
                             if (!viewModel.isLoading.value!!) {
                                 if (isTopReached) openPrevChapter()
@@ -219,16 +218,6 @@ class ReaderFragment : Fragment() {
             })
         }
 
-        viewModel.verticalReaderContent.observe(viewLifecycleOwner, Observer { content ->
-            binding.verticalReader.apply {
-                adapter = ImageVerticalListAdapter(context, content)
-                setReaderPage(viewModel.startPage)
-
-                viewModel.chapterPosition.value =
-                    (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                viewModel.chapterSize.value = content.size
-            }
-        })
     }
 
     private fun openPrevChapter() {
@@ -249,8 +238,9 @@ class ReaderFragment : Fragment() {
     }
 
     private fun setReaderPage(position: Int) {
-        if (viewModel.isHorizontalReaderEnable.value!!) setHorizontalReaderPage(position)
-        else setVerticalReaderPage(position)
+        if (viewModel.readingDirection.value == SettingsHelper.READING_DIRECTION_VERTICAL)
+            setVerticalReaderPage(position)
+        else setHorizontalReaderPage(position)
     }
 
     private fun makeSnakeBar(content: String) {
