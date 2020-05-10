@@ -10,10 +10,12 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -146,8 +148,13 @@ class GalleryFragment : Fragment() {
 
             button.text = chapter
             button.setOnClickListener {
-                viewModel.openChapter(collectionIndex, index)
-                button.findNavController().navigate(R.id.action_gallery_to_reader, null)
+                val detail = (viewModel.mangaDetail.value!! as Result.Success).data
+                val bundle = bundleOf(
+                    "detail" to detail,
+                    "collectionIndex" to collectionIndex,
+                    "chapterIndex" to index
+                )
+                button.findNavController().navigate(R.id.action_gallery_to_reader, bundle)
             }
         }
         for (i in 1..(3 - collection.chapters.size)) {

@@ -9,7 +9,7 @@
 
         <variable
             name="viewModel"
-            type="com.fishhawk.driftinglibraryandroid.gallery.GalleryViewModel" />
+            type="com.fishhawk.driftinglibraryandroid.reader.ReaderViewModel" />
     </data>
 
     <FrameLayout

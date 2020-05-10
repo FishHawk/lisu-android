@@ -12,18 +12,28 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.FragmentReaderBinding
-import com.fishhawk.driftinglibraryandroid.gallery.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.google.android.material.snackbar.Snackbar
 
 class ReaderFragment : Fragment() {
-    private lateinit var viewModel: GalleryViewModel
+    private lateinit var viewModel: ReaderViewModel
     private lateinit var binding: FragmentReaderBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = activity?.run { ViewModelProvider(this)[GalleryViewModel::class.java] }
-            ?: throw Exception("Invalid Activity")
+        viewModel = ViewModelProvider(this)[ReaderViewModel::class.java]
+
+        val detail = arguments?.getParcelable<MangaDetail>("detail")!!
+        val collectionIndex: Int = arguments?.getInt("collectionIndex") ?: 0
+        val chapterIndex: Int = arguments?.getInt("chapterIndex") ?: 0
+
+        viewModel.setup(
+            detail.id,
+            detail.collections[collectionIndex].title,
+            detail.collections[collectionIndex].chapters
+        )
+        viewModel.openChapter(chapterIndex)
     }
 
     override fun onCreateView(
@@ -186,11 +196,13 @@ class ReaderFragment : Fragment() {
                         }
                         RecyclerView.SCROLL_STATE_SETTLING -> {
                             isTopReached = isTopReached && !recyclerView.canScrollVertically(-1)
-                            isBottomReached = isBottomReached && !recyclerView.canScrollVertically(1)
+                            isBottomReached =
+                                isBottomReached && !recyclerView.canScrollVertically(1)
                         }
                         RecyclerView.SCROLL_STATE_IDLE -> {
                             isTopReached = isTopReached && !recyclerView.canScrollVertically(-1)
-                            isBottomReached = isBottomReached && !recyclerView.canScrollVertically(1)
+                            isBottomReached =
+                                isBottomReached && !recyclerView.canScrollVertically(1)
 
                             if (!viewModel.isLoading.value!!) {
                                 if (isTopReached) openPrevChapter()
