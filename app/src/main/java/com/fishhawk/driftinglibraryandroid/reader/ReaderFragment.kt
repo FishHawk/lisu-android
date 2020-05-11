@@ -1,10 +1,14 @@
 package com.fishhawk.driftinglibraryandroid.reader
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.widget.SeekBar
+import android.widget.Toolbar
+import androidx.annotation.ColorInt
 import androidx.viewpager2.widget.ViewPager2
 import androidx.appcompat.app.AppCompatActivity
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -88,23 +92,26 @@ class ReaderFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         (activity as? AppCompatActivity)?.supportActionBar?.hide()
-        activity?.window?.decorView?.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE
-                // Set the content to appear under the system bars so that the
-                // content doesn't resize when the system bars hide and show.
-                or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                // Hide the nav bar and status bar
-                or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_FULLSCREEN)
+        activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.setStatusBarBackgroundColor(Color.TRANSPARENT)
+        activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.fitsSystemWindows = false
+        activity?.window?.decorView?.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        or View.SYSTEM_UI_FLAG_IMMERSIVE
+                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_FULLSCREEN)
     }
 
     override fun onStop() {
         super.onStop()
         (activity as? AppCompatActivity)?.supportActionBar?.show()
-        activity?.window?.decorView?.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+        activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.fitsSystemWindows = true
+        activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.setStatusBarBackgroundColor(0xff6300ee.toInt())
+        activity?.window?.decorView?.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
     }
 
     private fun setupReaderLayout() {
@@ -197,11 +204,13 @@ class ReaderFragment : Fragment() {
                         }
                         RecyclerView.SCROLL_STATE_SETTLING -> {
                             isTopReached = isTopReached && !recyclerView.canScrollVertically(-1)
-                            isBottomReached = isBottomReached && !recyclerView.canScrollVertically(1)
+                            isBottomReached =
+                                isBottomReached && !recyclerView.canScrollVertically(1)
                         }
                         RecyclerView.SCROLL_STATE_IDLE -> {
                             isTopReached = isTopReached && !recyclerView.canScrollVertically(-1)
-                            isBottomReached = isBottomReached && !recyclerView.canScrollVertically(1)
+                            isBottomReached =
+                                isBottomReached && !recyclerView.canScrollVertically(1)
 
                             if (!viewModel.isLoading.value!!) {
                                 if (isTopReached) openPrevChapter()
