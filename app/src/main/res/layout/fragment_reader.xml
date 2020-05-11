@@ -93,8 +93,8 @@
                         android:id="@+id/radio_vertical"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:checked="@{viewModel.readingDirection == 2}"
                         android:buttonTint="@color/colorAccent"
+                        android:checked="@{viewModel.readingDirection == 2}"
                         android:text="@string/settings_reading_direction_vertical"
                         android:textColor="#ffffff" />
                 </RadioGroup>
@@ -118,6 +118,7 @@
                         android:layout_width="0dp"
                         android:layout_height="28dp"
                         android:layout_weight="1"
+                        android:tint="?attr/colorSecondary"
                         android:max="@{viewModel.chapterSize - 1}"
                         android:progress="@{viewModel.chapterPosition}" />
 

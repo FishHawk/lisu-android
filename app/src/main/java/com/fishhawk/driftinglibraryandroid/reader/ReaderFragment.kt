@@ -2,6 +2,7 @@ package com.fishhawk.driftinglibraryandroid.reader
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.*
 import android.widget.SeekBar
 import android.widget.Toolbar
@@ -94,24 +95,16 @@ class ReaderFragment : Fragment() {
         (activity as? AppCompatActivity)?.supportActionBar?.hide()
         activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.setStatusBarBackgroundColor(Color.TRANSPARENT)
         activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.fitsSystemWindows = false
-        activity?.window?.decorView?.systemUiVisibility = (
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        or View.SYSTEM_UI_FLAG_IMMERSIVE
-                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        or View.SYSTEM_UI_FLAG_FULLSCREEN)
     }
 
     override fun onStop() {
         super.onStop()
+        val statusBarColor = TypedValue()
+        context?.theme?.resolveAttribute(R.attr.colorPrimaryDark, statusBarColor, true)
+
         (activity as? AppCompatActivity)?.supportActionBar?.show()
         activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.fitsSystemWindows = true
-        activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.setStatusBarBackgroundColor(0xff6300ee.toInt())
-        activity?.window?.decorView?.systemUiVisibility = (
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+        activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.setStatusBarBackgroundColor(statusBarColor.data)
     }
 
     private fun setupReaderLayout() {
