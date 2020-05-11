@@ -1,6 +1,8 @@
 package com.fishhawk.driftinglibraryandroid.reader
 
+import android.content.Context
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
@@ -20,6 +22,7 @@ import com.fishhawk.driftinglibraryandroid.databinding.FragmentReaderBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.google.android.material.snackbar.Snackbar
+import java.lang.reflect.Method
 
 class ReaderFragment : Fragment() {
     private lateinit var viewModel: ReaderViewModel
@@ -93,8 +96,18 @@ class ReaderFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         (activity as? AppCompatActivity)?.supportActionBar?.hide()
-        activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.setStatusBarBackgroundColor(Color.TRANSPARENT)
         activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.fitsSystemWindows = false
+        activity?.findViewById<DrawerLayout>(R.id.drawer_layout)
+            ?.setStatusBarBackgroundColor(Color.TRANSPARENT)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val wrapper: Class<*> = Context::class.java
+            val method: Method = wrapper.getMethod("getThemeResId")
+            method.isAccessible = true
+            if (method.invoke(context) as Int == R.style.AppTheme_NoActionBar)
+                activity?.window?.decorView?.systemUiVisibility =
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
     }
 
     override fun onStop() {
@@ -104,7 +117,16 @@ class ReaderFragment : Fragment() {
 
         (activity as? AppCompatActivity)?.supportActionBar?.show()
         activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.fitsSystemWindows = true
-        activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.setStatusBarBackgroundColor(statusBarColor.data)
+        activity?.findViewById<DrawerLayout>(R.id.drawer_layout)
+            ?.setStatusBarBackgroundColor(statusBarColor.data)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val wrapper: Class<*> = Context::class.java
+            val method: Method = wrapper.getMethod("getThemeResId")
+            method.isAccessible = true
+            if (method.invoke(context) as Int == R.style.AppTheme_NoActionBar)
+                activity?.window?.decorView?.systemUiVisibility = 0
+        }
     }
 
     private fun setupReaderLayout() {
