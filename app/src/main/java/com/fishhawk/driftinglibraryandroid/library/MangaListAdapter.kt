@@ -15,11 +15,13 @@ import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
 
 class MangaListAdapter(
     private val context: Context,
-    private var data: List<MangaSummary>,
+    private var data: MutableList<MangaSummary>,
     private val listener: (MangaSummary, ImageView) -> Unit
 ) : RecyclerView.Adapter<MangaListAdapter.ViewHolder>() {
-    fun update(newData: List<MangaSummary>) {
-        data = newData
+
+    fun update(newData: MutableList<MangaSummary>) {
+        data.clear()
+        data.addAll(newData)
         notifyDataSetChanged()
     }
 

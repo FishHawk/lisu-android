@@ -17,6 +17,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.FragmentLibraryBinding
 import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
@@ -76,7 +77,7 @@ class LibraryFragment : Fragment() {
             addItemDecoration(GridSpacingItemDecoration(mColumnCount, 16, true))
 
             // set adapter
-            adapter = MangaListAdapter(context, emptyList()) { item, imageView ->
+            adapter = MangaListAdapter(context, mutableListOf()) { item, imageView ->
                 val extras = FragmentNavigatorExtras(imageView to item.id)
                 val bundle = bundleOf(
                     "id" to item.id,
@@ -108,7 +109,7 @@ class LibraryFragment : Fragment() {
         viewModel.mangaList.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is Result.Success -> {
-                    binding.list.adapter!!.let { (it as MangaListAdapter).update(result.data) }
+                    (binding.list.adapter!! as MangaListAdapter).update(result.data.toMutableList())
                     if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
                     else binding.multipleStatusView.showContent()
                 }
