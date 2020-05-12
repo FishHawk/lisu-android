@@ -1,6 +1,7 @@
 package com.fishhawk.driftinglibraryandroid
 
 import android.os.Bundle
+import android.widget.Button
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -11,10 +12,12 @@ import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.navigation.ui.NavigationUI
+import com.fishhawk.driftinglibraryandroid.databinding.ActivityMainBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,35 +27,42 @@ class MainActivity : AppCompatActivity() {
             SettingsHelper.THEME_DARK -> setTheme(R.style.AppTheme_Dark_NoActionBar)
         }
 
-        SettingsHelper.theme.observe(this, Observer {
-            val currentTheme = Util.extractThemeResId(this)
-            when (it) {
-                SettingsHelper.THEME_LIGHT ->
-                    if (currentTheme != R.style.AppTheme_NoActionBar) {
-                        setTheme(R.style.AppTheme_NoActionBar)
-                        recreate()
-                    }
-                SettingsHelper.THEME_DARK ->
-                    if (currentTheme != R.style.AppTheme_Dark_NoActionBar) {
-                        recreate()
-                        setTheme(R.style.AppTheme_NoActionBar)
-                    }
-            }
-        })
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.contentMain.toolbar)
 
-        setContentView(R.layout.activity_main)
-
-        val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
-        navView.setupWithNavController(navController)
-
-        val drawer: DrawerLayout = findViewById(R.id.drawer_layout)
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
+        binding.navView.setupWithNavController(navController)
         appBarConfiguration = AppBarConfiguration.Builder(R.id.nav_library)
-            .setDrawerLayout(drawer)
+            .setDrawerLayout(binding.drawerLayout)
             .build()
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
+
+        SettingsHelper.theme.observe(this, Observer {
+            val applyTheme = { themeId: Int, themeString: String ->
+                binding.themeSelector.text = themeString
+                if (Util.extractThemeResId(this) != themeId) {
+                    setTheme(R.style.AppTheme_NoActionBar)
+                    recreate()
+                }
+            }
+            when (it) {
+                SettingsHelper.THEME_LIGHT -> applyTheme(
+                    R.style.AppTheme_NoActionBar,
+                    getString(R.string.theme_selector_light)
+                )
+                SettingsHelper.THEME_DARK -> applyTheme(
+                    R.style.AppTheme_Dark_NoActionBar,
+                    getString(R.string.theme_selector_dark)
+                )
+            }
+        })
+        binding.themeSelector.setOnClickListener {
+            when (SettingsHelper.theme.value) {
+                SettingsHelper.THEME_LIGHT -> SettingsHelper.theme.setValue(SettingsHelper.THEME_DARK)
+                SettingsHelper.THEME_DARK -> SettingsHelper.theme.setValue(SettingsHelper.THEME_LIGHT)
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
