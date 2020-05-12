@@ -7,8 +7,6 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
 import android.widget.SeekBar
-import android.widget.Toolbar
-import androidx.annotation.ColorInt
 import androidx.viewpager2.widget.ViewPager2
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
@@ -65,31 +63,25 @@ class ReaderFragment : Fragment() {
         setupHorizontalReader()
         setupVerticalReader()
 
-        viewModel.layoutDirection.observe(viewLifecycleOwner, Observer {
-            binding.horizontalReader.layoutDirection = it
+        viewModel.isReaderDirectionEqualRightToLeft.observe(viewLifecycleOwner, Observer {
+            binding.horizontalReader.layoutDirection =
+                if (it) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
             viewModel.startPage = viewModel.chapterPosition.value!!
             viewModel.readerContent.value = viewModel.readerContent.value
         })
 
         viewModel.readerContent.observe(viewLifecycleOwner, Observer { content ->
-            if (viewModel.isHorizontalReaderEnable.value!!) {
-                binding.horizontalReader.apply {
-                    adapter = ImageHorizontalListAdapter(context, content)
-                    setReaderPage(viewModel.startPage)
-
-                    viewModel.chapterPosition.value = currentItem
-                    viewModel.chapterSize.value = content.size
-                }
-            } else {
+            if (viewModel.isReaderDirectionEqualVertical.value!!)
                 binding.verticalReader.apply {
                     adapter = ImageVerticalListAdapter(context, content)
-                    setReaderPage(viewModel.startPage)
-
-                    viewModel.chapterPosition.value =
-                        (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                    viewModel.chapterSize.value = content.size
                 }
-            }
+            else
+                binding.horizontalReader.apply {
+                    adapter = ImageHorizontalListAdapter(context, content)
+                }
+            setReaderPage(viewModel.startPage)
+            viewModel.chapterPosition.value = viewModel.startPage
+            viewModel.chapterSize.value = content.size
         })
     }
 
@@ -166,8 +158,7 @@ class ReaderFragment : Fragment() {
                 R.id.radio_vertical -> SettingsHelper.READING_DIRECTION_VERTICAL
                 else -> SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT
             }
-            viewModel.readingDirection.value = direction
-            SettingsHelper.setReadingDirection(direction)
+            viewModel.readingDirection.setValue(direction)
         }
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {

@@ -45,16 +45,6 @@ class LibraryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val libraryAddress = SettingsHelper.getLibraryAddress()
-        if (!Repository.matchUrl(libraryAddress)) {
-            Repository.setUrl(libraryAddress)
-            viewModel.filter = ""
-            viewModel.reload()
-        } else if (viewModel.mangaList.value !is Result.Success) {
-            viewModel.filter = ""
-            viewModel.reload()
-        }
-
         binding.refreshLayout.apply {
             setOnRefreshListener(object : RefreshLayout.OnRefreshListener {
                 override fun onHeaderRefresh() = viewModel.refresh()
@@ -103,6 +93,17 @@ class LibraryFragment : Fragment() {
                 true
             }
         }
+
+        viewModel.libraryAddress.observe(viewLifecycleOwner, Observer { address ->
+            if (!Repository.matchUrl(address)) {
+                Repository.setUrl(address)
+                viewModel.filter = ""
+                viewModel.reload()
+            } else if (viewModel.mangaList.value !is Result.Success) {
+                viewModel.filter = ""
+                viewModel.reload()
+            }
+        })
 
         viewModel.mangaList.observe(viewLifecycleOwner, Observer { result ->
             when (result) {

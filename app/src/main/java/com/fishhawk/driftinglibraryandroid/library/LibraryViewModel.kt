@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
+import com.fishhawk.driftinglibraryandroid.setting.PreferenceStringLiveData
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -23,7 +25,10 @@ class LibraryViewModel : ViewModel() {
         }
     }
 
+    // library address
+    val libraryAddress: PreferenceStringLiveData = SettingsHelper.libraryAddress
 
+    // library content
     private val _refreshResult: MutableLiveData<Result<List<MangaSummary>>> = MutableLiveData()
     val refreshResult: LiveData<Result<List<MangaSummary>>> = _refreshResult
 

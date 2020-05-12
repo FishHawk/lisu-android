@@ -1,12 +1,12 @@
 package com.fishhawk.driftinglibraryandroid.reader
 
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.setting.PreferenceStringLiveData
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -23,18 +23,14 @@ class ReaderViewModel : ViewModel() {
         this.chapters = chapters
     }
 
-    // reader
-    val readingDirection: MutableLiveData<Int> =
-        MutableLiveData(SettingsHelper.getReadingDirection())
-    val layoutDirection: LiveData<Int> = Transformations.map(readingDirection) {
-        when (it) {
-            SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT -> View.LAYOUT_DIRECTION_RTL
-            else -> View.LAYOUT_DIRECTION_LTR
-        }
-    }
-    val isHorizontalReaderEnable: LiveData<Boolean> = Transformations.map(readingDirection) {
-        it != SettingsHelper.READING_DIRECTION_VERTICAL
-    }
+    // reading direction
+    val readingDirection: PreferenceStringLiveData = SettingsHelper.readingDirection
+    val isReaderDirectionEqualLeftToRight: LiveData<Boolean> =
+        Transformations.map(readingDirection) { it == SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT }
+    val isReaderDirectionEqualRightToLeft: LiveData<Boolean> =
+        Transformations.map(readingDirection) { it == SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT }
+    val isReaderDirectionEqualVertical: LiveData<Boolean> =
+        Transformations.map(readingDirection) { it == SettingsHelper.READING_DIRECTION_VERTICAL }
 
     // menu
     val isMenuVisible: MutableLiveData<Boolean> = MutableLiveData(false)

@@ -26,13 +26,13 @@
                 android:id="@+id/horizontal_reader"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="@{viewModel.isHorizontalReaderEnable ? View.VISIBLE : View.GONE}" />
+                android:visibility="@{!viewModel.isReaderDirectionEqualVertical ? View.VISIBLE : View.GONE}" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/vertical_reader"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="@{!viewModel.isHorizontalReaderEnable ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.isReaderDirectionEqualVertical ? View.VISIBLE : View.GONE}"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
         </com.fishhawk.driftinglibraryandroid.reader.ReaderLayout>
 
@@ -76,7 +76,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="@color/colorAccent"
-                        android:checked="@{viewModel.readingDirection == 0}"
+                        android:checked="@{viewModel.isReaderDirectionEqualLeftToRight}"
                         android:text="@string/settings_reading_direction_left_to_right"
                         android:textColor="#ffffff" />
 
@@ -85,7 +85,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="@color/colorAccent"
-                        android:checked="@{viewModel.readingDirection == 1}"
+                        android:checked="@{viewModel.isReaderDirectionEqualRightToLeft}"
                         android:text="@string/settings_reading_direction_right_to_Left"
                         android:textColor="#ffffff" />
 
@@ -94,7 +94,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:buttonTint="@color/colorAccent"
-                        android:checked="@{viewModel.readingDirection == 2}"
+                        android:checked="@{viewModel.isReaderDirectionEqualVertical}"
                         android:text="@string/settings_reading_direction_vertical"
                         android:textColor="#ffffff" />
                 </RadioGroup>
@@ -104,7 +104,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/baseline_4dp"
                     android:gravity="center_vertical"
-                    android:layoutDirection="@{viewModel.layoutDirection}"
+                    android:layoutDirection="@{viewModel.isReaderDirectionEqualRightToLeft ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR}"
                     android:orientation="horizontal">
 
                     <TextView
@@ -118,9 +118,9 @@
                         android:layout_width="0dp"
                         android:layout_height="28dp"
                         android:layout_weight="1"
-                        android:tint="?attr/colorSecondary"
                         android:max="@{viewModel.chapterSize - 1}"
-                        android:progress="@{viewModel.chapterPosition}" />
+                        android:progress="@{viewModel.chapterPosition}"
+                        android:tint="?attr/colorSecondary" />
 
                     <TextView
                         android:layout_width="wrap_content"

@@ -11,32 +11,29 @@ object SettingsHelper {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     }
 
-    private fun setPreference(key: String?, value: Int) {
-        sharedPreferences.edit().putString(key, value.toString()).apply()
-    }
-    private fun setPreference(key: String?, value: String) {
-        sharedPreferences.edit().putString(key, value).apply()
-    }
-
-    private fun getPreference(key: String, default: Int): Int {
-        return sharedPreferences.getString(key, null)?.toIntOrNull() ?: default
-    }
-    private fun getPreference(key: String, default: String): String {
-        return sharedPreferences.getString(key, null)?: default
-    }
-
     private const val KEY_LIBRARY_ADDRESS = "library_address"
     private const val DEFAULT_LIBRARY_ADDRESS: String = "192.168.0.101:8080"
 
-    fun getLibraryAddress(): String = getPreference(KEY_LIBRARY_ADDRESS, DEFAULT_LIBRARY_ADDRESS)
+    val libraryAddress by lazy {
+        PreferenceStringLiveData(
+            sharedPreferences,
+            KEY_LIBRARY_ADDRESS,
+            DEFAULT_LIBRARY_ADDRESS
+        )
+    }
 
-    const val READING_DIRECTION_LEFT_TO_RIGHT: Int = 0
-    const val READING_DIRECTION_RIGHT_TO_LEFT: Int = 1
-    const val READING_DIRECTION_VERTICAL: Int = 2
+    const val READING_DIRECTION_LEFT_TO_RIGHT: String = "0"
+    const val READING_DIRECTION_RIGHT_TO_LEFT: String = "1"
+    const val READING_DIRECTION_VERTICAL: String = "2"
 
     private const val KEY_READING_DIRECTION = "reading_direction"
-    private const val DEFAULT_READING_DIRECTION: Int = READING_DIRECTION_RIGHT_TO_LEFT
+    private const val DEFAULT_READING_DIRECTION: String = READING_DIRECTION_RIGHT_TO_LEFT
 
-    fun getReadingDirection(): Int = getPreference(KEY_READING_DIRECTION, DEFAULT_READING_DIRECTION)
-    fun setReadingDirection(value: Int) = setPreference(KEY_READING_DIRECTION, value)
+    val readingDirection by lazy {
+        PreferenceStringLiveData(
+            sharedPreferences,
+            KEY_READING_DIRECTION,
+            DEFAULT_READING_DIRECTION
+        )
+    }
 }
