@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.lifecycle.MutableLiveData
 
-
 abstract class PreferenceLiveData<T>(
     protected val sharedPreferences: SharedPreferences,
     private val key: String,
@@ -14,8 +13,10 @@ abstract class PreferenceLiveData<T>(
         if (this.key == key) super.setValue(getPreference(key, defaultValue))
     }
 
-    abstract fun getPreference(key: String, defValue: T): T
-    abstract fun setPreference(key: String, value: T)
+    protected abstract fun getPreference(key: String, defValue: T): T
+    protected abstract fun setPreference(key: String, value: T)
+
+    fun getValueDirectly(): T = getPreference(key, defaultValue)
 
     override fun onActive() {
         super.onActive()

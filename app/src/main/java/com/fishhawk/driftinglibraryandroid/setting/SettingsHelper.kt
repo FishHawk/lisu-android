@@ -36,4 +36,18 @@ object SettingsHelper {
             DEFAULT_READING_DIRECTION
         )
     }
+
+    const val THEME_LIGHT: String = "0"
+    const val THEME_DARK: String = "1"
+
+    private const val KEY_THEME = "theme"
+    private const val DEFAULT_THEME: String = THEME_LIGHT
+
+    val theme by lazy {
+        PreferenceStringLiveData(
+            sharedPreferences,
+            KEY_THEME,
+            DEFAULT_THEME
+        )
+    }
 }
