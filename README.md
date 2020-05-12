@@ -2,6 +2,8 @@
 
 这是漂流图书馆的安卓客户端，用来远程连接服务端。服务端的搭建参考[DriftingLibraryServer](https://github.com/FishHawk/DriftingLibraryServer)。
 
+启动后，在`Setting`里设置library address为服务端ip地址，如`192.168.0.101：8080`。
+
 ## 截图
 
 | LibraryPageLight                                             | LibraryPageDark                                              | GalleryPage                                                  | ReaderPage                                                   |
