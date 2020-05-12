@@ -28,6 +28,7 @@
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:ellipsize="end"
+            android:gravity="center"
             android:singleLine="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
