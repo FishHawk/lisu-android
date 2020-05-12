@@ -6,16 +6,18 @@
         android:title="@string/settings_library_address" />
 
     <ListPreference
-        android:key="reading_direction"
-        android:title="@string/settings_reading_direction"
-        android:summary="%s"
+        android:defaultValue="1"
         android:entries="@array/reading_direction_entries"
-        android:entryValues="@array/reading_direction_entry_values"/>
+        android:entryValues="@array/reading_direction_entry_values"
+        android:key="reading_direction"
+        android:summary="%s"
+        android:title="@string/settings_reading_direction" />
 
     <ListPreference
-        android:key="theme"
-        android:title="@string/settings_theme"
-        android:summary="%s"
+        android:defaultValue="0"
         android:entries="@array/theme_entries"
-        android:entryValues="@array/theme_entry_values"/>
+        android:entryValues="@array/theme_entry_values"
+        android:key="theme"
+        android:summary="%s"
+        android:title="@string/settings_theme" />
 </PreferenceScreen>
