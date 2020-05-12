@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.Util
 import com.fishhawk.driftinglibraryandroid.databinding.FragmentReaderBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
@@ -93,10 +94,8 @@ class ReaderFragment : Fragment() {
             ?.setStatusBarBackgroundColor(Color.TRANSPARENT)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val wrapper: Class<*> = Context::class.java
-            val method: Method = wrapper.getMethod("getThemeResId")
-            method.isAccessible = true
-            if (method.invoke(context) as Int == R.style.AppTheme_NoActionBar)
+            val themeId = Util.extractThemeResId(context!!)
+            if (themeId as Int == R.style.AppTheme_NoActionBar)
                 activity?.window?.decorView?.systemUiVisibility =
                     View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
