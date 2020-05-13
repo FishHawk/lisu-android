@@ -1,27 +1,22 @@
 package com.fishhawk.driftinglibraryandroid.reader
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.fishhawk.driftinglibraryandroid.setting.PreferenceStringLiveData
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class ReaderViewModel : ViewModel() {
-    private lateinit var id: String
-    private lateinit var collection: String
-    private lateinit var chapters: List<String>
-
-    fun setup(id: String, collection: String, chapters: List<String>) {
-        this.id = id
-        this.collection = collection
-        this.chapters = chapters
-    }
+class ReaderViewModel(
+    detail: MangaDetail,
+    collectionIndex: Int,
+    private var chapterIndex: Int
+) : ViewModel() {
+    private val id = detail.id
+    private val collection = detail.collections[collectionIndex]
 
     // reading direction
     val readingDirection: PreferenceStringLiveData = SettingsHelper.readingDirection
@@ -43,19 +38,24 @@ class ReaderViewModel : ViewModel() {
     val chapterPosition: MutableLiveData<Int> = MutableLiveData(0)
     val chapterSize: MutableLiveData<Int> = MutableLiveData(0)
     val chapterTitle: MutableLiveData<String> = MutableLiveData("")
-    private var chapterIndex: Int = 0
 
+    init {
+        openChapter(chapterIndex)
+    }
 
-    fun openChapter(chapterIndex: Int, isFromStart: Boolean = true) {
-        this.chapterIndex = chapterIndex
+    private fun openChapter(chapterIndex: Int, isFromStart: Boolean = true) {
         isLoading.value = true
-        val chapter = chapters[chapterIndex]
+
+        val self = this
+        val chapterTitle = collection.chapters[chapterIndex]
+
         GlobalScope.launch(Dispatchers.Main) {
-            when (val result = Repository.getChapterContent(id, collection, chapter)) {
+            when (val result = Repository.getChapterContent(id, collection.title, chapterTitle)) {
                 is Result.Success -> {
                     startPage = if (isFromStart) 0 else result.data.size - 1
                     readerContent.value = result.data
-                    chapterTitle.value = chapter
+                    self.chapterIndex = chapterIndex
+                    self.chapterTitle.value = chapterTitle
                 }
             }
             isLoading.value = false
@@ -63,7 +63,7 @@ class ReaderViewModel : ViewModel() {
     }
 
     fun openNextChapter(): Boolean {
-        if (chapterIndex < chapters.size - 1) {
+        if (chapterIndex < collection.chapters.size - 1) {
             openChapter(chapterIndex + 1)
             return true
         }
@@ -79,3 +79,19 @@ class ReaderViewModel : ViewModel() {
     }
 }
 
+
+@Suppress("UNCHECKED_CAST")
+class ReaderViewModelFactory(
+    private val detail: MangaDetail,
+    private val collectionIndex: Int,
+    private val chapterIndex: Int
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
+        when {
+            isAssignableFrom(ReaderViewModel::class.java) ->
+                ReaderViewModel(detail, collectionIndex, chapterIndex)
+            else ->
+                throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+        }
+    } as T
+}

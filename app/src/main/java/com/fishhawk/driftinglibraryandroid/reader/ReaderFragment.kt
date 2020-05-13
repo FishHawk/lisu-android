@@ -11,6 +11,7 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,26 +25,13 @@ import com.google.android.material.snackbar.Snackbar
 import java.lang.reflect.Method
 
 class ReaderFragment : Fragment() {
-    private lateinit var viewModel: ReaderViewModel
-    private lateinit var binding: FragmentReaderBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this)[ReaderViewModel::class.java]
-
-        if (savedInstanceState == null) {
-            val detail = arguments?.getParcelable<MangaDetail>("detail")!!
-            val collectionIndex: Int = arguments?.getInt("collectionIndex") ?: 0
-            val chapterIndex: Int = arguments?.getInt("chapterIndex") ?: 0
-
-            viewModel.setup(
-                detail.id,
-                detail.collections[collectionIndex].title,
-                detail.collections[collectionIndex].chapters
-            )
-            viewModel.openChapter(chapterIndex)
-        }
+    private val viewModel: ReaderViewModel by viewModels {
+        val detail = arguments?.getParcelable<MangaDetail>("detail")!!
+        val collectionIndex: Int = arguments?.getInt("collectionIndex") ?: 0
+        val chapterIndex: Int = arguments?.getInt("chapterIndex") ?: 0
+        ReaderViewModelFactory(detail, collectionIndex, chapterIndex)
     }
+    private lateinit var binding: FragmentReaderBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,

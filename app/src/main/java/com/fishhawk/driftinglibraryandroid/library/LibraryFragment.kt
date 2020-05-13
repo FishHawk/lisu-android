@@ -6,6 +6,7 @@ import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -17,20 +18,17 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.FragmentLibraryBinding
 import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
 
 class LibraryFragment : Fragment() {
-    private lateinit var viewModel: LibraryViewModel
+    private val viewModel: LibraryViewModel by viewModels()
     private lateinit var binding: FragmentLibraryBinding
 
     private var mColumnCount = 3
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this)[LibraryViewModel::class.java]
         setHasOptionsMenu(true)
     }
 

@@ -12,10 +12,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -32,15 +31,14 @@ import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.google.android.flexbox.FlexboxLayout
 
 class GalleryFragment : Fragment() {
-    private lateinit var viewModel: GalleryViewModel
+    private val viewModel: GalleryViewModel by viewModels {
+        val id = arguments?.getString("id")!!
+        GalleryViewModelFactory(id)
+    }
     private lateinit var binding: FragmentGalleryBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = activity?.run { ViewModelProvider(this)[GalleryViewModel::class.java] }
-            ?: throw Exception("Invalid Activity")
-        viewModel.openManga(arguments?.getString("id")!!)
-
         sharedElementEnterTransition =
             TransitionInflater.from(context).inflateTransition(android.R.transition.move)
         sharedElementReturnTransition =
@@ -68,7 +66,7 @@ class GalleryFragment : Fragment() {
 
         binding.title.text = title
         binding.thumb.apply {
-            binding.thumb.transitionName = id
+            transitionName = id
             Glide.with(this).load(thumb)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .override(300, 400)
