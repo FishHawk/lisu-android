@@ -23,6 +23,7 @@ import com.fishhawk.driftinglibraryandroid.databinding.FragmentReaderBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.runBlocking
 import java.lang.reflect.Method
 
 class ReaderFragment : Fragment() {
@@ -113,7 +114,9 @@ class ReaderFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.updateReadingHistory()
+        runBlocking {
+            viewModel.updateReadingHistory()
+        }
     }
 
     private fun setupReaderLayout() {

@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -103,22 +104,28 @@ class GalleryFragment : Fragment() {
             when (result) {
                 is Result.Success -> {
                     bindTags(result.data.tags, binding.tags)
-                    binding.content.removeAllViews()
-                    for ((index, collection) in result.data.collections.withIndex()) {
-                        bindCollection(collection, index, binding.content)
-                    }
+
                 }
                 is Result.Error -> println()
                 is Result.Loading -> println()
             }
         })
         viewModel.readingHistory.observe(viewLifecycleOwner, Observer { history ->
+            println(history)
+            val result = viewModel.mangaDetail.value as Result.Success
+            binding.content.removeAllViews()
+            for ((index, collection) in result.data.collections.withIndex()) {
+                if (history != null && history.collectionIndex == index)
+                    bindCollection(collection, index, history.chapterIndex, binding.content)
+                else bindCollection(collection, index, -1, binding.content)
+            }
         })
     }
 
     private fun bindCollection(
         collection: Collection,
         collectionIndex: Int,
+        chapterMarked: Int,
         contentLayout: LinearLayout
     ) {
         val collectionLayout = layoutInflater.inflate(
@@ -150,6 +157,10 @@ class GalleryFragment : Fragment() {
             chaptersLayout.addView(button)
 
             button.text = chapter
+            if (chapterMarked == index) {
+                button.backgroundTintList =
+                    ContextCompat.getColorStateList(requireContext(), R.color.colorAccent)
+            }
             button.setOnClickListener {
                 val detail = (viewModel.mangaDetail.value!! as Result.Success).data
                 val bundle = bundleOf(

@@ -82,7 +82,7 @@ class ReaderViewModel(
         return false
     }
 
-    fun updateReadingHistory() {
+    suspend fun updateReadingHistory() {
         val readingHistory = ReadingHistory(
             detail.id,
             detail.title,
@@ -92,9 +92,7 @@ class ReaderViewModel(
             chapterIndex,
             chapterPosition.value ?: 0
         )
-        viewModelScope.launch {
-            readingHistoryRepository.updateReadingHistory(readingHistory)
-        }
+        readingHistoryRepository.updateReadingHistory(readingHistory)
     }
 }
 
