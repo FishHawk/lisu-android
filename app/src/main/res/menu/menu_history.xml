@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_clear_history"
-        android:icon="@drawable/ic_clear_all_black_24dp"
+        android:icon="@drawable/ic_clear_all_auto_24dp"
         android:title="@string/menu_history_clear"
         app:showAsAction="always" />
 </menu>
