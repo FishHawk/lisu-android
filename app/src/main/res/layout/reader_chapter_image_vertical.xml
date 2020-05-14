@@ -33,7 +33,6 @@
             android:gravity="center_horizontal"
             android:textColor="#ff3300"
             android:textSize="30sp" />
-
     </LinearLayout>
 
     <ImageView
@@ -41,5 +40,4 @@
         android:layout_width="match_parent"
         android:layout_height="400dp"
         tools:ignore="ContentDescription" />
-
 </FrameLayout>

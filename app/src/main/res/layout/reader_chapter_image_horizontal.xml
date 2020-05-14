@@ -32,12 +32,10 @@
             android:layout_marginTop="10dp"
             android:textColor="#ff3300"
             android:textSize="30sp" />
-
     </LinearLayout>
 
     <com.github.chrisbanes.photoview.PhotoView
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
 </FrameLayout>

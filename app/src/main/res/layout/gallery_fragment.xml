@@ -59,7 +59,5 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="@dimen/keyline_margin" />
-
     </LinearLayout>
-
 </ScrollView>

@@ -1,22 +1,21 @@
 package com.fishhawk.driftinglibraryandroid.library
 
 import android.content.Context
-import android.view.View
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
-import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.databinding.LibraryThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
 
-class MangaListAdapter(
+class LibraryListAdapter(
     private val context: Context,
     private var data: MutableList<MangaSummary>,
     private val listener: (MangaSummary, ImageView) -> Unit
-) : RecyclerView.Adapter<MangaListAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<LibraryListAdapter.ViewHolder>() {
 
     fun update(newData: MutableList<MangaSummary>) {
         data.clear()
@@ -24,8 +23,11 @@ class MangaListAdapter(
         notifyDataSetChanged()
     }
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(View.inflate(context, R.layout.library_thumbnail, null))
+        return ViewHolder(
+            LibraryThumbnailBinding.inflate(LayoutInflater.from(context), parent, false)
+        )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -34,20 +36,18 @@ class MangaListAdapter(
 
     override fun getItemCount() = data.size
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val view: View = itemView
-        private val thumbView: ImageView = itemView.findViewById(R.id.thumb)
-        private val titleView: TextView = itemView.findViewById(R.id.title)
+    inner class ViewHolder(private val binding: LibraryThumbnailBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: MangaSummary) {
-            titleView.text = item.title
-            thumbView.transitionName = item.id
-            Glide.with(view).load(item.thumb)
+            binding.title.text = item.title
+            binding.thumb.transitionName = item.id
+            Glide.with(context).load(item.thumb)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .override(300, 400)
                 .apply(RequestOptions().dontTransform())
-                .into(thumbView)
-            view.setOnClickListener { listener(item, thumbView) }
+                .into(binding.thumb)
+            binding.root.setOnClickListener { listener(item, binding.thumb) }
         }
     }
 }

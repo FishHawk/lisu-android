@@ -8,7 +8,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.GridLayoutManager
@@ -75,7 +74,7 @@ class LibraryFragment : Fragment() {
             addItemDecoration(GridSpacingItemDecoration(mColumnCount, 16, true))
 
             // set adapter
-            adapter = MangaListAdapter(context, mutableListOf()) { item, imageView ->
+            adapter = LibraryListAdapter(context, mutableListOf()) { item, imageView ->
                 val extras = FragmentNavigatorExtras(imageView to item.id)
                 val bundle = bundleOf(
                     "id" to item.id,
@@ -107,7 +106,7 @@ class LibraryFragment : Fragment() {
         viewModel.mangaList.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is Result.Success -> {
-                    (binding.list.adapter!! as MangaListAdapter).update(result.data.toMutableList())
+                    (binding.list.adapter!! as LibraryListAdapter).update(result.data.toMutableList())
                     if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
                     else binding.multipleStatusView.showContent()
                 }
