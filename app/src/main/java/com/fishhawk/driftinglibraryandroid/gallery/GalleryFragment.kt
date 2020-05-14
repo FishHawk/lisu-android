@@ -23,6 +23,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.FragmentGalleryBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
@@ -33,7 +34,9 @@ import com.google.android.flexbox.FlexboxLayout
 class GalleryFragment : Fragment() {
     private val viewModel: GalleryViewModel by viewModels {
         val id = arguments?.getString("id")!!
-        GalleryViewModelFactory(id)
+        val readingHistoryRepository =
+            (requireContext().applicationContext as MainApplication).readingHistoryRepository
+        GalleryViewModelFactory(id, readingHistoryRepository)
     }
     private lateinit var binding: FragmentGalleryBinding
 
@@ -108,6 +111,8 @@ class GalleryFragment : Fragment() {
                 is Result.Error -> println()
                 is Result.Loading -> println()
             }
+        })
+        viewModel.readingHistory.observe(viewLifecycleOwner, Observer { history ->
         })
     }
 

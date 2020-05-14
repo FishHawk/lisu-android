@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.Util
 import com.fishhawk.driftinglibraryandroid.databinding.FragmentReaderBinding
@@ -29,7 +30,9 @@ class ReaderFragment : Fragment() {
         val detail = arguments?.getParcelable<MangaDetail>("detail")!!
         val collectionIndex: Int = arguments?.getInt("collectionIndex") ?: 0
         val chapterIndex: Int = arguments?.getInt("chapterIndex") ?: 0
-        ReaderViewModelFactory(detail, collectionIndex, chapterIndex)
+        val readingHistoryRepository =
+            (requireContext().applicationContext as MainApplication).readingHistoryRepository
+        ReaderViewModelFactory(detail, collectionIndex, chapterIndex, readingHistoryRepository)
     }
     private lateinit var binding: FragmentReaderBinding
 
@@ -106,6 +109,11 @@ class ReaderFragment : Fragment() {
             if (method.invoke(context) as Int == R.style.AppTheme_NoActionBar)
                 activity?.window?.decorView?.systemUiVisibility = 0
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.updateReadingHistory()
     }
 
     private fun setupReaderLayout() {

@@ -1,19 +1,23 @@
 package com.fishhawk.driftinglibraryandroid.reader
 
 import androidx.lifecycle.*
+import com.fishhawk.driftinglibraryandroid.repository.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
+import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.setting.PreferenceStringLiveData
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.*
 
 class ReaderViewModel(
-    detail: MangaDetail,
-    collectionIndex: Int,
-    private var chapterIndex: Int
+    private val detail: MangaDetail,
+    private val collectionIndex: Int,
+    private var chapterIndex: Int,
+    private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModel() {
     private val id = detail.id
     private val collection = detail.collections[collectionIndex]
@@ -49,7 +53,7 @@ class ReaderViewModel(
         val self = this
         val chapterTitle = collection.chapters[chapterIndex]
 
-        GlobalScope.launch(Dispatchers.Main) {
+        viewModelScope.launch {
             when (val result = Repository.getChapterContent(id, collection.title, chapterTitle)) {
                 is Result.Success -> {
                     startPage = if (isFromStart) 0 else result.data.size - 1
@@ -77,6 +81,21 @@ class ReaderViewModel(
         }
         return false
     }
+
+    fun updateReadingHistory() {
+        val readingHistory = ReadingHistory(
+            detail.id,
+            detail.title,
+            detail.thumb,
+            Calendar.getInstance().time.time,
+            collectionIndex,
+            chapterIndex,
+            chapterPosition.value ?: 0
+        )
+        viewModelScope.launch {
+            readingHistoryRepository.updateReadingHistory(readingHistory)
+        }
+    }
 }
 
 
@@ -84,12 +103,13 @@ class ReaderViewModel(
 class ReaderViewModelFactory(
     private val detail: MangaDetail,
     private val collectionIndex: Int,
-    private val chapterIndex: Int
+    private val chapterIndex: Int,
+    private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
         when {
             isAssignableFrom(ReaderViewModel::class.java) ->
-                ReaderViewModel(detail, collectionIndex, chapterIndex)
+                ReaderViewModel(detail, collectionIndex, chapterIndex, readingHistoryRepository)
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

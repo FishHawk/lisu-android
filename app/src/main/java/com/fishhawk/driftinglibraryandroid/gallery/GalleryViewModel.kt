@@ -1,30 +1,36 @@
 package com.fishhawk.driftinglibraryandroid.gallery
 
 import androidx.lifecycle.*
+import com.fishhawk.driftinglibraryandroid.repository.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 
-class GalleryViewModel(private val id: String) : ViewModel() {
-    private val _mangaDetail: MutableLiveData<Result<MangaDetail>> = MutableLiveData(Result.Loading)
-    val mangaDetail: LiveData<Result<MangaDetail>> = _mangaDetail
+class GalleryViewModel(
+    private val id: String,
+    private val readingHistoryRepository: ReadingHistoryRepository
+) : ViewModel() {
+    val mangaDetail: LiveData<Result<MangaDetail>> = liveData {
+        emit(Result.Loading)
+        emit(Repository.getMangaDetail(id))
+    }
 
-    init {
-        GlobalScope.launch(Dispatchers.Main) {
-            _mangaDetail.value = Repository.getMangaDetail(id)
-        }
+    val readingHistory: LiveData<ReadingHistory> = mangaDetail.switchMap {
+        if (it is Result.Success) readingHistoryRepository.observeReadingHistory(it.data.id)
+        else MutableLiveData()
     }
 }
 
 @Suppress("UNCHECKED_CAST")
-class GalleryViewModelFactory(private val id: String) : ViewModelProvider.Factory {
+class GalleryViewModelFactory(
+    private val id: String,
+    private val readingHistoryRepository: ReadingHistoryRepository
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
         when {
             isAssignableFrom(GalleryViewModel::class.java) ->
-                GalleryViewModel(id)
+                GalleryViewModel(id, readingHistoryRepository)
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
