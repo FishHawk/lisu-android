@@ -1,6 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.library
 
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
@@ -12,11 +11,11 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
 
@@ -71,7 +70,7 @@ class LibraryFragment : Fragment() {
                 if (mColumnCount <= 1) LinearLayoutManager(context)
                 else GridLayoutManager(context, mColumnCount)
 
-            addItemDecoration(GridSpacingItemDecoration(mColumnCount, 16, true))
+            addItemDecoration(SpacingItemDecoration(mColumnCount, 16, true))
 
             // set adapter
             adapter = LibraryListAdapter(context, mutableListOf()) { item, imageView ->
@@ -157,35 +156,5 @@ class LibraryFragment : Fragment() {
 
     private fun makeSnakeBar(content: String) {
         view?.let { Snackbar.make(it, content, Snackbar.LENGTH_SHORT).show() }
-    }
-
-    inner class GridSpacingItemDecoration(
-        private var spanCount: Int,
-        private var spacing: Int,
-        private var includeEdge: Boolean
-    ) : RecyclerView.ItemDecoration() {
-
-        override fun getItemOffsets(
-            outRect: Rect,
-            view: View,
-            parent: RecyclerView,
-            state: RecyclerView.State
-        ) {
-            super.getItemOffsets(outRect, view, parent, state)
-
-            val position = parent.getChildAdapterPosition(view)
-            val column = position % spanCount
-
-            if (includeEdge) {
-                outRect.left = spacing - column * spacing / spanCount
-                outRect.right = (column + 1) * spacing / spanCount
-                if (position < spanCount) outRect.top = spacing
-                outRect.bottom = spacing
-            } else {
-                outRect.left = column * spacing / spanCount
-                outRect.right = spacing - (column + 1) * spacing / spanCount
-                if (position >= spanCount) outRect.top = spacing
-            }
-        }
     }
 }

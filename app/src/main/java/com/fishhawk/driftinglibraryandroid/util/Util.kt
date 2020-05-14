@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid
+package com.fishhawk.driftinglibraryandroid.util
 
 import android.content.Context
 import java.lang.reflect.Method

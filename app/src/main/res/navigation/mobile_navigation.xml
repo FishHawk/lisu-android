@@ -13,7 +13,7 @@
         tools:layout="@layout/library_fragment">
         <action
             android:id="@+id/action_library_to_gallery"
-            app:destination="@id/nav_manga"
+            app:destination="@id/nav_gallery"
             app:enterAnim="@android:anim/fade_in"
             app:exitAnim="@android:anim/fade_out" />
     </fragment>
@@ -23,15 +23,15 @@
         android:name="com.fishhawk.driftinglibraryandroid.history.HistoryFragment"
         android:label="@string/menu_history"
         tools:layout="@layout/history_fragment">
-<!--        <action-->
-<!--            android:id="@+id/action_library_to_gallery"-->
-<!--            app:destination="@id/nav_manga"-->
-<!--            app:enterAnim="@android:anim/fade_in"-->
-<!--            app:exitAnim="@android:anim/fade_out" />-->
+        <action
+            android:id="@+id/action_history_to_gallery"
+            app:destination="@id/nav_gallery"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out" />
     </fragment>
 
     <fragment
-        android:id="@+id/nav_manga"
+        android:id="@+id/nav_gallery"
         android:name="com.fishhawk.driftinglibraryandroid.gallery.GalleryFragment"
         tools:layout="@layout/gallery_fragment">
         <action
