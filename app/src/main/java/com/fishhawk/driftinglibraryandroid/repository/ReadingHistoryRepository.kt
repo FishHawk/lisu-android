@@ -13,6 +13,7 @@ class ReadingHistoryRepository(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
     fun observeReadingHistory(id: String): LiveData<ReadingHistory> = dao.observe(id)
+    fun observeAllReadingHistory(): LiveData<List<ReadingHistory>> = dao.observeAll()
 
     suspend fun updateReadingHistory(readingHistory: ReadingHistory) = withContext(ioDispatcher) {
         dao.insert(readingHistory)
