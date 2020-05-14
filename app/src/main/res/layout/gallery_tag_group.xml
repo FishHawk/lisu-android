@@ -9,7 +9,7 @@
 
     <include
         android:id="@+id/key"
-        layout="@layout/item_tag" />
+        layout="@layout/gallery_tag" />
 
     <com.google.android.flexbox.FlexboxLayout
         android:id="@+id/value"

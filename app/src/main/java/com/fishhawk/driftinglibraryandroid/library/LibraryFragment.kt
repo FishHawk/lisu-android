@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.FragmentLibraryBinding
+import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.google.android.material.snackbar.Snackbar
@@ -23,7 +23,7 @@ import com.hippo.refreshlayout.RefreshLayout
 
 class LibraryFragment : Fragment() {
     private val viewModel: LibraryViewModel by viewModels()
-    private lateinit var binding: FragmentLibraryBinding
+    private lateinit var binding: LibraryFragmentBinding
 
     private var mColumnCount = 3
 
@@ -37,7 +37,7 @@ class LibraryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentLibraryBinding.inflate(inflater, container, false)
+        binding = LibraryFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 

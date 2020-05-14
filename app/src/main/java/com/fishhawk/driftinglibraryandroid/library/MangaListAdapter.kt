@@ -25,7 +25,7 @@ class MangaListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(View.inflate(context, R.layout.item_thumbnail_card, null))
+        return ViewHolder(View.inflate(context, R.layout.library_thumbnail, null))
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

@@ -15,7 +15,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.ItemChapterImageVerticalBinding
+import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageVerticalBinding
 
 
 class ImageVerticalListAdapter(
@@ -25,7 +25,7 @@ class ImageVerticalListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ItemChapterImageVerticalBinding.inflate(LayoutInflater.from(context), parent, false)
+            ReaderChapterImageVerticalBinding.inflate(LayoutInflater.from(context), parent, false)
         )
     }
 
@@ -35,7 +35,7 @@ class ImageVerticalListAdapter(
 
     override fun getItemCount() = data.size
 
-    inner class ViewHolder(private val binding: ItemChapterImageVerticalBinding) :
+    inner class ViewHolder(private val binding: ReaderChapterImageVerticalBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: String, position: Int) {

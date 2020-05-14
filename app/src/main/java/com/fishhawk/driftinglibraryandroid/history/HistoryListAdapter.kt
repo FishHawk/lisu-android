@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
-import com.fishhawk.driftinglibraryandroid.databinding.ItemThumbnailCardHistoryBinding
+import com.fishhawk.driftinglibraryandroid.databinding.HistoryThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import java.util.*
 
@@ -20,7 +20,7 @@ class HistoryListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ItemThumbnailCardHistoryBinding.inflate(LayoutInflater.from(context), parent, false)
+            HistoryThumbnailBinding.inflate(LayoutInflater.from(context), parent, false)
         )
     }
 
@@ -30,7 +30,7 @@ class HistoryListAdapter(
 
     override fun getItemCount() = data.size
 
-    inner class ViewHolder(private val binding: ItemThumbnailCardHistoryBinding) :
+    inner class ViewHolder(private val binding: HistoryThumbnailBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ReadingHistory) {

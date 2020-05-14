@@ -7,7 +7,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.FragmentHistoryBinding
+import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
 
 class HistoryFragment : Fragment() {
     private val viewModel: HistoryViewModel by viewModels {
@@ -15,7 +15,7 @@ class HistoryFragment : Fragment() {
             (requireContext().applicationContext as MainApplication).readingHistoryRepository
         HistoryViewModelFactory(readingHistoryRepository)
     }
-    private lateinit var binding: FragmentHistoryBinding
+    private lateinit var binding: HistoryFragmentBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,7 +27,7 @@ class HistoryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentHistoryBinding.inflate(inflater, container, false)
+        binding = HistoryFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 

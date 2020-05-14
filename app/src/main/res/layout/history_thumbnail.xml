@@ -13,7 +13,6 @@
             android:id="@+id/thumb"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:background="@android:color/transparent"
             android:contentDescription="@null"
             android:scaleType="fitCenter"
             app:layout_constraintDimensionRatio="H,4:3"
@@ -32,7 +31,6 @@
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:singleLine="true" />
@@ -41,7 +39,6 @@
                 android:id="@+id/date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:singleLine="true" />

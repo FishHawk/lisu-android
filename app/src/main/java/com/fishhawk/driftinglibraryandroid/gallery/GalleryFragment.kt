@@ -26,7 +26,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.FragmentGalleryBinding
+import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.fishhawk.driftinglibraryandroid.repository.Result
@@ -39,7 +39,7 @@ class GalleryFragment : Fragment() {
             (requireContext().applicationContext as MainApplication).readingHistoryRepository
         GalleryViewModelFactory(id, readingHistoryRepository)
     }
-    private lateinit var binding: FragmentGalleryBinding
+    private lateinit var binding: GalleryFragmentBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +55,7 @@ class GalleryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentGalleryBinding.inflate(inflater, container, false)
+        binding = GalleryFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -129,7 +129,7 @@ class GalleryFragment : Fragment() {
         contentLayout: LinearLayout
     ) {
         val collectionLayout = layoutInflater.inflate(
-            R.layout.item_collection, contentLayout, false
+            R.layout.gallery_collection, contentLayout, false
         ) as LinearLayout
         contentLayout.addView(collectionLayout)
 
@@ -152,7 +152,7 @@ class GalleryFragment : Fragment() {
 
         for ((index, chapter) in collection.chapters.withIndex()) {
             val button = layoutInflater.inflate(
-                R.layout.item_chapter_button, chaptersLayout, false
+                R.layout.gallery_chapter_button, chaptersLayout, false
             ) as Button
             chaptersLayout.addView(button)
 
@@ -173,7 +173,7 @@ class GalleryFragment : Fragment() {
         }
         for (i in 1..(3 - collection.chapters.size)) {
             val button = layoutInflater.inflate(
-                R.layout.item_chapter_button, chaptersLayout, false
+                R.layout.gallery_chapter_button, chaptersLayout, false
             ) as Button
             button.visibility = View.INVISIBLE
             chaptersLayout.addView(button)
@@ -196,7 +196,7 @@ class GalleryFragment : Fragment() {
 
         for (tagGroup in tags) {
             val tagGroupLayout = layoutInflater.inflate(
-                R.layout.item_tag_group, tagsLayout, false
+                R.layout.gallery_tag_group, tagsLayout, false
             ) as LinearLayout
             tagsLayout.addView(tagGroupLayout)
 
@@ -208,7 +208,7 @@ class GalleryFragment : Fragment() {
             val tagGroupValueLayout: FlexboxLayout = tagGroupLayout.findViewById(R.id.value)
             for (value in tagGroup.value) {
                 val tagGroupValueView = layoutInflater.inflate(
-                    R.layout.item_tag, tagGroupValueLayout, false
+                    R.layout.gallery_tag, tagGroupValueLayout, false
                 ) as TextView
                 tagGroupValueLayout.addView(tagGroupValueView)
                 tagGroupValueView.text = value

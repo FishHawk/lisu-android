@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.Util
-import com.fishhawk.driftinglibraryandroid.databinding.FragmentReaderBinding
+import com.fishhawk.driftinglibraryandroid.databinding.ReaderFragmentBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.google.android.material.snackbar.Snackbar
@@ -35,14 +35,14 @@ class ReaderFragment : Fragment() {
             (requireContext().applicationContext as MainApplication).readingHistoryRepository
         ReaderViewModelFactory(detail, collectionIndex, chapterIndex, readingHistoryRepository)
     }
-    private lateinit var binding: FragmentReaderBinding
+    private lateinit var binding: ReaderFragmentBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentReaderBinding.inflate(inflater, container, false)
+        binding = ReaderFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 

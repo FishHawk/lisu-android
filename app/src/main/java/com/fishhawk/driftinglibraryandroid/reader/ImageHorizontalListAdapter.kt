@@ -12,7 +12,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.ItemChapterImageHorizontalBinding
+import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageHorizontalBinding
 
 class ImageHorizontalListAdapter(
     private val context: Context,
@@ -21,7 +21,7 @@ class ImageHorizontalListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ItemChapterImageHorizontalBinding.inflate(LayoutInflater.from(context), parent, false)
+            ReaderChapterImageHorizontalBinding.inflate(LayoutInflater.from(context), parent, false)
         )
     }
 
@@ -31,7 +31,7 @@ class ImageHorizontalListAdapter(
 
     override fun getItemCount() = data.size
 
-    inner class ViewHolder(private val binding: ItemChapterImageHorizontalBinding) :
+    inner class ViewHolder(private val binding: ReaderChapterImageHorizontalBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: String, position: Int) {
