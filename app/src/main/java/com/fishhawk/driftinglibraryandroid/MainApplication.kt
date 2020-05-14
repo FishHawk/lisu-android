@@ -8,6 +8,8 @@ import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.local.ApplicationDatabase
 import com.fishhawk.driftinglibraryandroid.repository.service.RemoteLibraryService
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -36,5 +38,28 @@ class MainApplication : Application() {
         remoteLibraryRepository = RemoteLibraryRepository(
             url, retrofit.create(RemoteLibraryService::class.java)
         )
+    }
+
+    fun setLibraryAddress(inputUrl: String): Boolean {
+        var url = inputUrl
+        url = if (URLUtil.isNetworkUrl(url)) url else "http://${url}"
+        url = if (url.last() == '/') url else "$url/"
+        val retrofit = try {
+            Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+        } catch (e: Throwable) {
+            null
+        }
+
+        retrofit?.let {
+            remoteLibraryRepository.url = url
+            remoteLibraryRepository.service = retrofit.create(RemoteLibraryService::class.java)
+            GlobalScope.launch {
+                readingHistoryRepository.clearReadingHistory()
+            }
+        }
+        return retrofit != null
     }
 }

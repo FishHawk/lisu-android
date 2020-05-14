@@ -95,16 +95,7 @@ class LibraryFragment : Fragment() {
             }
         }
 
-        viewModel.libraryAddress.observe(viewLifecycleOwner, Observer { address ->
-//            if (!RemoteLibraryRepository.matchUrl(address)) {
-//                RemoteLibraryRepository.setUrl(address)
-                viewModel.filter = ""
-                viewModel.reload()
-//            } else if (viewModel.mangaList.value !is Result.Success) {
-//                viewModel.filter = ""
-//                viewModel.reload()
-//            }
-        })
+        viewModel.reloadIfNeed()
 
         viewModel.mangaList.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
@@ -147,8 +138,7 @@ class LibraryFragment : Fragment() {
         searchView.queryHint = getString(R.string.library_search_hint)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                viewModel.filter = query ?: ""
-                viewModel.reload()
+                viewModel.reload(query ?: "")
                 return false
             }
 

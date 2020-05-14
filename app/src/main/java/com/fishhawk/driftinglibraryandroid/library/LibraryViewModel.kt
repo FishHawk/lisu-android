@@ -7,8 +7,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
-import com.fishhawk.driftinglibraryandroid.setting.PreferenceStringLiveData
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -17,19 +15,24 @@ class LibraryViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository
 ) : ViewModel() {
     var filter: String = ""
+    var address = remoteLibraryRepository.url
+
 
     private val _mangaList: MutableLiveData<Result<List<MangaSummary>>> = MutableLiveData()
     val mangaList: LiveData<Result<List<MangaSummary>>> = _mangaList
 
-    fun reload() {
+    fun reload(filter: String) {
+        this.filter = filter
         _mangaList.value = Result.Loading
         GlobalScope.launch(Dispatchers.Main) {
             _mangaList.value = remoteLibraryRepository.getMangaList("", filter)
         }
     }
 
-    // library address
-    val libraryAddress: PreferenceStringLiveData = SettingsHelper.libraryAddress
+    fun reloadIfNeed() {
+        if (address != remoteLibraryRepository.url || mangaList.value !is Result.Success) reload("")
+        address = remoteLibraryRepository.url
+    }
 
     // library content
     private val _refreshResult: MutableLiveData<Result<List<MangaSummary>>> = MutableLiveData()
