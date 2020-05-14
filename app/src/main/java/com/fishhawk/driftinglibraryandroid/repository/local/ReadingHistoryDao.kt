@@ -20,5 +20,8 @@ interface ReadingHistoryDao {
 
     @Update
     fun update(history: ReadingHistory)
+
+    @Query("DELETE FROM ReadingHistory")
+    fun deleteAll()
 }
 

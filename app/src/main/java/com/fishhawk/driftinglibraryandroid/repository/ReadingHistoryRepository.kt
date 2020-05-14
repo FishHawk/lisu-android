@@ -18,4 +18,8 @@ class ReadingHistoryRepository(
     suspend fun updateReadingHistory(readingHistory: ReadingHistory) = withContext(ioDispatcher) {
         dao.insert(readingHistory)
     }
+
+    suspend fun clearReadingHistory() = withContext(ioDispatcher) {
+        dao.deleteAll()
+    }
 }

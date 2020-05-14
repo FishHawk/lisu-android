@@ -2,6 +2,7 @@ package com.fishhawk.driftinglibraryandroid.history
 
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -73,5 +74,20 @@ class HistoryFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_history, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_clear_history -> {
+                AlertDialog.Builder(requireActivity())
+                    .setMessage(R.string.dialog_clear_history)
+                    .setPositiveButton(R.string.dialog_clear_history_positive) { _, _ ->
+                        viewModel.clearReadingHistory()
+                    }
+                    .show()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }
