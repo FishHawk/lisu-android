@@ -18,7 +18,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        SettingsHelper.initialize(this)
         when (SettingsHelper.theme.getValueDirectly()) {
             SettingsHelper.THEME_LIGHT -> setTheme(R.style.AppTheme_NoActionBar)
             SettingsHelper.THEME_DARK -> setTheme(R.style.AppTheme_Dark_NoActionBar)

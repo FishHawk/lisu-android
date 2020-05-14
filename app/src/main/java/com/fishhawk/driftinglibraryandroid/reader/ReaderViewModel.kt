@@ -2,7 +2,7 @@ package com.fishhawk.driftinglibraryandroid.reader
 
 import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.repository.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.repository.Repository
+import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
@@ -15,6 +15,7 @@ class ReaderViewModel(
     private val detail: MangaDetail,
     private val collectionIndex: Int,
     private var chapterIndex: Int,
+    private val remoteLibraryRepository: RemoteLibraryRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModel() {
     private val id = detail.id
@@ -52,7 +53,8 @@ class ReaderViewModel(
         val chapterTitle = collection.chapters[chapterIndex]
 
         viewModelScope.launch {
-            when (val result = Repository.getChapterContent(id, collection.title, chapterTitle)) {
+            when (val result =
+                remoteLibraryRepository.getChapterContent(id, collection.title, chapterTitle)) {
                 is Result.Success -> {
                     startPage = if (isFromStart) 0 else result.data.size - 1
                     readerContent.value = result.data
@@ -100,12 +102,19 @@ class ReaderViewModelFactory(
     private val detail: MangaDetail,
     private val collectionIndex: Int,
     private val chapterIndex: Int,
+    private val remoteLibraryRepository: RemoteLibraryRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
         when {
             isAssignableFrom(ReaderViewModel::class.java) ->
-                ReaderViewModel(detail, collectionIndex, chapterIndex, readingHistoryRepository)
+                ReaderViewModel(
+                    detail,
+                    collectionIndex,
+                    chapterIndex,
+                    remoteLibraryRepository,
+                    readingHistoryRepository
+                )
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

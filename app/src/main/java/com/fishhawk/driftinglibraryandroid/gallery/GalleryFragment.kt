@@ -35,9 +35,10 @@ import com.google.android.flexbox.FlexboxLayout
 class GalleryFragment : Fragment() {
     private val viewModel: GalleryViewModel by viewModels {
         val id = arguments?.getString("id")!!
-        val readingHistoryRepository =
-            (requireContext().applicationContext as MainApplication).readingHistoryRepository
-        GalleryViewModelFactory(id, readingHistoryRepository)
+        val application = requireContext().applicationContext as MainApplication
+        val remoteLibraryRepository = application.remoteLibraryRepository
+        val readingHistoryRepository = application.readingHistoryRepository
+        GalleryViewModelFactory(id, remoteLibraryRepository, readingHistoryRepository)
     }
     private lateinit var binding: GalleryFragmentBinding
 

@@ -30,9 +30,16 @@ class ReaderFragment : Fragment() {
         val detail = arguments?.getParcelable<MangaDetail>("detail")!!
         val collectionIndex: Int = arguments?.getInt("collectionIndex") ?: 0
         val chapterIndex: Int = arguments?.getInt("chapterIndex") ?: 0
-        val readingHistoryRepository =
-            (requireContext().applicationContext as MainApplication).readingHistoryRepository
-        ReaderViewModelFactory(detail, collectionIndex, chapterIndex, readingHistoryRepository)
+        val application = requireContext().applicationContext as MainApplication
+        val remoteLibraryRepository = application.remoteLibraryRepository
+        val readingHistoryRepository = application.readingHistoryRepository
+        ReaderViewModelFactory(
+            detail,
+            collectionIndex,
+            chapterIndex,
+            remoteLibraryRepository,
+            readingHistoryRepository
+        )
     }
     private lateinit var binding: ReaderFragmentBinding
 

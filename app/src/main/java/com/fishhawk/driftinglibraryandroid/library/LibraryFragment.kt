@@ -11,16 +11,20 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
-import com.fishhawk.driftinglibraryandroid.repository.Repository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
 
 class LibraryFragment : Fragment() {
-    private val viewModel: LibraryViewModel by viewModels()
+    private val viewModel: LibraryViewModel by viewModels {
+        val application = requireContext().applicationContext as MainApplication
+        val remoteLibraryRepository = application.remoteLibraryRepository
+        LibraryViewModelFactory(remoteLibraryRepository)
+    }
     private lateinit var binding: LibraryFragmentBinding
 
     private var mColumnCount = 3
@@ -92,14 +96,14 @@ class LibraryFragment : Fragment() {
         }
 
         viewModel.libraryAddress.observe(viewLifecycleOwner, Observer { address ->
-            if (!Repository.matchUrl(address)) {
-                Repository.setUrl(address)
+//            if (!RemoteLibraryRepository.matchUrl(address)) {
+//                RemoteLibraryRepository.setUrl(address)
                 viewModel.filter = ""
                 viewModel.reload()
-            } else if (viewModel.mangaList.value !is Result.Success) {
-                viewModel.filter = ""
-                viewModel.reload()
-            }
+//            } else if (viewModel.mangaList.value !is Result.Success) {
+//                viewModel.filter = ""
+//                viewModel.reload()
+//            }
         })
 
         viewModel.mangaList.observe(viewLifecycleOwner, Observer { result ->

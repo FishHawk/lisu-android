@@ -3,7 +3,8 @@ package com.fishhawk.driftinglibraryandroid.library
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.fishhawk.driftinglibraryandroid.repository.Repository
+import androidx.lifecycle.ViewModelProvider
+import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
 import com.fishhawk.driftinglibraryandroid.setting.PreferenceStringLiveData
@@ -12,7 +13,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class LibraryViewModel : ViewModel() {
+class LibraryViewModel(
+    private val remoteLibraryRepository: RemoteLibraryRepository
+) : ViewModel() {
     var filter: String = ""
 
     private val _mangaList: MutableLiveData<Result<List<MangaSummary>>> = MutableLiveData()
@@ -21,7 +24,7 @@ class LibraryViewModel : ViewModel() {
     fun reload() {
         _mangaList.value = Result.Loading
         GlobalScope.launch(Dispatchers.Main) {
-            _mangaList.value = Repository.getMangaList("", filter)
+            _mangaList.value = remoteLibraryRepository.getMangaList("", filter)
         }
     }
 
@@ -34,7 +37,7 @@ class LibraryViewModel : ViewModel() {
 
     fun refresh() {
         GlobalScope.launch(Dispatchers.Main) {
-            val result = Repository.getMangaList("", filter)
+            val result = remoteLibraryRepository.getMangaList("", filter)
             if (result is Result.Success) _mangaList.value = result
             _refreshResult.value = result
         }
@@ -49,7 +52,7 @@ class LibraryViewModel : ViewModel() {
         }
 
         GlobalScope.launch(Dispatchers.Main) {
-            val result = Repository.getMangaList(lastId, filter)
+            val result = remoteLibraryRepository.getMangaList(lastId, filter)
             if (result is Result.Success)
                 _mangaList.value = (_mangaList.value as Result.Success).also { old ->
                     old.data.plus(result.data)
@@ -57,4 +60,18 @@ class LibraryViewModel : ViewModel() {
             _fetchMoreResult.value = result
         }
     }
+}
+
+@Suppress("UNCHECKED_CAST")
+class LibraryViewModelFactory(
+    private val remoteLibraryRepository: RemoteLibraryRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
+        when {
+            isAssignableFrom(LibraryViewModel::class.java) ->
+                LibraryViewModel(remoteLibraryRepository)
+            else ->
+                throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+        }
+    } as T
 }
