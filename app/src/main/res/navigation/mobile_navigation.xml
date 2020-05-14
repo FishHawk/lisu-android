@@ -19,6 +19,18 @@
     </fragment>
 
     <fragment
+        android:id="@+id/nav_history"
+        android:name="com.fishhawk.driftinglibraryandroid.history.HistoryFragment"
+        android:label="@string/menu_history"
+        tools:layout="@layout/fragment_history">
+<!--        <action-->
+<!--            android:id="@+id/action_library_to_gallery"-->
+<!--            app:destination="@id/nav_manga"-->
+<!--            app:enterAnim="@android:anim/fade_in"-->
+<!--            app:exitAnim="@android:anim/fade_out" />-->
+    </fragment>
+
+    <fragment
         android:id="@+id/nav_manga"
         android:name="com.fishhawk.driftinglibraryandroid.gallery.GalleryFragment"
         tools:layout="@layout/fragment_gallery">
