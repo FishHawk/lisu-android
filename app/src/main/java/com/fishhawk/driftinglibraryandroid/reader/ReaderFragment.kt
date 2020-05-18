@@ -30,6 +30,7 @@ class ReaderFragment : Fragment() {
         val detail = arguments?.getParcelable<MangaDetail>("detail")!!
         val collectionIndex: Int = arguments?.getInt("collectionIndex") ?: 0
         val chapterIndex: Int = arguments?.getInt("chapterIndex") ?: 0
+        val pageIndex: Int = arguments?.getInt("pageIndex") ?: 0
         val application = requireContext().applicationContext as MainApplication
         val remoteLibraryRepository = application.remoteLibraryRepository
         val readingHistoryRepository = application.readingHistoryRepository
@@ -37,6 +38,7 @@ class ReaderFragment : Fragment() {
             detail,
             collectionIndex,
             chapterIndex,
+            pageIndex,
             remoteLibraryRepository,
             readingHistoryRepository
         )
@@ -92,7 +94,7 @@ class ReaderFragment : Fragment() {
             ?.setStatusBarBackgroundColor(Color.TRANSPARENT)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val themeId = Util.extractThemeResId(context!!)
+            val themeId = Util.extractThemeResId(requireContext())
             if (themeId as Int == R.style.AppTheme_NoActionBar)
                 activity?.window?.decorView?.systemUiVisibility =
                     View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR

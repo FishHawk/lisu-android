@@ -15,7 +15,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -67,9 +67,8 @@ class GalleryFragment : Fragment() {
         val title: String? = arguments?.getString("title")
         val thumb: String? = arguments?.getString("thumb")
 
-        (activity as? AppCompatActivity)?.supportActionBar?.title = title
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = title
 
-        binding.title.text = title
         binding.thumb.apply {
             transitionName = id
             Glide.with(this).load(thumb)
@@ -101,32 +100,49 @@ class GalleryFragment : Fragment() {
                 .into(this)
         }
 
+        binding.readButton.setOnClickListener {
+            when (viewModel.mangaDetail.value) {
+                is Result.Success -> {
+                    viewModel.readingHistory.value?.let {
+                        openChapter(it.collectionIndex, it.chapterIndex, it.pageIndex)
+                    } ?: openChapter()
+                }
+            }
+        }
+
         viewModel.mangaDetail.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is Result.Success -> {
                     bindTags(result.data.tags, binding.tags)
-
                 }
                 is Result.Error -> println()
                 is Result.Loading -> println()
             }
         })
         viewModel.readingHistory.observe(viewLifecycleOwner, Observer { history ->
-            println(history)
             val result = viewModel.mangaDetail.value as Result.Success
             binding.content.removeAllViews()
             for ((index, collection) in result.data.collections.withIndex()) {
-                if (history != null && history.collectionIndex == index)
-                    bindCollection(collection, index, history.chapterIndex, binding.content)
-                else bindCollection(collection, index, -1, binding.content)
+                bindCollection(collection, index, binding.content)
             }
         })
     }
 
+    private fun openChapter(collectionIndex: Int = 0, chapterIndex: Int = 0, pageIndex: Int = 0) {
+        val detail = (viewModel.mangaDetail.value!! as Result.Success).data
+        val bundle = bundleOf(
+            "detail" to detail,
+            "collectionIndex" to collectionIndex,
+            "chapterIndex" to chapterIndex,
+            "pageIndex" to pageIndex
+        )
+        findNavController().navigate(R.id.action_gallery_to_reader, bundle)
+    }
+
+
     private fun bindCollection(
         collection: Collection,
         collectionIndex: Int,
-        chapterMarked: Int,
         contentLayout: LinearLayout
     ) {
         val collectionLayout = layoutInflater.inflate(
@@ -145,32 +161,27 @@ class GalleryFragment : Fragment() {
             noChaptersView.visibility = View.GONE
         }
 
-        if (collection.title == "") {
-            titleView.visibility = View.GONE
-        } else {
-            titleView.text = collection.title
-        }
+        if (collection.title == "") titleView.visibility = View.GONE
+        else titleView.text = collection.title
 
-        for ((index, chapter) in collection.chapters.withIndex()) {
+        for ((chapterIndex, chapter) in collection.chapters.withIndex()) {
             val button = layoutInflater.inflate(
                 R.layout.gallery_chapter_button, chaptersLayout, false
             ) as Button
             chaptersLayout.addView(button)
 
             button.text = chapter
-            if (chapterMarked == index) {
+
+            val isMarked = viewModel.readingHistory.value?.let {
+                collectionIndex == it.collectionIndex && chapterIndex == it.chapterIndex
+            } ?: false
+            val pageIndex = if (isMarked) viewModel.readingHistory.value?.pageIndex ?: 0 else 0
+
+            if (isMarked) {
                 button.backgroundTintList =
                     ContextCompat.getColorStateList(requireContext(), R.color.colorAccent)
             }
-            button.setOnClickListener {
-                val detail = (viewModel.mangaDetail.value!! as Result.Success).data
-                val bundle = bundleOf(
-                    "detail" to detail,
-                    "collectionIndex" to collectionIndex,
-                    "chapterIndex" to index
-                )
-                button.findNavController().navigate(R.id.action_gallery_to_reader, bundle)
-            }
+            button.setOnClickListener { openChapter(collectionIndex, chapterIndex, pageIndex) }
         }
         for (i in 1..(3 - collection.chapters.size)) {
             val button = layoutInflater.inflate(

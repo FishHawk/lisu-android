@@ -15,6 +15,7 @@ class ReaderViewModel(
     private val detail: MangaDetail,
     private val collectionIndex: Int,
     private var chapterIndex: Int,
+    pageIndex: Int,
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModel() {
@@ -35,7 +36,7 @@ class ReaderViewModel(
 
     // reader content
     val readerContent: MutableLiveData<List<String>> = MutableLiveData(emptyList())
-    var startPage: Int = 0
+    var startPage: Int = -1
 
     val isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
     val chapterPosition: MutableLiveData<Int> = MutableLiveData(0)
@@ -43,10 +44,10 @@ class ReaderViewModel(
     val chapterTitle: MutableLiveData<String> = MutableLiveData("")
 
     init {
-        openChapter(chapterIndex)
+        openChapter(chapterIndex, pageIndex)
     }
 
-    private fun openChapter(chapterIndex: Int, isFromStart: Boolean = true) {
+    private fun openChapter(chapterIndex: Int, startPage: Int = 0) {
         isLoading.value = true
 
         val self = this
@@ -56,8 +57,11 @@ class ReaderViewModel(
             when (val result =
                 remoteLibraryRepository.getChapterContent(id, collection.title, chapterTitle)) {
                 is Result.Success -> {
-                    startPage = if (isFromStart) 0 else result.data.size - 1
-                    readerContent.value = result.data
+                    self.startPage = when {
+                        startPage < 0 || startPage >= result.data.size -> result.data.size - 1
+                        else -> startPage
+                    }
+                    self.readerContent.value = result.data
                     self.chapterIndex = chapterIndex
                     self.chapterTitle.value = chapterTitle
                 }
@@ -76,7 +80,7 @@ class ReaderViewModel(
 
     fun openPrevChapter(): Boolean {
         if (chapterIndex > 0) {
-            openChapter(chapterIndex - 1, isFromStart = false)
+            openChapter(chapterIndex - 1, -1)
             return true
         }
         return false
@@ -102,6 +106,7 @@ class ReaderViewModelFactory(
     private val detail: MangaDetail,
     private val collectionIndex: Int,
     private val chapterIndex: Int,
+    private val pageIndex: Int,
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModelProvider.Factory {
@@ -112,6 +117,7 @@ class ReaderViewModelFactory(
                     detail,
                     collectionIndex,
                     chapterIndex,
+                    pageIndex,
                     remoteLibraryRepository,
                     readingHistoryRepository
                 )
