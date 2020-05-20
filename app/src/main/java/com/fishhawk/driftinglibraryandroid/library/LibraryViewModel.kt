@@ -33,8 +33,9 @@ class LibraryViewModel(
         }
     }
 
-    fun reloadIfNeed() {
-        if (address != remoteLibraryRepository.url || mangaList.value !is Result.Success) reload("")
+    fun reloadIfNeed(filter: String) {
+        if (address != remoteLibraryRepository.url || mangaList.value !is Result.Success)
+            reload(filter)
         address = remoteLibraryRepository.url
     }
 

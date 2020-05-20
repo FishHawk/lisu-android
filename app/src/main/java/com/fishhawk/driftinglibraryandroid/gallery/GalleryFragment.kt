@@ -31,6 +31,7 @@ import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.google.android.flexbox.FlexboxLayout
+import kotlinx.android.synthetic.main.gallery_tag_group.*
 
 class GalleryFragment : Fragment() {
     private val viewModel: GalleryViewModel by viewModels {
@@ -224,6 +225,11 @@ class GalleryFragment : Fragment() {
                 ) as TextView
                 tagGroupValueLayout.addView(tagGroupValueView)
                 tagGroupValueView.text = value
+                tagGroupValueView.setOnClickListener {
+                    val filter = "${tagGroup.key}:$value"
+                    val bundle = bundleOf("filter" to filter)
+                    findNavController().navigate(R.id.action_gallery_to_library, bundle)
+                }
             }
         }
     }

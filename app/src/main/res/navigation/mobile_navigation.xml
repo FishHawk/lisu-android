@@ -37,6 +37,9 @@
         <action
             android:id="@+id/action_gallery_to_reader"
             app:destination="@id/nav_reader" />
+        <action
+            android:id="@+id/action_gallery_to_library"
+            app:destination="@id/nav_library" />
     </fragment>
 
     <fragment

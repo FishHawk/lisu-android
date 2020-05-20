@@ -96,7 +96,8 @@ class LibraryFragment : Fragment() {
             }
         }
 
-        viewModel.reloadIfNeed()
+        val filter: String? = arguments?.getString("filter")
+        viewModel.reloadIfNeed(filter ?: "")
 
         viewModel.mangaList.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
@@ -137,6 +138,7 @@ class LibraryFragment : Fragment() {
         inflater.inflate(R.menu.menu_library, menu)
         val searchView: SearchView = menu.findItem(R.id.action_search).actionView as SearchView
         searchView.queryHint = getString(R.string.library_search_hint)
+        if (viewModel.filter != "") searchView.setQuery(viewModel.filter, false)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 viewModel.reload(query ?: "")
