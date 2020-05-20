@@ -15,6 +15,7 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.util.EventObserver
 import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
@@ -109,23 +110,23 @@ class LibraryFragment : Fragment() {
             }
         })
 
-        viewModel.refreshResult.observe(viewLifecycleOwner, Observer { result ->
+        viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver { exception ->
             binding.refreshLayout.isHeaderRefreshing = false
-            when (result) {
-                is Result.Success -> if (result.data.isEmpty()) {
-                    makeSnakeBar(getString(R.string.library_empty_hint))
+            exception?.apply {
+                when (this) {
+                    is EmptyListException -> makeSnakeBar(getString(R.string.library_empty_hint))
+                    else -> makeSnakeBar(message ?: getString(R.string.library_unknown_error_hint))
                 }
-                is Result.Error -> result.exception.message?.let { makeSnakeBar(it) }
             }
         })
 
-        viewModel.fetchMoreResult.observe(viewLifecycleOwner, Observer { result ->
+        viewModel.fetchMoreFinish.observe(viewLifecycleOwner, EventObserver { exception ->
             binding.refreshLayout.isFooterRefreshing = false
-            when (result) {
-                is Result.Success -> if (result.data.isEmpty()) {
-                    makeSnakeBar(getString(R.string.library_reach_end_hint))
+            exception?.apply {
+                when (this) {
+                    is EmptyListException -> makeSnakeBar(getString(R.string.library_reach_end_hint))
+                    else -> makeSnakeBar(message ?: getString(R.string.library_unknown_error_hint))
                 }
-                is Result.Error -> result.exception.message?.let { makeSnakeBar(it) }
             }
         })
     }

@@ -18,6 +18,7 @@
     <string name="library_search_hint">Search Library</string>
     <string name="library_reach_end_hint">No more mangas.</string>
     <string name="library_empty_hint">Library is empty.</string>
+    <string name="library_unknown_error_hint">Unknown error.</string>
 
     <!-- gallery fragment -->
     <string name="gallery_no_tags_hint">No tags</string>

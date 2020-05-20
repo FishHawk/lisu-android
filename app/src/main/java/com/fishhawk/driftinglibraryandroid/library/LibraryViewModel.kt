@@ -7,15 +7,19 @@ import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
+import com.fishhawk.driftinglibraryandroid.util.Event
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.lang.Exception
+
+class EmptyListException : Exception()
 
 class LibraryViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository
 ) : ViewModel() {
+    private var address = remoteLibraryRepository.url
     var filter: String = ""
-    var address = remoteLibraryRepository.url
 
 
     private val _mangaList: MutableLiveData<Result<List<MangaSummary>>> = MutableLiveData()
@@ -34,20 +38,26 @@ class LibraryViewModel(
         address = remoteLibraryRepository.url
     }
 
-    // library content
-    private val _refreshResult: MutableLiveData<Result<List<MangaSummary>>> = MutableLiveData()
-    val refreshResult: LiveData<Result<List<MangaSummary>>> = _refreshResult
+
+    private val _refreshFinish: MutableLiveData<Event<Throwable?>> = MutableLiveData()
+    val refreshFinish: LiveData<Event<Throwable?>> = _refreshFinish
 
     fun refresh() {
         GlobalScope.launch(Dispatchers.Main) {
-            val result = remoteLibraryRepository.getMangaList("", filter)
-            if (result is Result.Success) _mangaList.value = result
-            _refreshResult.value = result
+            when (val result = remoteLibraryRepository.getMangaList("", filter)) {
+                is Result.Success -> {
+                    _mangaList.value = result
+                    if (result.data.isEmpty()) _refreshFinish.value = Event(EmptyListException())
+                    else _refreshFinish.value = Event(null)
+                }
+                is Result.Error -> _refreshFinish.value = Event(result.exception)
+            }
         }
     }
 
-    private val _fetchMoreResult: MutableLiveData<Result<List<MangaSummary>>> = MutableLiveData()
-    val fetchMoreResult: LiveData<Result<List<MangaSummary>>> = _fetchMoreResult
+
+    private val _fetchMoreFinish: MutableLiveData<Event<Throwable?>> = MutableLiveData()
+    val fetchMoreFinish: LiveData<Event<Throwable?>> = _fetchMoreFinish
 
     fun fetchMore() {
         val lastId = (_mangaList.value as Result.Success).data.let {
@@ -55,12 +65,15 @@ class LibraryViewModel(
         }
 
         GlobalScope.launch(Dispatchers.Main) {
-            val result = remoteLibraryRepository.getMangaList(lastId, filter)
-            if (result is Result.Success)
-                _mangaList.value = (_mangaList.value as Result.Success).also { old ->
-                    old.data.plus(result.data)
+            when (val result = remoteLibraryRepository.getMangaList(lastId, filter)) {
+                is Result.Success -> {
+                    (_mangaList.value as Result.Success).data.plus(result.data)
+                    _mangaList.value = _mangaList.value
+                    if (result.data.isEmpty()) _fetchMoreFinish.value = Event(EmptyListException())
+                    else _fetchMoreFinish.value = Event(null)
                 }
-            _fetchMoreResult.value = result
+                is Result.Error -> _fetchMoreFinish.value = Event(result.exception)
+            }
         }
     }
 }
