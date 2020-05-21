@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.history
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -35,14 +36,18 @@ class HistoryListAdapter(
         RecyclerView.ViewHolder(binding.root) {
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
+        @SuppressLint("SetTextI18n")
         fun bind(item: ReadingHistory) {
             binding.title.text = item.title
-            if (item.collectionTitle.isEmpty())
-                binding.record.text = "Seen: ${item.chapterTitle} Page${item.pageIndex + 1}"
-            else
-                binding.record.text =
-                    "Seen: ${item.collectionTitle} ${item.chapterTitle} Page${item.pageIndex + 1}"
-            binding.date.text = "Time: " + dateFormat.format(Date(item.date))
+
+            val seenHint = when {
+                item.collectionTitle.isEmpty() -> "Seen: ${item.chapterTitle} Page${item.pageIndex + 1}"
+                else -> "Seen: ${item.collectionTitle} ${item.chapterTitle} Page${item.pageIndex + 1}"
+            }
+            binding.record.text = seenHint
+
+            val timeHint = "Time: ${dateFormat.format(Date(item.date))}"
+            binding.date.text = timeHint
 
             binding.thumb.transitionName = item.id
             Glide.with(context).load(item.thumb)

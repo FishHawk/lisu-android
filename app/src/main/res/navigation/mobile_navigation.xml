@@ -28,6 +28,9 @@
             app:destination="@id/nav_gallery"
             app:enterAnim="@android:anim/fade_in"
             app:exitAnim="@android:anim/fade_out" />
+        <action
+            android:id="@+id/action_history_to_reader"
+            app:destination="@id/nav_reader" />
     </fragment>
 
     <fragment
@@ -45,12 +48,10 @@
     <fragment
         android:id="@+id/nav_reader"
         android:name="com.fishhawk.driftinglibraryandroid.reader.ReaderFragment"
-        tools:layout="@layout/reader_fragment">
-    </fragment>
+        tools:layout="@layout/reader_fragment" />
 
     <fragment
         android:id="@+id/nav_setting"
-        android:label="@string/menu_setting"
-        android:name="com.fishhawk.driftinglibraryandroid.setting.SettingsFragment">
-    </fragment>
+        android:name="com.fishhawk.driftinglibraryandroid.setting.SettingsFragment"
+        android:label="@string/menu_setting" />
 </navigation>
