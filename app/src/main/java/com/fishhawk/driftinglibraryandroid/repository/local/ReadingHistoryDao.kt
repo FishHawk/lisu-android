@@ -6,7 +6,7 @@ import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 
 @Dao
 interface ReadingHistoryDao {
-    @Query("SELECT * FROM ReadingHistory")
+    @Query("SELECT * FROM ReadingHistory ORDER BY date DESC")
     fun observeAll(): LiveData<List<ReadingHistory>>
 
     @Query("SELECT * FROM ReadingHistory WHERE id = :id")
