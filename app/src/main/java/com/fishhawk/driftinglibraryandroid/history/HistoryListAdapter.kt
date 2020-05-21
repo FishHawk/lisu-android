@@ -1,6 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.history
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -39,10 +38,11 @@ class HistoryListAdapter(
         fun bind(item: ReadingHistory) {
             binding.title.text = item.title
             if (item.collectionTitle.isEmpty())
-                binding.record.text = "${item.chapterTitle} Page:${item.pageIndex + 1}"
+                binding.record.text = "Seen: ${item.chapterTitle} Page${item.pageIndex + 1}"
             else
-                binding.record.text = "${item.collectionTitle} ${item.chapterTitle} Page:${item.pageIndex + 1}"
-            binding.date.text = dateFormat.format(Date(item.date))
+                binding.record.text =
+                    "Seen: ${item.collectionTitle} ${item.chapterTitle} Page${item.pageIndex + 1}"
+            binding.date.text = "Time: " + dateFormat.format(Date(item.date))
 
             binding.thumb.transitionName = item.id
             Glide.with(context).load(item.thumb)
