@@ -33,6 +33,17 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:gravity="center"
+                android:singleLine="true"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/record"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/baseline_8dp"
+                android:ellipsize="end"
+                android:gravity="center"
                 android:singleLine="true" />
 
             <TextView

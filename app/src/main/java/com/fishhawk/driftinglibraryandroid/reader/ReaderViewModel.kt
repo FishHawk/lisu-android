@@ -93,7 +93,9 @@ class ReaderViewModel(
             detail.thumb,
             Calendar.getInstance().time.time,
             collectionIndex,
+            collection.title,
             chapterIndex,
+            collection.chapters[chapterIndex],
             chapterPosition.value ?: 0
         )
         readingHistoryRepository.updateReadingHistory(readingHistory)

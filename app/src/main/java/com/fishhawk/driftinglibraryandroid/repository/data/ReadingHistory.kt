@@ -10,6 +10,8 @@ data class ReadingHistory(
     var thumb: String,
     var date: Long,
     var collectionIndex: Int,
+    var collectionTitle: String,
     var chapterIndex: Int,
+    var chapterTitle: String,
     var pageIndex: Int
 )

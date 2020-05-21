@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.history
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
+import java.text.SimpleDateFormat
 import java.util.*
 
 class HistoryListAdapter(
@@ -32,10 +34,15 @@ class HistoryListAdapter(
 
     inner class ViewHolder(private val binding: HistoryThumbnailBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
         fun bind(item: ReadingHistory) {
             binding.title.text = item.title
-            binding.date.text = Date(item.date).toString()
+            if (item.collectionTitle.isEmpty())
+                binding.record.text = "${item.chapterTitle} Page:${item.pageIndex + 1}"
+            else
+                binding.record.text = "${item.collectionTitle} ${item.chapterTitle} Page:${item.pageIndex + 1}"
+            binding.date.text = dateFormat.format(Date(item.date))
 
             binding.thumb.transitionName = item.id
             Glide.with(context).load(item.thumb)
