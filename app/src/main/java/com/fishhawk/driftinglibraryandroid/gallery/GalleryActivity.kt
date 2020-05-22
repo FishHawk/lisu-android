@@ -18,12 +18,14 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import com.fishhawk.driftinglibraryandroid.MainActivity
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryActivityBinding
 import com.fishhawk.driftinglibraryandroid.reader.ReaderActivity
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
+import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.google.android.flexbox.FlexboxLayout
@@ -106,7 +108,6 @@ class GalleryActivity : AppCompatActivity() {
             when (result) {
                 is Result.Success -> {
                     bindTags(result.data.tags, binding.tags)
-                    bindContent(result.data.collections)
                 }
                 is Result.Error -> println()
                 is Result.Loading -> println()
@@ -127,14 +128,18 @@ class GalleryActivity : AppCompatActivity() {
         }
 
         viewModel.readingHistory.observe(this, Observer { history ->
-            if (history != null)
-                (binding.content.adapter as ContentAdapter).markChapter(
-                    history.collectionIndex,
-                    history.chapterIndex,
-                    history.pageIndex
-                )
-            else
-                (binding.content.adapter as ContentAdapter).unmarkChapter()
+            if (binding.content.adapter == null) {
+                val result = viewModel.mangaDetail.value as Result.Success
+                bindContent(result.data.collections, history)
+            } else {
+                if (history != null)
+                    (binding.content.adapter as ContentAdapter).markChapter(
+                        history.collectionIndex,
+                        history.chapterIndex,
+                        history.pageIndex
+                    )
+                else (binding.content.adapter as ContentAdapter).unmarkChapter()
+            }
         })
     }
 
@@ -152,7 +157,7 @@ class GalleryActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun bindContent(collections: List<Collection>) {
+    private fun bindContent(collections: List<Collection>, history: ReadingHistory?) {
         val items = mutableListOf<ContentItem>()
         for ((collectionIndex, collection) in collections.withIndex()) {
             if (collection.title.isNotEmpty())
@@ -162,11 +167,18 @@ class GalleryActivity : AppCompatActivity() {
                     )
                 )
             for ((chapterIndex, chapter) in collection.chapters.withIndex()) {
-                items.add(
-                    ContentItem.Chapter(
-                        chapter, collectionIndex, chapterIndex
+                if (history != null && history.collectionIndex == collectionIndex && history.chapterIndex == chapterIndex)
+                    items.add(
+                        ContentItem.ChapterMarked(
+                            chapter, collectionIndex, chapterIndex, history.pageIndex
+                        )
                     )
-                )
+                else
+                    items.add(
+                        ContentItem.Chapter(
+                            chapter, collectionIndex, chapterIndex
+                        )
+                    )
             }
         }
         binding.content.adapter = ContentAdapter(this, items, ::openChapter)
@@ -204,11 +216,13 @@ class GalleryActivity : AppCompatActivity() {
                 ) as TextView
                 tagGroupValueLayout.addView(tagGroupValueView)
                 tagGroupValueView.text = value
-//                tagGroupValueView.setOnClickListener {
-//                    val filter = "${tagGroup.key}:$value"
-//                    val bundle = bundleOf("filter" to filter)
-//                    findNavController().navigate(R.id.action_gallery_to_library, bundle)
-//                }
+                tagGroupValueView.setOnClickListener {
+                    val filter = "${tagGroup.key}:$value"
+                    val bundle = bundleOf("filter" to filter)
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.putExtras(bundle)
+                    startActivity(intent)
+                }
             }
         }
     }
