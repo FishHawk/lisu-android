@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.gallery
 
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -22,12 +23,14 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import com.fishhawk.driftinglibraryandroid.MainActivity
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
-import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
+import com.fishhawk.driftinglibraryandroid.reader.ReaderActivity
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
+import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
 import com.google.android.flexbox.FlexboxLayout
 
 class GalleryFragment : Fragment() {
@@ -152,7 +155,10 @@ class GalleryFragment : Fragment() {
             "chapterIndex" to chapterIndex,
             "pageIndex" to pageIndex
         )
-        findNavController().navigate(R.id.action_gallery_to_reader, bundle)
+
+        val intent = Intent(activity, ReaderActivity::class.java)
+        intent.putExtras(bundle)
+        startActivity(intent)
     }
 
     private fun bindContent(collections: List<Collection>) {

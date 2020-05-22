@@ -1,37 +1,33 @@
 package com.fishhawk.driftinglibraryandroid.reader
 
-import android.content.Context
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.TypedValue
-import android.view.*
+import android.view.View
 import android.widget.SeekBar
-import androidx.viewpager2.widget.ViewPager2
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.util.Util
-import com.fishhawk.driftinglibraryandroid.databinding.ReaderFragmentBinding
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.databinding.ReaderActivityBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.util.Util
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.runBlocking
-import java.lang.reflect.Method
 
-class ReaderFragment : Fragment() {
+class ReaderActivity : AppCompatActivity() {
     private val viewModel: ReaderViewModel by viewModels {
-        val detail = arguments?.getParcelable<MangaDetail>("detail")!!
-        val collectionIndex: Int = arguments?.getInt("collectionIndex") ?: 0
-        val chapterIndex: Int = arguments?.getInt("chapterIndex") ?: 0
-        val pageIndex: Int = arguments?.getInt("pageIndex") ?: 0
-        val application = requireContext().applicationContext as MainApplication
+        val arguments = intent.extras!!
+
+        val detail = arguments.getParcelable<MangaDetail>("detail")!!
+        val collectionIndex: Int = arguments.getInt("collectionIndex")
+        val chapterIndex: Int = arguments.getInt("chapterIndex")
+        val pageIndex: Int = arguments.getInt("pageIndex")
+        val application = applicationContext as MainApplication
         val remoteLibraryRepository = application.remoteLibraryRepository
         val readingHistoryRepository = application.readingHistoryRepository
         ReaderViewModelFactory(
@@ -43,35 +39,37 @@ class ReaderFragment : Fragment() {
             readingHistoryRepository
         )
     }
-    private lateinit var binding: ReaderFragmentBinding
+    private lateinit var binding: ReaderActivityBinding
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = ReaderFragmentBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        when (SettingsHelper.theme.getValueDirectly()) {
+            SettingsHelper.THEME_LIGHT -> setTheme(R.style.AppTheme_NoActionBar)
+            SettingsHelper.THEME_DARK -> setTheme(R.style.AppTheme_Dark_NoActionBar)
+        }
+
+        setupSystemUiVisibility()
+
+        binding = ReaderActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         binding.viewModel = viewModel
-        binding.lifecycleOwner = this.viewLifecycleOwner
+        binding.lifecycleOwner = this
 
         setupReaderLayout()
         setupMenuLayout()
         setupHorizontalReader()
         setupVerticalReader()
 
-        viewModel.isReaderDirectionEqualRightToLeft.observe(viewLifecycleOwner, Observer {
+        viewModel.isReaderDirectionEqualRightToLeft.observe(this, Observer {
             binding.horizontalReader.layoutDirection =
                 if (it) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
             viewModel.startPage = viewModel.chapterPosition.value!!
             viewModel.readerContent.value = viewModel.readerContent.value
         })
 
-        viewModel.readerContent.observe(viewLifecycleOwner, Observer { content ->
+        viewModel.readerContent.observe(this, Observer { content ->
             if (viewModel.isReaderDirectionEqualVertical.value!!)
                 binding.verticalReader.apply {
                     adapter = ImageVerticalListAdapter(context, content)
@@ -86,44 +84,23 @@ class ReaderFragment : Fragment() {
         })
     }
 
-    override fun onResume() {
-        super.onResume()
-        (activity as? AppCompatActivity)?.supportActionBar?.hide()
-        activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.fitsSystemWindows = false
-        activity?.findViewById<DrawerLayout>(R.id.drawer_layout)
-            ?.setStatusBarBackgroundColor(Color.TRANSPARENT)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val themeId = Util.extractThemeResId(requireContext())
-            if (themeId as Int == R.style.AppTheme_NoActionBar)
-                activity?.window?.decorView?.systemUiVisibility =
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        val statusBarColor = TypedValue()
-        context?.theme?.resolveAttribute(R.attr.colorPrimaryDark, statusBarColor, true)
-
-        (activity as? AppCompatActivity)?.supportActionBar?.show()
-        activity?.findViewById<DrawerLayout>(R.id.drawer_layout)?.fitsSystemWindows = true
-        activity?.findViewById<DrawerLayout>(R.id.drawer_layout)
-            ?.setStatusBarBackgroundColor(statusBarColor.data)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val wrapper: Class<*> = Context::class.java
-            val method: Method = wrapper.getMethod("getThemeResId")
-            method.isAccessible = true
-            if (method.invoke(context) as Int == R.style.AppTheme_NoActionBar)
-                activity?.window?.decorView?.systemUiVisibility = 0
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         runBlocking {
             viewModel.updateReadingHistory()
+        }
+    }
+
+    private fun setupSystemUiVisibility() {
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val themeId = Util.extractThemeResId(this)
+            if (themeId as Int == R.style.AppTheme_NoActionBar)
+                window.decorView.systemUiVisibility = (window.decorView.systemUiVisibility
+                        or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
         }
     }
 
@@ -265,6 +242,6 @@ class ReaderFragment : Fragment() {
     }
 
     private fun makeSnakeBar(content: String) {
-        view?.let { Snackbar.make(it, content, Snackbar.LENGTH_SHORT).show() }
+        binding.root.let { Snackbar.make(it, content, Snackbar.LENGTH_SHORT).show() }
     }
 }
