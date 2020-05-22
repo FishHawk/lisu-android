@@ -3,17 +3,13 @@ package com.fishhawk.driftinglibraryandroid.gallery
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
@@ -23,52 +19,48 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
-import com.fishhawk.driftinglibraryandroid.MainActivity
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
+import com.fishhawk.driftinglibraryandroid.databinding.GalleryActivityBinding
 import com.fishhawk.driftinglibraryandroid.reader.ReaderActivity
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.google.android.flexbox.FlexboxLayout
 
-class GalleryFragment : Fragment() {
+class GalleryActivity : AppCompatActivity() {
     private val viewModel: GalleryViewModel by viewModels {
-        val id = arguments?.getString("id")!!
-        val application = requireContext().applicationContext as MainApplication
+        val arguments = intent.extras!!
+        val id = arguments.getString("id")!!
+
+        val application = applicationContext as MainApplication
         val remoteLibraryRepository = application.remoteLibraryRepository
         val readingHistoryRepository = application.readingHistoryRepository
+
         GalleryViewModelFactory(id, remoteLibraryRepository, readingHistoryRepository)
     }
-    private lateinit var binding: GalleryFragmentBinding
+    private lateinit var binding: GalleryActivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sharedElementEnterTransition =
-            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
-        sharedElementReturnTransition =
-            TransitionInflater.from(context).inflateTransition(android.R.transition.move)
-        activity?.supportPostponeEnterTransition()
-    }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = GalleryFragmentBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+        when (SettingsHelper.theme.getValueDirectly()) {
+            SettingsHelper.THEME_LIGHT -> setTheme(R.style.AppTheme_NoActionBar)
+            SettingsHelper.THEME_DARK -> setTheme(R.style.AppTheme_Dark_NoActionBar)
+        }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        supportPostponeEnterTransition()
 
-        val id: String? = arguments?.getString("id")
-        val title: String? = arguments?.getString("title")
-        val thumb: String? = arguments?.getString("thumb")
+        binding = GalleryActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        (requireActivity() as AppCompatActivity).supportActionBar?.title = title
+        val arguments = intent.extras!!
+        val id: String? = arguments.getString("id")
+        val title: String? = arguments.getString("title")
+        val thumb: String? = arguments.getString("thumb")
+
+//        (requireActivity() as AppCompatActivity).supportActionBar?.title = title
 
         binding.thumb.apply {
             transitionName = id
@@ -83,7 +75,7 @@ class GalleryFragment : Fragment() {
                         target: Target<Drawable>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        activity?.supportStartPostponedEnterTransition()
+                        supportStartPostponedEnterTransition()
                         return false
                     }
 
@@ -94,7 +86,7 @@ class GalleryFragment : Fragment() {
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        activity?.supportStartPostponedEnterTransition()
+                        supportStartPostponedEnterTransition()
                         return false
                     }
                 })
@@ -111,7 +103,7 @@ class GalleryFragment : Fragment() {
             }
         }
 
-        viewModel.mangaDetail.observe(viewLifecycleOwner, Observer { result ->
+        viewModel.mangaDetail.observe(this, Observer { result ->
             when (result) {
                 is Result.Success -> {
                     bindTags(result.data.tags, binding.tags)
@@ -135,7 +127,7 @@ class GalleryFragment : Fragment() {
                 }
         }
 
-        viewModel.readingHistory.observe(viewLifecycleOwner, Observer { history ->
+        viewModel.readingHistory.observe(this, Observer { history ->
             if (history != null)
                 (binding.content.adapter as ContentAdapter).markChapter(
                     history.collectionIndex,
@@ -156,7 +148,7 @@ class GalleryFragment : Fragment() {
             "pageIndex" to pageIndex
         )
 
-        val intent = Intent(activity, ReaderActivity::class.java)
+        val intent = Intent(this, ReaderActivity::class.java)
         intent.putExtras(bundle)
         startActivity(intent)
     }
@@ -178,7 +170,7 @@ class GalleryFragment : Fragment() {
                 )
             }
         }
-        binding.content.adapter = ContentAdapter(requireContext(), items, ::openChapter)
+        binding.content.adapter = ContentAdapter(this, items, ::openChapter)
     }
 
     private fun bindTags(
@@ -213,11 +205,11 @@ class GalleryFragment : Fragment() {
                 ) as TextView
                 tagGroupValueLayout.addView(tagGroupValueView)
                 tagGroupValueView.text = value
-                tagGroupValueView.setOnClickListener {
-                    val filter = "${tagGroup.key}:$value"
-                    val bundle = bundleOf("filter" to filter)
-                    findNavController().navigate(R.id.action_gallery_to_library, bundle)
-                }
+//                tagGroupValueView.setOnClickListener {
+//                    val filter = "${tagGroup.key}:$value"
+//                    val bundle = bundleOf("filter" to filter)
+//                    findNavController().navigate(R.id.action_gallery_to_library, bundle)
+//                }
             }
         }
     }

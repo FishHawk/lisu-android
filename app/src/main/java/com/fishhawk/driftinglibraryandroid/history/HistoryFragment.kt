@@ -1,9 +1,12 @@
 package com.fishhawk.driftinglibraryandroid.history
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -12,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
+import com.fishhawk.driftinglibraryandroid.gallery.GalleryActivity
 import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
 
 class HistoryFragment : Fragment() {
@@ -46,18 +50,21 @@ class HistoryFragment : Fragment() {
 
                 // set adapter
                 adapter = HistoryListAdapter(context, data) { item, imageView ->
-                    val extras = FragmentNavigatorExtras(imageView to item.id)
                     val bundle = bundleOf(
                         "id" to item.id,
                         "title" to item.title,
                         "thumb" to item.thumb
                     )
-                    findNavController().navigate(
-                        R.id.action_history_to_gallery,
-                        bundle,
-                        null,
-                        extras
-                    )
+
+                    val intent = Intent(activity, GalleryActivity::class.java)
+                    intent.putExtras(bundle)
+                    val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            requireActivity(),
+                            imageView,
+                            ViewCompat.getTransitionName(imageView)!!
+                        )
+//                    startActivity(intent, options.toBundle())
+                    startActivity(intent)
                 }
 
                 // set transition
