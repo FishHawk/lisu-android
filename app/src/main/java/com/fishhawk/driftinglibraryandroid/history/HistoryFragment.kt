@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
@@ -17,6 +18,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.gallery.GalleryActivity
 import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
+import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
 
 class HistoryFragment : Fragment() {
     private val viewModel: HistoryViewModel by viewModels {
@@ -50,21 +52,9 @@ class HistoryFragment : Fragment() {
 
                 // set adapter
                 adapter = HistoryListAdapter(context, data) { item, imageView ->
-                    val bundle = bundleOf(
-                        "id" to item.id,
-                        "title" to item.title,
-                        "thumb" to item.thumb
+                    (requireActivity() as AppCompatActivity).navToGalleryActivity(
+                        item.id, item.title, item.thumb, imageView
                     )
-
-                    val intent = Intent(activity, GalleryActivity::class.java)
-                    intent.putExtras(bundle)
-                    val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                            requireActivity(),
-                            imageView,
-                            ViewCompat.getTransitionName(imageView)!!
-                        )
-//                    startActivity(intent, options.toBundle())
-                    startActivity(intent)
                 }
 
                 // set transition

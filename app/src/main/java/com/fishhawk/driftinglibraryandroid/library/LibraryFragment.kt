@@ -3,6 +3,7 @@ package com.fishhawk.driftinglibraryandroid.library
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.os.bundleOf
@@ -20,6 +21,7 @@ import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.util.EventObserver
 import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
 import com.fishhawk.driftinglibraryandroid.util.makeSnackBar
+import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
 import com.hippo.refreshlayout.RefreshLayout
 
 
@@ -82,21 +84,9 @@ class LibraryFragment : Fragment() {
 
             // set adapter
             adapter = LibraryListAdapter(context, mutableListOf()) { item, imageView ->
-                val bundle = bundleOf(
-                    "id" to item.id,
-                    "title" to item.title,
-                    "thumb" to item.thumb
+                (requireActivity() as AppCompatActivity).navToGalleryActivity(
+                    item.id, item.title, item.thumb, imageView
                 )
-
-                val intent = Intent(activity, GalleryActivity::class.java)
-                intent.putExtras(bundle)
-                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                    requireActivity(),
-                    imageView,
-                    ViewCompat.getTransitionName(imageView)!!
-                )
-//                startActivity(intent, options.toBundle())
-                startActivity(intent)
             }
 
             // set transition
@@ -127,7 +117,9 @@ class LibraryFragment : Fragment() {
             exception?.apply {
                 when (this) {
                     is EmptyListException -> view.makeSnackBar(getString(R.string.library_empty_hint))
-                    else -> view.makeSnackBar(message ?: getString(R.string.library_unknown_error_hint))
+                    else -> view.makeSnackBar(
+                        message ?: getString(R.string.library_unknown_error_hint)
+                    )
                 }
             }
         })
@@ -137,7 +129,9 @@ class LibraryFragment : Fragment() {
             exception?.apply {
                 when (this) {
                     is EmptyListException -> view.makeSnackBar(getString(R.string.library_reach_end_hint))
-                    else -> view.makeSnackBar(message ?: getString(R.string.library_unknown_error_hint))
+                    else -> view.makeSnackBar(
+                        message ?: getString(R.string.library_unknown_error_hint)
+                    )
                 }
             }
         })

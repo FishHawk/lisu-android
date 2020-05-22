@@ -28,6 +28,8 @@ import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.util.navToMainActivity
+import com.fishhawk.driftinglibraryandroid.util.navToReaderActivity
 import com.google.android.flexbox.FlexboxLayout
 
 class GalleryActivity : AppCompatActivity() {
@@ -97,18 +99,22 @@ class GalleryActivity : AppCompatActivity() {
         binding.readButton.setOnClickListener {
             when (viewModel.mangaDetail.value) {
                 is Result.Success -> {
+                    val detail = (viewModel.mangaDetail.value!! as Result.Success).data
                     viewModel.readingHistory.value?.let {
-                        openChapter(it.collectionIndex, it.chapterIndex, it.pageIndex)
-                    } ?: openChapter()
+                        navToReaderActivity(
+                            detail,
+                            it.collectionIndex,
+                            it.chapterIndex,
+                            it.pageIndex
+                        )
+                    } ?: navToReaderActivity(detail)
                 }
             }
         }
 
         viewModel.mangaDetail.observe(this, Observer { result ->
             when (result) {
-                is Result.Success -> {
-                    bindTags(result.data.tags, binding.tags)
-                }
+                is Result.Success -> bindTags(result.data.tags, binding.tags)
                 is Result.Error -> println()
                 is Result.Loading -> println()
             }
@@ -143,20 +149,6 @@ class GalleryActivity : AppCompatActivity() {
         })
     }
 
-    private fun openChapter(collectionIndex: Int = 0, chapterIndex: Int = 0, pageIndex: Int = 0) {
-        val detail = (viewModel.mangaDetail.value!! as Result.Success).data
-        val bundle = bundleOf(
-            "detail" to detail,
-            "collectionIndex" to collectionIndex,
-            "chapterIndex" to chapterIndex,
-            "pageIndex" to pageIndex
-        )
-
-        val intent = Intent(this, ReaderActivity::class.java)
-        intent.putExtras(bundle)
-        startActivity(intent)
-    }
-
     private fun bindContent(collections: List<Collection>, history: ReadingHistory?) {
         val items = mutableListOf<ContentItem>()
         for ((collectionIndex, collection) in collections.withIndex()) {
@@ -181,7 +173,11 @@ class GalleryActivity : AppCompatActivity() {
                     )
             }
         }
-        binding.content.adapter = ContentAdapter(this, items, ::openChapter)
+        binding.content.adapter = ContentAdapter(this, items)
+        { collectionIndex, chapterIndex, pageIndex ->
+            val detail = (viewModel.mangaDetail.value!! as Result.Success).data
+            navToReaderActivity(detail, collectionIndex, chapterIndex, pageIndex)
+        }
     }
 
     private fun bindTags(
@@ -216,13 +212,7 @@ class GalleryActivity : AppCompatActivity() {
                 ) as TextView
                 tagGroupValueLayout.addView(tagGroupValueView)
                 tagGroupValueView.text = value
-                tagGroupValueView.setOnClickListener {
-                    val filter = "${tagGroup.key}:$value"
-                    val bundle = bundleOf("filter" to filter)
-                    val intent = Intent(this, MainActivity::class.java)
-                    intent.putExtras(bundle)
-                    startActivity(intent)
-                }
+                tagGroupValueView.setOnClickListener { navToMainActivity("${tagGroup.key}:$value") }
             }
         }
     }
