@@ -1,6 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.gallery
 
-import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
@@ -8,7 +7,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
@@ -18,11 +16,9 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
-import com.fishhawk.driftinglibraryandroid.MainActivity
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryActivityBinding
-import com.fishhawk.driftinglibraryandroid.reader.ReaderActivity
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
@@ -99,15 +95,16 @@ class GalleryActivity : AppCompatActivity() {
         binding.readButton.setOnClickListener {
             when (viewModel.mangaDetail.value) {
                 is Result.Success -> {
-                    val id = (viewModel.mangaDetail.value!! as Result.Success).data.id
                     viewModel.readingHistory.value?.let {
                         navToReaderActivity(
-                            id,
+                            (viewModel.mangaDetail.value!! as Result.Success).data.id,
                             it.collectionIndex,
                             it.chapterIndex,
                             it.pageIndex
                         )
-                    } ?: navToReaderActivity(id)
+                    } ?: navToReaderActivity(
+                        (viewModel.mangaDetail.value!! as Result.Success).data.id
+                    )
                 }
             }
         }
@@ -136,7 +133,7 @@ class GalleryActivity : AppCompatActivity() {
         viewModel.readingHistory.observe(this, Observer { history ->
             if (binding.content.adapter == null) {
                 val result = viewModel.mangaDetail.value as Result.Success
-                bindContent(result.data.collections, history)
+                bindContent(result.data.id, result.data.collections, history)
             } else {
                 if (history != null)
                     (binding.content.adapter as ContentAdapter).markChapter(
@@ -149,7 +146,7 @@ class GalleryActivity : AppCompatActivity() {
         })
     }
 
-    private fun bindContent(collections: List<Collection>, history: ReadingHistory?) {
+    private fun bindContent(id: String, collections: List<Collection>, history: ReadingHistory?) {
         val items = mutableListOf<ContentItem>()
         for ((collectionIndex, collection) in collections.withIndex()) {
             if (collection.title.isNotEmpty())
@@ -173,11 +170,7 @@ class GalleryActivity : AppCompatActivity() {
                     )
             }
         }
-        binding.content.adapter = ContentAdapter(this, items)
-        { collectionIndex, chapterIndex, pageIndex ->
-            val id = (viewModel.mangaDetail.value!! as Result.Success).data.id
-            navToReaderActivity(id, collectionIndex, chapterIndex, pageIndex)
-        }
+        binding.content.adapter = ContentAdapter(this, id, items)
     }
 
     private fun bindTags(

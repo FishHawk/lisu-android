@@ -1,13 +1,15 @@
 package com.fishhawk.driftinglibraryandroid.gallery
 
-import android.content.Context
+import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryChapterBinding
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryChapterMarkedBinding
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryCollectionTitleBinding
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryNoChapterHintBinding
+import com.fishhawk.driftinglibraryandroid.util.navToReaderActivity
 
 sealed class ContentItem {
     data class Chapter(
@@ -28,9 +30,9 @@ sealed class ContentItem {
 }
 
 class ContentAdapter(
-    private val context: Context,
-    private val data: MutableList<ContentItem>,
-    private val onChapterClick: (Int, Int, Int) -> Unit
+    private val activity: Activity,
+    private val id: String,
+    private val data: MutableList<ContentItem>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     enum class ViewType(val value: Int) {
         CHAPTER(0),
@@ -64,16 +66,16 @@ class ContentAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ViewType.CHAPTER.value -> ChapterViewHolder(
-                GalleryChapterBinding.inflate(LayoutInflater.from(context), parent, false)
+                GalleryChapterBinding.inflate(LayoutInflater.from(activity), parent, false)
             )
             ViewType.CHAPTER_MARKED.value -> ChapterMarkedViewHolder(
-                GalleryChapterMarkedBinding.inflate(LayoutInflater.from(context), parent, false)
+                GalleryChapterMarkedBinding.inflate(LayoutInflater.from(activity), parent, false)
             )
             ViewType.COLLECTION_HEADER.value -> CollectionHeaderViewHolder(
-                GalleryCollectionTitleBinding.inflate(LayoutInflater.from(context), parent, false)
+                GalleryCollectionTitleBinding.inflate(LayoutInflater.from(activity), parent, false)
             )
             ViewType.NO_CHAPTER_HINT.value -> NoChapterHintViewHolder(
-                GalleryNoChapterHintBinding.inflate(LayoutInflater.from(context), parent, false)
+                GalleryNoChapterHintBinding.inflate(LayoutInflater.from(activity), parent, false)
             )
             else -> throw IllegalAccessError()
         }
@@ -108,7 +110,8 @@ class ContentAdapter(
         fun bind(item: ContentItem.Chapter) {
             binding.button.text = item.title
             binding.button.setOnClickListener {
-                onChapterClick(
+                (activity as AppCompatActivity).navToReaderActivity(
+                    id,
                     item.collectionIndex,
                     item.chapterIndex,
                     0
@@ -123,7 +126,8 @@ class ContentAdapter(
         fun bind(item: ContentItem.ChapterMarked) {
             binding.button.text = item.title
             binding.button.setOnClickListener {
-                onChapterClick(
+                (activity as AppCompatActivity).navToReaderActivity(
+                    id,
                     item.collectionIndex,
                     item.chapterIndex,
                     item.pageIndex

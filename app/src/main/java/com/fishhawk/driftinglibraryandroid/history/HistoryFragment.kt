@@ -1,24 +1,15 @@
 package com.fishhawk.driftinglibraryandroid.history
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityOptionsCompat
-import androidx.core.os.bundleOf
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.FragmentNavigatorExtras
-import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
-import com.fishhawk.driftinglibraryandroid.gallery.GalleryActivity
 import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
-import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
 
 class HistoryFragment : Fragment() {
     private val viewModel: HistoryViewModel by viewModels {

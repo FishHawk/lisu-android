@@ -1,13 +1,8 @@
 package com.fishhawk.driftinglibraryandroid.library
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.core.app.ActivityOptionsCompat
-import androidx.core.os.bundleOf
-import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -16,12 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
-import com.fishhawk.driftinglibraryandroid.gallery.GalleryActivity
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.util.EventObserver
 import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
 import com.fishhawk.driftinglibraryandroid.util.makeSnackBar
-import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
 import com.hippo.refreshlayout.RefreshLayout
 
 
@@ -75,21 +68,14 @@ class LibraryFragment : Fragment() {
         }
 
         binding.list.apply {
-            // set layout manager
             layoutManager =
                 if (mColumnCount <= 1) LinearLayoutManager(context)
                 else GridLayoutManager(context, mColumnCount)
 
             addItemDecoration(SpacingItemDecoration(mColumnCount, 16, true))
 
-            // set adapter
-            adapter = LibraryListAdapter(context, mutableListOf()) { item, imageView ->
-                (requireActivity() as AppCompatActivity).navToGalleryActivity(
-                    item.id, item.title, item.thumb, imageView
-                )
-            }
+            adapter = LibraryListAdapter(requireActivity(), mutableListOf())
 
-            // set transition
             postponeEnterTransition()
             viewTreeObserver.addOnPreDrawListener {
                 startPostponedEnterTransition()
@@ -112,24 +98,31 @@ class LibraryFragment : Fragment() {
             }
         })
 
-        viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver { exception ->
-            binding.refreshLayout.isHeaderRefreshing = false
+        observeRefreshFinishEvent()
+        observeFetchMoreFinishEvent()
+    }
+
+    private fun observeFetchMoreFinishEvent() {
+        viewModel.fetchMoreFinish.observe(viewLifecycleOwner, EventObserver { exception ->
+            binding.refreshLayout.isFooterRefreshing = false
             exception?.apply {
                 when (this) {
-                    is EmptyListException -> view.makeSnackBar(getString(R.string.library_empty_hint))
-                    else -> view.makeSnackBar(
+                    is EmptyListException -> binding.root.makeSnackBar(getString(R.string.library_reach_end_hint))
+                    else -> binding.root.makeSnackBar(
                         message ?: getString(R.string.library_unknown_error_hint)
                     )
                 }
             }
         })
+    }
 
-        viewModel.fetchMoreFinish.observe(viewLifecycleOwner, EventObserver { exception ->
-            binding.refreshLayout.isFooterRefreshing = false
+    private fun observeRefreshFinishEvent() {
+        viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver { exception ->
+            binding.refreshLayout.isHeaderRefreshing = false
             exception?.apply {
                 when (this) {
-                    is EmptyListException -> view.makeSnackBar(getString(R.string.library_reach_end_hint))
-                    else -> view.makeSnackBar(
+                    is EmptyListException -> binding.root.makeSnackBar(getString(R.string.library_empty_hint))
+                    else -> binding.root.makeSnackBar(
                         message ?: getString(R.string.library_unknown_error_hint)
                     )
                 }
