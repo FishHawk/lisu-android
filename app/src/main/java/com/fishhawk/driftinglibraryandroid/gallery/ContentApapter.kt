@@ -29,7 +29,7 @@ sealed class ContentItem {
 
 class ContentAdapter(
     private val context: Context,
-    private val data: List<ContentItem>,
+    private val data: MutableList<ContentItem>,
     private val onChapterClick: (Int, Int, Int) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     enum class ViewType(val value: Int) {
@@ -37,6 +37,28 @@ class ContentAdapter(
         CHAPTER_MARKED(1),
         COLLECTION_HEADER(2),
         NO_CHAPTER_HINT(3)
+    }
+
+    fun unmarkChapter() {
+        for ((index, item) in data.withIndex()) {
+            if (item is ContentItem.ChapterMarked)
+                data[index] = ContentItem.Chapter(
+                    item.title, item.collectionIndex, item.chapterIndex
+                )
+        }
+    }
+
+    fun markChapter(collectionIndex: Int, chapterIndex: Int, pageIndex: Int) {
+        unmarkChapter()
+
+        for ((index, item) in data.withIndex()) {
+            if (item is ContentItem.Chapter && item.collectionIndex == collectionIndex && item.chapterIndex == chapterIndex)
+                data[index] = ContentItem.ChapterMarked(
+                    item.title, item.collectionIndex, item.chapterIndex, pageIndex
+                )
+        }
+
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -84,8 +106,8 @@ class ContentAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ContentItem.Chapter) {
-            binding.root.text = item.title
-            binding.root.setOnClickListener {
+            binding.button.text = item.title
+            binding.button.setOnClickListener {
                 onChapterClick(
                     item.collectionIndex,
                     item.chapterIndex,
@@ -99,8 +121,8 @@ class ContentAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ContentItem.ChapterMarked) {
-            binding.root.text = item.title
-            binding.root.setOnClickListener {
+            binding.button.text = item.title
+            binding.button.setOnClickListener {
                 onChapterClick(
                     item.collectionIndex,
                     item.chapterIndex,
@@ -114,7 +136,7 @@ class ContentAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ContentItem.CollectionHeader) {
-            binding.root.text = item.title
+            binding.title.text = item.title
         }
     }
 

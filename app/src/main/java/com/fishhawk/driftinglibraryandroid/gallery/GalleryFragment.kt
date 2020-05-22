@@ -27,6 +27,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.google.android.flexbox.FlexboxLayout
 
 class GalleryFragment : Fragment() {
@@ -111,6 +112,7 @@ class GalleryFragment : Fragment() {
             when (result) {
                 is Result.Success -> {
                     bindTags(result.data.tags, binding.tags)
+                    bindContent(result.data.collections)
                 }
                 is Result.Error -> println()
                 is Result.Loading -> println()
@@ -131,32 +133,14 @@ class GalleryFragment : Fragment() {
         }
 
         viewModel.readingHistory.observe(viewLifecycleOwner, Observer { history ->
-            val result = viewModel.mangaDetail.value as Result.Success
-
-            val items = mutableListOf<ContentItem>()
-            for ((collectionIndex, collection) in result.data.collections.withIndex()) {
-                if (collection.title.isNotEmpty())
-                    items.add(
-                        ContentItem.CollectionHeader(
-                            collection.title
-                        )
-                    )
-                for ((chapterIndex, chapter) in collection.chapters.withIndex()) {
-                    if (history != null && history.collectionIndex == collectionIndex && history.chapterIndex == chapterIndex)
-                        items.add(
-                            ContentItem.ChapterMarked(
-                                chapter, collectionIndex, chapterIndex, history.pageIndex
-                            )
-                        )
-                    else
-                        items.add(
-                            ContentItem.Chapter(
-                                chapter, collectionIndex, chapterIndex
-                            )
-                        )
-                }
-            }
-            binding.content.adapter = ContentAdapter(requireContext(), items, ::openChapter)
+            if (history != null)
+                (binding.content.adapter as ContentAdapter).markChapter(
+                    history.collectionIndex,
+                    history.chapterIndex,
+                    history.pageIndex
+                )
+            else
+                (binding.content.adapter as ContentAdapter).unmarkChapter()
         })
     }
 
@@ -169,6 +153,26 @@ class GalleryFragment : Fragment() {
             "pageIndex" to pageIndex
         )
         findNavController().navigate(R.id.action_gallery_to_reader, bundle)
+    }
+
+    private fun bindContent(collections: List<Collection>) {
+        val items = mutableListOf<ContentItem>()
+        for ((collectionIndex, collection) in collections.withIndex()) {
+            if (collection.title.isNotEmpty())
+                items.add(
+                    ContentItem.CollectionHeader(
+                        collection.title
+                    )
+                )
+            for ((chapterIndex, chapter) in collection.chapters.withIndex()) {
+                items.add(
+                    ContentItem.Chapter(
+                        chapter, collectionIndex, chapterIndex
+                    )
+                )
+            }
+        }
+        binding.content.adapter = ContentAdapter(requireContext(), items, ::openChapter)
     }
 
     private fun bindTags(
