@@ -10,7 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.ui.NavigationUI
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityMainBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.util.Util
+import com.fishhawk.driftinglibraryandroid.util.getThemeResId
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         SettingsHelper.theme.observe(this, Observer {
             val applyTheme = { themeId: Int, themeString: String ->
                 binding.themeSelector.text = themeString
-                if (Util.extractThemeResId(this) != themeId) {
+                if (getThemeResId() != themeId) {
                     setTheme(R.style.AppTheme_NoActionBar)
                     recreate()
                 }

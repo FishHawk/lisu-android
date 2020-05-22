@@ -15,7 +15,8 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderActivityBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.util.Util
+import com.fishhawk.driftinglibraryandroid.util.getThemeResId
+import com.fishhawk.driftinglibraryandroid.util.makeSnackBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.runBlocking
 
@@ -97,8 +98,7 @@ class ReaderActivity : AppCompatActivity() {
                 or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val themeId = Util.extractThemeResId(this)
-            if (themeId as Int == R.style.AppTheme_NoActionBar)
+            if (getThemeResId() == R.style.AppTheme_NoActionBar)
                 window.decorView.systemUiVisibility = (window.decorView.systemUiVisibility
                         or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
         }
@@ -219,11 +219,11 @@ class ReaderActivity : AppCompatActivity() {
     }
 
     private fun openPrevChapter() {
-        if (!viewModel.openPrevChapter()) makeSnakeBar(getString(R.string.reader_no_prev_chapter_hint))
+        if (!viewModel.openPrevChapter()) binding.root.makeSnackBar(getString(R.string.reader_no_prev_chapter_hint))
     }
 
     private fun openNextChapter() {
-        if (!viewModel.openNextChapter()) makeSnakeBar(getString(R.string.reader_no_next_chapter_hint))
+        if (!viewModel.openNextChapter()) binding.root.makeSnackBar(getString(R.string.reader_no_next_chapter_hint))
     }
 
     private fun setHorizontalReaderPage(position: Int) {
@@ -239,9 +239,5 @@ class ReaderActivity : AppCompatActivity() {
         if (viewModel.readingDirection.value == SettingsHelper.READING_DIRECTION_VERTICAL)
             setVerticalReaderPage(position)
         else setHorizontalReaderPage(position)
-    }
-
-    private fun makeSnakeBar(content: String) {
-        binding.root.let { Snackbar.make(it, content, Snackbar.LENGTH_SHORT).show() }
     }
 }

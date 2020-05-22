@@ -10,7 +10,6 @@ import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fishhawk.driftinglibraryandroid.MainApplication
@@ -20,7 +19,7 @@ import com.fishhawk.driftinglibraryandroid.gallery.GalleryActivity
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.util.EventObserver
 import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
-import com.google.android.material.snackbar.Snackbar
+import com.fishhawk.driftinglibraryandroid.util.makeSnackBar
 import com.hippo.refreshlayout.RefreshLayout
 
 
@@ -127,8 +126,8 @@ class LibraryFragment : Fragment() {
             binding.refreshLayout.isHeaderRefreshing = false
             exception?.apply {
                 when (this) {
-                    is EmptyListException -> makeSnakeBar(getString(R.string.library_empty_hint))
-                    else -> makeSnakeBar(message ?: getString(R.string.library_unknown_error_hint))
+                    is EmptyListException -> view.makeSnackBar(getString(R.string.library_empty_hint))
+                    else -> view.makeSnackBar(message ?: getString(R.string.library_unknown_error_hint))
                 }
             }
         })
@@ -137,8 +136,8 @@ class LibraryFragment : Fragment() {
             binding.refreshLayout.isFooterRefreshing = false
             exception?.apply {
                 when (this) {
-                    is EmptyListException -> makeSnakeBar(getString(R.string.library_reach_end_hint))
-                    else -> makeSnakeBar(message ?: getString(R.string.library_unknown_error_hint))
+                    is EmptyListException -> view.makeSnackBar(getString(R.string.library_reach_end_hint))
+                    else -> view.makeSnackBar(message ?: getString(R.string.library_unknown_error_hint))
                 }
             }
         })
@@ -161,9 +160,5 @@ class LibraryFragment : Fragment() {
                 return true
             }
         })
-    }
-
-    private fun makeSnakeBar(content: String) {
-        view?.let { Snackbar.make(it, content, Snackbar.LENGTH_SHORT).show() }
     }
 }
