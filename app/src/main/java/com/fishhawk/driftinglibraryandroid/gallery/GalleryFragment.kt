@@ -5,17 +5,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.GridLayout
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -28,10 +26,8 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
-import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.google.android.flexbox.FlexboxLayout
-import kotlinx.android.synthetic.main.gallery_tag_group.*
 
 class GalleryFragment : Fragment() {
     private val viewModel: GalleryViewModel by viewModels {
@@ -120,12 +116,47 @@ class GalleryFragment : Fragment() {
                 is Result.Loading -> println()
             }
         })
+
+        binding.content.apply {
+            (layoutManager as GridLayoutManager).spanSizeLookup =
+                object : GridLayoutManager.SpanSizeLookup() {
+                    override fun getSpanSize(position: Int): Int {
+                        return when (adapter?.getItemViewType(position)) {
+                            ContentAdapter.ViewType.CHAPTER.value -> 1
+                            ContentAdapter.ViewType.CHAPTER_MARKED.value -> 1
+                            else -> 3
+                        }
+                    }
+                }
+        }
+
         viewModel.readingHistory.observe(viewLifecycleOwner, Observer { history ->
             val result = viewModel.mangaDetail.value as Result.Success
-            binding.content.removeAllViews()
-            for ((index, collection) in result.data.collections.withIndex()) {
-                bindCollection(collection, index, binding.content)
+
+            val items = mutableListOf<ContentItem>()
+            for ((collectionIndex, collection) in result.data.collections.withIndex()) {
+                if (collection.title.isNotEmpty())
+                    items.add(
+                        ContentItem.CollectionHeader(
+                            collection.title
+                        )
+                    )
+                for ((chapterIndex, chapter) in collection.chapters.withIndex()) {
+                    if (history != null && history.collectionIndex == collectionIndex && history.chapterIndex == chapterIndex)
+                        items.add(
+                            ContentItem.ChapterMarked(
+                                chapter, collectionIndex, chapterIndex, history.pageIndex
+                            )
+                        )
+                    else
+                        items.add(
+                            ContentItem.Chapter(
+                                chapter, collectionIndex, chapterIndex
+                            )
+                        )
+                }
             }
+            binding.content.adapter = ContentAdapter(requireContext(), items, ::openChapter)
         })
     }
 
@@ -138,59 +169,6 @@ class GalleryFragment : Fragment() {
             "pageIndex" to pageIndex
         )
         findNavController().navigate(R.id.action_gallery_to_reader, bundle)
-    }
-
-
-    private fun bindCollection(
-        collection: Collection,
-        collectionIndex: Int,
-        contentLayout: LinearLayout
-    ) {
-        val collectionLayout = layoutInflater.inflate(
-            R.layout.gallery_collection, contentLayout, false
-        ) as LinearLayout
-        contentLayout.addView(collectionLayout)
-
-        val titleView = collectionLayout.findViewById<TextView>(R.id.title)
-        val chaptersLayout = collectionLayout.findViewById<GridLayout>(R.id.chapters)
-        val noChaptersView = collectionLayout.findViewById<TextView>(R.id.no_chapters)
-
-        if (collection.chapters.isEmpty()) {
-            titleView.visibility = View.GONE
-            return
-        } else {
-            noChaptersView.visibility = View.GONE
-        }
-
-        if (collection.title == "") titleView.visibility = View.GONE
-        else titleView.text = collection.title
-
-        for ((chapterIndex, chapter) in collection.chapters.withIndex()) {
-            val button = layoutInflater.inflate(
-                R.layout.gallery_chapter_button, chaptersLayout, false
-            ) as Button
-            chaptersLayout.addView(button)
-
-            button.text = chapter
-
-            val isMarked = viewModel.readingHistory.value?.let {
-                collectionIndex == it.collectionIndex && chapterIndex == it.chapterIndex
-            } ?: false
-            val pageIndex = if (isMarked) viewModel.readingHistory.value?.pageIndex ?: 0 else 0
-
-            if (isMarked) {
-                button.backgroundTintList =
-                    ContextCompat.getColorStateList(requireContext(), R.color.colorAccent)
-            }
-            button.setOnClickListener { openChapter(collectionIndex, chapterIndex, pageIndex) }
-        }
-        for (i in 1..(3 - collection.chapters.size)) {
-            val button = layoutInflater.inflate(
-                R.layout.gallery_chapter_button, chaptersLayout, false
-            ) as Button
-            button.visibility = View.INVISIBLE
-            chaptersLayout.addView(button)
-        }
     }
 
     private fun bindTags(

@@ -1,62 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:divider="@drawable/divider_light"
+    android:dividerPadding="@dimen/keyline_margin"
+    android:orientation="vertical"
+    android:showDividers="middle"
     tools:context=".gallery.GalleryFragment">
 
     <LinearLayout
+        android:id="@+id/info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="@drawable/divider_light"
-        android:dividerPadding="@dimen/keyline_margin"
-        android:orientation="vertical"
-        android:showDividers="middle">
+        android:orientation="horizontal"
+        android:padding="@dimen/keyline_margin">
 
-        <LinearLayout
-            android:id="@+id/info"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/thumb"
+            android:layout_width="150dp"
+            android:layout_height="200dp"
+            android:layout_margin="0dp"
+            android:scaleType="fitCenter"
+            tools:ignore="ContentDescription" />
+
+        <Button
+            android:id="@+id/read_button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/keyline_margin">
-
-            <ImageView
-                android:id="@+id/thumb"
-                android:layout_width="150dp"
-                android:layout_height="200dp"
-                android:layout_margin="0dp"
-                android:scaleType="fitCenter"
-                tools:ignore="ContentDescription" />
-
-            <Button
-                android:id="@+id/read_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Read" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/tags"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/keyline_margin">
-
-            <TextView
-                android:id="@+id/no_tags"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="@string/gallery_no_tags_hint"
-                android:textColor="?attr/colorSecondary" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/content"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/keyline_margin" />
+            android:text="Read" />
     </LinearLayout>
-</ScrollView>
+
+    <LinearLayout
+        android:id="@+id/tags"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/keyline_margin">
+
+        <TextView
+            android:id="@+id/no_tags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/gallery_no_tags_hint"
+            android:textColor="?attr/colorSecondary" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/keyline_margin"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:spanCount="3" />
+</LinearLayout>
