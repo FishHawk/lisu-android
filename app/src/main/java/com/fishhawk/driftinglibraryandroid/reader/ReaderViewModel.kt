@@ -12,16 +12,13 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 class ReaderViewModel(
-    private val detail: MangaDetail,
+    private val id: String,
     private val collectionIndex: Int,
     private var chapterIndex: Int,
     pageIndex: Int,
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModel() {
-    private val id = detail.id
-    private val collection = detail.collections[collectionIndex]
-
     // reading direction
     val readingDirection: PreferenceStringLiveData = SettingsHelper.readingDirection
     val isReaderDirectionEqualLeftToRight: LiveData<Boolean> =
@@ -35,7 +32,8 @@ class ReaderViewModel(
     val isMenuVisible: MutableLiveData<Boolean> = MutableLiveData(false)
 
     // reader content
-    val readerContent: MutableLiveData<List<String>> = MutableLiveData(emptyList())
+    private val mangaDetail: MutableLiveData<Result<MangaDetail>> = MutableLiveData()
+    val readerContent: MutableLiveData<Result<List<String>>> = MutableLiveData(Result.Loading)
     var startPage: Int = -1
 
     val isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -44,68 +42,92 @@ class ReaderViewModel(
     val chapterTitle: MutableLiveData<String> = MutableLiveData("")
 
     init {
-        openChapter(chapterIndex, pageIndex)
+        viewModelScope.launch {
+            isLoading.value = true
+            val detail = remoteLibraryRepository.getMangaDetail(id)
+            mangaDetail.value = detail
+            when (detail) {
+                is Result.Success -> openChapter(chapterIndex, pageIndex)
+                is Result.Error -> readerContent.value = Result.Error(detail.exception)
+            }
+        }
     }
 
     private fun openChapter(chapterIndex: Int, startPage: Int = 0) {
         isLoading.value = true
 
+        val detail = (mangaDetail.value as? Result.Success)?.data ?: return
+        val collection = detail.collections[collectionIndex]
+
         val self = this
         val chapterTitle = collection.chapters[chapterIndex]
 
         viewModelScope.launch {
-            when (val result =
-                remoteLibraryRepository.getChapterContent(id, collection.title, chapterTitle)) {
+            val result =
+                remoteLibraryRepository.getChapterContent(id, collection.title, chapterTitle)
+            when (result) {
                 is Result.Success -> {
                     self.startPage = when {
                         startPage < 0 || startPage >= result.data.size -> result.data.size - 1
                         else -> startPage
                     }
-                    self.readerContent.value = result.data
                     self.chapterIndex = chapterIndex
                     self.chapterTitle.value = chapterTitle
                 }
             }
+            self.readerContent.value = result
             isLoading.value = false
         }
     }
 
     fun openNextChapter(): Boolean {
-        if (chapterIndex < collection.chapters.size - 1) {
-            openChapter(chapterIndex + 1)
-            return true
+        val detail = (mangaDetail.value as? Result.Success)?.data
+        if (detail != null) {
+            val collection = detail.collections[collectionIndex]
+            if (chapterIndex < collection.chapters.size - 1) {
+                openChapter(chapterIndex + 1)
+                return true
+            }
         }
         return false
     }
 
     fun openPrevChapter(): Boolean {
-        if (chapterIndex > 0) {
-            openChapter(chapterIndex - 1, -1)
-            return true
+        val detail = (mangaDetail.value as? Result.Success)?.data
+        if (detail != null) {
+            if (chapterIndex > 0) {
+                openChapter(chapterIndex - 1, -1)
+                return true
+            }
         }
         return false
     }
 
     suspend fun updateReadingHistory() {
-        val readingHistory = ReadingHistory(
-            detail.id,
-            detail.title,
-            detail.thumb,
-            Calendar.getInstance().time.time,
-            collectionIndex,
-            collection.title,
-            chapterIndex,
-            collection.chapters[chapterIndex],
-            chapterPosition.value ?: 0
-        )
-        readingHistoryRepository.updateReadingHistory(readingHistory)
+        val detail = (mangaDetail.value as? Result.Success)?.data
+
+        detail?.let {
+            val collection = detail.collections[collectionIndex]
+            val readingHistory = ReadingHistory(
+                it.id,
+                it.title,
+                it.thumb,
+                Calendar.getInstance().time.time,
+                collectionIndex,
+                collection.title,
+                chapterIndex,
+                collection.chapters[chapterIndex],
+                chapterPosition.value ?: 0
+            )
+            readingHistoryRepository.updateReadingHistory(readingHistory)
+        }
     }
 }
 
 
 @Suppress("UNCHECKED_CAST")
 class ReaderViewModelFactory(
-    private val detail: MangaDetail,
+    private val id: String,
     private val collectionIndex: Int,
     private val chapterIndex: Int,
     private val pageIndex: Int,
@@ -116,7 +138,7 @@ class ReaderViewModelFactory(
         when {
             isAssignableFrom(ReaderViewModel::class.java) ->
                 ReaderViewModel(
-                    detail,
+                    id,
                     collectionIndex,
                     chapterIndex,
                     pageIndex,

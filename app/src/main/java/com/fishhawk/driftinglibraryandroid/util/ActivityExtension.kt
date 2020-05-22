@@ -45,13 +45,13 @@ fun AppCompatActivity.navToGalleryActivity(
 }
 
 fun AppCompatActivity.navToReaderActivity(
-    detail: MangaDetail,
+    id: String,
     collectionIndex: Int = 0,
     chapterIndex: Int = 0,
     pageIndex: Int = 0
 ) {
     val bundle = bundleOf(
-        "detail" to detail,
+        "id" to id,
         "collectionIndex" to collectionIndex,
         "chapterIndex" to chapterIndex,
         "pageIndex" to pageIndex

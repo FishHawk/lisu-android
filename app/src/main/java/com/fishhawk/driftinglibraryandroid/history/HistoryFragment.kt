@@ -44,25 +44,18 @@ class HistoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.list.apply {
+            addItemDecoration(SpacingItemDecoration(1, 16, true))
+
+            viewTreeObserver.addOnPreDrawListener {
+                startPostponedEnterTransition()
+                true
+            }
+        }
 
         postponeEnterTransition()
         viewModel.readingHistoryList.observe(viewLifecycleOwner, Observer { data ->
-            binding.list.apply {
-                addItemDecoration(SpacingItemDecoration(1, 16, true))
-
-                // set adapter
-                adapter = HistoryListAdapter(context, data) { item, imageView ->
-                    (requireActivity() as AppCompatActivity).navToGalleryActivity(
-                        item.id, item.title, item.thumb, imageView
-                    )
-                }
-
-                // set transition
-                viewTreeObserver.addOnPreDrawListener {
-                    startPostponedEnterTransition()
-                    true
-                }
-            }
+            binding.list.adapter = HistoryListAdapter(requireActivity(), data)
             if (data.isEmpty()) binding.multipleStatusView.showEmpty()
             else binding.multipleStatusView.showContent()
         })

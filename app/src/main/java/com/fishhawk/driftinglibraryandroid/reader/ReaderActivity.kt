@@ -13,26 +13,25 @@ import androidx.viewpager2.widget.ViewPager2
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderActivityBinding
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
+import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.util.getThemeResId
 import com.fishhawk.driftinglibraryandroid.util.makeSnackBar
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.runBlocking
 
 class ReaderActivity : AppCompatActivity() {
     private val viewModel: ReaderViewModel by viewModels {
         val arguments = intent.extras!!
 
-        val detail = arguments.getParcelable<MangaDetail>("detail")!!
-        val collectionIndex: Int = arguments.getInt("collectionIndex")
-        val chapterIndex: Int = arguments.getInt("chapterIndex")
-        val pageIndex: Int = arguments.getInt("pageIndex")
+        val id = arguments.getString("id")!!
+        val collectionIndex = arguments.getInt("collectionIndex")
+        val chapterIndex = arguments.getInt("chapterIndex")
+        val pageIndex = arguments.getInt("pageIndex")
         val application = applicationContext as MainApplication
         val remoteLibraryRepository = application.remoteLibraryRepository
         val readingHistoryRepository = application.readingHistoryRepository
         ReaderViewModelFactory(
-            detail,
+            id,
             collectionIndex,
             chapterIndex,
             pageIndex,
@@ -70,18 +69,23 @@ class ReaderActivity : AppCompatActivity() {
             viewModel.readerContent.value = viewModel.readerContent.value
         })
 
-        viewModel.readerContent.observe(this, Observer { content ->
-            if (viewModel.isReaderDirectionEqualVertical.value!!)
-                binding.verticalReader.apply {
-                    adapter = ImageVerticalListAdapter(context, content)
+        viewModel.readerContent.observe(this, Observer { result ->
+            when (result) {
+                is Result.Success -> {
+                    val content = result.data
+                    if (viewModel.isReaderDirectionEqualVertical.value!!)
+                        binding.verticalReader.apply {
+                            adapter = ImageVerticalListAdapter(context, content)
+                        }
+                    else
+                        binding.horizontalReader.apply {
+                            adapter = ImageHorizontalListAdapter(context, content)
+                        }
+                    setReaderPage(viewModel.startPage)
+                    viewModel.chapterPosition.value = viewModel.startPage
+                    viewModel.chapterSize.value = content.size
                 }
-            else
-                binding.horizontalReader.apply {
-                    adapter = ImageHorizontalListAdapter(context, content)
-                }
-            setReaderPage(viewModel.startPage)
-            viewModel.chapterPosition.value = viewModel.startPage
-            viewModel.chapterSize.value = content.size
+            }
         })
     }
 

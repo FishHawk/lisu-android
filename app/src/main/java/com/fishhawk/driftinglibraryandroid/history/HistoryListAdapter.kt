@@ -1,28 +1,31 @@
 package com.fishhawk.driftinglibraryandroid.history
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
+import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
+import com.fishhawk.driftinglibraryandroid.util.navToReaderActivity
 import java.text.SimpleDateFormat
 import java.util.*
 
 class HistoryListAdapter(
-    private val context: Context,
-    private var data: List<ReadingHistory>,
-    private val listener: (ReadingHistory, ImageView) -> Unit
+    private val activity: Activity,
+    private var data: List<ReadingHistory>
 ) : RecyclerView.Adapter<HistoryListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            HistoryThumbnailBinding.inflate(LayoutInflater.from(context), parent, false)
+            HistoryThumbnailBinding.inflate(LayoutInflater.from(activity), parent, false)
         )
     }
 
@@ -50,12 +53,21 @@ class HistoryListAdapter(
             binding.date.text = timeHint
 
             binding.thumb.transitionName = item.id
-            Glide.with(context).load(item.thumb)
+            Glide.with(activity).load(item.thumb)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .override(300, 400)
                 .apply(RequestOptions().dontTransform())
                 .into(binding.thumb)
-            binding.root.setOnClickListener { listener(item, binding.thumb) }
+            binding.thumb.setOnClickListener {
+                (activity as AppCompatActivity).navToGalleryActivity(
+                    item.id, item.title, item.thumb, binding.thumb
+                )
+            }
+            binding.root.setOnClickListener {
+                (activity as AppCompatActivity).navToReaderActivity(
+                    item.id, item.collectionIndex, item.chapterIndex, item.pageIndex
+                )
+            }
         }
     }
 }

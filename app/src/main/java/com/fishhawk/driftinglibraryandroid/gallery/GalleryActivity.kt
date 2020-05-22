@@ -99,15 +99,15 @@ class GalleryActivity : AppCompatActivity() {
         binding.readButton.setOnClickListener {
             when (viewModel.mangaDetail.value) {
                 is Result.Success -> {
-                    val detail = (viewModel.mangaDetail.value!! as Result.Success).data
+                    val id = (viewModel.mangaDetail.value!! as Result.Success).data.id
                     viewModel.readingHistory.value?.let {
                         navToReaderActivity(
-                            detail,
+                            id,
                             it.collectionIndex,
                             it.chapterIndex,
                             it.pageIndex
                         )
-                    } ?: navToReaderActivity(detail)
+                    } ?: navToReaderActivity(id)
                 }
             }
         }
@@ -175,8 +175,8 @@ class GalleryActivity : AppCompatActivity() {
         }
         binding.content.adapter = ContentAdapter(this, items)
         { collectionIndex, chapterIndex, pageIndex ->
-            val detail = (viewModel.mangaDetail.value!! as Result.Success).data
-            navToReaderActivity(detail, collectionIndex, chapterIndex, pageIndex)
+            val id = (viewModel.mangaDetail.value!! as Result.Success).data.id
+            navToReaderActivity(id, collectionIndex, chapterIndex, pageIndex)
         }
     }
 
