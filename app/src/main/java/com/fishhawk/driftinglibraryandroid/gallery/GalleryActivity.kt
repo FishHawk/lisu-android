@@ -59,8 +59,7 @@ class GalleryActivity : AppCompatActivity() {
         val title: String? = arguments.getString("title")
         val thumb: String? = arguments.getString("thumb")
 
-//        (requireActivity() as AppCompatActivity).supportActionBar?.title = title
-
+        binding.title.text = title
         binding.thumb.apply {
             transitionName = id
             Glide.with(this).load(thumb)
