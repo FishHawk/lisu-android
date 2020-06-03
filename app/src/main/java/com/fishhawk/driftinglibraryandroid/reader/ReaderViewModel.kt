@@ -34,7 +34,6 @@ class ReaderViewModel(
     // reader content
     private val mangaDetail: MutableLiveData<Result<MangaDetail>> = MutableLiveData()
     val readerContent: MutableLiveData<Result<List<String>>> = MutableLiveData(Result.Loading)
-    var startPage: Int = -1
 
     val isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
     val chapterPosition: MutableLiveData<Int> = MutableLiveData(0)
@@ -67,12 +66,13 @@ class ReaderViewModel(
                 remoteLibraryRepository.getChapterContent(id, collection.title, chapterTitle)
             when (result) {
                 is Result.Success -> {
-                    self.startPage = when {
+                    self.chapterIndex = chapterIndex
+                    self.chapterTitle.value = chapterTitle
+                    self.chapterSize.value = result.data.size
+                    self.chapterPosition.value = when {
                         startPage < 0 || startPage >= result.data.size -> result.data.size - 1
                         else -> startPage
                     }
-                    self.chapterIndex = chapterIndex
-                    self.chapterTitle.value = chapterTitle
                 }
             }
             self.readerContent.value = result

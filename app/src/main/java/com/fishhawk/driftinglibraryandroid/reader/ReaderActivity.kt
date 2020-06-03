@@ -65,7 +65,6 @@ class ReaderActivity : AppCompatActivity() {
         viewModel.isReaderDirectionEqualRightToLeft.observe(this, Observer {
             binding.horizontalReader.layoutDirection =
                 if (it) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
-            viewModel.startPage = viewModel.chapterPosition.value!!
             viewModel.readerContent.value = viewModel.readerContent.value
         })
 
@@ -82,9 +81,7 @@ class ReaderActivity : AppCompatActivity() {
                         binding.horizontalReader.apply {
                             adapter = ImageHorizontalListAdapter(context, content)
                         }
-                    setReaderPage(viewModel.startPage)
-                    viewModel.chapterPosition.value = viewModel.startPage
-                    viewModel.chapterSize.value = content.size
+                    viewModel.chapterPosition.value?.let { setReaderPage(it) }
                 }
             }
         })
