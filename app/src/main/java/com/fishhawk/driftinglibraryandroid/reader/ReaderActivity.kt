@@ -69,6 +69,7 @@ class ReaderActivity : AppCompatActivity() {
             viewModel.readerContent.value = viewModel.readerContent.value
         })
 
+
         viewModel.readerContent.observe(this, Observer { result ->
             when (result) {
                 is Result.Success -> {
@@ -138,15 +139,36 @@ class ReaderActivity : AppCompatActivity() {
     private fun setupMenuLayout() {
         binding.menuLayout.setOnClickListener { viewModel.isMenuVisible.value = false }
 
-        binding.radioGroupDirection.setOnCheckedChangeListener { _, checkedId ->
-            val direction = when (checkedId) {
-                R.id.radio_left_to_right -> SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT
-                R.id.radio_right_to_left -> SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT
-                R.id.radio_vertical -> SettingsHelper.READING_DIRECTION_VERTICAL
-                else -> SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT
+        binding.buttonReadingDirection.setOnClickListener {
+            val direction = when (viewModel.readingDirection.value) {
+                SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT ->
+                    SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT
+                SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT ->
+                    SettingsHelper.READING_DIRECTION_VERTICAL
+                SettingsHelper.READING_DIRECTION_VERTICAL ->
+                    SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT
+                else ->
+                    SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT
             }
             viewModel.readingDirection.setValue(direction)
         }
+
+        viewModel.readingDirection.observe(this, Observer {
+            when (it) {
+                SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT -> {
+                    binding.buttonReadingDirection.setImageResource(R.drawable.ic_baseline_keyboard_arrow_right_24)
+                    binding.hintReadingDirection.setText(R.string.hint_reading_direction_left_to_right)
+                }
+                SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT -> {
+                    binding.buttonReadingDirection.setImageResource(R.drawable.ic_baseline_keyboard_arrow_left_24)
+                    binding.hintReadingDirection.setText(R.string.hint_reading_direction_right_to_Left)
+                }
+                SettingsHelper.READING_DIRECTION_VERTICAL -> {
+                    binding.buttonReadingDirection.setImageResource(R.drawable.ic_baseline_keyboard_arrow_down_24)
+                    binding.hintReadingDirection.setText(R.string.hint_reading_direction_vertical)
+                }
+            }
+        })
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}

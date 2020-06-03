@@ -28,6 +28,10 @@
     <string name="reader_no_prev_chapter_hint">Already at the beginning.</string>
     <string name="reader_no_next_chapter_hint">Already at the end.</string>
 
+    <string name="hint_reading_direction_left_to_right">L to R</string>
+    <string name="hint_reading_direction_right_to_Left">R to L</string>
+    <string name="hint_reading_direction_vertical">Vertical</string>
+
     <string name="image_unknown_error_hint">Unknown error</string>
 
     <!-- setting fragment -->

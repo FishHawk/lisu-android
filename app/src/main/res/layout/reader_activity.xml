@@ -57,47 +57,35 @@
             android:visibility="@{viewModel.isMenuVisible ? View.VISIBLE : View.GONE}">
 
             <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:background="#AA000000"
+                android:orientation="vertical"
+                android:padding="@dimen/baseline_4dp">
+
+                <ImageView
+                    android:id="@+id/button_reading_direction"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center_horizontal"
+                    tools:ignore="ContentDescription" />
+
+                <TextView
+                    android:id="@+id/hint_reading_direction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:textColor="#ffffff" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:background="#AA000000"
                 android:orientation="vertical"
                 android:padding="@dimen/baseline_4dp">
-
-                <RadioGroup
-                    android:id="@+id/radio_group_direction"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/baseline_4dp"
-                    android:orientation="horizontal">
-
-                    <RadioButton
-                        android:id="@+id/radio_left_to_right"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/colorAccent"
-                        android:checked="@{viewModel.isReaderDirectionEqualLeftToRight}"
-                        android:text="@string/settings_reading_direction_left_to_right"
-                        android:textColor="#ffffff" />
-
-                    <RadioButton
-                        android:id="@+id/radio_right_to_left"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/colorAccent"
-                        android:checked="@{viewModel.isReaderDirectionEqualRightToLeft}"
-                        android:text="@string/settings_reading_direction_right_to_Left"
-                        android:textColor="#ffffff" />
-
-                    <RadioButton
-                        android:id="@+id/radio_vertical"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:buttonTint="@color/colorAccent"
-                        android:checked="@{viewModel.isReaderDirectionEqualVertical}"
-                        android:text="@string/settings_reading_direction_vertical"
-                        android:textColor="#ffffff" />
-                </RadioGroup>
 
                 <LinearLayout
                     android:layout_width="match_parent"
