@@ -87,8 +87,8 @@ class ReaderActivity : AppCompatActivity() {
         })
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onPause() {
+        super.onPause()
         runBlocking {
             viewModel.updateReadingHistory()
         }
