@@ -95,12 +95,6 @@
                     android:layoutDirection="@{viewModel.isReaderDirectionEqualRightToLeft ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR}"
                     android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@{String.valueOf(viewModel.chapterSize)}"
-                        android:textColor="#ffffff" />
-
                     <SeekBar
                         android:id="@+id/seek_bar"
                         android:layout_width="0dp"
@@ -113,7 +107,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{String.valueOf(viewModel.chapterPosition + 1)}"
+                        android:text="@{String.format(`%s/%s`,String.valueOf(viewModel.chapterPosition + 1),String.valueOf(viewModel.chapterSize))}"
                         android:textColor="#ffffff" />
                 </LinearLayout>
             </LinearLayout>
