@@ -41,7 +41,6 @@ class ImageHorizontalListAdapter(
             binding.errorHint.visibility = View.GONE
 
             binding.number.text = (position + 1).toString()
-            binding.content.setZoomable(true)
             Glide.with(context)
                 .asBitmap()
                 .load(item)
