@@ -7,10 +7,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.base.MangasAdapter
+import com.fishhawk.driftinglibraryandroid.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.util.EventObserver
@@ -68,7 +67,7 @@ class LibraryFragment : Fragment() {
 
         binding.list.apply {
             val columnCount = 3
-            adapter = MangasAdapter(requireActivity(), mutableListOf()).apply { setViewTypeGrid() }
+            adapter = MangaListAdapter(requireActivity(), mutableListOf()).apply { setViewTypeGrid() }
             layoutManager = GridLayoutManager(context, columnCount)
 
             addItemDecoration(SpacingItemDecoration(columnCount, 16, true))
@@ -86,7 +85,7 @@ class LibraryFragment : Fragment() {
         viewModel.mangaList.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is Result.Success -> {
-                    (binding.list.adapter!! as MangasAdapter).update(result.data.toMutableList())
+                    (binding.list.adapter!! as MangaListAdapter).update(result.data.toMutableList())
                     if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
                     else binding.multipleStatusView.showContent()
                 }

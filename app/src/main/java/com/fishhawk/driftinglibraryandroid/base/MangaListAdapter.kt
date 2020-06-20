@@ -9,18 +9,18 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.fishhawk.driftinglibraryandroid.databinding.MangaGridThumbnailBinding
-import com.fishhawk.driftinglibraryandroid.databinding.MangaListThumbnailBinding
+import com.fishhawk.driftinglibraryandroid.databinding.MangaLinearThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
 import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
 
 
-class MangasAdapter(
+class MangaListAdapter(
     private val activity: Activity,
     private var data: MutableList<MangaSummary>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     enum class ViewType(val value: Int) {
         GRID(0),
-        LIST(1)
+        LINEAR(1)
     }
 
     private var viewType = ViewType.GRID
@@ -30,8 +30,8 @@ class MangasAdapter(
         notifyDataSetChanged()
     }
 
-    fun setViewTypeList() {
-        viewType = ViewType.LIST
+    fun setViewTypeLinear() {
+        viewType = ViewType.LINEAR
         notifyDataSetChanged()
     }
 
@@ -50,9 +50,9 @@ class MangasAdapter(
                         parent, false
                     )
                 )
-            ViewType.LIST ->
-                ListViewHolder(
-                    MangaListThumbnailBinding.inflate(
+            ViewType.LINEAR ->
+                LinearViewHolder(
+                    MangaLinearThumbnailBinding.inflate(
                         LayoutInflater.from(activity),
                         parent, false
                     )
@@ -63,7 +63,7 @@ class MangasAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is GridViewHolder -> holder.bind(data[position])
-            is ListViewHolder -> holder.bind(data[position])
+            is LinearViewHolder -> holder.bind(data[position])
         }
     }
 
@@ -90,7 +90,7 @@ class MangasAdapter(
         }
     }
 
-    inner class ListViewHolder(private val binding: MangaListThumbnailBinding) :
+    inner class LinearViewHolder(private val binding: MangaLinearThumbnailBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: MangaSummary) {
@@ -115,6 +115,3 @@ class MangasAdapter(
         }
     }
 }
-
-
-

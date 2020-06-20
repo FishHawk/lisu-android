@@ -3,6 +3,7 @@ package com.fishhawk.driftinglibraryandroid.repository
 import com.fishhawk.driftinglibraryandroid.repository.service.RemoteLibraryService
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
+import com.fishhawk.driftinglibraryandroid.repository.data.Source
 
 class RemoteLibraryRepository(
     var url: String,
@@ -59,6 +60,16 @@ class RemoteLibraryRepository(
         }
     }
 
+    suspend fun getSources(): Result<List<Source>> {
+        return try {
+            service.getSources().let {
+                Result.Success(it)
+            }
+        } catch (he: Throwable) {
+            Result.Error(he)
+        }
+    }
+
     suspend fun search(
         source: String,
         keywords: String,
@@ -66,6 +77,32 @@ class RemoteLibraryRepository(
     ): Result<List<MangaSummary>> {
         return try {
             service.search(source, keywords, page).let {
+                Result.Success(it)
+            }
+        } catch (he: Throwable) {
+            Result.Error(he)
+        }
+    }
+
+    suspend fun getPopularMangaList(
+        source: String,
+        page: Int
+    ): Result<List<MangaSummary>> {
+        return try {
+            service.getPopular(source, page).let {
+                Result.Success(it)
+            }
+        } catch (he: Throwable) {
+            Result.Error(he)
+        }
+    }
+
+    suspend fun getLatestMangaList(
+        source: String,
+        page: Int
+    ): Result<List<MangaSummary>> {
+        return try {
+            service.getLatest(source, page).let {
                 Result.Success(it)
             }
         } catch (he: Throwable) {

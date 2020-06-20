@@ -5,6 +5,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
+import com.fishhawk.driftinglibraryandroid.repository.data.Source
 
 interface RemoteLibraryService {
     @GET("library")
@@ -23,6 +24,9 @@ interface RemoteLibraryService {
         @Query("chapter") chapter: String
     ): List<String>
 
+
+    @GET("/sources")
+    suspend fun getSources(): List<Source>
 
     @GET("/source/{source}/search")
     suspend fun search(

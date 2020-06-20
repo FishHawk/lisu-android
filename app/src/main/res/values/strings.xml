@@ -13,6 +13,8 @@
     <string name="menu_download">Download</string>
     <string name="menu_history">History</string>
     <string name="menu_explore">Explore</string>
+    <string name="menu_latest">Latest</string>
+    <string name="menu_popular">Popular</string>
     <string name="menu_setting">Setting</string>
 
     <!-- library fragment -->

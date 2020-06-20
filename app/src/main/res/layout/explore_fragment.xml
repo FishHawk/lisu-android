@@ -13,17 +13,11 @@
         app:errorView="@layout/status_error"
         app:loadingView="@layout/status_loading">
 
-        <com.hippo.refreshlayout.RefreshLayout
-            android:id="@+id/refresh_layout"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/explore_thumbnail" />
-        </com.hippo.refreshlayout.RefreshLayout>
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/explore_source_card" />
     </com.classic.common.MultipleStatusView>
 </FrameLayout>
