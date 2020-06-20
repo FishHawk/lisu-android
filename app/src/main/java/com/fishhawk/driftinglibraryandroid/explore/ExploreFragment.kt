@@ -6,8 +6,11 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.base.MangasAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.ExploreFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
@@ -68,7 +71,8 @@ class ExploreFragment : Fragment() {
         binding.list.apply {
             addItemDecoration(SpacingItemDecoration(1, 16, true))
 
-            adapter = ExploreListAdapter(requireActivity(), mutableListOf())
+            layoutManager = LinearLayoutManager(context)
+            adapter = MangasAdapter(requireActivity(), mutableListOf()).apply { setViewTypeList() }
 
             postponeEnterTransition()
             viewTreeObserver.addOnPreDrawListener {
@@ -83,7 +87,7 @@ class ExploreFragment : Fragment() {
         viewModel.mangaList.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is Result.Success -> {
-                    (binding.list.adapter!! as ExploreListAdapter).update(result.data.toMutableList())
+                    (binding.list.adapter!! as MangasAdapter).update(result.data.toMutableList())
                     if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
                     else binding.multipleStatusView.showContent()
                 }

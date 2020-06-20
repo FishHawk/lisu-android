@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.base.MangasAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.util.EventObserver
@@ -25,8 +26,6 @@ class LibraryFragment : Fragment() {
         LibraryViewModelFactory(remoteLibraryRepository)
     }
     private lateinit var binding: LibraryFragmentBinding
-
-    private var mColumnCount = 3
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,13 +67,11 @@ class LibraryFragment : Fragment() {
         }
 
         binding.list.apply {
-            layoutManager =
-                if (mColumnCount <= 1) LinearLayoutManager(context)
-                else GridLayoutManager(context, mColumnCount)
+            val columnCount = 3
+            adapter = MangasAdapter(requireActivity(), mutableListOf()).apply { setViewTypeGrid() }
+            layoutManager = GridLayoutManager(context, columnCount)
 
-            addItemDecoration(SpacingItemDecoration(mColumnCount, 16, true))
-
-            adapter = LibraryListAdapter(requireActivity(), mutableListOf())
+            addItemDecoration(SpacingItemDecoration(columnCount, 16, true))
 
             postponeEnterTransition()
             viewTreeObserver.addOnPreDrawListener {
@@ -89,7 +86,7 @@ class LibraryFragment : Fragment() {
         viewModel.mangaList.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is Result.Success -> {
-                    (binding.list.adapter!! as LibraryListAdapter).update(result.data.toMutableList())
+                    (binding.list.adapter!! as MangasAdapter).update(result.data.toMutableList())
                     if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
                     else binding.multipleStatusView.showContent()
                 }

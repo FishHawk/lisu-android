@@ -10,7 +10,6 @@ import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 class ExploreViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository
