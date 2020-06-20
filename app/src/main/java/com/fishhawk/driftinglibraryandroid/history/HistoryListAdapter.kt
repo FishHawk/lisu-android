@@ -58,12 +58,12 @@ class HistoryListAdapter(
                 .into(binding.thumb)
             binding.thumb.setOnClickListener {
                 (activity as AppCompatActivity).navToGalleryActivity(
-                    item.id, item.title, item.thumb, binding.thumb
+                    item.id, item.title, item.thumb, null, binding.thumb
                 )
             }
             binding.root.setOnClickListener {
                 (activity as AppCompatActivity).navToReaderActivity(
-                    item.id, item.collectionIndex, item.chapterIndex, item.pageIndex
+                    item.id,null, item.collectionIndex, item.chapterIndex, item.pageIndex
                 )
             }
         }

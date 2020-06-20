@@ -24,6 +24,7 @@ class ReaderActivity : AppCompatActivity() {
         val arguments = intent.extras!!
 
         val id = arguments.getString("id")!!
+        val source = arguments.getString("source")
         val collectionIndex = arguments.getInt("collectionIndex")
         val chapterIndex = arguments.getInt("chapterIndex")
         val pageIndex = arguments.getInt("pageIndex")
@@ -32,6 +33,7 @@ class ReaderActivity : AppCompatActivity() {
         val readingHistoryRepository = application.readingHistoryRepository
         ReaderViewModelFactory(
             id,
+            source,
             collectionIndex,
             chapterIndex,
             pageIndex,

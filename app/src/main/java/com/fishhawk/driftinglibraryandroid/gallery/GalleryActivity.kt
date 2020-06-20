@@ -32,12 +32,13 @@ class GalleryActivity : AppCompatActivity() {
     private val viewModel: GalleryViewModel by viewModels {
         val arguments = intent.extras!!
         val id = arguments.getString("id")!!
+        val source = arguments.getString("source")
 
         val application = applicationContext as MainApplication
         val remoteLibraryRepository = application.remoteLibraryRepository
         val readingHistoryRepository = application.readingHistoryRepository
 
-        GalleryViewModelFactory(id, remoteLibraryRepository, readingHistoryRepository)
+        GalleryViewModelFactory(id, source, remoteLibraryRepository, readingHistoryRepository)
     }
     private lateinit var binding: GalleryActivityBinding
 
@@ -97,18 +98,21 @@ class GalleryActivity : AppCompatActivity() {
                     viewModel.readingHistory.value?.let {
                         navToReaderActivity(
                             (viewModel.mangaDetail.value!! as Result.Success).data.id,
+                            (viewModel.mangaDetail.value!! as Result.Success).data.source,
                             it.collectionIndex,
                             it.chapterIndex,
                             it.pageIndex
                         )
                     } ?: navToReaderActivity(
-                        (viewModel.mangaDetail.value!! as Result.Success).data.id
+                        (viewModel.mangaDetail.value!! as Result.Success).data.id,
+                        (viewModel.mangaDetail.value!! as Result.Success).data.source
                     )
                 }
             }
         }
 
         viewModel.mangaDetail.observe(this, Observer { result ->
+            println(result)
             when (result) {
                 is Result.Success -> bindTags(result.data.tags, binding.tags)
                 is Result.Error -> println()
@@ -132,7 +136,7 @@ class GalleryActivity : AppCompatActivity() {
         viewModel.readingHistory.observe(this, Observer { history ->
             if (binding.content.adapter == null) {
                 val result = viewModel.mangaDetail.value as Result.Success
-                bindContent(result.data.id, result.data.collections, history)
+                bindContent(result.data.id, result.data.source, result.data.collections, history)
             } else {
                 if (history != null)
                     (binding.content.adapter as ContentAdapter).markChapter(
@@ -145,7 +149,12 @@ class GalleryActivity : AppCompatActivity() {
         })
     }
 
-    private fun bindContent(id: String, collections: List<Collection>, history: ReadingHistory?) {
+    private fun bindContent(
+        id: String,
+        source: String?,
+        collections: List<Collection>,
+        history: ReadingHistory?
+    ) {
         val items = mutableListOf<ContentItem>()
         for ((collectionIndex, collection) in collections.withIndex()) {
             if (collection.title.isNotEmpty())
@@ -158,18 +167,18 @@ class GalleryActivity : AppCompatActivity() {
                 if (history != null && history.collectionIndex == collectionIndex && history.chapterIndex == chapterIndex)
                     items.add(
                         ContentItem.ChapterMarked(
-                            chapter, collectionIndex, chapterIndex, history.pageIndex
+                            chapter.title, collectionIndex, chapterIndex, history.pageIndex
                         )
                     )
                 else
                     items.add(
                         ContentItem.Chapter(
-                            chapter, collectionIndex, chapterIndex
+                            chapter.title, collectionIndex, chapterIndex
                         )
                     )
             }
         }
-        binding.content.adapter = ContentAdapter(this, id, items)
+        binding.content.adapter = ContentAdapter(this, id, source, items)
     }
 
     private fun bindTags(

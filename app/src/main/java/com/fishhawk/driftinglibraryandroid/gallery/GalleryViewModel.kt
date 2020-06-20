@@ -9,12 +9,13 @@ import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 
 class GalleryViewModel(
     private val id: String,
+    private val source: String?,
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModel() {
     val mangaDetail: LiveData<Result<MangaDetail>> = liveData {
         emit(Result.Loading)
-        emit(remoteLibraryRepository.getMangaDetail(id))
+        emit(remoteLibraryRepository.getMangaDetail(id, source))
     }
 
     val readingHistory: LiveData<ReadingHistory> = mangaDetail.switchMap {
@@ -26,13 +27,14 @@ class GalleryViewModel(
 @Suppress("UNCHECKED_CAST")
 class GalleryViewModelFactory(
     private val id: String,
+    private val source: String?,
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
         when {
             isAssignableFrom(GalleryViewModel::class.java) ->
-                GalleryViewModel(id, remoteLibraryRepository, readingHistoryRepository)
+                GalleryViewModel(id, source, remoteLibraryRepository, readingHistoryRepository)
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

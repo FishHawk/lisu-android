@@ -21,6 +21,13 @@
     </fragment>
 
     <fragment
+        android:id="@+id/nav_explore"
+        android:name="com.fishhawk.driftinglibraryandroid.explore.ExploreFragment"
+        android:label="@string/menu_explore"
+        tools:layout="@layout/explore_fragment">
+    </fragment>
+
+    <fragment
         android:id="@+id/nav_setting"
         android:name="com.fishhawk.driftinglibraryandroid.setting.SettingsFragment"
         android:label="@string/menu_setting" />

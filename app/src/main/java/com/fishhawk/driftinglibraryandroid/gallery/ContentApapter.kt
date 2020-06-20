@@ -32,6 +32,7 @@ sealed class ContentItem {
 class ContentAdapter(
     private val activity: Activity,
     private val id: String,
+    private val source: String?,
     private val data: MutableList<ContentItem>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     enum class ViewType(val value: Int) {
@@ -112,6 +113,7 @@ class ContentAdapter(
             binding.button.setOnClickListener {
                 (activity as AppCompatActivity).navToReaderActivity(
                     id,
+                    source,
                     item.collectionIndex,
                     item.chapterIndex,
                     0
@@ -128,6 +130,7 @@ class ContentAdapter(
             binding.button.setOnClickListener {
                 (activity as AppCompatActivity).navToReaderActivity(
                     id,
+                    source,
                     item.collectionIndex,
                     item.chapterIndex,
                     item.pageIndex

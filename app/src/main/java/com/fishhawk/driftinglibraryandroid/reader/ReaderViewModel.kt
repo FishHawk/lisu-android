@@ -13,6 +13,7 @@ import java.util.*
 
 class ReaderViewModel(
     private val id: String,
+    private val source: String?,
     private val collectionIndex: Int,
     private var chapterIndex: Int,
     pageIndex: Int,
@@ -43,7 +44,7 @@ class ReaderViewModel(
     init {
         viewModelScope.launch {
             isLoading.value = true
-            val detail = remoteLibraryRepository.getMangaDetail(id)
+            val detail = remoteLibraryRepository.getMangaDetail(id, source)
             mangaDetail.value = detail
             when (detail) {
                 is Result.Success -> openChapter(chapterIndex, pageIndex)
@@ -59,11 +60,19 @@ class ReaderViewModel(
         val collection = detail.collections[collectionIndex]
 
         val self = this
-        val chapterTitle = collection.chapters[chapterIndex]
+        val chapterId = collection.chapters[chapterIndex].id
+        val chapterTitle = collection.chapters[chapterIndex].title
 
         viewModelScope.launch {
-            val result =
-                remoteLibraryRepository.getChapterContent(id, collection.title, chapterTitle)
+            val result = if (source == null)
+                remoteLibraryRepository.getChapterContent(
+                    id,
+                    collection.title,
+                    chapterTitle,
+                    source
+                )
+            else
+                remoteLibraryRepository.getChapterContent(id, collection.title, chapterId, source)
             when (result) {
                 is Result.Success -> {
                     self.chapterIndex = chapterIndex
@@ -116,7 +125,7 @@ class ReaderViewModel(
                 collectionIndex,
                 collection.title,
                 chapterIndex,
-                collection.chapters[chapterIndex],
+                collection.chapters[chapterIndex].title,
                 chapterPosition.value ?: 0
             )
             readingHistoryRepository.updateReadingHistory(readingHistory)
@@ -128,6 +137,7 @@ class ReaderViewModel(
 @Suppress("UNCHECKED_CAST")
 class ReaderViewModelFactory(
     private val id: String,
+    private val source: String?,
     private val collectionIndex: Int,
     private val chapterIndex: Int,
     private val pageIndex: Int,
@@ -139,6 +149,7 @@ class ReaderViewModelFactory(
             isAssignableFrom(ReaderViewModel::class.java) ->
                 ReaderViewModel(
                     id,
+                    source,
                     collectionIndex,
                     chapterIndex,
                     pageIndex,

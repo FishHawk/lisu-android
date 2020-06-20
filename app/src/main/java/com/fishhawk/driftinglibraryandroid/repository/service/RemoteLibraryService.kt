@@ -16,11 +16,42 @@ interface RemoteLibraryService {
     @GET("manga/{id}")
     suspend fun getMangaDetail(@Path("id") id: String): MangaDetail
 
-
     @GET("chapter/{id}")
     suspend fun getChapterContent(
         @Path("id") id: String,
         @Query("collection") collection: String,
         @Query("chapter") chapter: String
+    ): List<String>
+
+
+    @GET("/source/{source}/search")
+    suspend fun search(
+        @Path("source") source: String,
+        @Query("keywords") keywords: String,
+        @Query("page") page: Int
+    ): List<MangaSummary>
+
+    @GET("/source/{source}/popular")
+    suspend fun getPopular(
+        @Path("source") source: String,
+        @Query("page") page: Int
+    ): List<MangaSummary>
+
+    @GET("/source/{source}/latest")
+    suspend fun getLatest(
+        @Path("source") source: String,
+        @Query("page") page: Int
+    ): List<MangaSummary>
+
+    @GET("/source/{source}/manga/{id}")
+    suspend fun getMangaDetail(
+        @Path("source") source: String,
+        @Path("id") id: String
+    ): MangaDetail
+
+    @GET("/source/{source}/chapter/{id}")
+    suspend fun getChapterContent(
+        @Path("source") source: String,
+        @Path("id") id: String
     ): List<String>
 }

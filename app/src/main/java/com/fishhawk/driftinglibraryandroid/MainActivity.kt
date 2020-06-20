@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         navController.setGraph(R.navigation.mobile_navigation, intent.extras)
         binding.navView.setupWithNavController(navController)
         appBarConfiguration = AppBarConfiguration
-            .Builder(R.id.nav_library, R.id.nav_history)
+            .Builder(R.id.nav_library, R.id.nav_history, R.id.nav_explore)
             .setDrawerLayout(binding.drawerLayout)
             .build()
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)

@@ -24,12 +24,14 @@ fun AppCompatActivity.navToGalleryActivity(
     id: String,
     title: String,
     thumb: String,
+    source: String?,
     imageView: ImageView
 ) {
     val bundle = bundleOf(
         "id" to id,
         "title" to title,
-        "thumb" to thumb
+        "thumb" to thumb,
+        "source" to source
     )
 
     val intent = Intent(this, GalleryActivity::class.java)
@@ -46,12 +48,14 @@ fun AppCompatActivity.navToGalleryActivity(
 
 fun AppCompatActivity.navToReaderActivity(
     id: String,
+    source: String?,
     collectionIndex: Int = 0,
     chapterIndex: Int = 0,
     pageIndex: Int = 0
 ) {
     val bundle = bundleOf(
         "id" to id,
+        "source" to source,
         "collectionIndex" to collectionIndex,
         "chapterIndex" to chapterIndex,
         "pageIndex" to pageIndex

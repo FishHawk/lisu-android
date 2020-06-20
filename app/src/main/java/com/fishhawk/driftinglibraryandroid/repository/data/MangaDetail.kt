@@ -10,16 +10,31 @@ data class TagGroup(
 ) : Parcelable
 
 @Parcelize
+data class Chapter(
+    val id: String,
+    val name: String,
+    val title: String
+) : Parcelable
+
+@Parcelize
 data class Collection(
     val title: String,
-    val chapters: List<String>
+    val chapters: List<Chapter>
 ) : Parcelable
 
 @Parcelize
 data class MangaDetail(
+    val source: String,
     val id: String,
     val title: String,
     var thumb: String,
+    val author: List<String>,
+    val status: Int,
+    val update: String,
+
+    val description: String,
+    val genre: List<String>,
+
     val tags: List<TagGroup>,
     val collections: List<Collection>
 ) : Parcelable
