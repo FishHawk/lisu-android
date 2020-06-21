@@ -9,6 +9,7 @@
     <string name="theme_selector_light">Light theme</string>
     <string name="theme_selector_dark">Dark theme</string>
 
+    <!-- fragment title -->
     <string name="menu_library">Library</string>
     <string name="menu_download">Download</string>
     <string name="menu_history">History</string>
@@ -18,13 +19,9 @@
     <string name="menu_setting">Setting</string>
 
     <!-- library fragment -->
-    <string name="library_search_hint">Search Library</string>
     <string name="library_reach_end_hint">No more mangas.</string>
     <string name="library_empty_hint">Library is empty.</string>
     <string name="library_unknown_error_hint">Unknown error.</string>
-
-    <!-- explore fragment -->
-    <string name="explore_search_hint">Search Provider Source</string>
 
     <!-- gallery fragment -->
     <string name="gallery_no_tags_hint">No tags</string>
@@ -58,12 +55,14 @@
     <string name="settings_display_mode_linear">Linear</string>
 
     <!-- menu-->
-    <string name="menu_library_search">Search</string>
-    <string name="menu_explore_search">Search</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_search_hint">Search…</string>
+    <string name="menu_search_global">Search global</string>
+    <string name="menu_search_global_hint">Search global…</string>
+    <string name="menu_display_mode">Display mode</string>
     <string name="menu_history_clear">Clear history</string>
 
     <!-- dialog-->
     <string name="dialog_clear_history">Clear all history?</string>
     <string name="dialog_clear_history_positive">clear all</string>
-    <string name="menu_popular_display_mode">Display mode</string>
 </resources>

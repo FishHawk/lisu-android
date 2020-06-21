@@ -2,6 +2,7 @@ package com.fishhawk.driftinglibraryandroid.explore
 
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -55,5 +56,8 @@ class ExploreFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_explore, menu)
+
+        val searchView: SearchView = menu.findItem(R.id.action_search).actionView as SearchView
+        searchView.queryHint = getString(R.string.menu_search_global_hint)
     }
 }
