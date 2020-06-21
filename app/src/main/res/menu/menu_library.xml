@@ -6,4 +6,9 @@
         android:title="@string/menu_library_search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always|withText" />
+
+    <item
+        android:id="@+id/action_display_mode"
+        android:title="@string/menu_popular_display_mode"
+        app:showAsAction="ifRoom" />
 </menu>
