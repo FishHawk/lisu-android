@@ -44,8 +44,8 @@ abstract class MangaListViewModel : ViewModel() {
     protected fun processFetchMoreResult(result: Result<List<MangaSummary>>) {
         when (result) {
             is Result.Success -> {
-                (_mangaList.value as Result.Success).data.plus(result.data)
-                _mangaList.value = _mangaList.value
+                _mangaList.value =
+                    Result.Success((_mangaList.value as Result.Success).data.plus(result.data))
                 if (result.data.isEmpty()) _fetchMoreFinish.value = Event(EmptyListException())
                 else _fetchMoreFinish.value = Event(null)
             }

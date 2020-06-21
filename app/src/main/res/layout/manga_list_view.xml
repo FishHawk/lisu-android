@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.classic.common.MultipleStatusView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/multiple_status_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:errorView="@layout/status_error"
+    app:loadingView="@layout/status_loading">
+
+    <com.hippo.refreshlayout.RefreshLayout
+        android:id="@+id/refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/manga_grid_thumbnail" />
+    </com.hippo.refreshlayout.RefreshLayout>
+</com.classic.common.MultipleStatusView>

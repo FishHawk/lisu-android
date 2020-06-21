@@ -1,28 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".library.LibraryFragment">
 
-    <com.classic.common.MultipleStatusView
-        android:id="@+id/multiple_status_view"
+    <com.fishhawk.driftinglibraryandroid.base.MangaListView
+        android:id="@+id/manga_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:errorView="@layout/status_error"
-        app:loadingView="@layout/status_loading">
-
-        <com.hippo.refreshlayout.RefreshLayout
-            android:id="@+id/refresh_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:listitem="@layout/manga_grid_thumbnail" />
-        </com.hippo.refreshlayout.RefreshLayout>
-    </com.classic.common.MultipleStatusView>
+        android:layout_height="match_parent" />
 </FrameLayout>

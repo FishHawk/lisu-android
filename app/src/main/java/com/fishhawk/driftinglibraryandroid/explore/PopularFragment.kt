@@ -2,18 +2,14 @@ package com.fishhawk.driftinglibraryandroid.explore
 
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.ExplorePopularFragmentBinding
-import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
-import com.hippo.refreshlayout.RefreshLayout
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.util.EventObserver
 
 class PopularFragment : Fragment() {
     private val viewModel: PopularViewModel by viewModels {
@@ -41,52 +37,59 @@ class PopularFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.refreshLayout.apply {
-            setOnRefreshListener(object : RefreshLayout.OnRefreshListener {
-                override fun onHeaderRefresh() = viewModel.refresh()
-                override fun onFooterRefresh() = viewModel.fetchMore()
-            })
-
-            setHeaderColorSchemeResources(
-                R.color.loading_indicator_red,
-                R.color.loading_indicator_purple,
-                R.color.loading_indicator_blue,
-                R.color.loading_indicator_cyan,
-                R.color.loading_indicator_green,
-                R.color.loading_indicator_yellow
-            )
-            setFooterColorSchemeResources(
-                R.color.loading_indicator_red,
-                R.color.loading_indicator_blue,
-                R.color.loading_indicator_green,
-                R.color.loading_indicator_orange
-            )
-        }
-
-        binding.list.apply {
-            addItemDecoration(SpacingItemDecoration(1, 16, true))
-            layoutManager = LinearLayoutManager(context)
-            adapter =
-                MangaListAdapter(requireActivity(), mutableListOf()).apply { setViewTypeLinear() }
-        }
+        binding.mangaList.setup(viewModel, requireActivity())
 
         viewModel.load()
 
+        SettingsHelper.displayMode.observe(viewLifecycleOwner, Observer {
+            binding.mangaList.updateMangaListDisplayMode()
+        })
+
         viewModel.mangaList.observe(viewLifecycleOwner, Observer { result ->
-            when (result) {
-                is Result.Success -> {
-                    (binding.list.adapter!! as MangaListAdapter).update(result.data.toMutableList())
-                    if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
-                    else binding.multipleStatusView.showContent()
-                }
-                is Result.Error -> binding.multipleStatusView.showError(result.exception.message)
-                is Result.Loading -> binding.multipleStatusView.showLoading()
-            }
+            binding.mangaList.onMangaListChanged(result)
+        })
+
+        viewModel.fetchMoreFinish.observe(viewLifecycleOwner, EventObserver { exception ->
+            binding.mangaList.onFetchMoreFinishEvent(exception)
+        })
+
+        viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver { exception ->
+            binding.mangaList.onRefreshFinishEvent(exception)
         })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_explore, menu)
+        inflater.inflate(R.menu.menu_popular, menu)
+
+        val item = menu.findItem(R.id.action_display_mode)
+        when (SettingsHelper.displayMode.getValueDirectly()) {
+            SettingsHelper.DISPLAY_MODE_GRID -> {
+                item.setIcon(R.drawable.ic_baseline_view_list_24)
+            }
+            SettingsHelper.DISPLAY_MODE_LINEAR -> {
+                item.setIcon(R.drawable.ic_baseline_view_module_24)
+            }
+        }
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_display_mode -> {
+                when (SettingsHelper.displayMode.getValueDirectly()) {
+                    SettingsHelper.DISPLAY_MODE_GRID -> {
+                        item.setIcon(R.drawable.ic_baseline_view_module_24)
+                        SettingsHelper.displayMode.setValue(SettingsHelper.DISPLAY_MODE_LINEAR)
+                    }
+                    SettingsHelper.DISPLAY_MODE_LINEAR -> {
+                        item.setIcon(R.drawable.ic_baseline_view_list_24)
+                        SettingsHelper.displayMode.setValue(SettingsHelper.DISPLAY_MODE_GRID)
+                    }
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }

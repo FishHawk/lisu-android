@@ -25,14 +25,12 @@ class MangaListAdapter(
 
     private var viewType = ViewType.GRID
 
-    fun setViewTypeGrid() {
+    fun setDisplayModeGrid() {
         viewType = ViewType.GRID
-        notifyDataSetChanged()
     }
 
-    fun setViewTypeLinear() {
+    fun setDisplayModeLinear() {
         viewType = ViewType.LINEAR
-        notifyDataSetChanged()
     }
 
     fun update(newData: MutableList<MangaSummary>) {

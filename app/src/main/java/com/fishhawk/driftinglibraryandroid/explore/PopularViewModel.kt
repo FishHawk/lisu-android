@@ -33,7 +33,7 @@ class PopularViewModel(
         page += 1
         GlobalScope.launch(Dispatchers.Main) {
             val result = remoteLibraryRepository.getPopularMangaList(source, page)
-            processRefreshResult(result)
+            processFetchMoreResult(result)
         }
     }
 }

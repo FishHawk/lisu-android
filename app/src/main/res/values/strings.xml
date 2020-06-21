@@ -53,6 +53,10 @@
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
 
+    <string name="settings_display_mode">Display mode</string>
+    <string name="settings_display_mode_gird">Grid</string>
+    <string name="settings_display_mode_linear">Linear</string>
+
     <!-- menu-->
     <string name="menu_library_search">Search</string>
     <string name="menu_explore_search">Search</string>
@@ -61,4 +65,5 @@
     <!-- dialog-->
     <string name="dialog_clear_history">Clear all history?</string>
     <string name="dialog_clear_history_positive">clear all</string>
+    <string name="menu_popular_display_mode">Display mode</string>
 </resources>

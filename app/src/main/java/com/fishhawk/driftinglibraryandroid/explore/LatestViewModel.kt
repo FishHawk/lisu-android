@@ -33,7 +33,7 @@ class LatestViewModel(
         page += 1
         GlobalScope.launch(Dispatchers.Main) {
             val result = remoteLibraryRepository.getLatestMangaList(source, page)
-            processRefreshResult(result)
+            processFetchMoreResult(result)
         }
     }
 }

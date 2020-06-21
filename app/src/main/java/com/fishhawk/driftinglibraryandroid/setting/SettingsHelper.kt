@@ -50,4 +50,18 @@ object SettingsHelper {
             DEFAULT_THEME
         )
     }
+
+    const val DISPLAY_MODE_GRID: String = "0"
+    const val DISPLAY_MODE_LINEAR: String = "1"
+
+    private const val KEY_DISPLAY_MODE = "display_mode"
+    private const val DEFAULT_DISPLAY_MODE: String = DISPLAY_MODE_GRID
+
+    val displayMode by lazy {
+        PreferenceStringLiveData(
+            sharedPreferences,
+            KEY_DISPLAY_MODE,
+            DEFAULT_DISPLAY_MODE
+        )
+    }
 }

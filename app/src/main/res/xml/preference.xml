@@ -20,4 +20,12 @@
         android:key="theme"
         android:summary="%s"
         android:title="@string/settings_theme" />
+
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/display_mode_entries"
+        android:entryValues="@array/display_mode_entry_values"
+        android:key="display_mode"
+        android:summary="%s"
+        android:title="@string/settings_display_mode" />
 </PreferenceScreen>

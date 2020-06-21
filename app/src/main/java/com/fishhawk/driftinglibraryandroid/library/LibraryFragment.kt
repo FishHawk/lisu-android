@@ -67,7 +67,7 @@ class LibraryFragment : Fragment() {
 
         binding.list.apply {
             val columnCount = 3
-            adapter = MangaListAdapter(requireActivity(), mutableListOf()).apply { setViewTypeGrid() }
+            adapter = MangaListAdapter(requireActivity(), mutableListOf()).apply { setDisplayModeGrid() }
             layoutManager = GridLayoutManager(context, columnCount)
 
             addItemDecoration(SpacingItemDecoration(columnCount, 16, true))
