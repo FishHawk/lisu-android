@@ -1,32 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="145dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/thumb"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:contentDescription="@null"
+            android:layout_height="match_parent"
             android:scaleType="fitCenter"
-            app:layout_constraintBottom_toTopOf="@id/title"
-            app:layout_constraintDimensionRatio="H,3:4"
-            app:layout_constraintTop_toTopOf="parent" />
+            tools:ignore="ContentDescription" />
+
+        <View
+            android:id="@+id/gradient"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@drawable/gradient_shape" />
 
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:ellipsize="end"
-            android:gravity="center"
-            android:singleLine="true"
+            android:lineSpacingExtra="-4dp"
+            android:maxLines="2"
+            android:padding="8dp"
+            android:shadowColor="?attr/colorOnSurface"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="2"
             android:textColor="?attr/colorOnSurface"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/thumb" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            tools:text="Sample name" />
+    </FrameLayout>
 </androidx.cardview.widget.CardView>
