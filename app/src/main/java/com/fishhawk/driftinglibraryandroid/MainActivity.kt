@@ -30,15 +30,13 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment)
         navController.setGraph(R.navigation.mobile_navigation, intent.extras)
         binding.navView.setupWithNavController(navController)
-        appBarConfiguration = AppBarConfiguration
-            .Builder(R.id.nav_library, R.id.nav_history, R.id.nav_explore)
-            .setDrawerLayout(binding.drawerLayout)
-            .build()
+        val appBarConfiguration = AppBarConfiguration(
+            setOf(R.id.nav_library, R.id.nav_history, R.id.nav_explore, R.id.nav_setting)
+        )
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
 
         SettingsHelper.theme.observe(this, Observer {
-            val applyTheme = { themeId: Int, themeString: String ->
-                binding.themeSelector.text = themeString
+            val applyTheme = { themeId: Int ->
                 if (getThemeResId() != themeId) {
                     setTheme(R.style.AppTheme_NoActionBar)
                     recreate()
@@ -46,21 +44,13 @@ class MainActivity : AppCompatActivity() {
             }
             when (it) {
                 SettingsHelper.THEME_LIGHT -> applyTheme(
-                    R.style.AppTheme_NoActionBar,
-                    getString(R.string.theme_selector_light)
+                    R.style.AppTheme_NoActionBar
                 )
                 SettingsHelper.THEME_DARK -> applyTheme(
-                    R.style.AppTheme_Dark_NoActionBar,
-                    getString(R.string.theme_selector_dark)
+                    R.style.AppTheme_Dark_NoActionBar
                 )
             }
         })
-        binding.themeSelector.setOnClickListener {
-            when (SettingsHelper.theme.value) {
-                SettingsHelper.THEME_LIGHT -> SettingsHelper.theme.setValue(SettingsHelper.THEME_DARK)
-                SettingsHelper.THEME_DARK -> SettingsHelper.theme.setValue(SettingsHelper.THEME_LIGHT)
-            }
-        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
