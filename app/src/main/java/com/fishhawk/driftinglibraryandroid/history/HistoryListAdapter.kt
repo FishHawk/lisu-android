@@ -63,7 +63,7 @@ class HistoryListAdapter(
             }
             binding.root.setOnClickListener {
                 (activity as AppCompatActivity).navToReaderActivity(
-                    item.id,null, item.collectionIndex, item.chapterIndex, item.pageIndex
+                    item.id, item.source, item.collectionIndex, item.chapterIndex, item.pageIndex
                 )
             }
         }

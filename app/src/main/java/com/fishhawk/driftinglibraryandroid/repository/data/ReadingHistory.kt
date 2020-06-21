@@ -8,6 +8,7 @@ data class ReadingHistory(
     @PrimaryKey val id: String,
     var title: String,
     var thumb: String,
+    var source: String?,
     var date: Long,
     var collectionIndex: Int,
     var collectionTitle: String,

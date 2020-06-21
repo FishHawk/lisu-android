@@ -44,7 +44,6 @@ class HistoryFragment : Fragment() {
             }
         }
 
-        postponeEnterTransition()
         viewModel.readingHistoryList.observe(viewLifecycleOwner, Observer { data ->
             binding.list.adapter = HistoryListAdapter(requireActivity(), data)
             if (data.isEmpty()) binding.multipleStatusView.showEmpty()

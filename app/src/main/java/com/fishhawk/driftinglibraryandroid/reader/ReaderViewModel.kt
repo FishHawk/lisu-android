@@ -121,6 +121,7 @@ class ReaderViewModel(
                 it.id,
                 it.title,
                 it.thumb,
+                it.source,
                 Calendar.getInstance().time.time,
                 collectionIndex,
                 collection.title,
