@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="145dp">
+    android:layout_height="150dp"
+    app:cardCornerRadius="4dp">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -13,7 +14,6 @@
             android:id="@+id/thumb"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitCenter"
             tools:ignore="ContentDescription" />
 
         <View
@@ -32,11 +32,11 @@
             android:lineSpacingExtra="-4dp"
             android:maxLines="2"
             android:padding="8dp"
-            android:shadowColor="?attr/colorOnSurface"
+            android:shadowColor="@android:color/white"
             android:shadowDx="0"
             android:shadowDy="0"
             android:shadowRadius="2"
-            android:textColor="?attr/colorOnSurface"
+            android:textColor="@android:color/white"
             tools:text="Sample name" />
     </FrameLayout>
 </androidx.cardview.widget.CardView>

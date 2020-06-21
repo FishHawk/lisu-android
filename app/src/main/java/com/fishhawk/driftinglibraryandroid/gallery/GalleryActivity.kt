@@ -1,6 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.gallery
 
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
@@ -24,6 +25,7 @@ import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.util.getThemeResId
 import com.fishhawk.driftinglibraryandroid.util.navToMainActivity
 import com.fishhawk.driftinglibraryandroid.util.navToReaderActivity
 import com.google.android.flexbox.FlexboxLayout
@@ -50,7 +52,7 @@ class GalleryActivity : AppCompatActivity() {
             SettingsHelper.THEME_DARK -> setTheme(R.style.AppTheme_Dark_NoActionBar)
         }
 
-        supportPostponeEnterTransition()
+        setupSystemUiVisibility()
 
         binding = GalleryActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -59,36 +61,17 @@ class GalleryActivity : AppCompatActivity() {
         val id: String? = arguments.getString("id")
         val title: String? = arguments.getString("title")
         val thumb: String? = arguments.getString("thumb")
+        val source: String? = arguments.getString("source")
 
         binding.title.text = title
         binding.thumb.apply {
-            transitionName = id
             Glide.with(this).load(thumb)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .override(300, 400)
-                .apply(RequestOptions().dontTransform())
-                .listener(object : RequestListener<Drawable> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        supportStartPostponedEnterTransition()
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        supportStartPostponedEnterTransition()
-                        return false
-                    }
-                })
+                .into(this)
+        }
+        binding.backdrop.apply {
+            Glide.with(this).load(thumb)
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .into(this)
         }
 
@@ -114,7 +97,33 @@ class GalleryActivity : AppCompatActivity() {
         viewModel.mangaDetail.observe(this, Observer { result ->
             println(result)
             when (result) {
-                is Result.Success -> bindTags(result.data.tags, binding.tags)
+                is Result.Success -> {
+                    val detail = result.data
+
+                    if (detail.author.isEmpty()) {
+                        binding.author.text = "Unknown"
+                    } else {
+                        binding.author.text = detail.author.joinToString(" ")
+                    }
+
+                    binding.status.text = when (detail.status) {
+                        0 -> "Completed"
+                        1 -> "Ongoing"
+                        else -> "Unknown"
+                    }
+
+                    binding.update.text = detail.update ?: "Unknown"
+                    binding.source.text = source ?: "Unknown"
+
+                    if (detail.description == null) {
+                        binding.description.visibility = View.GONE
+                    } else {
+                        binding.description.text = detail.description
+
+                    }
+
+                    bindTags(result.data.tags, binding.tags)
+                }
                 is Result.Error -> println()
                 is Result.Loading -> println()
             }
@@ -149,6 +158,18 @@ class GalleryActivity : AppCompatActivity() {
         })
     }
 
+    private fun setupSystemUiVisibility() {
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (getThemeResId() == R.style.AppTheme_NoActionBar)
+                window.decorView.systemUiVisibility = (window.decorView.systemUiVisibility
+                        or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
+        }
+    }
+
     private fun bindContent(
         id: String,
         source: String?,
@@ -167,13 +188,13 @@ class GalleryActivity : AppCompatActivity() {
                 if (history != null && history.collectionIndex == collectionIndex && history.chapterIndex == chapterIndex)
                     items.add(
                         ContentItem.ChapterMarked(
-                            chapter.title, collectionIndex, chapterIndex, history.pageIndex
+                            chapter.name, collectionIndex, chapterIndex, history.pageIndex
                         )
                     )
                 else
                     items.add(
                         ContentItem.Chapter(
-                            chapter.title, collectionIndex, chapterIndex
+                            chapter.name, collectionIndex, chapterIndex
                         )
                     )
             }
@@ -185,14 +206,12 @@ class GalleryActivity : AppCompatActivity() {
         tags: List<TagGroup>?,
         tagsLayout: LinearLayout
     ) {
-        val noTagsView = tagsLayout.findViewById<TextView>(R.id.no_tags)
-
-        tagsLayout.removeViews(1, tagsLayout.childCount - 1)
+        tagsLayout.removeViews(0, tagsLayout.childCount)
         if (tags == null || tags.isEmpty()) {
-            noTagsView.visibility = View.VISIBLE
+            binding.tags.visibility = View.GONE
             return
         } else {
-            noTagsView.visibility = View.GONE
+            binding.tags.visibility = View.VISIBLE
         }
 
         for (tagGroup in tags) {
