@@ -6,11 +6,9 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.navigation.ui.NavigationUI
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityMainBinding
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.util.getThemeResId
+import com.fishhawk.driftinglibraryandroid.util.setupTheme
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -18,10 +16,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        when (SettingsHelper.theme.getValueDirectly()) {
-            SettingsHelper.THEME_LIGHT -> setTheme(R.style.AppTheme_NoActionBar)
-            SettingsHelper.THEME_DARK -> setTheme(R.style.AppTheme_Dark_NoActionBar)
-        }
+        setupTheme()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -35,22 +30,6 @@ class MainActivity : AppCompatActivity() {
         )
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
 
-        SettingsHelper.theme.observe(this, Observer {
-            val applyTheme = { themeId: Int ->
-                if (getThemeResId() != themeId) {
-                    setTheme(R.style.AppTheme_NoActionBar)
-                    recreate()
-                }
-            }
-            when (it) {
-                SettingsHelper.THEME_LIGHT -> applyTheme(
-                    R.style.AppTheme_NoActionBar
-                )
-                SettingsHelper.THEME_DARK -> applyTheme(
-                    R.style.AppTheme_Dark_NoActionBar
-                )
-            }
-        })
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -1,7 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.gallery
 
-import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
@@ -11,12 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryActivityBinding
@@ -24,10 +17,10 @@ import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.util.getThemeResId
 import com.fishhawk.driftinglibraryandroid.util.navToMainActivity
 import com.fishhawk.driftinglibraryandroid.util.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.util.setupFullScreen
+import com.fishhawk.driftinglibraryandroid.util.setupTheme
 import com.google.android.flexbox.FlexboxLayout
 
 class GalleryActivity : AppCompatActivity() {
@@ -46,13 +39,8 @@ class GalleryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        when (SettingsHelper.theme.getValueDirectly()) {
-            SettingsHelper.THEME_LIGHT -> setTheme(R.style.AppTheme_NoActionBar)
-            SettingsHelper.THEME_DARK -> setTheme(R.style.AppTheme_Dark_NoActionBar)
-        }
-
-        setupSystemUiVisibility()
+        setupTheme()
+        setupFullScreen()
 
         binding = GalleryActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -158,18 +146,6 @@ class GalleryActivity : AppCompatActivity() {
                 else (binding.content.adapter as ContentAdapter).unmarkChapter()
             }
         })
-    }
-
-    private fun setupSystemUiVisibility() {
-        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (getThemeResId() == R.style.AppTheme_NoActionBar)
-                window.decorView.systemUiVisibility = (window.decorView.systemUiVisibility
-                        or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
-        }
     }
 
     private fun bindContent(

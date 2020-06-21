@@ -2,23 +2,19 @@ package com.fishhawk.driftinglibraryandroid.util;
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.os.bundleOf
-import androidx.core.view.ViewCompat
+import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainActivity
+import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.gallery.GalleryActivity
 import com.fishhawk.driftinglibraryandroid.reader.ReaderActivity
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import java.lang.reflect.Method
 
-fun AppCompatActivity.getThemeResId(): Int {
-    val wrapper: Class<*> = Context::class.java
-    val method: Method = wrapper.getMethod("getThemeResId")
-    method.isAccessible = true
-    return method.invoke(this) as Int
-}
 
 fun AppCompatActivity.navToGalleryActivity(
     id: String,
@@ -37,13 +33,6 @@ fun AppCompatActivity.navToGalleryActivity(
     val intent = Intent(this, GalleryActivity::class.java)
     intent.putExtras(bundle)
     startActivity(intent)
-
-//    val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-//        this,
-//        imageView,
-//        ViewCompat.getTransitionName(imageView)!!
-//    )
-//                startActivity(intent, options.toBundle())
 }
 
 fun AppCompatActivity.navToReaderActivity(
@@ -74,3 +63,45 @@ fun AppCompatActivity.navToMainActivity(
     intent.putExtras(bundle)
     startActivity(intent)
 }
+
+private fun AppCompatActivity.getThemeResId(): Int {
+    val wrapper: Class<*> = Context::class.java
+    val method: Method = wrapper.getMethod("getThemeResId")
+    method.isAccessible = true
+    return method.invoke(this) as Int
+}
+
+fun AppCompatActivity.setupFullScreen() {
+    window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (getThemeResId() == R.style.AppTheme_NoActionBar)
+            window.decorView.systemUiVisibility = (window.decorView.systemUiVisibility
+                    or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
+    }
+}
+
+fun AppCompatActivity.setupTheme() {
+    val lightThemeId = R.style.Theme_App_Light
+    val darkThemeId = R.style.Theme_App_Dark
+
+    when (SettingsHelper.theme.getValueDirectly()) {
+        SettingsHelper.THEME_LIGHT -> setTheme(lightThemeId)
+        SettingsHelper.THEME_DARK -> setTheme(darkThemeId)
+    }
+
+    SettingsHelper.theme.observe(this, Observer {
+        val themeId = when (it) {
+            SettingsHelper.THEME_LIGHT -> lightThemeId
+            SettingsHelper.THEME_DARK -> darkThemeId
+            else -> lightThemeId
+        }
+        if (getThemeResId() != themeId) {
+            setTheme(themeId)
+            recreate()
+        }
+    })
+}
+

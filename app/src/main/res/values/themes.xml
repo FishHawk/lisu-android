@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--============-->
+    <!-- Base Theme -->
+    <!--============-->
+    <style name="Theme"/>
+
+    <!--==============-->
+    <!-- Light Themes -->
+    <!--=======-======-->
+    <style name="Theme.Base" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- AppBar -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <!-- Theme colors -->
+        <item name="colorPrimary">@color/md_white_1000</item>
+        <item name="colorOnPrimary">@color/md_black_1000</item>
+        <item name="colorPrimaryVariant">@color/md_white_1000</item>
+        <item name="colorSecondary">@color/colorAccentLight</item>
+        <item name="colorOnSecondary">@color/md_white_1000</item>
+        <item name="colorSurface">@color/dialogLight</item>
+        <item name="colorOnSurface">@color/textColorPrimaryLight</item>
+        <item name="colorOnBackground">@color/textColorPrimaryLight</item>
+        <item name="colorAccent">@color/colorAccentLight</item>
+
+        <!-- Base background/text colors -->
+        <item name="android:colorBackground">@color/backgroundLight</item>
+        <item name="android:textColorPrimary">@color/textColorPrimaryLight</item>
+        <item name="android:textColorSecondary">@color/textColorSecondaryLight</item>
+        <item name="android:textColorHint">@color/textColorHintLight</item>
+        <item name="android:textColorPrimaryInverse">@color/textColorPrimaryDark</item>
+        <item name="android:textColorSecondaryInverse">@color/textColorSecondaryDark</item>
+        <item name="android:textColorHintInverse">@color/textColorHintDark</item>
+        <item name="rippleColor">@color/rippleColorLight</item>
+
+        <!-- Themes -->
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:navigationBarColor">?attr/colorPrimary</item>
+<!--        <item name="windowActionModeOverlay">true</item>-->
+<!--        <item name="elevationOverlayEnabled">false</item>-->
+<!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>-->
+<!--        <item name="toolbarNavigationButtonStyle">@style/Theme.Toolbar.Navigation</item>-->
+<!--        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
+<!--        <item name="dialogTheme">@style/Theme.AlertDialog.Light</item>-->
+<!--        <item name="alertDialogTheme">@style/Theme.AlertDialog.Dark</item>-->
+<!--        <item name="chipStyle">@style/Theme.Widget.Chip</item>-->
+<!--        <item name="buttonStyle">@style/Theme.Widget.Button</item>-->
+<!--        <item name="snackbarStyle">@style/Theme.Widget.Snackbar</item>-->
+<!--        <item name="snackbarButtonStyle">@style/Theme.Widget.Button</item>-->
+<!--        <item name="snackbarTextViewStyle">@style/Theme.Widget.Snackbar.TextView</item>-->
+<!--        <item name="textAppearanceButton">@style/TextAppearance.Widget.Button</item>-->
+<!--        <item name="textInputStyle">@style/Theme.Widget.TextInputLayout.OutlinedBox</item>-->
+<!--        <item name="android:itemTextAppearance">@style/TextAppearance.Widget.Menu</item>-->
+<!--        <item name="swipeRefreshLayoutProgressSpinnerBackgroundColor">?attr/colorAccent</item>-->
+    </style>
+
+    <!--===========-->
+    <!-- Main Theme-->
+    <!--===========-->
+    <style name="Theme.App.Light" parent="Theme.Base">
+        <item name="android:statusBarColor">@color/md_black_1000_54</item>
+        <item name="android:navigationBarColor">@color/md_black_1000_54</item>
+    </style>
+
+    <!--=============-->
+    <!-- Dark Themes -->
+    <!--=============-->
+    <style name="Theme.Base.Dark" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Theme colors -->
+        <item name="colorPrimary">@color/colorDarkPrimary</item>
+        <item name="colorOnPrimary">@color/textColorPrimaryDark</item>
+        <item name="colorPrimaryVariant">@color/colorDarkPrimary</item>
+        <item name="colorSecondary">@color/colorAccentDark</item>
+        <item name="colorOnSecondary">@color/textColorPrimaryDark</item>
+        <item name="colorSurface">@color/dialogDark</item>
+        <item name="colorOnSurface">@color/textColorPrimaryDark</item>
+        <item name="colorOnBackground">@color/textColorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccentDark</item>
+
+        <!-- Base background/text colors -->
+        <item name="android:colorBackground">@color/backgroundDark</item>
+        <item name="android:textColorPrimary">@color/textColorPrimaryDark</item>
+        <item name="android:textColorSecondary">@color/textColorSecondaryDark</item>
+        <item name="android:textColorHint">@color/textColorHintDark</item>
+        <item name="android:textColorPrimaryInverse">@color/textColorPrimaryLight</item>
+        <item name="android:textColorSecondaryInverse">@color/textColorSecondaryLight</item>
+        <item name="android:textColorHintInverse">@color/textColorHintLight</item>
+        <item name="rippleColor">@color/rippleColorDark</item>
+
+        <!-- Themes -->
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:navigationBarColor">?attr/colorPrimary</item>
+<!--        <item name="windowActionModeOverlay">true</item>-->
+<!--        <item name="elevationOverlayEnabled">false</item>-->
+<!--        <item name="actionBarTheme">@style/ThemeOverlay.MaterialComponents.Dark.ActionBar</item>-->
+<!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>-->
+<!--        <item name="toolbarNavigationButtonStyle">@style/Theme.Toolbar.Navigation</item>-->
+<!--        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
+<!--        <item name="dialogTheme">@style/Theme.AlertDialog.Dark</item>-->
+<!--        <item name="alertDialogTheme">@style/Theme.AlertDialog.Dark</item>-->
+<!--        <item name="chipStyle">@style/Theme.Widget.Chip</item>-->
+<!--        <item name="buttonStyle">@style/Theme.Widget.Button</item>-->
+<!--        <item name="snackbarStyle">@style/Theme.Widget.Snackbar</item>-->
+<!--        <item name="snackbarButtonStyle">@style/Theme.Widget.Button</item>-->
+<!--        <item name="snackbarTextViewStyle">@style/Theme.Widget.Snackbar.TextView</item>-->
+<!--        <item name="textAppearanceButton">@style/TextAppearance.Widget.Button</item>-->
+<!--        <item name="textInputStyle">@style/Theme.Widget.TextInputLayout.OutlinedBox</item>-->
+<!--        <item name="android:itemTextAppearance">@style/TextAppearance.Widget.Menu</item>-->
+<!--        <item name="swipeRefreshLayoutProgressSpinnerBackgroundColor">?attr/colorAccent</item>-->
+    </style>
+
+    <style name="Theme.App.Dark" parent="Theme.Base.Dark">
+    </style>
+
+<!--    &lt;!&ndash;==============&ndash;&gt;-->
+<!--    &lt;!&ndash; Reader Theme &ndash;&gt;-->
+<!--    &lt;!&ndash;==============&ndash;&gt;-->
+<!--    <style name="Theme.Base.Reader.Dark" parent="Theme.Base.Dark">-->
+<!--        <item name="colorPrimary">@color/readerColorDarkPrimary</item>-->
+<!--        <item name="colorOnPrimary">@color/textColorPrimaryDark</item>-->
+<!--        <item name="colorPrimaryVariant">@color/readerColorDarkPrimary</item>-->
+<!--        <item name="colorSurface">@color/md_black_1000</item>-->
+
+<!--        <item name="android:colorBackground">@color/md_black_1000</item>-->
+<!--        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>-->
+<!--        <item name="android:navigationBarColor">?attr/colorPrimaryVariant</item>-->
+
+<!--        <item name="actionBarTheme">@style/ThemeOverlay.MaterialComponents.Dark.ActionBar</item>-->
+<!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>-->
+<!--        <item name="switchStyle">@style/Theme.Widget.BasicSwitch</item>-->
+<!--    </style>-->
+
+<!--    <style name="Theme.Base.Reader.Light" parent="Theme.Base">-->
+<!--        <item name="colorPrimary">@color/readerColorDarkPrimary</item>-->
+<!--        <item name="colorOnPrimary">@color/textColorPrimaryDark</item>-->
+<!--        <item name="colorPrimaryVariant">@color/readerColorDarkPrimary</item>-->
+<!--        <item name="colorSurface">@color/md_white_1000</item>-->
+
+<!--        <item name="android:colorBackground">@color/md_white_1000</item>-->
+<!--        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>-->
+<!--        <item name="android:navigationBarColor">?attr/colorPrimaryVariant</item>-->
+
+<!--        <item name="actionBarTheme">@style/ThemeOverlay.MaterialComponents.Dark.ActionBar</item>-->
+<!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>-->
+<!--        <item name="switchStyle">@style/Theme.Widget.BasicSwitch</item>-->
+<!--    </style>-->
+
+<!--    <style name="Theme.Reader.Dark" parent="Theme.Base.Reader.Dark" />-->
+
+<!--    <style name="Theme.Reader.Dark.Grey" parent="Theme.Base.Reader.Dark">-->
+<!--        <item name="android:colorBackground">@color/backgroundDark</item>-->
+<!--    </style>-->
+
+<!--    <style name="Theme.Reader.Light" parent="Theme.Base.Reader.Light" />-->
+
+
+<!--    &lt;!&ndash;===============&ndash;&gt;-->
+<!--    &lt;!&ndash; Launch Screen &ndash;&gt;-->
+<!--    &lt;!&ndash;===============&ndash;&gt;-->
+<!--    <style name="Theme.Splash" parent="Theme.Tachiyomi.LightBlue">-->
+<!--        <item name="colorBackgroundSplash">@color/colorPrimary</item>-->
+
+<!--        <item name="android:windowBackground">@drawable/splash_background</item>-->
+<!--        <item name="android:statusBarColor">?attr/colorBackgroundSplash</item>-->
+<!--        <item name="android:navigationBarColor">?attr/colorBackgroundSplash</item>-->
+<!--    </style>-->
+
+</resources>
