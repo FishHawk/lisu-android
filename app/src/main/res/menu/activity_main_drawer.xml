@@ -14,7 +14,7 @@
             android:title="@string/menu_history" />
         <item
             android:id="@+id/nav_explore"
-            android:icon="@drawable/ic_history_black_24dp"
+            android:icon="@drawable/ic_baseline_explore_24"
             android:title="@string/menu_explore" />
         <item
             android:id="@+id/nav_setting"
