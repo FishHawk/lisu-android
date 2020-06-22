@@ -31,9 +31,7 @@ data class MangaDetail(
     val author: List<String>,
     val status: Int,
     val update: String,
-
     val description: String,
-    val genre: List<String>,
 
     val tags: List<TagGroup>,
     val collections: List<Collection>

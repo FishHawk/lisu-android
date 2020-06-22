@@ -11,7 +11,6 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.util.EventObserver
-import com.fishhawk.driftinglibraryandroid.util.makeSnackBar
 
 
 class LibraryFragment : Fragment() {

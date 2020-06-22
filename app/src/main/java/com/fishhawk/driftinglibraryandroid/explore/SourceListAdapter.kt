@@ -39,6 +39,11 @@ class SourceListAdapter(
         fun bind(item: Source) {
             binding.name.text = item.name
 
+            binding.root.setOnClickListener {
+                val bundle = bundleOf("source" to item.name, "keywords" to "")
+                binding.root.findNavController().navigate(R.id.action_explore_to_search, bundle)
+            }
+
             if (!item.isLatestSupport) binding.latest.visibility = View.INVISIBLE
             binding.latest.setOnClickListener {
                 val bundle = bundleOf("source" to item.name)

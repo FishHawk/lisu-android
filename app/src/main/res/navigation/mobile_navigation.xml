@@ -9,19 +9,19 @@
     <fragment
         android:id="@+id/nav_library"
         android:name="com.fishhawk.driftinglibraryandroid.library.LibraryFragment"
-        android:label="@string/menu_library"
+        android:label="@string/label_library"
         tools:layout="@layout/library_fragment" />
 
     <fragment
         android:id="@+id/nav_history"
         android:name="com.fishhawk.driftinglibraryandroid.history.HistoryFragment"
-        android:label="@string/menu_history"
+        android:label="@string/label_history"
         tools:layout="@layout/history_fragment" />
 
     <fragment
         android:id="@+id/nav_explore"
         android:name="com.fishhawk.driftinglibraryandroid.explore.ExploreFragment"
-        android:label="@string/menu_explore"
+        android:label="@string/label_explore"
         tools:layout="@layout/explore_fragment">
         <action
             android:id="@+id/action_explore_to_popular"
@@ -29,20 +29,36 @@
         <action
             android:id="@+id/action_explore_to_latest"
             app:destination="@id/nav_latest" />
+        <action
+            android:id="@+id/action_explore_to_search"
+            app:destination="@id/nav_search" />
     </fragment>
 
     <fragment
         android:id="@+id/nav_popular"
         android:name="com.fishhawk.driftinglibraryandroid.explore.PopularFragment"
-        android:label="@string/menu_popular" />
+        android:label="@string/label_popular">
+        <action
+            android:id="@+id/action_popular_to_search"
+            app:destination="@id/nav_search" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_latest"
         android:name="com.fishhawk.driftinglibraryandroid.explore.LatestFragment"
-        android:label="@string/menu_latest" />
+        android:label="@string/label_latest">
+        <action
+            android:id="@+id/action_latest_to_search"
+            app:destination="@id/nav_search" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_search"
+        android:name="com.fishhawk.driftinglibraryandroid.explore.SearchFragment"
+        android:label="@string/label_search" />
 
     <fragment
         android:id="@+id/nav_setting"
         android:name="com.fishhawk.driftinglibraryandroid.setting.SettingsFragment"
-        android:label="@string/menu_setting" />
+        android:label="@string/label_setting" />
 </navigation>

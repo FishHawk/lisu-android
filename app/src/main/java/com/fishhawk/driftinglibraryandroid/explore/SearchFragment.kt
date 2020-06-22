@@ -1,27 +1,26 @@
 package com.fishhawk.driftinglibraryandroid.explore
 
+
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.ExploreLatestFragmentBinding
+import com.fishhawk.driftinglibraryandroid.databinding.ExplorePopularFragmentBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.util.EventObserver
 
-class LatestFragment : Fragment() {
-    private val viewModel: LatestViewModel by viewModels {
+class SearchFragment : Fragment() {
+    private val viewModel: SearchViewModel by viewModels {
         val source = arguments?.getString("source")!!
         val application = requireContext().applicationContext as MainApplication
         val remoteLibraryRepository = application.remoteLibraryRepository
         ExploreViewModelFactory(source, remoteLibraryRepository)
     }
-    private lateinit var binding: ExploreLatestFragmentBinding
+    private lateinit var binding: ExplorePopularFragmentBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +32,7 @@ class LatestFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = ExploreLatestFragmentBinding.inflate(inflater, container, false)
+        binding = ExplorePopularFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -42,7 +41,8 @@ class LatestFragment : Fragment() {
 
         binding.mangaList.setup(viewModel, requireActivity())
 
-        viewModel.load()
+        val keywords = arguments?.getString("keywords")!!
+        viewModel.search(keywords)
 
         SettingsHelper.displayMode.observe(viewLifecycleOwner, Observer {
             binding.mangaList.updateMangaListDisplayMode()
@@ -69,12 +69,7 @@ class LatestFragment : Fragment() {
         searchView.queryHint = getString(R.string.menu_search_hint)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                searchView.setQuery("", false);
-                val bundle = bundleOf(
-                    "source" to arguments?.getString("source")!!,
-                    "keywords" to (query ?: "")
-                )
-                binding.root.findNavController().navigate(R.id.action_latest_to_search, bundle)
+                viewModel.search(query ?: "")
                 return true
             }
 
@@ -90,7 +85,6 @@ class LatestFragment : Fragment() {
                 item.setIcon(R.drawable.ic_baseline_view_module_24)
             }
         }
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.explore
 
+import android.widget.SearchView
 import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
@@ -27,6 +28,8 @@ class ExploreViewModelFactory(
                 LatestViewModel(source, remoteLibraryRepository)
             isAssignableFrom(PopularViewModel::class.java) ->
                 PopularViewModel(source, remoteLibraryRepository)
+            isAssignableFrom(SearchViewModel::class.java) ->
+                SearchViewModel(source, remoteLibraryRepository)
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
