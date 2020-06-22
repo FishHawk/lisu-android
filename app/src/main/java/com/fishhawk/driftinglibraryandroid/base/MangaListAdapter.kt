@@ -101,8 +101,6 @@ class MangaListAdapter(
 
             Glide.with(activity).load(item.thumb)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .override(300, 400)
-                .apply(RequestOptions().dontTransform())
                 .into(binding.thumb)
 
             binding.root.setOnClickListener {

@@ -52,13 +52,11 @@ class GalleryActivity : AppCompatActivity() {
         binding.thumb.apply {
             Glide.with(this).load(thumb)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .override(300, 400)
                 .into(this)
         }
         binding.backdrop.apply {
             Glide.with(this).load(thumb)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .override(300, 400)
                 .into(this)
         }
 

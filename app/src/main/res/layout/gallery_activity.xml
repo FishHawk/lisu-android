@@ -30,16 +30,23 @@
                 android:background="@android:color/transparent"
                 android:fitsSystemWindows="true">
 
-                <ImageView
-                    android:id="@+id/thumb"
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/thumb_card"
+                    style="@style/Theme.Widget.CardView"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_margin="16dp"
-                    android:contentDescription="@null"
-                    android:scaleType="fitCenter"
                     app:layout_constraintDimensionRatio="H,4:3"
                     app:layout_constraintEnd_toStartOf="@id/info"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <ImageView
+                        android:id="@+id/thumb"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@null"
+                        android:scaleType="centerCrop" />
+                </androidx.cardview.widget.CardView>
 
                 <LinearLayout
                     android:id="@+id/info"
@@ -51,7 +58,7 @@
                     android:layout_marginBottom="16dp"
                     android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/thumb">
+                    app:layout_constraintStart_toEndOf="@+id/thumb_card">
 
                     <TextView
                         android:id="@+id/title"
