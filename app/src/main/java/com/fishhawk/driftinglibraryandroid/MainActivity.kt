@@ -1,6 +1,7 @@
 package com.fishhawk.driftinglibraryandroid
 
 import android.os.Bundle
+import android.view.View
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -20,16 +21,26 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setSupportActionBar(binding.contentMain.toolbar)
+        setSupportActionBar(binding.toolbar)
 
         val navController = findNavController(R.id.nav_host_fragment)
         navController.setGraph(R.navigation.mobile_navigation, intent.extras)
         binding.navView.setupWithNavController(navController)
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(R.id.nav_library, R.id.nav_history, R.id.nav_explore, R.id.nav_setting)
+        val mainFragmentSet = setOf(
+            R.id.nav_library,
+            R.id.nav_history,
+            R.id.nav_explore,
+            R.id.nav_setting
         )
+        val appBarConfiguration = AppBarConfiguration(mainFragmentSet)
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
 
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                in mainFragmentSet -> binding.navView.visibility = View.VISIBLE
+                else -> binding.navView.visibility = View.GONE
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

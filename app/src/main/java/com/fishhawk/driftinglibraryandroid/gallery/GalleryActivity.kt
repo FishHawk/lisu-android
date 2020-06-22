@@ -17,10 +17,7 @@ import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
-import com.fishhawk.driftinglibraryandroid.util.navToMainActivity
-import com.fishhawk.driftinglibraryandroid.util.navToReaderActivity
-import com.fishhawk.driftinglibraryandroid.util.setupFullScreen
-import com.fishhawk.driftinglibraryandroid.util.setupTheme
+import com.fishhawk.driftinglibraryandroid.util.*
 import com.google.android.flexbox.FlexboxLayout
 
 class GalleryActivity : AppCompatActivity() {
@@ -39,7 +36,7 @@ class GalleryActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupTheme()
+        setupThemeWithTranslucentStatus()
         setupFullScreen()
 
         binding = GalleryActivityBinding.inflate(layoutInflater)

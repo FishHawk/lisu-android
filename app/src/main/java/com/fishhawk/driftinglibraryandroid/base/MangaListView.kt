@@ -110,6 +110,6 @@ class MangaListView @JvmOverloads constructor(
     }
 
     private fun getString(id: Int): String {
-        return Resources.getSystem().getString(id)
+        return context.resources.getString(id)
     }
 }

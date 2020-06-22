@@ -16,7 +16,7 @@ import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.util.makeSnackBar
 import com.fishhawk.driftinglibraryandroid.util.setupFullScreen
-import com.fishhawk.driftinglibraryandroid.util.setupTheme
+import com.fishhawk.driftinglibraryandroid.util.setupThemeWithTranslucentStatus
 import kotlinx.coroutines.runBlocking
 
 class ReaderActivity : AppCompatActivity() {
@@ -45,7 +45,7 @@ class ReaderActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupTheme()
+        setupThemeWithTranslucentStatus()
         setupFullScreen()
 
         binding = ReaderActivityBinding.inflate(layoutInflater)

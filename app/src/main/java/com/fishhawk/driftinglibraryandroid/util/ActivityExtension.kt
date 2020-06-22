@@ -77,10 +77,32 @@ fun AppCompatActivity.setupFullScreen() {
             or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        if (getThemeResId() == R.style.AppTheme_NoActionBar)
+        if (getThemeResId() == R.style.Theme_App_Light)
             window.decorView.systemUiVisibility = (window.decorView.systemUiVisibility
                     or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
     }
+}
+
+fun AppCompatActivity.setupThemeWithTranslucentStatus() {
+    val lightThemeId = R.style.Theme_App_Light_TranslucentStatus
+    val darkThemeId = R.style.Theme_App_Dark_TranslucentStatus
+
+    when (SettingsHelper.theme.getValueDirectly()) {
+        SettingsHelper.THEME_LIGHT -> setTheme(lightThemeId)
+        SettingsHelper.THEME_DARK -> setTheme(darkThemeId)
+    }
+
+    SettingsHelper.theme.observe(this, Observer {
+        val themeId = when (it) {
+            SettingsHelper.THEME_LIGHT -> lightThemeId
+            SettingsHelper.THEME_DARK -> darkThemeId
+            else -> lightThemeId
+        }
+        if (getThemeResId() != themeId) {
+            setTheme(themeId)
+            recreate()
+        }
+    })
 }
 
 fun AppCompatActivity.setupTheme() {
