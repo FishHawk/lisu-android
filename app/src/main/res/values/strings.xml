@@ -23,6 +23,11 @@
     <string name="library_empty_hint">Library is empty.</string>
     <string name="library_unknown_error_hint">Unknown error.</string>
 
+    <!-- history fragment -->
+    <string name="history_thumbnail_seen">Seen:</string>
+    <string name="history_thumbnail_date">Date:</string>
+    <string name="history_thumbnail_source">Source:</string>
+
     <!-- gallery fragment -->
     <string name="gallery_no_tags_hint">No tags</string>
     <string name="gallery_no_chapters_hint">No chapters</string>

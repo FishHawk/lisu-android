@@ -42,16 +42,12 @@ class HistoryListAdapter(
             binding.title.text = item.title
 
             val seenHint = when {
-                item.collectionTitle.isEmpty() -> "Seen: ${item.chapterTitle} Page${item.pageIndex + 1}"
-                else -> "Seen: ${item.collectionTitle} ${item.chapterTitle} Page${item.pageIndex + 1}"
+                item.collectionTitle.isEmpty() -> "${item.chapterTitle} Page${item.pageIndex + 1}"
+                else -> "${item.collectionTitle} ${item.chapterTitle} Page${item.pageIndex + 1}"
             }
-            binding.record.text = seenHint
-
-            val timeHint = "Time: ${dateFormat.format(Date(item.date))}"
-            binding.date.text = timeHint
-
-            val sourceHint = "Source: ${item.source}"
-            binding.source.text = sourceHint
+            binding.seen.text = seenHint
+            binding.date.text = dateFormat.format(Date(item.date))
+            binding.source.text = item.source
 
             binding.thumb.transitionName = item.id
             Glide.with(activity).load(item.thumb)

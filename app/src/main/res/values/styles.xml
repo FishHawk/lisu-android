@@ -35,10 +35,16 @@
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="Theme.TextAppearance.Subtitle">
+    <style name="Theme.TextAppearance.Subtitle1">
         <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="Theme.TextAppearance.Subtitle2">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
     <!--==============-->
