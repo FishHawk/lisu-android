@@ -27,7 +27,7 @@
             android:layout_marginStart="@dimen/baseline_8dp"
             android:layout_marginTop="@dimen/baseline_8dp"
             android:ellipsize="end"
-            android:singleLine="true"
+            android:maxLines="2"
             app:layout_constraintStart_toEndOf="@+id/thumb"
             app:layout_constraintTop_toTopOf="parent" />
 

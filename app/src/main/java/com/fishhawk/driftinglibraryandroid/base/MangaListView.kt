@@ -2,7 +2,6 @@ package com.fishhawk.driftinglibraryandroid.base
 
 import android.app.Activity
 import android.content.Context
-import android.content.res.Resources
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.recyclerview.widget.GridLayoutManager

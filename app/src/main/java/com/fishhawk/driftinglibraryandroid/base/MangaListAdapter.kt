@@ -2,7 +2,9 @@ package com.fishhawk.driftinglibraryandroid.base
 
 import android.app.Activity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -12,6 +14,7 @@ import com.fishhawk.driftinglibraryandroid.databinding.MangaGridThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.databinding.MangaLinearThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
 import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
+import kotlin.Unit as Unit1
 
 
 class MangaListAdapter(
@@ -93,11 +96,11 @@ class MangaListAdapter(
 
         fun bind(item: MangaSummary) {
             binding.title.text = item.title
-            binding.thumb.transitionName = item.id
+            binding.author.text = item.author
+            binding.update.text = item.update
+            binding.source.text = item.source
 
-            item.source.let { binding.source.text = it }
-            item.author.let { binding.author.text = it }
-            item.update.let { binding.update.text = it }
+            binding.update.visibility = if (item.update == null) View.GONE else View.VISIBLE
 
             Glide.with(activity).load(item.thumb)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
