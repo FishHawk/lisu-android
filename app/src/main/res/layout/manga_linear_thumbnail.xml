@@ -31,16 +31,7 @@
 
             <TextView
                 android:id="@+id/title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/baseline_8dp"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/update"
+                style="@style/Theme.TextAppearance.LinearThumbnailTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/baseline_8dp"
@@ -49,6 +40,16 @@
 
             <TextView
                 android:id="@+id/author"
+                style="@style/Theme.TextAppearance.Subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/baseline_4dp"
+                android:ellipsize="end"
+                android:singleLine="true" />
+
+            <TextView
+                android:id="@+id/update"
+                style="@style/Theme.TextAppearance.Subtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
@@ -56,6 +57,7 @@
 
             <TextView
                 android:id="@+id/source"
+                style="@style/Theme.TextAppearance.Subtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"

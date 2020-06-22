@@ -126,7 +126,7 @@ class ReaderViewModel(
                 collectionIndex,
                 collection.title,
                 chapterIndex,
-                collection.chapters[chapterIndex].title,
+                collection.chapters[chapterIndex].name,
                 chapterPosition.value ?: 0
             )
             readingHistoryRepository.updateReadingHistory(readingHistory)

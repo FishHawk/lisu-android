@@ -26,7 +26,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="240dp"
+                android:layout_height="220dp"
                 android:background="@android:color/transparent"
                 android:fitsSystemWindows="true">
 
@@ -62,16 +62,16 @@
 
                     <TextView
                         android:id="@+id/title"
+                        style="@style/Theme.TextAppearance.Title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
                         android:maxLines="2"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textIsSelectable="false"
-                        android:textSize="18sp" />
+                        android:textIsSelectable="false" />
 
                     <TextView
                         android:id="@+id/author"
+                        style="@style/Theme.TextAppearance.Subtitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/baseline_4dp"
@@ -81,6 +81,7 @@
 
                     <TextView
                         android:id="@+id/update"
+                        style="@style/Theme.TextAppearance.Subtitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
@@ -89,6 +90,7 @@
 
                     <TextView
                         android:id="@+id/status"
+                        style="@style/Theme.TextAppearance.Subtitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"
@@ -97,6 +99,7 @@
 
                     <TextView
                         android:id="@+id/source"
+                        style="@style/Theme.TextAppearance.Subtitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ellipsize="end"

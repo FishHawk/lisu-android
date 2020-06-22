@@ -6,6 +6,41 @@
         <item name="cardElevation">2dp</item>
     </style>
 
+    <!--===============-->
+    <!--Text Appearance-->
+    <!--===============-->
+
+    <style name="Theme.TextAppearance" parent="@android:style/TextAppearance" />
+
+    <style name="Theme.TextAppearance.Title">
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="Theme.TextAppearance.GridThumbnailTitle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:lineSpacingExtra">-4dp</item>
+        <item name="android:shadowColor">@android:color/white</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
+        <item name="android:shadowRadius">2</item>
+    </style>
+
+    <style name="Theme.TextAppearance.LinearThumbnailTitle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="Theme.TextAppearance.Subtitle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
     <!--==============-->
     <!--Widgets.Button-->
     <!--==============-->
@@ -26,4 +61,5 @@
         <item name="android:textColor">?attr/colorAccent</item>
         <item name="rippleColor">?attr/colorAccent</item>
     </style>
+
 </resources>

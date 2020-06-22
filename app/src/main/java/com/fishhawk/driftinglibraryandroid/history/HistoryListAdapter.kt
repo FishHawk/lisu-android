@@ -50,6 +50,9 @@ class HistoryListAdapter(
             val timeHint = "Time: ${dateFormat.format(Date(item.date))}"
             binding.date.text = timeHint
 
+            val sourceHint = "Source: ${item.source}"
+            binding.source.text = sourceHint
+
             binding.thumb.transitionName = item.id
             Glide.with(activity).load(item.thumb)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)

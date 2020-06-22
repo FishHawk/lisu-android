@@ -25,18 +25,13 @@
 
         <TextView
             android:id="@+id/title"
+            style="@style/Theme.TextAppearance.GridThumbnailTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:ellipsize="end"
-            android:lineSpacingExtra="-4dp"
             android:maxLines="2"
             android:padding="8dp"
-            android:shadowColor="@android:color/white"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="2"
-            android:textColor="@android:color/white"
             tools:text="Sample name" />
     </FrameLayout>
 </androidx.cardview.widget.CardView>
