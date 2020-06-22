@@ -36,8 +36,6 @@
         <item name="rippleColor">@color/rippleColorLight</item>
 
         <!-- Themes -->
-        <item name="android:statusBarColor">?attr/colorPrimary</item>
-        <item name="android:navigationBarColor">?attr/colorPrimary</item>
         <!--        <item name="windowActionModeOverlay">true</item>-->
         <!--        <item name="elevationOverlayEnabled">false</item>-->
         <!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>-->
@@ -65,7 +63,7 @@
     </style>
 
     <style name="Theme.App.Light.TranslucentStatus" parent="Theme.Base">
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <!--=============-->
@@ -94,7 +92,6 @@
         <item name="rippleColor">@color/rippleColorDark</item>
 
         <!-- Themes -->
-        <item name="android:statusBarColor">?attr/colorPrimary</item>
         <item name="android:navigationBarColor">?attr/colorPrimary</item>
         <!--        <item name="windowActionModeOverlay">true</item>-->
         <!--        <item name="elevationOverlayEnabled">false</item>-->
@@ -115,10 +112,12 @@
         <!--        <item name="swipeRefreshLayoutProgressSpinnerBackgroundColor">?attr/colorAccent</item>-->
     </style>
 
-    <style name="Theme.App.Dark" parent="Theme.Base.Dark"></style>
+    <style name="Theme.App.Dark" parent="Theme.Base.Dark">
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+    </style>
 
     <style name="Theme.App.Dark.TranslucentStatus" parent="Theme.Base.Dark">
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <!--    &lt;!&ndash;==============&ndash;&gt;-->

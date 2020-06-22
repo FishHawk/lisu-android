@@ -77,7 +77,7 @@ fun AppCompatActivity.setupFullScreen() {
             or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        if (getThemeResId() == R.style.Theme_App_Light)
+        if (getThemeResId() == R.style.Theme_App_Light_TranslucentStatus)
             window.decorView.systemUiVisibility = (window.decorView.systemUiVisibility
                     or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR)
     }
