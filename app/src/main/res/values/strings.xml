@@ -28,6 +28,10 @@
     <string name="history_thumbnail_date">Date:</string>
     <string name="history_thumbnail_source">Source:</string>
 
+    <!-- explore fragment -->
+    <string name="explore_card_latest">Latest</string>
+    <string name="explore_card_popular">Popular</string>
+
     <!-- gallery fragment -->
     <string name="gallery_no_tags_hint">No tags</string>
     <string name="gallery_no_chapters_hint">No chapters</string>

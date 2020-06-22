@@ -4,7 +4,6 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -12,14 +11,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.fishhawk.driftinglibraryandroid.databinding.MangaGridThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.databinding.MangaLinearThumbnailBinding
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
+import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
 import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
-import kotlin.Unit as Unit1
 
 
 class MangaListAdapter(
     private val activity: Activity,
-    private var data: MutableList<MangaSummary>
+    private var data: MutableList<MangaOutline>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     enum class ViewType(val value: Int) {
         GRID(0),
@@ -36,7 +34,7 @@ class MangaListAdapter(
         viewType = ViewType.LINEAR
     }
 
-    fun update(newData: MutableList<MangaSummary>) {
+    fun update(newData: MutableList<MangaOutline>) {
         data.clear()
         data.addAll(newData)
         notifyDataSetChanged()
@@ -73,7 +71,7 @@ class MangaListAdapter(
     inner class GridViewHolder(private val binding: MangaGridThumbnailBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: MangaSummary) {
+        fun bind(item: MangaOutline) {
             binding.title.text = item.title
             binding.thumb.transitionName = item.id
 
@@ -94,7 +92,7 @@ class MangaListAdapter(
     inner class LinearViewHolder(private val binding: MangaLinearThumbnailBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: MangaSummary) {
+        fun bind(item: MangaOutline) {
             binding.title.text = item.title
             binding.author.text = item.author
             binding.update.text = item.update

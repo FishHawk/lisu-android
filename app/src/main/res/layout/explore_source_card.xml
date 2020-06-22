@@ -22,14 +22,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Latest" />
+            android:text="@string/explore_card_latest" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/browser"
+            android:id="@+id/popular"
             style="@style/Theme.Widget.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Browser" />
+            android:text="@string/explore_card_popular" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

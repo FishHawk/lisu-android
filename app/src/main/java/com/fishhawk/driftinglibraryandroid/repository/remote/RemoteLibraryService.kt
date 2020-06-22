@@ -1,10 +1,10 @@
-package com.fishhawk.driftinglibraryandroid.repository.service
+package com.fishhawk.driftinglibraryandroid.repository.remote
 
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
+import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.data.Source
 
 interface RemoteLibraryService {
@@ -12,7 +12,7 @@ interface RemoteLibraryService {
     suspend fun getMangaList(
         @Query("last_id") lastId: String,
         @Query("filter") filter: String
-    ): List<MangaSummary>
+    ): List<MangaOutline>
 
     @GET("manga/{id}")
     suspend fun getMangaDetail(@Path("id") id: String): MangaDetail
@@ -33,19 +33,19 @@ interface RemoteLibraryService {
         @Path("source") source: String,
         @Query("keywords") keywords: String,
         @Query("page") page: Int
-    ): List<MangaSummary>
+    ): List<MangaOutline>
 
     @GET("/source/{source}/popular")
     suspend fun getPopular(
         @Path("source") source: String,
         @Query("page") page: Int
-    ): List<MangaSummary>
+    ): List<MangaOutline>
 
     @GET("/source/{source}/latest")
     suspend fun getLatest(
         @Path("source") source: String,
         @Query("page") page: Int
-    ): List<MangaSummary>
+    ): List<MangaOutline>
 
     @GET("/source/{source}/manga/{id}")
     suspend fun getMangaDetail(

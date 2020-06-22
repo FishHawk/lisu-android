@@ -50,7 +50,7 @@ class SourceListAdapter(
                 binding.root.findNavController().navigate(R.id.action_explore_to_latest, bundle)
             }
 
-            binding.browser.setOnClickListener {
+            binding.popular.setOnClickListener {
                 val bundle = bundleOf("source" to item.name)
                 binding.root.findNavController().navigate(R.id.action_explore_to_popular, bundle)
             }

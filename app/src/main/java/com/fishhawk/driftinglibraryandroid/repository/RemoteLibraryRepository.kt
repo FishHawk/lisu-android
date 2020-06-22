@@ -1,7 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.repository
 
-import com.fishhawk.driftinglibraryandroid.repository.service.RemoteLibraryService
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryService
+import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.data.Source
 
@@ -9,7 +9,7 @@ class RemoteLibraryRepository(
     var url: String,
     var service: RemoteLibraryService
 ) {
-    suspend fun getMangaList(lastId: String, filter: String): Result<List<MangaSummary>> {
+    suspend fun getMangaList(lastId: String, filter: String): Result<List<MangaOutline>> {
         return try {
             service.getMangaList(lastId, filter).let {
                 for (s in it) {
@@ -74,7 +74,7 @@ class RemoteLibraryRepository(
         source: String,
         keywords: String,
         page: Int
-    ): Result<List<MangaSummary>> {
+    ): Result<List<MangaOutline>> {
         return try {
             service.search(source, keywords, page).let {
                 Result.Success(it)
@@ -87,7 +87,7 @@ class RemoteLibraryRepository(
     suspend fun getPopularMangaList(
         source: String,
         page: Int
-    ): Result<List<MangaSummary>> {
+    ): Result<List<MangaOutline>> {
         return try {
             service.getPopular(source, page).let {
                 Result.Success(it)
@@ -100,7 +100,7 @@ class RemoteLibraryRepository(
     suspend fun getLatestMangaList(
         source: String,
         page: Int
-    ): Result<List<MangaSummary>> {
+    ): Result<List<MangaOutline>> {
         return try {
             service.getLatest(source, page).let {
                 Result.Success(it)

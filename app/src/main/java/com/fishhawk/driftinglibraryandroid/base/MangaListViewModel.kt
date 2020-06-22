@@ -5,12 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.fishhawk.driftinglibraryandroid.library.EmptyListException
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
+import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
 import com.fishhawk.driftinglibraryandroid.util.Event
 
 abstract class MangaListViewModel : ViewModel() {
-    private val _mangaList: MutableLiveData<Result<List<MangaSummary>>> = MutableLiveData()
-    val mangaList: LiveData<Result<List<MangaSummary>>> = _mangaList
+    private val _mangaList: MutableLiveData<Result<List<MangaOutline>>> = MutableLiveData()
+    val mangaList: LiveData<Result<List<MangaOutline>>> = _mangaList
 
     private val _refreshFinish: MutableLiveData<Event<Throwable?>> = MutableLiveData()
     val refreshFinish: LiveData<Event<Throwable?>> = _refreshFinish
@@ -26,11 +26,11 @@ abstract class MangaListViewModel : ViewModel() {
         _mangaList.value = Result.Loading
     }
 
-    protected fun processLoadResult(result: Result<List<MangaSummary>>) {
+    protected fun processLoadResult(result: Result<List<MangaOutline>>) {
         _mangaList.value = result
     }
 
-    protected fun processRefreshResult(result: Result<List<MangaSummary>>) {
+    protected fun processRefreshResult(result: Result<List<MangaOutline>>) {
         when (result) {
             is Result.Success -> {
                 _mangaList.value = result
@@ -41,7 +41,7 @@ abstract class MangaListViewModel : ViewModel() {
         }
     }
 
-    protected fun processFetchMoreResult(result: Result<List<MangaSummary>>) {
+    protected fun processFetchMoreResult(result: Result<List<MangaOutline>>) {
         when (result) {
             is Result.Success -> {
                 _mangaList.value =

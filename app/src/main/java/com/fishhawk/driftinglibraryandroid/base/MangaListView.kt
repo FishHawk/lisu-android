@@ -11,7 +11,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.MangaListViewBinding
 import com.fishhawk.driftinglibraryandroid.library.EmptyListException
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaSummary
+import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
 import com.fishhawk.driftinglibraryandroid.util.makeSnackBar
@@ -72,7 +72,7 @@ class MangaListView @JvmOverloads constructor(
         }
     }
 
-    fun onMangaListChanged(result: Result<List<MangaSummary>>) {
+    fun onMangaListChanged(result: Result<List<MangaOutline>>) {
         when (result) {
             is Result.Success -> {
                 (binding.list.adapter!! as MangaListAdapter).update(result.data.toMutableList())
