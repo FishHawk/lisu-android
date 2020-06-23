@@ -18,6 +18,7 @@
     <string name="label_search">Search</string>
     <string name="label_more">More</string>
     <string name="label_settings">Setting</string>
+    <string name="label_about">About</string>
 
     <!-- library fragment -->
     <string name="library_reach_end_hint">No more mangas.</string>

@@ -10,18 +10,19 @@ class MoreFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val settings: Preference = findPreference("settings")!!
-        settings.setOnPreferenceClickListener {
-            findNavController().navigate(R.id.action_more_to_settings)
-            true
+        findPreference<Preference>("settings")!!.apply {
+            setOnPreferenceClickListener {
+                findNavController().navigate(R.id.action_more_to_settings)
+                true
+            }
         }
 
-//        val about: Preference = findPreference("about")!!
-//        about.setOnPreferenceClickListener {
-//            findNavController().navigate(R.id.action_more_to_settings)
-//            true
-//        }
-
+        findPreference<Preference>("about")!!.apply {
+            setOnPreferenceClickListener {
+                findNavController().navigate(R.id.action_more_to_about)
+                true
+            }
+        }
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

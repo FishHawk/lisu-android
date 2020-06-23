@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <EditTextPreference
+        app:key="library_address"
+        app:title="@string/settings_library_address" />
+
+    <ListPreference
+        app:defaultValue="1"
+        app:entries="@array/reading_direction_entries"
+        app:entryValues="@array/reading_direction_entry_values"
+        app:key="reading_direction"
+        app:summary="%s"
+        app:title="@string/settings_reading_direction" />
+
+    <ListPreference
+        app:defaultValue="0"
+        app:entries="@array/theme_entries"
+        app:entryValues="@array/theme_entry_values"
+        app:key="theme"
+        app:summary="%s"
+        app:title="@string/settings_theme" />
+
+    <ListPreference
+        app:defaultValue="0"
+        app:entries="@array/display_mode_entries"
+        app:entryValues="@array/display_mode_entry_values"
+        app:key="display_mode"
+        app:summary="%s"
+        app:title="@string/settings_display_mode" />
+</PreferenceScreen>
