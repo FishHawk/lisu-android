@@ -6,6 +6,7 @@ import com.fishhawk.driftinglibraryandroid.repository.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
+import com.fishhawk.driftinglibraryandroid.repository.data.OrderMode
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.util.Event
 import kotlinx.coroutines.Dispatchers
@@ -35,8 +36,12 @@ class GalleryViewModel(
         val id = (mangaDetail.value as Result.Success).data.id
         val title = (mangaDetail.value as Result.Success).data.title
         GlobalScope.launch(Dispatchers.Main) {
-            when (val result = remoteLibraryRepository.postOrder(source!!, id, title)) {
-                is Result.Success -> _downloadRequestFinish.value = Event(null)
+            when (val result = remoteLibraryRepository.postOrder(
+                source!!, id, title, OrderMode.PASS_IF_MANGA_EXIST
+            )) {
+                is Result.Success -> {
+                    _downloadRequestFinish.value = Event(null)
+                }
                 is Result.Error -> _downloadRequestFinish.value = Event(result.exception)
             }
         }

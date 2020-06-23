@@ -1,9 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.repository.remote
 
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
-import com.fishhawk.driftinglibraryandroid.repository.data.Order
-import com.fishhawk.driftinglibraryandroid.repository.data.Source
+import com.fishhawk.driftinglibraryandroid.repository.data.*
 import okhttp3.Response
 import retrofit2.http.*
 
@@ -77,7 +74,8 @@ interface RemoteLibraryService {
     suspend fun postUser(
         @Field("source") source: String,
         @Field("sourceMangaId") sourceMangaId: String,
-        @Field("targetMangaId") targetMangaId: String
+        @Field("targetMangaId") targetMangaId: String,
+        @Field("mode") mode: String
     ): Order
 
     @DELETE("/order/{id}")

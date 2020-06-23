@@ -1,10 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.repository
 
+import com.fishhawk.driftinglibraryandroid.repository.data.*
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryService
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
-import com.fishhawk.driftinglibraryandroid.repository.data.Order
-import com.fishhawk.driftinglibraryandroid.repository.data.Source
 import retrofit2.http.Field
 
 class RemoteLibraryRepository(
@@ -116,10 +113,11 @@ class RemoteLibraryRepository(
     suspend fun postOrder(
         source: String,
         sourceMangaId: String,
-        targetMangaId: String
+        targetMangaId: String,
+        mode: OrderMode
     ): Result<Order> {
         return try {
-            service.postUser(source, sourceMangaId, targetMangaId).let {
+            service.postUser(source, sourceMangaId, targetMangaId, mode.value).let {
                 Result.Success(it)
             }
         } catch (he: Throwable) {
