@@ -24,7 +24,7 @@ class MangaListView @JvmOverloads constructor(
 ) : MultipleStatusView(context, attrs, defStyleAttr) {
     private val binding = MangaListViewBinding.inflate(LayoutInflater.from(context), this, true)
 
-    fun setup(viewModel: MangaListViewModel, activity: Activity) {
+    fun setup(viewModel: MangaListViewModel, activity: Activity, source: String?) {
         binding.refreshLayout.apply {
             setOnRefreshListener(object : RefreshLayout.OnRefreshListener {
                 override fun onHeaderRefresh() = viewModel.refresh()
@@ -47,7 +47,7 @@ class MangaListView @JvmOverloads constructor(
             )
         }
 
-        binding.list.adapter = MangaListAdapter(activity, mutableListOf())
+        binding.list.adapter = MangaListAdapter(activity, mutableListOf(), source)
     }
 
     fun updateMangaListDisplayMode() {

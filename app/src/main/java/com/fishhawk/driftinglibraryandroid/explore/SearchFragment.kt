@@ -39,7 +39,8 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.mangaList.setup(viewModel, requireActivity())
+        val source = arguments?.getString("source")!!
+        binding.mangaList.setup(viewModel, requireActivity(), source)
 
         val keywords = arguments?.getString("keywords")!!
         viewModel.search(keywords)

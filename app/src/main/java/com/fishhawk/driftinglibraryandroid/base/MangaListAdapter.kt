@@ -17,7 +17,8 @@ import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
 
 class MangaListAdapter(
     private val activity: Activity,
-    private var data: MutableList<MangaOutline>
+    private var data: MutableList<MangaOutline>,
+    private val source: String?
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     enum class ViewType(val value: Int) {
         GRID(0),
@@ -83,7 +84,7 @@ class MangaListAdapter(
 
             binding.root.setOnClickListener {
                 (activity as AppCompatActivity).navToGalleryActivity(
-                    item.id, item.title, item.thumb, item.source, binding.thumb
+                    item.id, item.title, item.thumb, source
                 )
             }
         }
@@ -96,7 +97,6 @@ class MangaListAdapter(
             binding.title.text = item.title
             binding.author.text = item.author
             binding.update.text = item.update
-            binding.source.text = item.source
 
             binding.update.visibility = if (item.update == null) View.GONE else View.VISIBLE
 
@@ -106,7 +106,7 @@ class MangaListAdapter(
 
             binding.root.setOnClickListener {
                 (activity as AppCompatActivity).navToGalleryActivity(
-                    item.id, item.title, item.thumb, item.source, binding.thumb
+                    item.id, item.title, item.thumb, source
                 )
             }
         }

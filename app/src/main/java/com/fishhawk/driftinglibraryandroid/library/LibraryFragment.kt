@@ -38,7 +38,7 @@ class LibraryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.mangaList.setup(viewModel, requireActivity())
+        binding.mangaList.setup(viewModel, requireActivity(), null)
 
         SettingsHelper.displayMode.observe(viewLifecycleOwner, Observer {
             binding.mangaList.updateMangaListDisplayMode()

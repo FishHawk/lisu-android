@@ -40,7 +40,8 @@ class PopularFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.mangaList.setup(viewModel, requireActivity())
+        val source = arguments?.getString("source")!!
+        binding.mangaList.setup(viewModel, requireActivity(), source)
 
         viewModel.load()
 

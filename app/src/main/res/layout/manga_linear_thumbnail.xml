@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Theme.Widget.CardView"
     android:layout_width="match_parent"
-    android:layout_height="100dp">
+    android:layout_height="95dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -26,7 +26,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/baseline_8dp"
-            android:layout_marginTop="@dimen/baseline_8dp"
+            android:layout_marginTop="@dimen/baseline_4dp"
             android:ellipsize="end"
             android:maxLines="2"
             app:layout_constraintEnd_toEndOf="parent"
@@ -40,7 +40,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/baseline_8dp"
-            android:layout_marginTop="@dimen/baseline_4dp"
             android:ellipsize="end"
             android:singleLine="true"
             app:layout_constraintEnd_toEndOf="parent"
@@ -49,28 +48,11 @@
             tools:text="Sample author" />
 
         <TextView
-            android:id="@+id/source"
-            style="@style/Theme.TextAppearance.Subtitle1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/baseline_8dp"
-
-            android:layout_marginTop="@dimen/baseline_4dp"
-            android:ellipsize="end"
-            android:gravity="end"
-            android:singleLine="true"
-            app:layout_constraintBottom_toTopOf="@+id/update"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/thumb"
-            tools:text="Source(ZH)" />
-
-        <TextView
             android:id="@+id/update"
             style="@style/Theme.TextAppearance.Subtitle1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/baseline_8dp"
-            android:layout_marginTop="@dimen/baseline_4dp"
             android:ellipsize="end"
             android:gravity="end"
             android:singleLine="true"

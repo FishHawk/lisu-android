@@ -20,8 +20,7 @@ fun AppCompatActivity.navToGalleryActivity(
     id: String,
     title: String,
     thumb: String,
-    source: String?,
-    imageView: ImageView
+    source: String?
 ) {
     val bundle = bundleOf(
         "id" to id,

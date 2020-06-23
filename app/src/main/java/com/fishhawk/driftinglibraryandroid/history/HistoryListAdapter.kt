@@ -57,7 +57,7 @@ class HistoryListAdapter(
                 .into(binding.thumb)
             binding.thumb.setOnClickListener {
                 (activity as AppCompatActivity).navToGalleryActivity(
-                    item.id, item.title, item.thumb, item.source, binding.thumb
+                    item.id, item.title, item.thumb, item.source
                 )
             }
             binding.root.setOnClickListener {

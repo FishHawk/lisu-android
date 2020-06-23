@@ -1,4 +1,6 @@
 <resources>
+    <string name="app_name">Drifting Library</string>
+
     <!-- fragment title -->
     <string name="label_library">Library</string>
     <string name="label_history">History</string>

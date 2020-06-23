@@ -5,7 +5,6 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class MangaOutline(
-    val source: String,
     val id: String,
     val title: String,
     var thumb: String,
