@@ -110,6 +110,16 @@ class RemoteLibraryRepository(
     }
 
 
+    suspend fun getOrders(): Result<List<Order>> {
+        return try {
+            service.getOrders().let {
+                Result.Success(it)
+            }
+        } catch (he: Throwable) {
+            Result.Error(he)
+        }
+    }
+
     suspend fun postOrder(
         source: String,
         sourceMangaId: String,

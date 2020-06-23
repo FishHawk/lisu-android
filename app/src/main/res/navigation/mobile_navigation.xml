@@ -62,12 +62,20 @@
         android:name="com.fishhawk.driftinglibraryandroid.more.MoreFragment"
         android:label="@string/label_more">
         <action
+            android:id="@+id/action_more_to_download"
+            app:destination="@id/nav_download" />
+        <action
             android:id="@+id/action_more_to_settings"
             app:destination="@id/nav_settings" />
         <action
             android:id="@+id/action_more_to_about"
             app:destination="@id/nav_about" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_download"
+        android:name="com.fishhawk.driftinglibraryandroid.more.DownloadFragment"
+        android:label="@string/label_download" />
 
     <fragment
         android:id="@+id/nav_settings"
