@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
             R.id.nav_library,
             R.id.nav_history,
             R.id.nav_explore,
-            R.id.nav_setting
+            R.id.nav_more
         )
         val appBarConfiguration = AppBarConfiguration(mainFragmentSet)
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)

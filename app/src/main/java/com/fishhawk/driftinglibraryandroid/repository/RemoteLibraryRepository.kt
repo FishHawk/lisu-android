@@ -3,7 +3,9 @@ package com.fishhawk.driftinglibraryandroid.repository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryService
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
+import com.fishhawk.driftinglibraryandroid.repository.data.Order
 import com.fishhawk.driftinglibraryandroid.repository.data.Source
+import retrofit2.http.Field
 
 class RemoteLibraryRepository(
     var url: String,
@@ -103,6 +105,21 @@ class RemoteLibraryRepository(
     ): Result<List<MangaOutline>> {
         return try {
             service.getLatest(source, page).let {
+                Result.Success(it)
+            }
+        } catch (he: Throwable) {
+            Result.Error(he)
+        }
+    }
+
+
+    suspend fun postOrder(
+        source: String,
+        sourceMangaId: String,
+        targetMangaId: String
+    ): Result<Order> {
+        return try {
+            service.postUser(source, sourceMangaId, targetMangaId).let {
                 Result.Success(it)
             }
         } catch (he: Throwable) {

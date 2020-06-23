@@ -17,8 +17,8 @@
             android:icon="@drawable/ic_baseline_explore_24"
             android:title="@string/label_explore" />
         <item
-            android:id="@+id/nav_setting"
-            android:icon="@drawable/ic_settings_black_24dp"
-            android:title="@string/label_setting" />
+            android:id="@+id/nav_more"
+            android:icon="@drawable/ic_baseline_more_horiz_24"
+            android:title="@string/label_more" />
     </group>
 </menu>

@@ -16,7 +16,8 @@
     <string name="label_latest">Latest</string>
     <string name="label_popular">Popular</string>
     <string name="label_search">Search</string>
-    <string name="label_setting">Setting</string>
+    <string name="label_more">More</string>
+    <string name="label_settings">Setting</string>
 
     <!-- library fragment -->
     <string name="library_reach_end_hint">No more mangas.</string>

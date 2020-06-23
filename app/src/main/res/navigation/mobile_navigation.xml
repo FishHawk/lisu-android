@@ -58,7 +58,16 @@
         android:label="@string/label_search" />
 
     <fragment
-        android:id="@+id/nav_setting"
-        android:name="com.fishhawk.driftinglibraryandroid.setting.SettingsFragment"
-        android:label="@string/label_setting" />
+        android:id="@+id/nav_more"
+        android:name="com.fishhawk.driftinglibraryandroid.more.MoreFragment"
+        android:label="@string/label_more">
+        <action
+            android:id="@+id/action_more_to_settings"
+            app:destination="@id/nav_settings" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.fishhawk.driftinglibraryandroid.more.SettingsFragment"
+        android:label="@string/label_settings" />
 </navigation>

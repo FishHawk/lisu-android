@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:key="control_category">
+
+        <Preference
+            app:icon="@drawable/ic_baseline_cloud_download_24"
+            app:key="download"
+            app:title="Manage download" />
+
+        <Preference
+            app:icon="@drawable/ic_baseline_rss_feed_24"
+            app:key="subscribe"
+            app:title="Manage subscribe" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:key="setting_category">
+
+        <Preference
+            app:icon="@drawable/ic_settings_black_24dp"
+            app:key="settings"
+            app:title="Settings" />
+
+        <Preference
+            app:icon="@drawable/ic_baseline_error_24"
+            app:key="about"
+            app:title="About" />
+    </PreferenceCategory>
+</PreferenceScreen>

@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.setting
+package com.fishhawk.driftinglibraryandroid.more
 
 import android.os.Bundle
 import androidx.preference.EditTextPreference

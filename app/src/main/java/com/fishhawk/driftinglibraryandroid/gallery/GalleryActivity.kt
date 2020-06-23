@@ -13,6 +13,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryActivityBinding
+import com.fishhawk.driftinglibraryandroid.library.EmptyListException
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
@@ -77,6 +78,24 @@ class GalleryActivity : AppCompatActivity() {
                     )
                 }
             }
+        }
+
+        if (source == null) {
+            binding.downloadButton.visibility = View.GONE
+            binding.subscribeButton.visibility = View.GONE
+        } else {
+            binding.downloadButton.setOnClickListener {
+                when (viewModel.mangaDetail.value) {
+                    is Result.Success -> viewModel.sendDownloadRequest()
+                    else -> binding.root.makeSnackBar("Manga not open.")
+                }
+            }
+            viewModel.downloadRequestFinish.observe(this, EventObserver { exception ->
+                when (exception) {
+                    null -> binding.root.makeSnackBar("Success")
+                    else -> binding.root.makeSnackBar("Fail: ${exception.message}")
+                }
+            })
         }
 
         viewModel.mangaDetail.observe(this, Observer { result ->
