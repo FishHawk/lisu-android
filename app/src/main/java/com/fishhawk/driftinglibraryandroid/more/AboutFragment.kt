@@ -18,7 +18,7 @@ class AboutFragment : PreferenceFragmentCompat() {
             }
         }
 
-        findPreference<Preference>("check_for_update")!!.apply {
+        findPreference<Preference>("check_for_updates")!!.apply {
             // TODO: check update
         }
     }
