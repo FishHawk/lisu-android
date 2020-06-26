@@ -65,6 +65,9 @@
             android:id="@+id/action_more_to_download"
             app:destination="@id/nav_download" />
         <action
+            android:id="@+id/action_more_to_subscription"
+            app:destination="@id/nav_subscription" />
+        <action
             android:id="@+id/action_more_to_settings"
             app:destination="@id/nav_settings" />
         <action
@@ -76,6 +79,11 @@
         android:id="@+id/nav_download"
         android:name="com.fishhawk.driftinglibraryandroid.more.DownloadFragment"
         android:label="@string/label_download" />
+
+    <fragment
+        android:id="@+id/nav_subscription"
+        android:name="com.fishhawk.driftinglibraryandroid.more.SubscriptionFragment"
+        android:label="@string/label_subscription" />
 
     <fragment
         android:id="@+id/nav_settings"

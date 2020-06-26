@@ -10,7 +10,7 @@
 
         <Preference
             app:icon="@drawable/ic_baseline_rss_feed_24"
-            app:key="subscribe"
+            app:key="subscription"
             app:title="@string/more_subscribe" />
     </PreferenceCategory>
 

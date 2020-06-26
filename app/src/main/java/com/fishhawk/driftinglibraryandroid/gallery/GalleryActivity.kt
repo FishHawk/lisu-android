@@ -107,7 +107,7 @@ class GalleryActivity : AppCompatActivity() {
                     if (detail.author.isEmpty()) {
                         binding.author.text = "Unknown"
                     } else {
-                        binding.author.text = detail.author.joinToString(" ")
+                        binding.author.text = detail.author
                     }
 
                     binding.status.text = when (detail.status) {

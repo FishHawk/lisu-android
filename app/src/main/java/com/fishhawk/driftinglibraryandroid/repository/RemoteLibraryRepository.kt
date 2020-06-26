@@ -2,7 +2,6 @@ package com.fishhawk.driftinglibraryandroid.repository
 
 import com.fishhawk.driftinglibraryandroid.repository.data.*
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryService
-import retrofit2.http.Field
 
 class RemoteLibraryRepository(
     var url: String,
@@ -12,7 +11,7 @@ class RemoteLibraryRepository(
         return try {
             service.getMangaList(lastId, filter).let {
                 for (s in it) {
-                    s.thumb = "${url}image/${s.id}/${s.thumb}"
+                    s.thumb = "${url}library/image/${s.id}/${s.thumb}"
                 }
                 Result.Success(it)
             }
@@ -25,7 +24,7 @@ class RemoteLibraryRepository(
         return try {
             if (source == null) {
                 service.getMangaDetail(id).let {
-                    it.thumb = "${url}image/${it.id}/${it.thumb}"
+                    it.thumb = "${url}library/image/${it.id}/${it.thumb}"
                     Result.Success(it)
                 }
             } else {
@@ -47,7 +46,7 @@ class RemoteLibraryRepository(
         return try {
             if (source == null) {
                 service.getChapterContent(id, collection, chapter).let {
-                    Result.Success(it.map { "${url}image/$id/$collection/$chapter/$it" })
+                    Result.Success(it.map { "${url}library/image/$id/$collection/$chapter/$it" })
                 }
             } else {
                 service.getChapterContent(source, chapter).let {
@@ -109,27 +108,35 @@ class RemoteLibraryRepository(
         }
     }
 
-
-    suspend fun getOrders(): Result<List<Order>> {
+    suspend fun getSubscriptions(): Result<List<Subscription>> {
         return try {
-            service.getOrders().let {
-                Result.Success(it)
-            }
+            service.getSubscriptions().let { Result.Success(it) }
         } catch (he: Throwable) {
             Result.Error(he)
         }
     }
 
-    suspend fun postOrder(
+    suspend fun postSubscription(
         source: String,
-        sourceMangaId: String,
-        targetMangaId: String,
-        mode: OrderMode
-    ): Result<Order> {
+        sourceManga: String,
+        targetManga: String,
+        updateStrategy: SubscriptionUpdateStrategy
+    ): Result<Subscription> {
         return try {
-            service.postUser(source, sourceMangaId, targetMangaId, mode.value).let {
-                Result.Success(it)
-            }
+            service.postSubscription(
+                source,
+                sourceManga,
+                targetManga,
+                updateStrategy.value
+            ).let { Result.Success(it) }
+        } catch (he: Throwable) {
+            Result.Error(he)
+        }
+    }
+
+    suspend fun deleteSubscription(id: Int): Result<Subscription> {
+        return try {
+            service.deleteSubscription(id).let { Result.Success(it) }
         } catch (he: Throwable) {
             Result.Error(he)
         }

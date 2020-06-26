@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Theme.Widget.CardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent">
+
+        <TextView
+            android:id="@+id/target_manga"
+            style="@style/Theme.TextAppearance.LinearThumbnailTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/baseline_8dp"
+            android:layout_marginTop="@dimen/baseline_8dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Sample target manga" />
+
+        <TextView
+            android:id="@+id/source_label"
+            style="@style/Theme.TextAppearance.Subtitle2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/baseline_8dp"
+            android:layout_marginTop="@dimen/baseline_4dp"
+            android:text="Source:"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/target_manga" />
+
+        <TextView
+            android:id="@+id/source"
+            style="@style/Theme.TextAppearance.Subtitle1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/baseline_8dp"
+            android:layout_marginTop="@dimen/baseline_4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/source_label"
+            app:layout_constraintTop_toBottomOf="@+id/target_manga"
+            tools:text="Sample source" />
+
+        <TextView
+            android:id="@+id/source_manga_label"
+            style="@style/Theme.TextAppearance.Subtitle2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/baseline_8dp"
+            android:layout_marginTop="@dimen/baseline_4dp"
+            android:text="Source manga:"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/source_label" />
+
+        <TextView
+            android:id="@+id/source_manga"
+            style="@style/Theme.TextAppearance.Subtitle1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/baseline_8dp"
+            android:layout_marginTop="@dimen/baseline_4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/source_manga_label"
+            app:layout_constraintTop_toBottomOf="@+id/source_label"
+            tools:text="Sample source manga" />
+
+        <TextView
+            android:id="@+id/update_strategy_label"
+            style="@style/Theme.TextAppearance.Subtitle2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/baseline_8dp"
+            android:layout_marginTop="@dimen/baseline_4dp"
+            android:text="Update strategy:"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/source_manga_label" />
+
+        <TextView
+            android:id="@+id/update_strategy"
+            style="@style/Theme.TextAppearance.Subtitle1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/baseline_8dp"
+            android:layout_marginTop="@dimen/baseline_4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/update_strategy_label"
+            app:layout_constraintTop_toBottomOf="@+id/source_manga_label"
+            tools:text="Sample update strategy" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

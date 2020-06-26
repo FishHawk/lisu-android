@@ -17,6 +17,13 @@ class MoreFragment : PreferenceFragmentCompat() {
             }
         }
 
+        findPreference<Preference>("subscription")!!.apply {
+            setOnPreferenceClickListener {
+                findNavController().navigate(R.id.action_more_to_subscription)
+                true
+            }
+        }
+
         findPreference<Preference>("settings")!!.apply {
             setOnPreferenceClickListener {
                 findNavController().navigate(R.id.action_more_to_settings)

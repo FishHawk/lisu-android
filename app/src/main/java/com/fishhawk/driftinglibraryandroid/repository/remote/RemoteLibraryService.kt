@@ -1,21 +1,24 @@
 package com.fishhawk.driftinglibraryandroid.repository.remote
 
 import com.fishhawk.driftinglibraryandroid.repository.data.*
-import okhttp3.Response
 import retrofit2.http.*
 
 
 interface RemoteLibraryService {
-    @GET("library")
+    /*
+    * Api: library
+    */
+
+    @GET("library/search")
     suspend fun getMangaList(
         @Query("last_id") lastId: String,
         @Query("filter") filter: String
     ): List<MangaOutline>
 
-    @GET("manga/{id}")
+    @GET("library/manga/{id}")
     suspend fun getMangaDetail(@Path("id") id: String): MangaDetail
 
-    @GET("chapter/{id}")
+    @GET("library/chapter/{id}")
     suspend fun getChapterContent(
         @Path("id") id: String,
         @Query("collection") collection: String,
@@ -63,21 +66,21 @@ interface RemoteLibraryService {
 
 
     /*
-    * Api: order
+    * Api: subscribe
     */
 
-    @GET("/orders")
-    suspend fun getOrders(): List<Order>
+    @GET("/subscriptions")
+    suspend fun getSubscriptions(): List<Subscription>
 
     @FormUrlEncoded
-    @POST("/order")
-    suspend fun postUser(
+    @POST("/subscription")
+    suspend fun postSubscription(
         @Field("source") source: String,
-        @Field("sourceMangaId") sourceMangaId: String,
-        @Field("targetMangaId") targetMangaId: String,
-        @Field("mode") mode: String
-    ): Order
+        @Field("sourceManga") sourceManga: String,
+        @Field("targetManga") targetManga: String,
+        @Field("updateStrategy") updateStrategy: String
+    ): Subscription
 
-    @DELETE("/order/{id}")
-    suspend fun deleteOrder(@Path("id") id: Int): Order
+    @DELETE("/subscription/{id}")
+    suspend fun deleteSubscription(@Path("id") id: Int): Subscription
 }
