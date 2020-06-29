@@ -77,8 +77,7 @@ interface RemoteLibraryService {
     suspend fun postSubscription(
         @Field("source") source: String,
         @Field("sourceManga") sourceManga: String,
-        @Field("targetManga") targetManga: String,
-        @Field("updateStrategy") updateStrategy: String
+        @Field("targetManga") targetManga: String
     ): Subscription
 
     @DELETE("/subscription/{id}")

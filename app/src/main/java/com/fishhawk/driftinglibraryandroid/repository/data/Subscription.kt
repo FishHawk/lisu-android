@@ -4,16 +4,30 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
-enum class SubscriptionUpdateStrategy(val value: String) {
-    @SerializedName("disposable")
-    DISPOSABLE("disposable"),
+enum class SubscriptionMode(val value: String) {
+    @SerializedName("enabled")
+    ENABLED("enabled"),
 
-    @SerializedName("periodic")
-    PERIODIC("periodic"),
-
-    @SerializedName("never")
-    NEVER("never"),
+    @SerializedName("disabled")
+    DISABLED("disabled"),
 }
+
+//enum class SubscriptionStatus(val value: String) {
+//    @SerializedName("waiting")
+//    WAITING("waiting"),
+//
+//    @SerializedName("downloading")
+//    DOWNLOADING("downloading"),
+//
+//    @SerializedName("completed")
+//    COMPLETED("completed"),
+//
+//    @SerializedName("paused")
+//    PAUSED("paused"),
+//
+//    @SerializedName("error")
+//    ERROR("error"),
+//}
 
 @Parcelize
 data class Subscription(
@@ -21,5 +35,5 @@ data class Subscription(
     val source: String,
     val sourceManga: String,
     val targetManga: String,
-    val updateStrategy: SubscriptionUpdateStrategy
+    val mode: SubscriptionMode
 ) : Parcelable

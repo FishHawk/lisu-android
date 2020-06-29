@@ -84,9 +84,9 @@ class GalleryActivity : AppCompatActivity() {
             binding.downloadButton.visibility = View.GONE
             binding.subscribeButton.visibility = View.GONE
         } else {
-            binding.downloadButton.setOnClickListener {
+            binding.subscribeButton.setOnClickListener {
                 when (viewModel.mangaDetail.value) {
-                    is Result.Success -> viewModel.sendDownloadRequest()
+                    is Result.Success -> viewModel.subscribe()
                     else -> binding.root.makeSnackBar("Manga not open.")
                 }
             }

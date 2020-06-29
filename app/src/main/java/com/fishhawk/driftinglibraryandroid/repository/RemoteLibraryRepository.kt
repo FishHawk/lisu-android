@@ -119,16 +119,10 @@ class RemoteLibraryRepository(
     suspend fun postSubscription(
         source: String,
         sourceManga: String,
-        targetManga: String,
-        updateStrategy: SubscriptionUpdateStrategy
+        targetManga: String
     ): Result<Subscription> {
         return try {
-            service.postSubscription(
-                source,
-                sourceManga,
-                targetManga,
-                updateStrategy.value
-            ).let { Result.Success(it) }
+            service.postSubscription(source, sourceManga, targetManga).let { Result.Success(it) }
         } catch (he: Throwable) {
             Result.Error(he)
         }
