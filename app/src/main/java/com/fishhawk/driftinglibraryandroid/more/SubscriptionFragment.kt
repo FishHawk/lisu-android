@@ -65,11 +65,11 @@ class SubscriptionFragment : Fragment() {
             )
         }
 
-        viewModel.subscriptions.observe(viewLifecycleOwner, Observer { result ->
+        viewModel.list.observe(viewLifecycleOwner, Observer { result ->
             println(result)
             when (result) {
                 is Result.Success -> {
-                    binding.list.adapter = SubscriptionListAdapter(requireActivity(), result.data, viewModel)
+                    binding.list.adapter = SubscriptionListAdapter(requireActivity(), result.data)
                     if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
                     else binding.multipleStatusView.showContent()
                 }

@@ -51,7 +51,8 @@ class SubscriptionListAdapter(
         return ViewHolder(
             SubscriptionCardBinding.inflate(
                 LayoutInflater.from(activity),
-                parent, false
+                parent,
+                false
             )
         )
     }
