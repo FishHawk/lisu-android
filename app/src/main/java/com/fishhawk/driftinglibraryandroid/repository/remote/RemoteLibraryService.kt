@@ -70,7 +70,13 @@ interface RemoteLibraryService {
     */
 
     @GET("/subscriptions")
-    suspend fun getSubscriptions(): List<Subscription>
+    suspend fun getAllSubscription(): List<Subscription>
+
+    @PATCH("/subscriptions/enable")
+    suspend fun enableAllSubscription(): List<Subscription>
+
+    @PATCH("/subscriptions/disable")
+    suspend fun disableAllSubscription(): List<Subscription>
 
     @FormUrlEncoded
     @POST("/subscription")

@@ -1,9 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.more
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -44,7 +42,13 @@ class SubscriptionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupRefreshLayout()
+        setupAdapter()
+        observeViewModel()
+        viewModel.load()
+    }
 
+    private fun setupRefreshLayout() {
         binding.refreshLayout.apply {
             setOnRefreshListener(object : RefreshLayout.OnRefreshListener {
                 override fun onHeaderRefresh() = viewModel.refresh()
@@ -68,9 +72,45 @@ class SubscriptionFragment : Fragment() {
                 R.color.loading_indicator_orange
             )
         }
+    }
 
-        setupAdapter()
+    private fun setupAdapter() {
+        val onError: (Int, String?) -> Unit = { id: Int, message: String? ->
+            adapter.refreshSubscription(id)
+            message?.let { binding.root.makeSnackBar(it) }
+        }
 
+        adapter.onEnable = { id ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                when (val result = viewModel.enableSubscription(id)) {
+                    is Result.Success -> adapter.enableSubscription(id)
+                    is Result.Error -> onError(id, result.exception.message)
+                }
+            }
+        }
+
+        adapter.onDisable = { id ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                when (val result = viewModel.disableSubscription(id)) {
+                    is Result.Success -> adapter.disableSubscription(id)
+                    is Result.Error -> onError(id, result.exception.message)
+                }
+            }
+        }
+
+        adapter.onDelete = { id ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                when (val result = viewModel.deleteSubscription(id)) {
+                    is Result.Success -> adapter.deleteSubscription(id)
+                    is Result.Error -> onError(id, result.exception.message)
+                }
+            }
+        }
+
+        binding.list.adapter = adapter
+    }
+
+    private fun observeViewModel() {
         viewModel.list.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is Result.Success -> {
@@ -94,50 +134,34 @@ class SubscriptionFragment : Fragment() {
                 }
             }
         })
-
-        viewModel.load()
     }
 
-    private fun setupAdapter() {
-        val onError: (Int, String?) -> Unit = { id: Int, message: String? ->
-            adapter.refreshSubscription(id)
-            message?.let { binding.root.makeSnackBar(it) }
-        }
-
-        adapter.onEnable = { id ->
-            viewLifecycleOwner.lifecycleScope.launch {
-                when (val result = viewModel.enable(id)) {
-                    is Result.Success -> adapter.enableSubscription(id)
-                    is Result.Error -> onError(id, result.exception.message)
-                }
-            }
-        }
-
-        adapter.onDisable = { id ->
-            viewLifecycleOwner.lifecycleScope.launch {
-                when (val result = viewModel.disable(id)) {
-                    is Result.Success -> adapter.disableSubscription(id)
-                    is Result.Error -> onError(id, result.exception.message)
-                }
-            }
-        }
-
-        adapter.onDelete = { id ->
-            viewLifecycleOwner.lifecycleScope.launch {
-                when (val result = viewModel.delete(id)) {
-                    is Result.Success -> adapter.deleteSubscription(id)
-                    is Result.Error -> onError(id, result.exception.message)
-                }
-            }
-        }
-
-        binding.list.adapter = adapter
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_subscribe, menu)
     }
-//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-//        super.onCreateOptionsMenu(menu, inflater)
-//        inflater.inflate(R.menu.menu_explore, menu)
-//
-//        val searchView: SearchView = menu.findItem(R.id.action_search).actionView as SearchView
-//        searchView.queryHint = getString(R.string.menu_search_global_hint)
-//    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_enable_all -> {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val result = viewModel.enableAllSubscription()
+                    if (result is Result.Error) binding.root.makeSnackBar(
+                        result.exception.message ?: "Unknown error"
+                    )
+                }
+                true
+            }
+            R.id.action_disable_all -> {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val result = viewModel.disableAllSubscription()
+                    if (result is Result.Error) binding.root.makeSnackBar(
+                        result.exception.message ?: "Unknown error"
+                    )
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 }

@@ -108,8 +108,16 @@ class RemoteLibraryRepository(
         }
     }
 
-    suspend fun getSubscriptions(): Result<List<Subscription>> = resultWrap {
-        service.getSubscriptions()
+    suspend fun getAllSubscription(): Result<List<Subscription>> = resultWrap {
+        service.getAllSubscription()
+    }
+
+    suspend fun enableAllSubscription(): Result<List<Subscription>> = resultWrap {
+        service.enableAllSubscription()
+    }
+
+    suspend fun disableAllSubscription(): Result<List<Subscription>> = resultWrap {
+        service.disableAllSubscription()
     }
 
     suspend fun postSubscription(

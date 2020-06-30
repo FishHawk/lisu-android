@@ -81,4 +81,6 @@
     <string name="dialog_clear_history_positive">clear all</string>
     <string name="label_download">Download</string>
     <string name="label_subscription">Subscription</string>
+    <string name="menu_enable_all">Enable all</string>
+    <string name="menu_disable_all">Disable all</string>
 </resources>
