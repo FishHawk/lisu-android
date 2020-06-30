@@ -13,20 +13,18 @@ import okhttp3.internal.wait
 class SubscriptionViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository
 ) : BaseListViewModel<Subscription>() {
-    fun enable(position: Int) {
-        viewModelScope.launch {
-            val id = (list.value as Result.Success).data[position].id
-            when (val result = remoteLibraryRepository.enableSubscription(id)) {
-                is Result.Success -> {
-                }
-                is Result.Error -> _refreshFinish.value = Event(result.exception)
-            }
-        }
-    }
-
     override suspend fun loadResult(): Result<List<Subscription>> {
         return remoteLibraryRepository.getSubscriptions()
     }
+
+    suspend fun enable(id: Int): Result<Subscription> =
+        remoteLibraryRepository.enableSubscription(id)
+
+    suspend fun disable(id: Int): Result<Subscription> =
+        remoteLibraryRepository.disableSubscription(id)
+
+    suspend fun delete(id: Int): Result<Subscription> =
+        remoteLibraryRepository.deleteSubscription(id)
 }
 
 @Suppress("UNCHECKED_CAST")

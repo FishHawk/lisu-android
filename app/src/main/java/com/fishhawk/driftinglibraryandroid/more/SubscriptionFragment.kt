@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.SubscriptionFragmentBinding
@@ -15,6 +16,7 @@ import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.util.EventObserver
 import com.fishhawk.driftinglibraryandroid.util.makeSnackBar
 import com.hippo.refreshlayout.RefreshLayout
+import kotlinx.coroutines.launch
 
 class SubscriptionFragment : Fragment() {
     private val viewModel: SubscriptionViewModel by viewModels {
@@ -23,6 +25,8 @@ class SubscriptionFragment : Fragment() {
         SubscriptionViewModelFactory(remoteLibraryRepository)
     }
     private lateinit var binding: SubscriptionFragmentBinding
+
+    private val adapter by lazy { SubscriptionListAdapter(requireActivity(), mutableListOf()) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,11 +69,12 @@ class SubscriptionFragment : Fragment() {
             )
         }
 
+        setupAdapter()
+
         viewModel.list.observe(viewLifecycleOwner, Observer { result ->
-            println(result)
             when (result) {
                 is Result.Success -> {
-                    binding.list.adapter = SubscriptionListAdapter(requireActivity(), result.data)
+                    adapter.changeList(result.data)
                     if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
                     else binding.multipleStatusView.showContent()
                 }
@@ -90,7 +95,43 @@ class SubscriptionFragment : Fragment() {
             }
         })
 
-        viewModel.refresh()
+        viewModel.load()
+    }
+
+    private fun setupAdapter() {
+        val onError: (Int, String?) -> Unit = { id: Int, message: String? ->
+            adapter.refreshSubscription(id)
+            message?.let { binding.root.makeSnackBar(it) }
+        }
+
+        adapter.onEnable = { id ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                when (val result = viewModel.enable(id)) {
+                    is Result.Success -> adapter.enableSubscription(id)
+                    is Result.Error -> onError(id, result.exception.message)
+                }
+            }
+        }
+
+        adapter.onDisable = { id ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                when (val result = viewModel.disable(id)) {
+                    is Result.Success -> adapter.disableSubscription(id)
+                    is Result.Error -> onError(id, result.exception.message)
+                }
+            }
+        }
+
+        adapter.onDelete = { id ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                when (val result = viewModel.delete(id)) {
+                    is Result.Success -> adapter.deleteSubscription(id)
+                    is Result.Error -> onError(id, result.exception.message)
+                }
+            }
+        }
+
+        binding.list.adapter = adapter
     }
 //    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
 //        super.onCreateOptionsMenu(menu, inflater)

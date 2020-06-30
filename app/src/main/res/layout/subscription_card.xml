@@ -41,6 +41,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="2"
+                    android:text="@{subscription.targetManga}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="Sample target manga" />
@@ -64,6 +65,7 @@
                     android:layout_marginTop="@dimen/baseline_4dp"
                     android:ellipsize="end"
                     android:maxLines="1"
+                    android:text="@{subscription.source}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/source_label"
                     app:layout_constraintTop_toBottomOf="@+id/target_manga"
@@ -88,31 +90,45 @@
                     android:layout_marginTop="@dimen/baseline_4dp"
                     android:ellipsize="end"
                     android:maxLines="1"
+                    android:text="@{subscription.sourceManga}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/source_manga_label"
                     app:layout_constraintTop_toBottomOf="@+id/source_label"
                     tools:text="Sample source manga" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <LinearLayout
+            <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="match_parent">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/switch_button"
-                    style="@style/Theme.Widget.Button.TextButton"
+                <LinearLayout
+                    android:id="@+id/action_panel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/switch_button"
+                        style="@style/Theme.Widget.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Switch" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/delete_button"
+                        style="@style/Theme.Widget.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Delete" />
+                </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/action_progress_bar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Switch" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/delete_button"
-                    style="@style/Theme.Widget.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Delete" />
-            </LinearLayout>
+                    android:layout_gravity="center"
+                    tools:visibility="invisible" />
+            </FrameLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </layout>

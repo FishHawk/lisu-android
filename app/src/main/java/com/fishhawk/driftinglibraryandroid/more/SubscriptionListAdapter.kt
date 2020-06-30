@@ -2,10 +2,12 @@ package com.fishhawk.driftinglibraryandroid.more
 
 import android.app.Activity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.base.BaseRecyclerViewAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.SubscriptionCardBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.Subscription
 import com.fishhawk.driftinglibraryandroid.repository.data.SubscriptionMode
@@ -13,10 +15,10 @@ import com.fishhawk.driftinglibraryandroid.repository.data.SubscriptionMode
 class SubscriptionListAdapter(
     private val activity: Activity,
     private val data: MutableList<Subscription>
-) : RecyclerView.Adapter<SubscriptionListAdapter.ViewHolder>() {
-    private var onDelete: (Int) -> Unit = {}
-    private var onEnable: (Int) -> Unit = {}
-    private var onDisable: (Int) -> Unit = {}
+) : BaseRecyclerViewAdapter<Subscription, SubscriptionListAdapter.ViewHolder>(data) {
+    var onDelete: (Int) -> Unit = {}
+    var onEnable: (Int) -> Unit = {}
+    var onDisable: (Int) -> Unit = {}
 
     fun enableSubscription(id: Int) {
         val position = data.indexOfFirst { it.id == id }
@@ -44,6 +46,13 @@ class SubscriptionListAdapter(
         }
     }
 
+    fun refreshSubscription(id: Int) {
+        val position = data.indexOfFirst { it.id == id }
+        if (position != -1) {
+            notifyItemChanged(position)
+        }
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -57,38 +66,46 @@ class SubscriptionListAdapter(
         )
     }
 
-    override fun onBindViewHolder(holder: SubscriptionListAdapter.ViewHolder, position: Int) {
-        holder.bind(data[position])
-    }
-
-    override fun getItemCount() = data.size
-
     inner class ViewHolder(private val binding: SubscriptionCardBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+        BaseRecyclerViewAdapter.ViewHolder<Subscription>(binding) {
 
-        fun bind(item: Subscription) {
+        private fun hideActions() {
+            binding.actionPanel.visibility = View.INVISIBLE
+            binding.actionProgressBar.visibility = View.VISIBLE
+        }
+
+        private fun showActions() {
+            binding.actionProgressBar.visibility = View.INVISIBLE
+            binding.actionPanel.visibility = View.VISIBLE
+        }
+
+        override fun bind(item: Subscription) {
             binding.subscription = item
+            showActions()
 
-            binding.source.text = item.source
-            binding.sourceManga.text = item.sourceManga
-            binding.targetManga.text = item.targetManga
-
-            val color = when (item.mode) {
-                SubscriptionMode.ENABLED ->
-                    ContextCompat.getColor(activity, R.color.loading_indicator_green)
-                SubscriptionMode.DISABLED ->
-                    ContextCompat.getColor(activity, R.color.loading_indicator_red)
+            when (item.mode) {
+                SubscriptionMode.ENABLED -> {
+                    val color = ContextCompat.getColor(activity, R.color.loading_indicator_green)
+                    binding.coloredHead.setBackgroundColor(color)
+                    binding.switchButton.text = "Disable"
+                }
+                SubscriptionMode.DISABLED -> {
+                    val color = ContextCompat.getColor(activity, R.color.loading_indicator_red)
+                    binding.coloredHead.setBackgroundColor(color)
+                    binding.switchButton.text = "Enable"
+                }
             }
-            binding.coloredHead.setBackgroundColor(color)
 
             binding.switchButton.setOnClickListener {
                 when (item.mode) {
-                    SubscriptionMode.ENABLED -> onEnable(item.id)
-                    SubscriptionMode.DISABLED -> onDisable(item.id)
+                    SubscriptionMode.ENABLED -> onDisable(item.id)
+                    SubscriptionMode.DISABLED -> onEnable(item.id)
                 }
+                hideActions()
             }
-            binding.switchButton.setOnClickListener {
+            binding.deleteButton.setOnClickListener {
                 onDelete(item.id)
+                hideActions()
             }
         }
     }
