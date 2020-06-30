@@ -82,4 +82,10 @@ interface RemoteLibraryService {
 
     @DELETE("/subscription/{id}")
     suspend fun deleteSubscription(@Path("id") id: Int): Subscription
+
+    @PATCH("/subscription/{id}/enable")
+    suspend fun enableSubscription(@Path("id") id: Int): Subscription
+
+    @PATCH("/subscription/{id}/disable")
+    suspend fun disableSubscription(@Path("id") id: Int): Subscription
 }

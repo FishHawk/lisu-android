@@ -69,7 +69,7 @@ class SubscriptionFragment : Fragment() {
             println(result)
             when (result) {
                 is Result.Success -> {
-                    binding.list.adapter = SubscriptionListAdapter(requireActivity(), result.data)
+                    binding.list.adapter = SubscriptionListAdapter(requireActivity(), result.data, viewModel)
                     if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
                     else binding.multipleStatusView.showContent()
                 }

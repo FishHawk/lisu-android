@@ -35,5 +35,5 @@ data class Subscription(
     val source: String,
     val sourceManga: String,
     val targetManga: String,
-    val mode: SubscriptionMode
+    var mode: SubscriptionMode
 ) : Parcelable

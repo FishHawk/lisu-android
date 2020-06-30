@@ -108,31 +108,35 @@ class RemoteLibraryRepository(
         }
     }
 
-    suspend fun getSubscriptions(): Result<List<Subscription>> {
-        return try {
-            service.getSubscriptions().let { Result.Success(it) }
-        } catch (he: Throwable) {
-            Result.Error(he)
-        }
+    suspend fun getSubscriptions(): Result<List<Subscription>> = resultWrap {
+        service.getSubscriptions()
     }
 
     suspend fun postSubscription(
         source: String,
         sourceManga: String,
         targetManga: String
-    ): Result<Subscription> {
-        return try {
-            service.postSubscription(source, sourceManga, targetManga).let { Result.Success(it) }
-        } catch (he: Throwable) {
-            Result.Error(he)
-        }
+    ): Result<Subscription> = resultWrap {
+        service.postSubscription(source, sourceManga, targetManga)
     }
 
-    suspend fun deleteSubscription(id: Int): Result<Subscription> {
+    suspend fun deleteSubscription(id: Int): Result<Subscription> = resultWrap {
+        service.deleteSubscription(id)
+    }
+
+    suspend fun enableSubscription(id: Int): Result<Subscription> = resultWrap {
+        service.enableSubscription(id)
+    }
+
+    suspend fun disableSubscription(id: Int): Result<Subscription> = resultWrap {
+        service.disableSubscription(id)
+    }
+
+    private inline fun <T> resultWrap(func: () -> T): Result<T> {
         return try {
-            service.deleteSubscription(id).let { Result.Success(it) }
-        } catch (he: Throwable) {
-            Result.Error(he)
+            Result.Success(func())
+        } catch (e: Exception) {
+            Result.Error(e)
         }
     }
 }

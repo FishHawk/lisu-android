@@ -12,8 +12,38 @@ import com.fishhawk.driftinglibraryandroid.repository.data.SubscriptionMode
 
 class SubscriptionListAdapter(
     private val activity: Activity,
-    private var data: List<Subscription>
+    private val data: MutableList<Subscription>
 ) : RecyclerView.Adapter<SubscriptionListAdapter.ViewHolder>() {
+    private var onDelete: (Int) -> Unit = {}
+    private var onEnable: (Int) -> Unit = {}
+    private var onDisable: (Int) -> Unit = {}
+
+    fun enableSubscription(id: Int) {
+        val position = data.indexOfFirst { it.id == id }
+        val subscription = data.getOrNull(position)
+        subscription?.let {
+            it.mode = SubscriptionMode.ENABLED
+            notifyItemChanged(position)
+        }
+    }
+
+    fun disableSubscription(id: Int) {
+        val position = data.indexOfFirst { it.id == id }
+        val subscription = data.getOrNull(position)
+        subscription?.let {
+            it.mode = SubscriptionMode.DISABLED
+            notifyItemChanged(position)
+        }
+    }
+
+    fun deleteSubscription(id: Int) {
+        val position = data.indexOfFirst { it.id == id }
+        if (position != -1) {
+            data.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -36,6 +66,8 @@ class SubscriptionListAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Subscription) {
+            binding.subscription = item
+
             binding.source.text = item.source
             binding.sourceManga.text = item.sourceManga
             binding.targetManga.text = item.targetManga
@@ -48,8 +80,14 @@ class SubscriptionListAdapter(
             }
             binding.coloredHead.setBackgroundColor(color)
 
-            binding.root.setOnClickListener {
-                println("asdfasdf")
+            binding.switchButton.setOnClickListener {
+                when (item.mode) {
+                    SubscriptionMode.ENABLED -> onEnable(item.id)
+                    SubscriptionMode.DISABLED -> onDisable(item.id)
+                }
+            }
+            binding.switchButton.setOnClickListener {
+                onDelete(item.id)
             }
         }
     }
