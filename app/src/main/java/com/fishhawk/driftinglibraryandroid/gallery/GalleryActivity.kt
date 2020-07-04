@@ -90,6 +90,12 @@ class GalleryActivity : AppCompatActivity() {
                     else -> binding.root.makeSnackBar("Manga not open.")
                 }
             }
+            binding.downloadButton.setOnClickListener {
+                when (viewModel.mangaDetail.value) {
+                    is Result.Success -> viewModel.download()
+                    else -> binding.root.makeSnackBar("Manga not open.")
+                }
+            }
             viewModel.downloadRequestFinish.observe(this, EventObserver { exception ->
                 when (exception) {
                     null -> binding.root.makeSnackBar("Success")

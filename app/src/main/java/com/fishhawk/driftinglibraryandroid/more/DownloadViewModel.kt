@@ -1,37 +1,77 @@
 package com.fishhawk.driftinglibraryandroid.more
 
 import androidx.lifecycle.*
-import com.fishhawk.driftinglibraryandroid.library.EmptyListException
+import com.fishhawk.driftinglibraryandroid.base.BaseListViewModel
 import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.data.Order
+import com.fishhawk.driftinglibraryandroid.repository.data.DownloadTask
 import com.fishhawk.driftinglibraryandroid.util.Event
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+
 
 class DownloadViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository
-) : ViewModel() {
-    private val _downloadTasks: MutableLiveData<Result<List<Order>>> =
-        MutableLiveData(Result.Loading)
-    val downloadTasks: LiveData<Result<List<Order>>> = _downloadTasks
+) : BaseListViewModel<DownloadTask>() {
+    override suspend fun loadResult(): Result<List<DownloadTask>> {
+        return remoteLibraryRepository.getAllDownloadTasks()
+    }
 
-    private val _refreshFinish: MutableLiveData<Event<Throwable?>> = MutableLiveData()
-    val refreshFinish: LiveData<Event<Throwable?>> = _refreshFinish
+    fun startDownloadTask(id: Int) = viewModelScope.launch {
+        val result = remoteLibraryRepository.startDownloadTask(id)
+        updateItem(id, result)
+    }
 
-    fun refresh() {
-//        GlobalScope.launch(Dispatchers.Main) {
-//            val result = remoteLibraryRepository.getOrders()
-//            _downloadTasks.value = result
-//            when (result) {
-//                is Result.Success -> {
-//                    if (result.data.isEmpty()) _refreshFinish.value = Event(EmptyListException())
-//                    else _refreshFinish.value = Event(null)
-//                }
-//                is Result.Error -> _refreshFinish.value = Event(result.exception)
-//            }
-//        }
+    fun pauseDownloadTask(id: Int) = viewModelScope.launch {
+        val result = remoteLibraryRepository.pauseDownloadTask(id)
+        updateItem(id, result)
+    }
+
+    fun deleteDownloadTask(id: Int) = viewModelScope.launch {
+        val result = remoteLibraryRepository.deleteDownloadTask(id)
+        deleteItem(id, result)
+    }
+
+    fun startAllDownloadTasks() = viewModelScope.launch {
+        val result = remoteLibraryRepository.startAllDownloadTasks()
+        updateList(result)
+    }
+
+    fun pauseAllDownloadTasks() = viewModelScope.launch {
+        val result = remoteLibraryRepository.pauseAllDownloadTasks()
+        updateList(result)
+    }
+
+    private fun deleteItem(id: Int, result: Result<DownloadTask>) {
+        when (result) {
+            is Result.Success -> {
+                (_list.value as? Result.Success)?.data?.let { taskList ->
+                    val index = taskList.indexOfFirst { it.id == id }
+                    taskList.removeAt(index)
+                }
+            }
+            is Result.Error -> _operationError.value = Event(result.exception)
+        }
+        _list.value = _list.value
+    }
+
+    private fun updateItem(id: Int, result: Result<DownloadTask>) {
+        when (result) {
+            is Result.Success -> {
+                (_list.value as? Result.Success)?.data?.let { taskList ->
+                    val index = taskList.indexOfFirst { it.id == id }
+                    taskList[index] = result.data
+                }
+            }
+            is Result.Error -> _operationError.value = Event(result.exception)
+        }
+        _list.value = _list.value
+    }
+
+    private fun updateList(result: Result<List<DownloadTask>>) {
+        when (result) {
+            is Result.Success -> _list.value = Result.Success(result.data.toMutableList())
+            is Result.Error -> _list.value = result
+        }
     }
 }
 

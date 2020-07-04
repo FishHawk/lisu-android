@@ -4,15 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.library.EmptyListException
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.util.Event
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.Exception
+
+class EmptyRefreshResultError : Exception()
+class EmptyFetchMoreResultError : Exception()
 
 abstract class BasePartListViewModel<T> : BaseListViewModel<T>() {
-    protected val _fetchMoreFinish: MutableLiveData<Event<Throwable?>> = MutableLiveData()
-    val fetchMoreFinish: LiveData<Event<Throwable?>> = _fetchMoreFinish
+    private val _fetchMoreFinish: MutableLiveData<Event<Unit>> = MutableLiveData()
+    val fetchMoreFinish: LiveData<Event<Unit>> = _fetchMoreFinish
 
     open fun onFetchMoreSuccess() {}
     open fun onFetchMoreError() {}
@@ -25,16 +28,15 @@ abstract class BasePartListViewModel<T> : BaseListViewModel<T>() {
                 is Result.Success -> {
                     (_list.value as? Result.Success)?.data?.addAll(result.data)
                     _list.value = _list.value
-                    _fetchMoreFinish.value =
-                        if (result.data.isEmpty()) Event(EmptyListException())
-                        else Event(null)
+                    if (result.data.isEmpty()) _operationError.value = Event(EmptyFetchMoreResultError())
                     onFetchMoreSuccess()
                 }
                 is Result.Error -> {
-                    _fetchMoreFinish.value = Event(result.exception)
+                    _operationError.value = Event(result.exception)
                     onFetchMoreError()
                 }
             }
+            _fetchMoreFinish.value = Event(Unit)
         }
     }
 }
@@ -43,8 +45,11 @@ abstract class BaseListViewModel<T> : ViewModel() {
     protected val _list: MutableLiveData<Result<MutableList<T>>> = MutableLiveData()
     val list: LiveData<Result<MutableList<T>>> = _list
 
-    protected val _refreshFinish: MutableLiveData<Event<Throwable?>> = MutableLiveData()
-    val refreshFinish: LiveData<Event<Throwable?>> = _refreshFinish
+    private val _refreshFinish: MutableLiveData<Event<Unit>> = MutableLiveData()
+    val refreshFinish: LiveData<Event<Unit>> = _refreshFinish
+
+    protected val _operationError: MutableLiveData<Event<Throwable>> = MutableLiveData()
+    val operationError: LiveData<Event<Throwable>> = _operationError
 
 
     open fun onLoadSuccess() {}
@@ -77,17 +82,15 @@ abstract class BaseListViewModel<T> : ViewModel() {
             when (val result = loadResult()) {
                 is Result.Success -> {
                     _list.value = Result.Success(result.data.toMutableList())
-                    _refreshFinish.value =
-                        if (result.data.isEmpty()) Event(EmptyListException())
-                        else Event(null)
+                    if (result.data.isEmpty()) _operationError.value = Event(EmptyRefreshResultError())
                     onRefreshSuccess()
                 }
                 is Result.Error -> {
-                    _refreshFinish.value = Event(result.exception)
+                    _operationError.value = Event(result.exception)
                     onRefreshError()
                 }
-
             }
+            _refreshFinish.value = Event(Unit)
         }
     }
 }

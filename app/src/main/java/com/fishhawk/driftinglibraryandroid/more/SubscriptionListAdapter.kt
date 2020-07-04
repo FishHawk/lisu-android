@@ -5,12 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.base.BaseRecyclerViewAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.SubscriptionCardBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.Subscription
-import com.fishhawk.driftinglibraryandroid.repository.data.SubscriptionMode
 
 class SubscriptionListAdapter(
     private val activity: Activity,
@@ -24,7 +22,7 @@ class SubscriptionListAdapter(
         val position = data.indexOfFirst { it.id == id }
         val subscription = data.getOrNull(position)
         subscription?.let {
-            it.mode = SubscriptionMode.ENABLED
+            it.isEnabled = true
             notifyItemChanged(position)
         }
     }
@@ -33,7 +31,7 @@ class SubscriptionListAdapter(
         val position = data.indexOfFirst { it.id == id }
         val subscription = data.getOrNull(position)
         subscription?.let {
-            it.mode = SubscriptionMode.DISABLED
+            it.isEnabled = false
             notifyItemChanged(position)
         }
     }
@@ -83,24 +81,19 @@ class SubscriptionListAdapter(
             binding.subscription = item
             showActions()
 
-            when (item.mode) {
-                SubscriptionMode.ENABLED -> {
-                    val color = ContextCompat.getColor(activity, R.color.loading_indicator_green)
-                    binding.coloredHead.setBackgroundColor(color)
-                    binding.switchButton.text = "Disable"
-                }
-                SubscriptionMode.DISABLED -> {
-                    val color = ContextCompat.getColor(activity, R.color.loading_indicator_red)
-                    binding.coloredHead.setBackgroundColor(color)
-                    binding.switchButton.text = "Enable"
-                }
+            if (item.isEnabled) {
+                val color = ContextCompat.getColor(activity, R.color.loading_indicator_green)
+                binding.coloredHead.setBackgroundColor(color)
+                binding.switchButton.text = "Disable"
+            } else {
+                val color = ContextCompat.getColor(activity, R.color.loading_indicator_red)
+                binding.coloredHead.setBackgroundColor(color)
+                binding.switchButton.text = "Enable"
             }
 
             binding.switchButton.setOnClickListener {
-                when (item.mode) {
-                    SubscriptionMode.ENABLED -> onDisable(item.id)
-                    SubscriptionMode.DISABLED -> onEnable(item.id)
-                }
+                if (item.isEnabled) onDisable(item.id)
+                else onEnable(item.id)
                 hideActions()
             }
             binding.deleteButton.setOnClickListener {

@@ -6,7 +6,6 @@ import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.repository.data.SubscriptionMode
 import com.fishhawk.driftinglibraryandroid.util.Event
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -31,7 +30,16 @@ class GalleryViewModel(
     private val _downloadRequestFinish: MutableLiveData<Event<Throwable?>> = MutableLiveData()
     val downloadRequestFinish: LiveData<Event<Throwable?>> = _downloadRequestFinish
 
-    fun download() {}
+    fun download() {
+        val id = (mangaDetail.value as Result.Success).data.id
+        val title = (mangaDetail.value as Result.Success).data.title
+        GlobalScope.launch(Dispatchers.Main) {
+            when (val result = remoteLibraryRepository.postDownloadTask(source!!, id, title)) {
+                is Result.Success -> _downloadRequestFinish.value = Event(null)
+                is Result.Error -> _downloadRequestFinish.value = Event(result.exception)
+            }
+        }
+    }
 
     fun subscribe() {
         val id = (mangaDetail.value as Result.Success).data.id

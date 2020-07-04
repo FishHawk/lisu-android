@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.base.EmptyRefreshResultError
 import com.fishhawk.driftinglibraryandroid.databinding.SubscriptionFragmentBinding
 import com.fishhawk.driftinglibraryandroid.library.EmptyListException
 import com.fishhawk.driftinglibraryandroid.repository.Result
@@ -123,16 +124,16 @@ class SubscriptionFragment : Fragment() {
             }
         })
 
-        viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver { exception ->
+        viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver {
             binding.refreshLayout.isHeaderRefreshing = false
-            exception?.apply {
-                when (this) {
-                    is EmptyListException -> binding.root.makeSnackBar(getString(R.string.library_empty_hint))
-                    else -> binding.root.makeSnackBar(
-                        message ?: getString(R.string.library_unknown_error_hint)
-                    )
-                }
+        })
+
+        viewModel.operationError.observe(viewLifecycleOwner, EventObserver { exception ->
+            val message = when (exception) {
+                is EmptyRefreshResultError -> getString(R.string.library_empty_hint)
+                else -> exception.message ?: getString(R.string.library_unknown_error_hint)
             }
+            binding.root.makeSnackBar(message)
         })
     }
 

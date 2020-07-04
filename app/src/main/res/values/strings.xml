@@ -83,4 +83,6 @@
     <string name="label_subscription">Subscription</string>
     <string name="menu_enable_all">Enable all</string>
     <string name="menu_disable_all">Disable all</string>
+    <string name="menu_pause_all">Pause all</string>
+    <string name="menu_start_all">Start all</string>
 </resources>

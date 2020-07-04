@@ -66,17 +66,48 @@ interface RemoteLibraryService {
 
 
     /*
+    * Api: download
+    */
+
+    @GET("/downloads")
+    suspend fun getAllDownloadTasks(): List<DownloadTask>
+
+    @PATCH("/downloads/start")
+    suspend fun startAllDownloadTasks(): List<DownloadTask>
+
+    @PATCH("/downloads/pause")
+    suspend fun pauseAllDownloadTasks(): List<DownloadTask>
+
+    @FormUrlEncoded
+    @POST("/download")
+    suspend fun postDownloadTask(
+        @Field("source") source: String,
+        @Field("sourceManga") sourceManga: String,
+        @Field("targetManga") targetManga: String
+    ): DownloadTask
+
+    @DELETE("/download/{id}")
+    suspend fun deleteDownloadTask(@Path("id") id: Int): DownloadTask
+
+    @PATCH("/download/{id}/start")
+    suspend fun startDownloadTask(@Path("id") id: Int): DownloadTask
+
+    @PATCH("/download/{id}/pause")
+    suspend fun pauseDownloadTask(@Path("id") id: Int): DownloadTask
+
+
+    /*
     * Api: subscribe
     */
 
     @GET("/subscriptions")
-    suspend fun getAllSubscription(): List<Subscription>
+    suspend fun getAllSubscriptions(): List<Subscription>
 
     @PATCH("/subscriptions/enable")
-    suspend fun enableAllSubscription(): List<Subscription>
+    suspend fun enableAllSubscriptions(): List<Subscription>
 
     @PATCH("/subscriptions/disable")
-    suspend fun disableAllSubscription(): List<Subscription>
+    suspend fun disableAllSubscriptions(): List<Subscription>
 
     @FormUrlEncoded
     @POST("/subscription")

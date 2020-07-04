@@ -108,16 +108,57 @@ class RemoteLibraryRepository(
         }
     }
 
-    suspend fun getAllSubscription(): Result<List<Subscription>> = resultWrap {
-        service.getAllSubscription()
+
+    /*
+     * download
+     */
+
+    suspend fun getAllDownloadTasks(): Result<List<DownloadTask>> = resultWrap {
+        service.getAllDownloadTasks()
     }
 
-    suspend fun enableAllSubscription(): Result<List<Subscription>> = resultWrap {
-        service.enableAllSubscription()
+    suspend fun startAllDownloadTasks(): Result<List<DownloadTask>> = resultWrap {
+        service.startAllDownloadTasks()
     }
 
-    suspend fun disableAllSubscription(): Result<List<Subscription>> = resultWrap {
-        service.disableAllSubscription()
+    suspend fun pauseAllDownloadTasks(): Result<List<DownloadTask>> = resultWrap {
+        service.pauseAllDownloadTasks()
+    }
+
+    suspend fun postDownloadTask(
+        source: String,
+        sourceManga: String,
+        targetManga: String
+    ): Result<DownloadTask> = resultWrap {
+        service.postDownloadTask(source, sourceManga, targetManga)
+    }
+
+    suspend fun deleteDownloadTask(id: Int): Result<DownloadTask> = resultWrap {
+        service.deleteDownloadTask(id)
+    }
+
+    suspend fun startDownloadTask(id: Int): Result<DownloadTask> = resultWrap {
+        service.startDownloadTask(id)
+    }
+
+    suspend fun pauseDownloadTask(id: Int): Result<DownloadTask> = resultWrap {
+        service.pauseDownloadTask(id)
+    }
+
+    /*
+     * subscription
+     */
+
+    suspend fun getAllSubscriptions(): Result<List<Subscription>> = resultWrap {
+        service.getAllSubscriptions()
+    }
+
+    suspend fun enableAllSubscriptions(): Result<List<Subscription>> = resultWrap {
+        service.enableAllSubscriptions()
+    }
+
+    suspend fun disableAllSubscriptions(): Result<List<Subscription>> = resultWrap {
+        service.disableAllSubscriptions()
     }
 
     suspend fun postSubscription(

@@ -5,14 +5,16 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.base.EmptyRefreshResultError
 import com.fishhawk.driftinglibraryandroid.databinding.DownloadFragmentBinding
-import com.fishhawk.driftinglibraryandroid.library.EmptyListException
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.util.EventObserver
 import com.fishhawk.driftinglibraryandroid.util.makeSnackBar
 import com.hippo.refreshlayout.RefreshLayout
+import kotlinx.coroutines.launch
 
 class DownloadFragment : Fragment() {
     private val viewModel: DownloadViewModel by viewModels {
@@ -38,12 +40,26 @@ class DownloadFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupRefreshLayout()
+        setupAdapter()
+        obverseViewModel()
+        viewModel.load()
+    }
 
+    private fun setupAdapter() {
+        val adapter = DownloadTaskListAdapter(requireActivity())
+        adapter.onStart = { id -> viewModel.startDownloadTask(id) }
+        adapter.onPause = { id -> viewModel.pauseDownloadTask(id) }
+        adapter.onDelete = { id -> viewModel.deleteDownloadTask(id) }
+        binding.list.adapter = adapter
+    }
+
+    private fun setupRefreshLayout() {
         binding.refreshLayout.apply {
             setOnRefreshListener(object : RefreshLayout.OnRefreshListener {
                 override fun onHeaderRefresh() = viewModel.refresh()
                 override fun onFooterRefresh() {
-                    binding.refreshLayout.isFooterRefreshing = false
+                    isFooterRefreshing = false
                 }
             })
 
@@ -62,12 +78,13 @@ class DownloadFragment : Fragment() {
                 R.color.loading_indicator_orange
             )
         }
+    }
 
-        viewModel.downloadTasks.observe(viewLifecycleOwner, Observer { result ->
-            println(result)
+    private fun obverseViewModel() {
+        viewModel.list.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is Result.Success -> {
-                    binding.list.adapter = DownloadTaskListAdapter(requireActivity(), result.data)
+                    (binding.list.adapter as DownloadTaskListAdapter).changeList(result.data)
                     if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
                     else binding.multipleStatusView.showContent()
                 }
@@ -76,25 +93,35 @@ class DownloadFragment : Fragment() {
             }
         })
 
-        viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver { exception ->
+        viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver {
             binding.refreshLayout.isHeaderRefreshing = false
-            exception?.apply {
-                when (this) {
-                    is EmptyListException -> binding.root.makeSnackBar(getString(R.string.library_empty_hint))
-                    else -> binding.root.makeSnackBar(
-                        message ?: getString(R.string.library_unknown_error_hint)
-                    )
-                }
-            }
         })
 
-        viewModel.refresh()
+        viewModel.operationError.observe(viewLifecycleOwner, EventObserver { exception ->
+            val message = when (exception) {
+                is EmptyRefreshResultError -> getString(R.string.library_empty_hint)
+                else -> exception.message ?: getString(R.string.library_unknown_error_hint)
+            }
+            binding.root.makeSnackBar(message)
+        })
     }
-//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-//        super.onCreateOptionsMenu(menu, inflater)
-//        inflater.inflate(R.menu.menu_explore, menu)
-//
-//        val searchView: SearchView = menu.findItem(R.id.action_search).actionView as SearchView
-//        searchView.queryHint = getString(R.string.menu_search_global_hint)
-//    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_subscribe, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_enable_all -> {
+                viewModel.startAllDownloadTasks()
+                true
+            }
+            R.id.action_disable_all -> {
+                viewModel.pauseAllDownloadTasks()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 }

@@ -5,13 +5,12 @@ import com.fishhawk.driftinglibraryandroid.base.BaseListViewModel
 import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.Subscription
-import kotlinx.coroutines.launch
 
 class SubscriptionViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository
 ) : BaseListViewModel<Subscription>() {
     override suspend fun loadResult(): Result<List<Subscription>> {
-        return remoteLibraryRepository.getAllSubscription()
+        return remoteLibraryRepository.getAllSubscriptions()
     }
 
     suspend fun enableSubscription(id: Int): Result<Subscription> =
@@ -24,13 +23,13 @@ class SubscriptionViewModel(
         remoteLibraryRepository.deleteSubscription(id)
 
     suspend fun enableAllSubscription(): Result<List<Subscription>> {
-        val result = remoteLibraryRepository.enableAllSubscription()
+        val result = remoteLibraryRepository.enableAllSubscriptions()
         if (result is Result.Success) _list.value = Result.Success(result.data.toMutableList())
         return result
     }
 
     suspend fun disableAllSubscription(): Result<List<Subscription>> {
-        val result = remoteLibraryRepository.disableAllSubscription()
+        val result = remoteLibraryRepository.disableAllSubscriptions()
         if (result is Result.Success) _list.value = Result.Success(result.data.toMutableList())
         return result
     }
