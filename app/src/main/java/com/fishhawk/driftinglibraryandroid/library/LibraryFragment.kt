@@ -13,10 +13,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.util.EventObserver
-import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
 import com.fishhawk.driftinglibraryandroid.util.bindToListViewModel
-import com.fishhawk.driftinglibraryandroid.util.showErrorMessage
 
 
 class LibraryFragment : Fragment() {
@@ -49,19 +46,13 @@ class LibraryFragment : Fragment() {
 
         SettingsHelper.displayMode.observe(viewLifecycleOwner, Observer {
             binding.mangaList.list.apply {
-                while (itemDecorationCount > 0) {
-                    removeItemDecorationAt(0);
-                }
-
                 when (SettingsHelper.displayMode.getValueDirectly()) {
                     SettingsHelper.DISPLAY_MODE_GRID -> {
-                        addItemDecoration(SpacingItemDecoration(3, 16, true))
-                        (adapter as MangaListAdapter).setDisplayModeGrid()
+                        adapter.setDisplayModeGrid()
                         layoutManager = GridLayoutManager(context, 3)
                     }
                     SettingsHelper.DISPLAY_MODE_LINEAR -> {
-                        addItemDecoration(SpacingItemDecoration(1, 16, true))
-                        (adapter as MangaListAdapter).setDisplayModeLinear()
+                        adapter.setDisplayModeLinear()
                         layoutManager = LinearLayoutManager(context)
                     }
                 }

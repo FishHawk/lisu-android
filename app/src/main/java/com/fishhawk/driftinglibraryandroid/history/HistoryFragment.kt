@@ -9,7 +9,6 @@ import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
-import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
 
 class HistoryFragment : Fragment() {
     private val viewModel: HistoryViewModel by viewModels {
@@ -36,8 +35,6 @@ class HistoryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.list.apply {
-            addItemDecoration(SpacingItemDecoration(1, 16, true))
-
             viewTreeObserver.addOnPreDrawListener {
                 startPostponedEnterTransition()
                 true

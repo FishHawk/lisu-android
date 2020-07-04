@@ -13,7 +13,8 @@
     <androidx.cardview.widget.CardView
         style="@style/Theme.Widget.CardView"
         android:layout_width="match_parent"
-        android:layout_height="95dp">
+        android:layout_height="95dp"
+        android:layout_margin="4dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
