@@ -12,9 +12,7 @@ import kotlinx.coroutines.launch
 class SubscriptionViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository
 ) : BaseListViewModel<Subscription>() {
-    override suspend fun loadResult(): Result<List<Subscription>> {
-        return remoteLibraryRepository.getAllSubscriptions()
-    }
+    override suspend fun loadResult() = remoteLibraryRepository.getAllSubscriptions()
 
     fun enableSubscription(id: Int) = viewModelScope.launch {
         val result = remoteLibraryRepository.enableSubscription(id)

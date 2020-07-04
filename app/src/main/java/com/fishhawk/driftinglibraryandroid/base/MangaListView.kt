@@ -24,7 +24,7 @@ class MangaListView @JvmOverloads constructor(
 ) : MultipleStatusView(context, attrs, defStyleAttr) {
     private val binding = MangaListViewBinding.inflate(LayoutInflater.from(context), this, true)
 
-    fun setup(viewModel: MangaListViewModel, activity: Activity, source: String?) {
+    fun setup(viewModel: BasePartListViewModel<*>, activity: Activity, source: String?) {
         binding.refreshLayout.apply {
             setOnRefreshListener(object : RefreshLayout.OnRefreshListener {
                 override fun onHeaderRefresh() = viewModel.refresh()
@@ -84,31 +84,11 @@ class MangaListView @JvmOverloads constructor(
         }
     }
 
-    fun onRefreshFinishEvent(exception: Throwable?) {
+    fun onRefreshFinishEvent() {
         binding.refreshLayout.isHeaderRefreshing = false
-        exception?.apply {
-            when (this) {
-                is EmptyListException -> binding.root.makeSnackBar(getString(R.string.library_empty_hint))
-                else -> binding.root.makeSnackBar(
-                    message ?: getString(R.string.library_unknown_error_hint)
-                )
-            }
-        }
     }
 
-    fun onFetchMoreFinishEvent(exception: Throwable?) {
+    fun onFetchMoreFinishEvent() {
         binding.refreshLayout.isFooterRefreshing = false
-        exception?.apply {
-            when (this) {
-                is EmptyListException -> binding.root.makeSnackBar(getString(R.string.library_reach_end_hint))
-                else -> binding.root.makeSnackBar(
-                    message ?: getString(R.string.library_unknown_error_hint)
-                )
-            }
-        }
-    }
-
-    private fun getString(id: Int): String {
-        return context.resources.getString(id)
     }
 }

@@ -12,9 +12,7 @@ import kotlinx.coroutines.launch
 class DownloadViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository
 ) : BaseListViewModel<DownloadTask>() {
-    override suspend fun loadResult(): Result<List<DownloadTask>> {
-        return remoteLibraryRepository.getAllDownloadTasks()
-    }
+    override suspend fun loadResult() = remoteLibraryRepository.getAllDownloadTasks()
 
     fun startDownloadTask(id: Int) = viewModelScope.launch {
         val result = remoteLibraryRepository.startDownloadTask(id)

@@ -1,45 +1,32 @@
 package com.fishhawk.driftinglibraryandroid.explore
 
-import com.fishhawk.driftinglibraryandroid.base.MangaListViewModel
+import com.fishhawk.driftinglibraryandroid.base.BasePartListViewModel
 import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
 
 class SearchViewModel(
     private val source: String,
     private val remoteLibraryRepository: RemoteLibraryRepository
-) : MangaListViewModel() {
+) : BasePartListViewModel<MangaOutline>() {
     private var page = 1
     private var keywords = ""
+
+    override suspend fun loadResult() =
+        remoteLibraryRepository.search(source, keywords, 1)
+
+    override suspend fun fetchMoreResult() =
+        remoteLibraryRepository.search(source, keywords, page + 1)
+
+    override fun onRefreshSuccess() {
+        page = 1
+    }
+
+    override fun onFetchMoreSuccess(size: Int) {
+        if (size > 0) page += 1
+    }
 
     fun search(keywords: String) {
         this.keywords = keywords
         load()
-    }
-
-    override fun load() {
-        page = 1
-        setLoading()
-        GlobalScope.launch(Dispatchers.Main) {
-            val result = remoteLibraryRepository.search(source, keywords, page)
-            processLoadResult(result)
-        }
-    }
-
-    override fun refresh() {
-        page = 1
-        GlobalScope.launch(Dispatchers.Main) {
-            val result = remoteLibraryRepository.search(source, keywords, page)
-            processRefreshResult(result)
-        }
-    }
-
-    override fun fetchMore() {
-        page += 1
-        GlobalScope.launch(Dispatchers.Main) {
-            val result = remoteLibraryRepository.search(source, keywords, page)
-            processFetchMoreResult(result)
-        }
     }
 }

@@ -17,7 +17,7 @@ abstract class BasePartListViewModel<T> : BaseListViewModel<T>() {
     private val _fetchMoreFinish: MutableLiveData<Event<Unit>> = MutableLiveData()
     val fetchMoreFinish: LiveData<Event<Unit>> = _fetchMoreFinish
 
-    open fun onFetchMoreSuccess() {}
+    open fun onFetchMoreSuccess(size: Int) {}
     open fun onFetchMoreError() {}
 
     abstract suspend fun fetchMoreResult(): Result<List<T>>
@@ -28,8 +28,9 @@ abstract class BasePartListViewModel<T> : BaseListViewModel<T>() {
                 is Result.Success -> {
                     (_list.value as? Result.Success)?.data?.addAll(result.data)
                     _list.value = _list.value
-                    if (result.data.isEmpty()) _operationError.value = Event(EmptyFetchMoreResultError())
-                    onFetchMoreSuccess()
+                    if (result.data.isEmpty()) _operationError.value =
+                        Event(EmptyFetchMoreResultError())
+                    onFetchMoreSuccess(result.data.size)
                 }
                 is Result.Error -> {
                     _operationError.value = Event(result.exception)
@@ -82,7 +83,8 @@ abstract class BaseListViewModel<T> : ViewModel() {
             when (val result = loadResult()) {
                 is Result.Success -> {
                     _list.value = Result.Success(result.data.toMutableList())
-                    if (result.data.isEmpty()) _operationError.value = Event(EmptyRefreshResultError())
+                    if (result.data.isEmpty()) _operationError.value =
+                        Event(EmptyRefreshResultError())
                     onRefreshSuccess()
                 }
                 is Result.Error -> {

@@ -11,6 +11,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.util.EventObserver
+import com.fishhawk.driftinglibraryandroid.util.showErrorMessage
 
 
 class LibraryFragment : Fragment() {
@@ -44,16 +45,20 @@ class LibraryFragment : Fragment() {
             binding.mangaList.updateMangaListDisplayMode()
         })
 
-        viewModel.mangaList.observe(viewLifecycleOwner, Observer { result ->
+        viewModel.list.observe(viewLifecycleOwner, Observer { result ->
             binding.mangaList.onMangaListChanged(result)
         })
 
-        viewModel.fetchMoreFinish.observe(viewLifecycleOwner, EventObserver { exception ->
-            binding.mangaList.onFetchMoreFinishEvent(exception)
+        viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver {
+            binding.mangaList.onRefreshFinishEvent()
         })
 
-        viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver { exception ->
-            binding.mangaList.onRefreshFinishEvent(exception)
+        viewModel.fetchMoreFinish.observe(viewLifecycleOwner, EventObserver {
+            binding.mangaList.onFetchMoreFinishEvent()
+        })
+
+        viewModel.operationError.observe(viewLifecycleOwner, EventObserver { exception ->
+            showErrorMessage(exception)
         })
 
         val filter: String? = arguments?.getString("filter")
