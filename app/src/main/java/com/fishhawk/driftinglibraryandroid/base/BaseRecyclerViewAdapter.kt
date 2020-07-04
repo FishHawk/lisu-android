@@ -4,9 +4,8 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 
 abstract class BaseRecyclerViewAdapter<ITEM, VH : BaseRecyclerViewAdapter.ViewHolder<ITEM>>(
-    private val list: MutableList<ITEM>
-) :
-    RecyclerView.Adapter<VH>() {
+    protected val list: MutableList<ITEM>
+) : RecyclerView.Adapter<VH>() {
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         holder.bind(list[position])

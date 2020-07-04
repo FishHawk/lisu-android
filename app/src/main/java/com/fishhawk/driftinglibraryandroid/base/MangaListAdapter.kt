@@ -9,17 +9,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.fishhawk.driftinglibraryandroid.databinding.DownloadTaskCardBinding
 import com.fishhawk.driftinglibraryandroid.databinding.MangaGridThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.databinding.MangaLinearThumbnailBinding
+import com.fishhawk.driftinglibraryandroid.repository.data.DownloadTask
+import com.fishhawk.driftinglibraryandroid.repository.data.DownloadTaskStatus
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
 import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
 
 
 class MangaListAdapter(
     private val activity: Activity,
-    private var data: MutableList<MangaOutline>,
     private val source: String?
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : BaseRecyclerViewAdapter<MangaOutline, BaseRecyclerViewAdapter.ViewHolder<MangaOutline>>(
+    mutableListOf()
+) {
     enum class ViewType(val value: Int) {
         GRID(0),
         LINEAR(1)
@@ -35,13 +39,7 @@ class MangaListAdapter(
         viewType = ViewType.LINEAR
     }
 
-    fun update(newData: MutableList<MangaOutline>) {
-        data.clear()
-        data.addAll(newData)
-        notifyDataSetChanged()
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<MangaOutline> {
         return when (this.viewType) {
             ViewType.GRID ->
                 GridViewHolder(
@@ -60,21 +58,11 @@ class MangaListAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (holder) {
-            is GridViewHolder -> holder.bind(data[position])
-            is LinearViewHolder -> holder.bind(data[position])
-        }
-    }
-
-    override fun getItemCount() = data.size
-
     inner class GridViewHolder(private val binding: MangaGridThumbnailBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+        BaseRecyclerViewAdapter.ViewHolder<MangaOutline>(binding) {
 
-        fun bind(item: MangaOutline) {
-            binding.title.text = item.title
-            binding.thumb.transitionName = item.id
+        override fun bind(item: MangaOutline) {
+            binding.outline = item
 
             Glide.with(activity).load(item.thumb)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
@@ -91,14 +79,10 @@ class MangaListAdapter(
     }
 
     inner class LinearViewHolder(private val binding: MangaLinearThumbnailBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+        BaseRecyclerViewAdapter.ViewHolder<MangaOutline>(binding) {
 
-        fun bind(item: MangaOutline) {
-            binding.title.text = item.title
-            binding.author.text = item.author
-            binding.update.text = item.update
-
-            binding.update.visibility = if (item.update == null) View.GONE else View.VISIBLE
+        override fun bind(item: MangaOutline) {
+            binding.outline = item
 
             Glide.with(activity).load(item.thumb)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)

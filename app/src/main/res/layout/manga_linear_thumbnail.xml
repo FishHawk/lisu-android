@@ -1,64 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Theme.Widget.CardView"
-    android:layout_width="match_parent"
-    android:layout_height="95dp">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <data>
+
+        <variable
+            name="outline"
+            type="com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        style="@style/Theme.Widget.CardView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/transparent">
+        android:layout_height="95dp">
 
-        <ImageView
-            android:id="@+id/thumb"
-            android:layout_width="0dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:contentDescription="@null"
-            android:scaleType="fitCenter"
-            app:layout_constraintDimensionRatio="H,4:3"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:background="@android:color/transparent">
 
-        <TextView
-            android:id="@+id/title"
-            style="@style/Theme.TextAppearance.LinearThumbnailTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/baseline_8dp"
-            android:layout_marginTop="@dimen/baseline_4dp"
-            android:ellipsize="end"
-            android:maxLines="2"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/thumb"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Sample title" />
+            <ImageView
+                android:id="@+id/thumb"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                app:layout_constraintDimensionRatio="H,4:3"
+                app:layout_constraintStart_toStartOf="parent" />
 
-        <TextView
-            android:id="@+id/author"
-            style="@style/Theme.TextAppearance.Subtitle1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/baseline_8dp"
-            android:ellipsize="end"
-            android:singleLine="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/thumb"
-            app:layout_constraintTop_toBottomOf="@+id/title"
-            tools:text="Sample author" />
+            <TextView
+                android:id="@+id/title"
+                style="@style/Theme.TextAppearance.LinearThumbnailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/baseline_8dp"
+                android:layout_marginTop="@dimen/baseline_4dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="@{outline.title}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/thumb"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Sample title" />
 
-        <TextView
-            android:id="@+id/update"
-            style="@style/Theme.TextAppearance.Subtitle1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/baseline_8dp"
-            android:ellipsize="end"
-            android:gravity="end"
-            android:singleLine="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/thumb"
-            tools:text="2020-06-22 17:51" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.cardview.widget.CardView>
+            <TextView
+                android:id="@+id/author"
+                style="@style/Theme.TextAppearance.Subtitle1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/baseline_8dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="@{outline.author}"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/thumb"
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                tools:text="Sample author" />
+
+            <TextView
+                android:id="@+id/update"
+                style="@style/Theme.TextAppearance.Subtitle1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/baseline_8dp"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:singleLine="true"
+                android:text="@{outline.update}"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/thumb"
+                tools:text="2020-06-22 17:51" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

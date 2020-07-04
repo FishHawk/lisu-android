@@ -5,8 +5,7 @@
     android:layout_height="match_parent"
     tools:context=".explore.LatestFragment">
 
-    <com.fishhawk.driftinglibraryandroid.base.MangaListView
+    <include
         android:id="@+id/manga_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        layout="@layout/manga_list_view" />
 </FrameLayout>

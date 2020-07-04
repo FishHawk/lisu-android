@@ -8,11 +8,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.ExplorePopularFragmentBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.util.EventObserver
+import com.fishhawk.driftinglibraryandroid.util.SpacingItemDecoration
+import com.fishhawk.driftinglibraryandroid.util.bindToListViewModel
 import com.fishhawk.driftinglibraryandroid.util.showErrorMessage
 
 class PopularFragment : Fragment() {
@@ -42,29 +47,38 @@ class PopularFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val source = arguments?.getString("source")!!
-        binding.mangaList.setup(viewModel, requireActivity(), source)
-
-        viewModel.load()
+        val adapter = MangaListAdapter(requireActivity(), source)
+        binding.mangaList.list.adapter = adapter
 
         SettingsHelper.displayMode.observe(viewLifecycleOwner, Observer {
-            binding.mangaList.updateMangaListDisplayMode()
+            binding.mangaList.list.apply {
+                while (itemDecorationCount > 0) {
+                    removeItemDecorationAt(0);
+                }
+
+                when (SettingsHelper.displayMode.getValueDirectly()) {
+                    SettingsHelper.DISPLAY_MODE_GRID -> {
+                        addItemDecoration(SpacingItemDecoration(3, 16, true))
+                        (adapter as MangaListAdapter).setDisplayModeGrid()
+                        layoutManager = GridLayoutManager(context, 3)
+                    }
+                    SettingsHelper.DISPLAY_MODE_LINEAR -> {
+                        addItemDecoration(SpacingItemDecoration(1, 16, true))
+                        (adapter as MangaListAdapter).setDisplayModeLinear()
+                        layoutManager = LinearLayoutManager(context)
+                    }
+                }
+                this.adapter = adapter
+            }
         })
 
-        viewModel.list.observe(viewLifecycleOwner, Observer { result ->
-            binding.mangaList.onMangaListChanged(result)
-        })
-
-        viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver {
-            binding.mangaList.onRefreshFinishEvent()
-        })
-
-        viewModel.fetchMoreFinish.observe(viewLifecycleOwner, EventObserver {
-            binding.mangaList.onFetchMoreFinishEvent()
-        })
-
-        viewModel.operationError.observe(viewLifecycleOwner, EventObserver { exception ->
-            showErrorMessage(exception)
-        })
+        bindToListViewModel(
+            binding.mangaList.multipleStatusView,
+            binding.mangaList.refreshLayout,
+            viewModel,
+            adapter
+        )
+        viewModel.load()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
