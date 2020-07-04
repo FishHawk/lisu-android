@@ -3,12 +3,15 @@ package com.fishhawk.driftinglibraryandroid.history
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
+import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
+import com.fishhawk.driftinglibraryandroid.util.navToReaderActivity
 
 class HistoryFragment : Fragment() {
     private val viewModel: HistoryViewModel by viewModels {
@@ -34,15 +37,22 @@ class HistoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.list.apply {
-            viewTreeObserver.addOnPreDrawListener {
-                startPostponedEnterTransition()
-                true
-            }
+
+        val adapter = HistoryListAdapter(requireActivity())
+        adapter.onThumbClicked = {
+            (requireActivity() as AppCompatActivity).navToGalleryActivity(
+                it.id, it.title, it.thumb, it.source
+            )
         }
+        adapter.onCardClicked = {
+            (requireActivity() as AppCompatActivity).navToReaderActivity(
+                it.id, it.source, it.collectionIndex, it.chapterIndex, it.pageIndex
+            )
+        }
+        binding.list.adapter = adapter
 
         viewModel.readingHistoryList.observe(viewLifecycleOwner, Observer { data ->
-            binding.list.adapter = HistoryListAdapter(requireActivity(), data)
+            (binding.list.adapter as HistoryListAdapter).changeList(data.toMutableList())
             if (data.isEmpty()) binding.multipleStatusView.showEmpty()
             else binding.multipleStatusView.showContent()
         })
@@ -54,7 +64,7 @@ class HistoryFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
+        when (item.itemId) {
             R.id.action_clear_history -> {
                 AlertDialog.Builder(requireActivity())
                     .setMessage(R.string.dialog_clear_history)
@@ -62,9 +72,9 @@ class HistoryFragment : Fragment() {
                         viewModel.clearReadingHistory()
                     }
                     .show()
-                true
             }
-            else -> super.onOptionsItemSelected(item)
+            else -> return super.onOptionsItemSelected(item)
         }
+        return true
     }
 }
