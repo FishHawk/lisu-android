@@ -49,9 +49,11 @@ class DownloadTaskListAdapter(
             when (item.status) {
                 DownloadTaskStatus.PAUSED, DownloadTaskStatus.ERROR -> {
                     binding.pauseButton.visibility = View.GONE
+                    binding.startButton.visibility = View.VISIBLE
                 }
                 DownloadTaskStatus.WAITING, DownloadTaskStatus.DOWNLOADING -> {
                     binding.startButton.visibility = View.GONE
+                    binding.pauseButton.visibility = View.VISIBLE
                 }
             }
 
