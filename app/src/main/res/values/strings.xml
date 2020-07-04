@@ -11,6 +11,8 @@
     <string name="label_more">More</string>
     <string name="label_settings">Setting</string>
     <string name="label_about">About</string>
+    <string name="label_download">Download</string>
+    <string name="label_subscription">Subscription</string>
 
     <!-- library fragment -->
     <string name="library_reach_end_hint">No more mangas.</string>
@@ -75,14 +77,17 @@
     <string name="menu_search_global_hint">Search global…</string>
     <string name="menu_display_mode">Display mode</string>
     <string name="menu_history_clear">Clear history</string>
-
-    <!-- dialog-->
-    <string name="dialog_clear_history">Clear all history?</string>
-    <string name="dialog_clear_history_positive">clear all</string>
-    <string name="label_download">Download</string>
-    <string name="label_subscription">Subscription</string>
     <string name="menu_enable_all">Enable all</string>
     <string name="menu_disable_all">Disable all</string>
     <string name="menu_pause_all">Pause all</string>
     <string name="menu_start_all">Start all</string>
+
+    <!-- dialog-->
+    <string name="dialog_clear_history">Clear all history?</string>
+    <string name="dialog_clear_history_positive">clear all</string>
+
+    <!-- misc-->
+    <string name="error_hint_unknown">Unknown error.</string>
+    <string name="error_hint_empty_refresh_result">List is empty.</string>
+    <string name="error_hint_empty_fetch_more_result">No more result.</string>
 </resources>

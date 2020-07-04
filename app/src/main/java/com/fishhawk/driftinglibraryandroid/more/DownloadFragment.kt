@@ -12,7 +12,9 @@ import com.fishhawk.driftinglibraryandroid.base.EmptyRefreshResultError
 import com.fishhawk.driftinglibraryandroid.databinding.DownloadFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.util.EventObserver
+import com.fishhawk.driftinglibraryandroid.util.bindingToViewModel
 import com.fishhawk.driftinglibraryandroid.util.makeSnackBar
+import com.fishhawk.driftinglibraryandroid.util.showErrorMessage
 import com.hippo.refreshlayout.RefreshLayout
 import kotlinx.coroutines.launch
 
@@ -40,7 +42,7 @@ class DownloadFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupRefreshLayout()
+        binding.refreshLayout.bindingToViewModel(viewModel)
         setupAdapter()
         obverseViewModel()
         viewModel.load()
@@ -52,32 +54,6 @@ class DownloadFragment : Fragment() {
         adapter.onPause = { id -> viewModel.pauseDownloadTask(id) }
         adapter.onDelete = { id -> viewModel.deleteDownloadTask(id) }
         binding.list.adapter = adapter
-    }
-
-    private fun setupRefreshLayout() {
-        binding.refreshLayout.apply {
-            setOnRefreshListener(object : RefreshLayout.OnRefreshListener {
-                override fun onHeaderRefresh() = viewModel.refresh()
-                override fun onFooterRefresh() {
-                    isFooterRefreshing = false
-                }
-            })
-
-            setHeaderColorSchemeResources(
-                R.color.loading_indicator_red,
-                R.color.loading_indicator_purple,
-                R.color.loading_indicator_blue,
-                R.color.loading_indicator_cyan,
-                R.color.loading_indicator_green,
-                R.color.loading_indicator_yellow
-            )
-            setFooterColorSchemeResources(
-                R.color.loading_indicator_red,
-                R.color.loading_indicator_blue,
-                R.color.loading_indicator_green,
-                R.color.loading_indicator_orange
-            )
-        }
     }
 
     private fun obverseViewModel() {
@@ -98,11 +74,7 @@ class DownloadFragment : Fragment() {
         })
 
         viewModel.operationError.observe(viewLifecycleOwner, EventObserver { exception ->
-            val message = when (exception) {
-                is EmptyRefreshResultError -> getString(R.string.library_empty_hint)
-                else -> exception.message ?: getString(R.string.library_unknown_error_hint)
-            }
-            binding.root.makeSnackBar(message)
+            showErrorMessage(exception)
         })
     }
 
@@ -112,16 +84,11 @@ class DownloadFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_enable_all -> {
-                viewModel.startAllDownloadTasks()
-                true
-            }
-            R.id.action_disable_all -> {
-                viewModel.pauseAllDownloadTasks()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+        when (item.itemId) {
+            R.id.action_start_all -> viewModel.startAllDownloadTasks()
+            R.id.action_pause_all -> viewModel.pauseAllDownloadTasks()
+            else -> return super.onOptionsItemSelected(item)
         }
+        return true
     }
 }

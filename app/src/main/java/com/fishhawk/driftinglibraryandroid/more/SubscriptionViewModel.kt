@@ -4,7 +4,10 @@ import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.base.BaseListViewModel
 import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.repository.data.DownloadTask
 import com.fishhawk.driftinglibraryandroid.repository.data.Subscription
+import com.fishhawk.driftinglibraryandroid.util.Event
+import kotlinx.coroutines.launch
 
 class SubscriptionViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository
@@ -13,25 +16,63 @@ class SubscriptionViewModel(
         return remoteLibraryRepository.getAllSubscriptions()
     }
 
-    suspend fun enableSubscription(id: Int): Result<Subscription> =
-        remoteLibraryRepository.enableSubscription(id)
-
-    suspend fun disableSubscription(id: Int): Result<Subscription> =
-        remoteLibraryRepository.disableSubscription(id)
-
-    suspend fun deleteSubscription(id: Int): Result<Subscription> =
-        remoteLibraryRepository.deleteSubscription(id)
-
-    suspend fun enableAllSubscription(): Result<List<Subscription>> {
-        val result = remoteLibraryRepository.enableAllSubscriptions()
-        if (result is Result.Success) _list.value = Result.Success(result.data.toMutableList())
-        return result
+    fun enableSubscription(id: Int) = viewModelScope.launch {
+        val result = remoteLibraryRepository.enableSubscription(id)
+        updateItem(id, result)
     }
 
-    suspend fun disableAllSubscription(): Result<List<Subscription>> {
+    fun disableSubscription(id: Int) = viewModelScope.launch {
+        val result = remoteLibraryRepository.disableSubscription(id)
+        updateItem(id, result)
+    }
+
+    fun deleteSubscription(id: Int) = viewModelScope.launch {
+        val result = remoteLibraryRepository.deleteSubscription(id)
+        deleteItem(id, result)
+    }
+
+    fun enableAllSubscription() = viewModelScope.launch {
+        val result = remoteLibraryRepository.enableAllSubscriptions()
+        updateList(result)
+    }
+
+    fun disableAllSubscription() = viewModelScope.launch {
         val result = remoteLibraryRepository.disableAllSubscriptions()
-        if (result is Result.Success) _list.value = Result.Success(result.data.toMutableList())
-        return result
+        updateList(result)
+    }
+
+
+    private fun deleteItem(id: Int, result: Result<Subscription>) {
+        when (result) {
+            is Result.Success -> {
+                (_list.value as? Result.Success)?.data?.let { taskList ->
+                    val index = taskList.indexOfFirst { it.id == id }
+                    taskList.removeAt(index)
+                }
+            }
+            is Result.Error -> _operationError.value = Event(result.exception)
+        }
+        _list.value = _list.value
+    }
+
+    private fun updateItem(id: Int, result: Result<Subscription>) {
+        when (result) {
+            is Result.Success -> {
+                (_list.value as? Result.Success)?.data?.let { taskList ->
+                    val index = taskList.indexOfFirst { it.id == id }
+                    taskList[index] = result.data
+                }
+            }
+            is Result.Error -> _operationError.value = Event(result.exception)
+        }
+        _list.value = _list.value
+    }
+
+    private fun updateList(result: Result<List<Subscription>>) {
+        when (result) {
+            is Result.Success -> _list.value = Result.Success(result.data.toMutableList())
+            is Result.Error -> _list.value = result
+        }
     }
 }
 

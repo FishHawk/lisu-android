@@ -11,45 +11,11 @@ import com.fishhawk.driftinglibraryandroid.databinding.SubscriptionCardBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.Subscription
 
 class SubscriptionListAdapter(
-    private val activity: Activity,
-    private val data: MutableList<Subscription>
-) : BaseRecyclerViewAdapter<Subscription, SubscriptionListAdapter.ViewHolder>(data) {
+    private val activity: Activity
+) : BaseRecyclerViewAdapter<Subscription, SubscriptionListAdapter.ViewHolder>(mutableListOf()) {
     var onDelete: (Int) -> Unit = {}
     var onEnable: (Int) -> Unit = {}
     var onDisable: (Int) -> Unit = {}
-
-    fun enableSubscription(id: Int) {
-        val position = data.indexOfFirst { it.id == id }
-        val subscription = data.getOrNull(position)
-        subscription?.let {
-            it.isEnabled = true
-            notifyItemChanged(position)
-        }
-    }
-
-    fun disableSubscription(id: Int) {
-        val position = data.indexOfFirst { it.id == id }
-        val subscription = data.getOrNull(position)
-        subscription?.let {
-            it.isEnabled = false
-            notifyItemChanged(position)
-        }
-    }
-
-    fun deleteSubscription(id: Int) {
-        val position = data.indexOfFirst { it.id == id }
-        if (position != -1) {
-            data.removeAt(position)
-            notifyItemRemoved(position)
-        }
-    }
-
-    fun refreshSubscription(id: Int) {
-        val position = data.indexOfFirst { it.id == id }
-        if (position != -1) {
-            notifyItemChanged(position)
-        }
-    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,

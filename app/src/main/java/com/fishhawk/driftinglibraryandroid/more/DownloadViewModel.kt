@@ -41,6 +41,7 @@ class DownloadViewModel(
         updateList(result)
     }
 
+
     private fun deleteItem(id: Int, result: Result<DownloadTask>) {
         when (result) {
             is Result.Success -> {
