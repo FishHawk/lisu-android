@@ -50,11 +50,11 @@ class SearchFragment : Fragment() {
             binding.mangaList.list.apply {
                 when (SettingsHelper.displayMode.getValueDirectly()) {
                     SettingsHelper.DISPLAY_MODE_GRID -> {
-                        (adapter as MangaListAdapter).setDisplayModeGrid()
+                        adapter.setDisplayModeGrid()
                         layoutManager = GridLayoutManager(context, 3)
                     }
                     SettingsHelper.DISPLAY_MODE_LINEAR -> {
-                        (adapter as MangaListAdapter).setDisplayModeLinear()
+                        adapter.setDisplayModeLinear()
                         layoutManager = LinearLayoutManager(context)
                     }
                 }
@@ -68,7 +68,6 @@ class SearchFragment : Fragment() {
             viewModel,
             adapter
         )
-        viewModel.load()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -85,6 +84,8 @@ class SearchFragment : Fragment() {
 
             override fun onQueryTextChange(query: String?): Boolean = true
         })
+        val keywords = arguments?.getString("keywords")!!
+        searchView.setQuery(keywords, true)
 
         val item = menu.findItem(R.id.action_display_mode)
         when (SettingsHelper.displayMode.getValueDirectly()) {

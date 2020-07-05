@@ -1,6 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.explore
 
-import android.widget.SearchView
 import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
@@ -24,6 +23,8 @@ class ExploreViewModelFactory(
         when {
             isAssignableFrom(ExploreViewModel::class.java) ->
                 ExploreViewModel(remoteLibraryRepository)
+            isAssignableFrom(GlobalSearchViewModel::class.java) ->
+                GlobalSearchViewModel(remoteLibraryRepository)
             isAssignableFrom(LatestViewModel::class.java) ->
                 LatestViewModel(source, remoteLibraryRepository)
             isAssignableFrom(PopularViewModel::class.java) ->

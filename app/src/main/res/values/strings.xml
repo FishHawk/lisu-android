@@ -7,6 +7,7 @@
     <string name="label_explore">Explore</string>
     <string name="label_latest">Latest</string>
     <string name="label_popular">Popular</string>
+    <string name="label_global_search">Global search</string>
     <string name="label_search">Search</string>
     <string name="label_more">More</string>
     <string name="label_settings">Setting</string>

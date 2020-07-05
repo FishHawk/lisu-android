@@ -51,11 +51,11 @@ class LatestFragment : Fragment() {
             binding.mangaList.list.apply {
                 when (SettingsHelper.displayMode.getValueDirectly()) {
                     SettingsHelper.DISPLAY_MODE_GRID -> {
-                        (adapter as MangaListAdapter).setDisplayModeGrid()
+                        adapter.setDisplayModeGrid()
                         layoutManager = GridLayoutManager(context, 3)
                     }
                     SettingsHelper.DISPLAY_MODE_LINEAR -> {
-                        (adapter as MangaListAdapter).setDisplayModeLinear()
+                        adapter.setDisplayModeLinear()
                         layoutManager = LinearLayoutManager(context)
                     }
                 }

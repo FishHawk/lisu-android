@@ -24,6 +24,9 @@
         android:label="@string/label_explore"
         tools:layout="@layout/explore_fragment">
         <action
+            android:id="@+id/action_explore_to_global_search"
+            app:destination="@id/nav_global_search" />
+        <action
             android:id="@+id/action_explore_to_popular"
             app:destination="@id/nav_popular" />
         <action
@@ -33,6 +36,11 @@
             android:id="@+id/action_explore_to_search"
             app:destination="@id/nav_search" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_global_search"
+        android:name="com.fishhawk.driftinglibraryandroid.explore.GlobalSearchFragment"
+        android:label="@string/label_global_search" />
 
     <fragment
         android:id="@+id/nav_popular"
