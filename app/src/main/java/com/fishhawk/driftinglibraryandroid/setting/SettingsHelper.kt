@@ -64,4 +64,19 @@ object SettingsHelper {
             DEFAULT_DISPLAY_MODE
         )
     }
+
+    const val HISTORY_FILTER_ALL: String = "0"
+    const val HISTORY_FILTER_FROM_LIBRARY: String = "1"
+    const val HISTORY_FILTER_FROM_SOURCES: String = "2"
+
+    private const val KEY_HISTORY_FILTER = "history_filter"
+    private const val DEFAULT_HISTORY_FILTER: String = HISTORY_FILTER_FROM_LIBRARY
+
+    val historyFilter by lazy {
+        PreferenceStringLiveData(
+            sharedPreferences,
+            KEY_HISTORY_FILTER,
+            DEFAULT_HISTORY_FILTER
+        )
+    }
 }

@@ -65,6 +65,11 @@
     <string name="settings_display_mode_gird">Grid</string>
     <string name="settings_display_mode_linear">Linear</string>
 
+    <string name="settings_history_filter">History filter</string>
+    <string name="settings_history_filter_all">All</string>
+    <string name="settings_history_filter_from_library">From library</string>
+    <string name="settings_history_filter_from_sources">From sources</string>
+
     <!-- about fragment -->
     <string name="about_version">Version</string>
     <string name="about_check_for_updates">Check for updates</string>

@@ -51,7 +51,7 @@ class HistoryFragment : Fragment() {
         }
         binding.list.adapter = adapter
 
-        viewModel.readingHistoryList.observe(viewLifecycleOwner, Observer { data ->
+        viewModel.filteredReadingHistoryList.observe(viewLifecycleOwner, Observer { data ->
             (binding.list.adapter as HistoryListAdapter).changeList(data.toMutableList())
             if (data.isEmpty()) binding.multipleStatusView.showEmpty()
             else binding.multipleStatusView.showContent()
