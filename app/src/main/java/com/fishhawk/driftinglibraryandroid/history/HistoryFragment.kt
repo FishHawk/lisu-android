@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.history
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
@@ -10,6 +11,7 @@ import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.util.navToReaderActivity
 
@@ -65,12 +67,31 @@ class HistoryFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.action_filter -> {
+                val checkedItem = when (SettingsHelper.historyFilter.getValueDirectly()) {
+                    SettingsHelper.HISTORY_FILTER_ALL -> 0
+                    SettingsHelper.HISTORY_FILTER_FROM_LIBRARY -> 1
+                    SettingsHelper.HISTORY_FILTER_FROM_SOURCES -> 2
+                    else -> -1
+                }
+                AlertDialog.Builder(requireActivity())
+                    .setTitle(R.string.dialog_filter_history)
+                    .setSingleChoiceItems(
+                        R.array.settings_history_filter_entries,
+                        checkedItem
+                    ) { _, which ->
+                        when (which) {
+                            0 -> SettingsHelper.historyFilter.setValue(SettingsHelper.HISTORY_FILTER_ALL)
+                            1 -> SettingsHelper.historyFilter.setValue(SettingsHelper.HISTORY_FILTER_FROM_LIBRARY)
+                            2 -> SettingsHelper.historyFilter.setValue(SettingsHelper.HISTORY_FILTER_FROM_SOURCES)
+                        }
+                    }
+                    .show()
+            }
             R.id.action_clear_history -> {
                 AlertDialog.Builder(requireActivity())
-                    .setMessage(R.string.dialog_clear_history)
-                    .setPositiveButton(R.string.dialog_clear_history_positive) { _, _ ->
-                        viewModel.clearReadingHistory()
-                    }
+                    .setTitle(R.string.dialog_clear_history)
+                    .setPositiveButton(R.string.dialog_clear_history_positive) { _, _ -> viewModel.clearReadingHistory() }
                     .show()
             }
             else -> return super.onOptionsItemSelected(item)
