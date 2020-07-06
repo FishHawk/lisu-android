@@ -17,5 +17,5 @@ class GlobalSearchViewModel(
     }
 
     suspend fun search(source: String, keywords: String): Result<List<MangaOutline>> =
-        remoteLibraryRepository.search(source, keywords, 1)
+        remoteLibraryRepository.searchInSource(source, keywords, 1)
 }

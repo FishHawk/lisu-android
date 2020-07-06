@@ -7,9 +7,9 @@ class RemoteLibraryRepository(
     var url: String,
     var service: RemoteLibraryService
 ) {
-    suspend fun getMangaList(lastId: String, filter: String): Result<List<MangaOutline>> {
+    suspend fun searchInLibrary(lastId: String, filter: String): Result<List<MangaOutline>> {
         return try {
-            service.getMangaList(lastId, filter).let {
+            service.searchInLibrary(lastId, filter).let {
                 for (s in it) {
                     s.thumb = "${url}library/image/${s.id}/${s.thumb}"
                 }
@@ -68,13 +68,13 @@ class RemoteLibraryRepository(
         }
     }
 
-    suspend fun search(
+    suspend fun searchInSource(
         source: String,
         keywords: String,
         page: Int
     ): Result<List<MangaOutline>> {
         return try {
-            service.search(source, keywords, page).let {
+            service.searchInSource(source, keywords, page).let {
                 Result.Success(it)
             }
         } catch (he: Throwable) {

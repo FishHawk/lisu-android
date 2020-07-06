@@ -16,13 +16,13 @@ class LibraryViewModel(
     private var address = remoteLibraryRepository.url
     var filter: String = ""
 
-    override suspend fun loadResult() = remoteLibraryRepository.getMangaList("", filter)
+    override suspend fun loadResult() = remoteLibraryRepository.searchInLibrary("", filter)
     override suspend fun fetchMoreResult(): Result<List<MangaOutline>> {
         val lastId = when (val result = _list.value) {
             is Result.Success -> result.data.let { if (it.isEmpty()) "" else it.last().id }
             else -> ""
         }
-        return remoteLibraryRepository.getMangaList(lastId, filter)
+        return remoteLibraryRepository.searchInLibrary(lastId, filter)
     }
 
     fun reload(filter: String) {

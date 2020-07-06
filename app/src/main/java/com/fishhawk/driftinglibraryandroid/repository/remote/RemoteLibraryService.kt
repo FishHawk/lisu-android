@@ -10,9 +10,9 @@ interface RemoteLibraryService {
     */
 
     @GET("library/search")
-    suspend fun getMangaList(
-        @Query("last_id") lastId: String,
-        @Query("filter") filter: String
+    suspend fun searchInLibrary(
+        @Query("lastId") lastId: String,
+        @Query("keywords") filter: String
     ): List<MangaOutline>
 
     @GET("library/manga/{id}")
@@ -34,7 +34,7 @@ interface RemoteLibraryService {
     suspend fun getSources(): List<Source>
 
     @GET("/source/{source}/search")
-    suspend fun search(
+    suspend fun searchInSource(
         @Path("source") source: String,
         @Query("keywords") keywords: String,
         @Query("page") page: Int

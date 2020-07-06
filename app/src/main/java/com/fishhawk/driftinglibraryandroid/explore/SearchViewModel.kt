@@ -12,10 +12,10 @@ class SearchViewModel(
     private var keywords = ""
 
     override suspend fun loadResult() =
-        remoteLibraryRepository.search(source, keywords, 1)
+        remoteLibraryRepository.searchInSource(source, keywords, 1)
 
     override suspend fun fetchMoreResult() =
-        remoteLibraryRepository.search(source, keywords, page + 1)
+        remoteLibraryRepository.searchInSource(source, keywords, page + 1)
 
     override fun onRefreshSuccess() {
         page = 1
