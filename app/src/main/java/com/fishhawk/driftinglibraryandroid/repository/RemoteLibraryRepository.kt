@@ -23,12 +23,12 @@ class RemoteLibraryRepository(
     suspend fun getManga(id: String, source: String? = null): Result<MangaDetail> {
         return try {
             if (source == null) {
-                service.getManga(id).let {
+                service.getMangaFromLibrary(id).let {
                     it.thumb = "${url}library/image/${it.id}/${it.thumb}"
                     Result.Success(it)
                 }
             } else {
-                service.getMangaDetail(source, id).let {
+                service.getMangaFromSource(source, id).let {
                     Result.Success(it)
                 }
             }
@@ -37,8 +37,18 @@ class RemoteLibraryRepository(
         }
     }
 
-    suspend fun deleteManga(id: String): Result<String> = resultWrap {
-        service.deleteManga(id)
+    suspend fun getMangaFromLibrary(id: String): Result<MangaDetail> = resultWrap {
+        service.getMangaFromLibrary(id).apply {
+            thumb = "${url}library/image/${id}/${thumb}"
+        }
+    }
+
+    suspend fun getMangaFromSource(source: String, id: String): Result<MangaDetail> = resultWrap {
+        service.getMangaFromSource(source, id)
+    }
+
+    suspend fun deleteMangaFromLibrary(id: String): Result<String> = resultWrap {
+        service.deleteMangaFromLibrary(id)
     }
 
     suspend fun getChapterContent(
@@ -49,11 +59,11 @@ class RemoteLibraryRepository(
     ): Result<List<String>> {
         return try {
             if (source == null) {
-                service.getChapterContent(id, collection, chapter).let {
+                service.getChapterContentFromLibrary(id, collection, chapter).let {
                     Result.Success(it.map { "${url}library/image/$id/$collection/$chapter/$it" })
                 }
             } else {
-                service.getChapterContent(source, chapter).let {
+                service.getChapterContentFromSource(source, chapter).let {
                     Result.Success(it.map { "${url}$it" })
                 }
             }

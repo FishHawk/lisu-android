@@ -13,9 +13,9 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryActivityBinding
-import com.fishhawk.driftinglibraryandroid.library.EmptyListException
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
+import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
 import com.fishhawk.driftinglibraryandroid.util.*
@@ -44,12 +44,94 @@ class GalleryActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val arguments = intent.extras!!
-        val id: String? = arguments.getString("id")
-        val title: String? = arguments.getString("title")
-        val thumb: String? = arguments.getString("thumb")
+        val id: String = arguments.getString("id")!!
+        val title: String = arguments.getString("title")!!
+        val thumb: String = arguments.getString("thumb")!!
         val source: String? = arguments.getString("source")
 
-        binding.title.text = title
+        binding.detail = MangaDetail(
+            source, id, title, thumb,
+            null,
+            null,
+            null,
+            null,
+            null,
+            mutableListOf()
+        )
+        setupThumb()
+        setupActionButton()
+
+        val adapter = ContentAdapter(this, id, source)
+        binding.chapters.adapter = adapter
+        binding.chapters.apply {
+            (layoutManager as GridLayoutManager).spanSizeLookup =
+                object : GridLayoutManager.SpanSizeLookup() {
+                    override fun getSpanSize(position: Int): Int {
+                        return when (adapter.getItemViewType(position)) {
+                            ContentAdapter.ViewType.CHAPTER.value -> 1
+                            ContentAdapter.ViewType.CHAPTER_MARKED.value -> 1
+                            else -> 3
+                        }
+                    }
+                }
+        }
+
+        viewModel.operationError.observe(this, EventObserver { exception ->
+            when (exception) {
+                null -> binding.root.makeSnackBar("Success")
+                else -> binding.root.makeSnackBar("Fail: ${exception.message}")
+            }
+        })
+
+        viewModel.detail.observe(this, Observer { result ->
+            binding.contentView.visibility = View.GONE
+            binding.loadingView.visibility = View.GONE
+            binding.errorView.visibility = View.GONE
+            when (result) {
+                is Result.Success -> {
+                    binding.contentView.visibility = View.VISIBLE
+
+                    val detail = result.data
+                    binding.detail = detail
+
+                    binding.status.text = when (detail.status) {
+                        0 -> "Completed"
+                        1 -> "Ongoing"
+                        else -> "Unknown"
+                    }
+
+                    if (detail.description == null || detail.description.isBlank())
+                        binding.description.visibility = View.GONE
+
+                    if (detail.tags == null || detail.tags.isEmpty())
+                        binding.tags.visibility = View.GONE
+                    else bindTags(detail.tags, binding.tags)
+
+                    if (detail.collections.isEmpty()) {
+                        binding.chapters
+                    }
+                    bindContent(adapter, detail.collections)
+                }
+                is Result.Error -> {
+                    binding.errorView.visibility = View.VISIBLE
+                    binding.errorView.text = result.exception.message
+                }
+                is Result.Loading -> binding.loadingView.visibility = View.VISIBLE
+            }
+        })
+
+        viewModel.readingHistory.observe(this, Observer { history ->
+            if (history != null)
+                history.let {
+                    adapter.markChapter(it.collectionIndex, it.chapterIndex, it.pageIndex)
+                }
+            else adapter.unmarkChapter()
+        })
+    }
+
+    private fun setupThumb() {
+        val arguments = intent.extras!!
+        val thumb: String = arguments.getString("thumb")!!
         binding.thumb.apply {
             Glide.with(this).load(thumb)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
@@ -60,158 +142,48 @@ class GalleryActivity : AppCompatActivity() {
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .into(this)
         }
+    }
 
+    private fun setupActionButton() {
         binding.readButton.setOnClickListener {
-            when (viewModel.mangaDetail.value) {
-                is Result.Success -> {
-                    viewModel.readingHistory.value?.let {
-                        navToReaderActivity(
-                            (viewModel.mangaDetail.value!! as Result.Success).data.id,
-                            (viewModel.mangaDetail.value!! as Result.Success).data.source,
-                            it.collectionIndex,
-                            it.chapterIndex,
-                            it.pageIndex
-                        )
-                    } ?: navToReaderActivity(
-                        (viewModel.mangaDetail.value!! as Result.Success).data.id,
-                        (viewModel.mangaDetail.value!! as Result.Success).data.source
-                    )
-                }
-            }
-        }
-
-        if (source == null) {
-            binding.downloadButton.visibility = View.GONE
-            binding.subscribeButton.visibility = View.GONE
-        } else {
-            binding.subscribeButton.setOnClickListener {
-                when (viewModel.mangaDetail.value) {
-                    is Result.Success -> viewModel.subscribe()
-                    else -> binding.root.makeSnackBar("Manga not open.")
-                }
-            }
-            binding.downloadButton.setOnClickListener {
-                when (viewModel.mangaDetail.value) {
-                    is Result.Success -> viewModel.download()
-                    else -> binding.root.makeSnackBar("Manga not open.")
-                }
-            }
-            viewModel.downloadRequestFinish.observe(this, EventObserver { exception ->
-                when (exception) {
-                    null -> binding.root.makeSnackBar("Success")
-                    else -> binding.root.makeSnackBar("Fail: ${exception.message}")
-                }
-            })
-        }
-
-        viewModel.mangaDetail.observe(this, Observer { result ->
-            println(result)
-            when (result) {
-                is Result.Success -> {
-                    val detail = result.data
-
-                    if (detail.author.isEmpty()) {
-                        binding.author.text = "Unknown"
-                    } else {
-                        binding.author.text = detail.author
-                    }
-
-                    binding.status.text = when (detail.status) {
-                        0 -> "Completed"
-                        1 -> "Ongoing"
-                        else -> "Unknown"
-                    }
-
-                    binding.update.text = detail.update ?: "Unknown"
-                    binding.source.text = source ?: "Unknown"
-
-                    if (detail.description == null) {
-                        binding.description.visibility = View.GONE
-                    } else {
-                        binding.description.text = detail.description
-
-                    }
-
-                    bindTags(result.data.tags, binding.tags)
-                }
-                is Result.Error -> println()
-                is Result.Loading -> println()
-            }
-        })
-
-        binding.content.apply {
-            (layoutManager as GridLayoutManager).spanSizeLookup =
-                object : GridLayoutManager.SpanSizeLookup() {
-                    override fun getSpanSize(position: Int): Int {
-                        return when (adapter?.getItemViewType(position)) {
-                            ContentAdapter.ViewType.CHAPTER.value -> 1
-                            ContentAdapter.ViewType.CHAPTER_MARKED.value -> 1
-                            else -> 3
-                        }
-                    }
-                }
-        }
-
-        viewModel.readingHistory.observe(this, Observer { history ->
-            if (binding.content.adapter == null) {
-                val result = viewModel.mangaDetail.value as Result.Success
-                bindContent(result.data.id, result.data.source, result.data.collections, history)
-            } else {
-                if (history != null)
-                    (binding.content.adapter as ContentAdapter).markChapter(
+            (viewModel.detail.value as? Result.Success)?.let { result ->
+                val detail = result.data
+                viewModel.readingHistory.value?.let { history ->
+                    navToReaderActivity(
+                        detail.id,
+                        detail.source,
                         history.collectionIndex,
                         history.chapterIndex,
                         history.pageIndex
                     )
-                else (binding.content.adapter as ContentAdapter).unmarkChapter()
+                } ?: navToReaderActivity(detail.id, detail.source)
             }
-        })
+        }
+        binding.subscribeButton.setOnClickListener {
+            (viewModel.detail.value as? Result.Success)?.let { viewModel.subscribe() }
+        }
+        binding.downloadButton.setOnClickListener {
+            (viewModel.detail.value as? Result.Success)?.let { viewModel.download() }
+        }
     }
 
-    private fun bindContent(
-        id: String,
-        source: String?,
-        collections: List<Collection>,
-        history: ReadingHistory?
-    ) {
+    private fun bindContent(adapter: ContentAdapter, collections: List<Collection>) {
         val items = mutableListOf<ContentItem>()
         for ((collectionIndex, collection) in collections.withIndex()) {
             if (collection.title.isNotEmpty())
-                items.add(
-                    ContentItem.CollectionHeader(
-                        collection.title
-                    )
-                )
+                items.add(ContentItem.CollectionHeader(collection.title))
             for ((chapterIndex, chapter) in collection.chapters.withIndex()) {
-                if (history != null && history.collectionIndex == collectionIndex && history.chapterIndex == chapterIndex)
-                    items.add(
-                        ContentItem.ChapterMarked(
-                            chapter.name, collectionIndex, chapterIndex, history.pageIndex
-                        )
-                    )
-                else
-                    items.add(
-                        ContentItem.Chapter(
-                            chapter.name, collectionIndex, chapterIndex
-                        )
-                    )
+                items.add(ContentItem.Chapter(chapter.name, collectionIndex, chapterIndex))
             }
         }
-        binding.content.adapter = ContentAdapter(this, id, source, items)
+        adapter.changeList(items)
     }
 
     private fun bindTags(
-        tags: List<TagGroup>?,
+        tags: List<TagGroup>,
         tagsLayout: LinearLayout
     ) {
         tagsLayout.removeViews(0, tagsLayout.childCount)
-        if (tags == null || tags.isEmpty()) {
-            binding.tags.visibility = View.GONE
-            return
-        } else {
-            binding.tags.visibility = View.VISIBLE
-        }
-
         for (tagGroup in tags) {
             val tagGroupLayout = layoutInflater.inflate(
                 R.layout.gallery_tag_group, tagsLayout, false

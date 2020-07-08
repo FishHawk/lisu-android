@@ -21,6 +21,6 @@ abstract class BaseRecyclerViewAdapter<ITEM, VH : BaseRecyclerViewAdapter.ViewHo
 
     abstract class ViewHolder<ITEM>(binding: ViewDataBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        abstract fun bind(item: ITEM)
+        open fun bind(item: ITEM) {}
     }
 }

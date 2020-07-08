@@ -4,7 +4,7 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
+import com.fishhawk.driftinglibraryandroid.base.BaseRecyclerViewAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryChapterBinding
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryChapterMarkedBinding
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryCollectionTitleBinding
@@ -32,9 +32,10 @@ sealed class ContentItem {
 class ContentAdapter(
     private val activity: Activity,
     private val id: String,
-    private val source: String?,
-    private val data: MutableList<ContentItem>
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private val source: String?
+) : BaseRecyclerViewAdapter<ContentItem, BaseRecyclerViewAdapter.ViewHolder<ContentItem>>(
+    mutableListOf()
+) {
     enum class ViewType(val value: Int) {
         CHAPTER(0),
         CHAPTER_MARKED(1),
@@ -43,28 +44,34 @@ class ContentAdapter(
     }
 
     fun unmarkChapter() {
-        for ((index, item) in data.withIndex()) {
-            if (item is ContentItem.ChapterMarked)
-                data[index] = ContentItem.Chapter(
-                    item.title, item.collectionIndex, item.chapterIndex
-                )
+        val index = list.indexOfFirst { it is ContentItem.ChapterMarked }
+        if (index != -1) {
+            val item = list[index] as ContentItem.Chapter
+            list[index] = ContentItem.Chapter(
+                item.title, item.collectionIndex, item.chapterIndex
+            )
+            notifyItemChanged(index)
         }
     }
 
     fun markChapter(collectionIndex: Int, chapterIndex: Int, pageIndex: Int) {
         unmarkChapter()
 
-        for ((index, item) in data.withIndex()) {
-            if (item is ContentItem.Chapter && item.collectionIndex == collectionIndex && item.chapterIndex == chapterIndex)
-                data[index] = ContentItem.ChapterMarked(
-                    item.title, item.collectionIndex, item.chapterIndex, pageIndex
-                )
+        val index = list.indexOfFirst {
+            it is ContentItem.Chapter &&
+                    it.collectionIndex == collectionIndex &&
+                    it.chapterIndex == chapterIndex
         }
-
-        notifyDataSetChanged()
+        if (index != -1) {
+            val item = list[index] as ContentItem.Chapter
+            list[index] = ContentItem.ChapterMarked(
+                item.title, item.collectionIndex, item.chapterIndex, pageIndex
+            )
+            notifyItemChanged(index)
+        }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<ContentItem> {
         return when (viewType) {
             ViewType.CHAPTER.value -> ChapterViewHolder(
                 GalleryChapterBinding.inflate(LayoutInflater.from(activity), parent, false)
@@ -81,20 +88,20 @@ class ContentAdapter(
             else -> throw IllegalAccessError()
         }
     }
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (holder.itemViewType) {
-            ViewType.COLLECTION_HEADER.value ->
-                (holder as CollectionHeaderViewHolder).bind(data[position] as ContentItem.CollectionHeader)
-            ViewType.CHAPTER.value ->
-                (holder as ChapterViewHolder).bind(data[position] as ContentItem.Chapter)
-            ViewType.CHAPTER_MARKED.value ->
-                (holder as ChapterMarkedViewHolder).bind(data[position] as ContentItem.ChapterMarked)
-        }
-    }
+//
+//    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+//        when (holder.itemViewType) {
+//            ViewType.COLLECTION_HEADER.value ->
+//                (holder as CollectionHeaderViewHolder).bind(data[position] as ContentItem.CollectionHeader)
+//            ViewType.CHAPTER.value ->
+//                (holder as ChapterViewHolder).bind(data[position] as ContentItem.Chapter)
+//            ViewType.CHAPTER_MARKED.value ->
+//                (holder as ChapterMarkedViewHolder).bind(data[position] as ContentItem.ChapterMarked)
+//        }
+//    }
 
     override fun getItemViewType(position: Int): Int {
-        return when (data[position]) {
+        return when (list[position]) {
             is ContentItem.Chapter -> ViewType.CHAPTER.value
             is ContentItem.ChapterMarked -> ViewType.CHAPTER_MARKED.value
             is ContentItem.CollectionHeader -> ViewType.COLLECTION_HEADER.value
@@ -102,13 +109,14 @@ class ContentAdapter(
         }
     }
 
-    override fun getItemCount() = data.size
+    override fun getItemCount() = list.size
 
 
     inner class ChapterViewHolder(private val binding: GalleryChapterBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+        BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
 
-        fun bind(item: ContentItem.Chapter) {
+        override fun bind(item: ContentItem) {
+            val item = item as ContentItem.Chapter
             binding.button.text = item.title
             binding.button.setOnClickListener {
                 (activity as AppCompatActivity).navToReaderActivity(
@@ -123,9 +131,10 @@ class ContentAdapter(
     }
 
     inner class ChapterMarkedViewHolder(private val binding: GalleryChapterMarkedBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+        BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
 
-        fun bind(item: ContentItem.ChapterMarked) {
+        override fun bind(item: ContentItem) {
+            val item = item as ContentItem.ChapterMarked
             binding.button.text = item.title
             binding.button.setOnClickListener {
                 (activity as AppCompatActivity).navToReaderActivity(
@@ -140,13 +149,14 @@ class ContentAdapter(
     }
 
     inner class CollectionHeaderViewHolder(private val binding: GalleryCollectionTitleBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+        BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
 
-        fun bind(item: ContentItem.CollectionHeader) {
+        override fun bind(item: ContentItem) {
+            val item = item as ContentItem.CollectionHeader
             binding.title.text = item.title
         }
     }
 
     inner class NoChapterHintViewHolder(binding: GalleryNoChapterHintBinding) :
-        RecyclerView.ViewHolder(binding.root)
+        BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding)
 }

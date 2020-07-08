@@ -16,13 +16,13 @@ interface RemoteLibraryService {
     ): List<MangaOutline>
 
     @GET("library/manga/{id}")
-    suspend fun getManga(@Path("id") id: String): MangaDetail
+    suspend fun getMangaFromLibrary(@Path("id") id: String): MangaDetail
 
     @DELETE("library/manga/{id}")
-    suspend fun deleteManga(@Path("id") id: String): String
+    suspend fun deleteMangaFromLibrary(@Path("id") id: String): String
 
     @GET("library/chapter/{id}")
-    suspend fun getChapterContent(
+    suspend fun getChapterContentFromLibrary(
         @Path("id") id: String,
         @Query("collection") collection: String,
         @Query("chapter") chapter: String
@@ -56,13 +56,13 @@ interface RemoteLibraryService {
     ): List<MangaOutline>
 
     @GET("/source/{source}/manga/{id}")
-    suspend fun getMangaDetail(
+    suspend fun getMangaFromSource(
         @Path("source") source: String,
         @Path("id") id: String
     ): MangaDetail
 
     @GET("/source/{source}/chapter/{id}")
-    suspend fun getChapterContent(
+    suspend fun getChapterContentFromSource(
         @Path("source") source: String,
         @Path("id") id: String
     ): List<String>

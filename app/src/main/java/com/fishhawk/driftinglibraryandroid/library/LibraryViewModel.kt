@@ -41,7 +41,7 @@ class LibraryViewModel(
 
     fun deleteManga(id: String) {
         viewModelScope.launch {
-            when (val result = remoteLibraryRepository.deleteManga(id)) {
+            when (val result = remoteLibraryRepository.deleteMangaFromLibrary(id)) {
                 is Result.Success -> load()
                 is Result.Error -> _operationError.value = Event(result.exception)
             }

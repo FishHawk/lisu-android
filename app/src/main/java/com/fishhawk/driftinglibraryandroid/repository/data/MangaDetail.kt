@@ -24,15 +24,15 @@ data class Collection(
 
 @Parcelize
 data class MangaDetail(
-    val source: String,
+    val source: String?,
     val id: String,
     val title: String,
     var thumb: String,
-    val author: String,
-    val status: Int,
-    val update: String,
-    val description: String,
+    val status: Int?,
+    val author: String?,
+    val update: String?,
+    val description: String?,
 
-    val tags: List<TagGroup>,
+    val tags: List<TagGroup>?,
     val collections: List<Collection>
 ) : Parcelable

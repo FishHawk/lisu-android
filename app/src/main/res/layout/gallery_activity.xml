@@ -1,172 +1,300 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".gallery.GalleryActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="detail"
+            type="com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:showDividers="middle">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/backdrop"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:alpha="0.3"
-                android:scaleType="centerCrop"
-                tools:ignore="ContentDescription" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:background="@android:color/transparent"
-                android:fitsSystemWindows="true">
-
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/thumb_card"
-                    style="@style/Theme.Widget.CardView"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_margin="16dp"
-                    app:layout_constraintDimensionRatio="H,4:3"
-                    app:layout_constraintEnd_toStartOf="@id/info"
-                    app:layout_constraintStart_toStartOf="parent">
-
-                    <ImageView
-                        android:id="@+id/thumb"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:contentDescription="@null"
-                        android:scaleType="centerCrop" />
-                </androidx.cardview.widget.CardView>
-
-                <LinearLayout
-                    android:id="@+id/info"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="0dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:orientation="vertical"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/thumb_card">
-
-                    <TextView
-                        android:id="@+id/title"
-                        style="@style/Theme.TextAppearance.Title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="2"
-                        android:textIsSelectable="false" />
-
-                    <TextView
-                        android:id="@+id/author"
-                        style="@style/Theme.TextAppearance.Subtitle1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/baseline_4dp"
-                        android:ellipsize="end"
-                        android:singleLine="true"
-                        android:textIsSelectable="false" />
-
-                    <TextView
-                        android:id="@+id/update"
-                        style="@style/Theme.TextAppearance.Subtitle1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:singleLine="true"
-                        android:textIsSelectable="false" />
-
-                    <TextView
-                        android:id="@+id/status"
-                        style="@style/Theme.TextAppearance.Subtitle1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:singleLine="true"
-                        android:textIsSelectable="false" />
-
-                    <TextView
-                        android:id="@+id/source"
-                        style="@style/Theme.TextAppearance.Subtitle1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:singleLine="true"
-                        android:textIsSelectable="false" />
-                </LinearLayout>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </FrameLayout>
+        tools:context=".gallery.GalleryActivity">
 
         <LinearLayout
-            android:id="@+id/actions_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:orientation="horizontal">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/read_button"
-                style="@style/Theme.Widget.Button.Icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Resume"
-                app:icon="@drawable/ic_baseline_play_arrow_24" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/download_button"
-                style="@style/Theme.Widget.Button.Icon.Textless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                app:icon="@drawable/ic_baseline_cloud_download_24" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/subscribe_button"
-                style="@style/Theme.Widget.Button.Icon.Textless"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                app:icon="@drawable/ic_baseline_rss_feed_24" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:textIsSelectable="false" />
-
-        <LinearLayout
-            android:id="@+id/tags"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:orientation="vertical" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            app:spanCount="3" />
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+            android:orientation="vertical"
+            android:showDividers="middle">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/backdrop"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:alpha="0.3"
+                    android:scaleType="centerCrop"
+                    tools:ignore="ContentDescription" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="220dp"
+                    android:background="@android:color/transparent"
+                    android:fitsSystemWindows="true">
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/thumb_card"
+                        style="@style/Theme.Widget.CardView"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_margin="16dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintDimensionRatio="H,4:3"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <ImageView
+                            android:id="@+id/thumb"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@null"
+                            android:scaleType="centerCrop" />
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/info"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_margin="16dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/thumb_card">
+
+                        <TextView
+                            android:id="@+id/title"
+                            style="@style/Theme.TextAppearance.Title"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="2"
+                            android:text="@{detail.title}"
+                            android:textIsSelectable="false"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="Sample title" />
+
+                        <TextView
+                            android:id="@+id/author_label"
+                            style="@style/Theme.TextAppearance.Subtitle2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Author:"
+                            android:visibility="@{detail.author != null ? View.VISIBLE : View.GONE}"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/title" />
+
+                        <TextView
+                            android:id="@+id/author"
+                            style="@style/Theme.TextAppearance.Subtitle1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="4dp"
+                            android:ellipsize="end"
+                            android:singleLine="true"
+                            android:text="@{detail.author}"
+                            android:textIsSelectable="false"
+                            android:visibility="@{detail.author != null ? View.VISIBLE : View.GONE}"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/author_label"
+                            app:layout_constraintTop_toBottomOf="@+id/title"
+                            tools:text="Sample author" />
+
+                        <TextView
+                            android:id="@+id/status_label"
+                            style="@style/Theme.TextAppearance.Subtitle2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Status:"
+                            android:visibility="@{detail.status != null ? View.VISIBLE : View.GONE}"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/author_label" />
+
+                        <TextView
+                            android:id="@+id/status"
+                            style="@style/Theme.TextAppearance.Subtitle1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="4dp"
+                            android:ellipsize="end"
+                            android:singleLine="true"
+                            android:textIsSelectable="false"
+                            android:visibility="@{detail.status != null ? View.VISIBLE : View.GONE}"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/status_label"
+                            app:layout_constraintTop_toBottomOf="@+id/author_label"
+                            tools:text="Sample status" />
+
+                        <TextView
+                            android:id="@+id/update_label"
+                            style="@style/Theme.TextAppearance.Subtitle2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Update:"
+                            android:visibility="@{detail.update != null ? View.VISIBLE : View.GONE}"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/status_label" />
+
+                        <TextView
+                            android:id="@+id/update"
+                            style="@style/Theme.TextAppearance.Subtitle1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="4dp"
+                            android:ellipsize="end"
+                            android:singleLine="true"
+                            android:text="@{detail.update}"
+                            android:textIsSelectable="false"
+                            android:visibility="@{detail.update != null ? View.VISIBLE : View.GONE}"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/update_label"
+                            app:layout_constraintTop_toBottomOf="@+id/status_label"
+                            tools:text="Sample update" />
+
+                        <TextView
+                            android:id="@+id/source_label"
+                            style="@style/Theme.TextAppearance.Subtitle2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Source:"
+                            android:visibility="@{detail.source != null ? View.VISIBLE : View.GONE}"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/update_label" />
+
+                        <TextView
+                            android:id="@+id/source"
+                            style="@style/Theme.TextAppearance.Subtitle1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="4dp"
+                            android:ellipsize="end"
+                            android:singleLine="true"
+                            android:text="@{detail.source}"
+                            android:textIsSelectable="false"
+                            android:visibility="@{detail.source != null ? View.VISIBLE : View.GONE}"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/source_label"
+                            app:layout_constraintTop_toBottomOf="@+id/update_label"
+                            tools:text="Sample source" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </FrameLayout>
+
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ProgressBar
+                    android:id="@+id/loading_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="16dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/error_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
+
+                <LinearLayout
+                    android:id="@+id/content_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:id="@+id/actions_bar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/read_button"
+                            style="@style/Theme.Widget.Button.Icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Read"
+                            app:icon="@drawable/ic_baseline_play_arrow_24" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/download_button"
+                            style="@style/Theme.Widget.Button.Icon.Textless"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:visibility="@{detail.source != null ? View.VISIBLE : View.GONE}"
+                            app:icon="@drawable/ic_baseline_cloud_download_24" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/subscribe_button"
+                            style="@style/Theme.Widget.Button.Icon.Textless"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:visibility="@{detail.source != null ? View.VISIBLE : View.GONE}"
+                            app:icon="@drawable/ic_baseline_rss_feed_24" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@{detail.description}"
+                        android:textIsSelectable="false"
+                        tools:text="Sample description line 1\nSample description line 2" />
+
+                    <LinearLayout
+                        android:id="@+id/tags"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:orientation="vertical" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/chapters"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:visibility="@{detail.collections.size() != 0 ? View.VISIBLE : View.GONE}"
+                        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                        app:spanCount="3" />
+
+                    <TextView
+                        android:id="@+id/no_chapter_hint"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/gallery_no_chapters_hint"
+                        android:textColor="?attr/colorSecondary"
+                        android:visibility="@{detail.collections.size() == 0 ? View.VISIBLE : View.GONE}" />
+                </LinearLayout>
+            </FrameLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</layout>

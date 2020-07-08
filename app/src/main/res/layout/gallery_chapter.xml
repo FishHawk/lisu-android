@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.button.MaterialButton xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/button"
-    style="@style/Theme.Widget.Button.OutlinedButton"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:ellipsize="end"
-    android:singleLine="true" />
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button"
+        style="@style/Theme.Widget.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:singleLine="true" />
+</layout>

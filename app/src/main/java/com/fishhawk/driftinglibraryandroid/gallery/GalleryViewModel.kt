@@ -8,7 +8,6 @@ import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.util.Event
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class GalleryViewModel(
@@ -17,37 +16,38 @@ class GalleryViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModel() {
-    val mangaDetail: LiveData<Result<MangaDetail>> = liveData {
+    val detail: LiveData<Result<MangaDetail>> = liveData {
         emit(Result.Loading)
-        emit(remoteLibraryRepository.getManga(id, source))
+        if (source == null) emit(remoteLibraryRepository.getMangaFromLibrary(id))
+        else emit(remoteLibraryRepository.getMangaFromSource(source, id))
     }
 
-    val readingHistory: LiveData<ReadingHistory> = mangaDetail.switchMap {
+    val readingHistory: LiveData<ReadingHistory> = detail.switchMap {
         if (it is Result.Success) readingHistoryRepository.observeReadingHistory(it.data.id)
         else MutableLiveData()
     }
 
-    private val _downloadRequestFinish: MutableLiveData<Event<Throwable?>> = MutableLiveData()
-    val downloadRequestFinish: LiveData<Event<Throwable?>> = _downloadRequestFinish
+    private val _operationError: MutableLiveData<Event<Throwable?>> = MutableLiveData()
+    val operationError: LiveData<Event<Throwable?>> = _operationError
 
     fun download() {
-        val id = (mangaDetail.value as Result.Success).data.id
-        val title = (mangaDetail.value as Result.Success).data.title
-        GlobalScope.launch(Dispatchers.Main) {
+        val id = (detail.value as Result.Success).data.id
+        val title = (detail.value as Result.Success).data.title
+        viewModelScope.launch(Dispatchers.Main) {
             when (val result = remoteLibraryRepository.postDownloadTask(source!!, id, title)) {
-                is Result.Success -> _downloadRequestFinish.value = Event(null)
-                is Result.Error -> _downloadRequestFinish.value = Event(result.exception)
+                is Result.Success -> _operationError.value = Event(null)
+                is Result.Error -> _operationError.value = Event(result.exception)
             }
         }
     }
 
     fun subscribe() {
-        val id = (mangaDetail.value as Result.Success).data.id
-        val title = (mangaDetail.value as Result.Success).data.title
-        GlobalScope.launch(Dispatchers.Main) {
+        val id = (detail.value as Result.Success).data.id
+        val title = (detail.value as Result.Success).data.title
+        viewModelScope.launch(Dispatchers.Main) {
             when (val result = remoteLibraryRepository.postSubscription(source!!, id, title)) {
-                is Result.Success -> _downloadRequestFinish.value = Event(null)
-                is Result.Error -> _downloadRequestFinish.value = Event(result.exception)
+                is Result.Success -> _operationError.value = Event(null)
+                is Result.Error -> _operationError.value = Event(result.exception)
             }
         }
     }
