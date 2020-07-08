@@ -1,4 +1,23 @@
 <resources>
+    <!--===========-->
+    <!--AlertDialog-->
+    <!--===========-->
+
+    <style name="Theme.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="buttonBarPositiveButtonStyle">@style/Theme.Widget.Button.TextButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Theme.Widget.Button.TextButton</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Theme.Widget.Button.TextButton</item>
+    </style>
+
+    <style name="Theme.AlertDialog.Light" parent="Theme.AlertDialog">
+        <item name="colorAccent">@color/colorAccentLight</item>
+    </style>
+
+    <style name="Theme.AlertDialog.Dark" parent="Theme.AlertDialog">
+        <item name="colorAccent">@color/colorAccentDark</item>
+    </style>
+
+
     <!--===============-->
     <!--Text Appearance-->
     <!--===============-->
@@ -64,7 +83,6 @@
     </style>
 
     <style name="Theme.Widget.Button.OutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:layout_marginStart">4dp</item>
         <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="rippleColor">?attr/colorOnPrimary</item>
     </style>

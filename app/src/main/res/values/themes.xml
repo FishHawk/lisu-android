@@ -35,14 +35,15 @@
         <item name="android:textColorHintInverse">@color/textColorHintDark</item>
         <item name="rippleColor">@color/rippleColorLight</item>
 
+        <item name="dialogTheme">@style/Theme.AlertDialog.Light</item>
+        <item name="alertDialogTheme">@style/Theme.AlertDialog.Light</item>
+
         <!-- Themes -->
         <!--        <item name="windowActionModeOverlay">true</item>-->
         <!--        <item name="elevationOverlayEnabled">false</item>-->
         <!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>-->
         <!--        <item name="toolbarNavigationButtonStyle">@style/Theme.Toolbar.Navigation</item>-->
         <!--        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
-        <!--        <item name="dialogTheme">@style/Theme.AlertDialog.Light</item>-->
-        <!--        <item name="alertDialogTheme">@style/Theme.AlertDialog.Dark</item>-->
         <!--        <item name="chipStyle">@style/Theme.Widget.Chip</item>-->
         <!--        <item name="buttonStyle">@style/Theme.Widget.Button</item>-->
         <!--        <item name="snackbarStyle">@style/Theme.Widget.Snackbar</item>-->
@@ -91,6 +92,9 @@
         <item name="android:textColorHintInverse">@color/textColorHintLight</item>
         <item name="rippleColor">@color/rippleColorDark</item>
 
+        <item name="dialogTheme">@style/Theme.AlertDialog.Dark</item>
+        <item name="alertDialogTheme">@style/Theme.AlertDialog.Dark</item>
+
         <!-- Themes -->
         <item name="android:navigationBarColor">?attr/colorPrimary</item>
         <!--        <item name="windowActionModeOverlay">true</item>-->
@@ -99,8 +103,6 @@
         <!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>-->
         <!--        <item name="toolbarNavigationButtonStyle">@style/Theme.Toolbar.Navigation</item>-->
         <!--        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
-        <!--        <item name="dialogTheme">@style/Theme.AlertDialog.Dark</item>-->
-        <!--        <item name="alertDialogTheme">@style/Theme.AlertDialog.Dark</item>-->
         <!--        <item name="chipStyle">@style/Theme.Widget.Chip</item>-->
         <!--        <item name="buttonStyle">@style/Theme.Widget.Button</item>-->
         <!--        <item name="snackbarStyle">@style/Theme.Widget.Snackbar</item>-->
