@@ -32,6 +32,11 @@
     <!-- gallery fragment -->
     <string name="gallery_no_tags_hint">No tags</string>
     <string name="gallery_no_chapters_hint">No chapters</string>
+    <string name="gallery_author_label">Author:</string>
+    <string name="gallery_status_label">Status:</string>
+    <string name="gallery_update_label">Update:</string>
+    <string name="gallery_source_label">Source:</string>
+    <string name="gallery_read_button_hint">Read</string>
 
     <!-- reader fragment -->
     <string name="reader_no_prev_chapter_hint">Already at the beginning.</string>

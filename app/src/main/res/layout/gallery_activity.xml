@@ -88,7 +88,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="Author:"
+                            android:text="@string/gallery_author_label"
                             android:visibility="@{detail.author != null ? View.VISIBLE : View.GONE}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/title" />
@@ -116,7 +116,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="Status:"
+                            android:text="@string/gallery_status_label"
                             android:visibility="@{detail.status != null ? View.VISIBLE : View.GONE}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/author_label" />
@@ -143,7 +143,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="Update:"
+                            android:text="@string/gallery_update_label"
                             android:visibility="@{detail.update != null ? View.VISIBLE : View.GONE}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/status_label" />
@@ -171,7 +171,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="Source:"
+                            android:text="@string/gallery_source_label"
                             android:visibility="@{detail.source != null ? View.VISIBLE : View.GONE}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/update_label" />
@@ -238,7 +238,7 @@
                             style="@style/Theme.Widget.Button.Icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Read"
+                            android:text="@string/gallery_read_button_hint"
                             app:icon="@drawable/ic_baseline_play_arrow_24" />
 
                         <com.google.android.material.button.MaterialButton
