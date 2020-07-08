@@ -20,10 +20,10 @@ class RemoteLibraryRepository(
         }
     }
 
-    suspend fun getMangaDetail(id: String, source: String? = null): Result<MangaDetail> {
+    suspend fun getManga(id: String, source: String? = null): Result<MangaDetail> {
         return try {
             if (source == null) {
-                service.getMangaDetail(id).let {
+                service.getManga(id).let {
                     it.thumb = "${url}library/image/${it.id}/${it.thumb}"
                     Result.Success(it)
                 }
@@ -35,6 +35,10 @@ class RemoteLibraryRepository(
         } catch (he: Throwable) {
             Result.Error(he)
         }
+    }
+
+    suspend fun deleteManga(id: String): Result<String> = resultWrap {
+        service.deleteManga(id)
     }
 
     suspend fun getChapterContent(

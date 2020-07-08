@@ -16,7 +16,10 @@ interface RemoteLibraryService {
     ): List<MangaOutline>
 
     @GET("library/manga/{id}")
-    suspend fun getMangaDetail(@Path("id") id: String): MangaDetail
+    suspend fun getManga(@Path("id") id: String): MangaDetail
+
+    @DELETE("library/manga/{id}")
+    suspend fun deleteManga(@Path("id") id: String): String
 
     @GET("library/chapter/{id}")
     suspend fun getChapterContent(

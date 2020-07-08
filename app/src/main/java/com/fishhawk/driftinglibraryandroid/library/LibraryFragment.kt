@@ -2,6 +2,7 @@ package com.fishhawk.driftinglibraryandroid.library
 
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -42,6 +43,14 @@ class LibraryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = MangaListAdapter(requireActivity(), null)
+        adapter.onCardLongClicked = { id ->
+            println(id)
+            AlertDialog.Builder(requireActivity())
+                .setTitle("Confirm to delete manga?")
+                .setPositiveButton("OK") { _, _ -> viewModel.deleteManga(id) }
+                .setNegativeButton("cancel") { _, _ -> }
+                .show()
+        }
         binding.mangaList.list.adapter = adapter
 
         SettingsHelper.displayMode.observe(viewLifecycleOwner, Observer {

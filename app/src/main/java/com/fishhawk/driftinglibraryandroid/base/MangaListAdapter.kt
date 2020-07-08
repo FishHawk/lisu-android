@@ -2,19 +2,15 @@ package com.fishhawk.driftinglibraryandroid.base
 
 import android.app.Activity
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
-import com.fishhawk.driftinglibraryandroid.databinding.DownloadTaskCardBinding
 import com.fishhawk.driftinglibraryandroid.databinding.MangaGridThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.databinding.MangaLinearThumbnailBinding
-import com.fishhawk.driftinglibraryandroid.repository.data.DownloadTask
-import com.fishhawk.driftinglibraryandroid.repository.data.DownloadTaskStatus
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
+import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
 
 
@@ -24,6 +20,8 @@ class MangaListAdapter(
 ) : BaseRecyclerViewAdapter<MangaOutline, BaseRecyclerViewAdapter.ViewHolder<MangaOutline>>(
     mutableListOf()
 ) {
+    var onCardLongClicked: (String) -> Unit = {}
+
     enum class ViewType(val value: Int) {
         GRID(0),
         LINEAR(1)
@@ -75,6 +73,10 @@ class MangaListAdapter(
                     item.id, item.title, item.thumb, source
                 )
             }
+            binding.root.setOnLongClickListener {
+                onCardLongClicked(item.id)
+                true
+            }
         }
     }
 
@@ -92,6 +94,10 @@ class MangaListAdapter(
                 (activity as AppCompatActivity).navToGalleryActivity(
                     item.id, item.title, item.thumb, source
                 )
+            }
+            binding.root.setOnLongClickListener {
+                onCardLongClicked(item.id)
+                true
             }
         }
     }

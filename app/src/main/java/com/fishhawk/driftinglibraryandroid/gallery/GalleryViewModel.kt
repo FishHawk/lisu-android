@@ -19,7 +19,7 @@ class GalleryViewModel(
 ) : ViewModel() {
     val mangaDetail: LiveData<Result<MangaDetail>> = liveData {
         emit(Result.Loading)
-        emit(remoteLibraryRepository.getMangaDetail(id, source))
+        emit(remoteLibraryRepository.getManga(id, source))
     }
 
     val readingHistory: LiveData<ReadingHistory> = mangaDetail.switchMap {
