@@ -31,23 +31,27 @@ class GalleryViewModel(
     val operationError: LiveData<Event<Throwable?>> = _operationError
 
     fun download() {
-        val id = (detail.value as Result.Success).data.id
-        val title = (detail.value as Result.Success).data.title
-        viewModelScope.launch(Dispatchers.Main) {
-            when (val result = remoteLibraryRepository.postDownloadTask(source!!, id, title)) {
-                is Result.Success -> _operationError.value = Event(null)
-                is Result.Error -> _operationError.value = Event(result.exception)
+        (detail.value as? Result.Success)?.let {
+            val id = it.data.id
+            val title = it.data.title
+            viewModelScope.launch(Dispatchers.Main) {
+                when (val result = remoteLibraryRepository.postDownloadTask(source!!, id, title)) {
+                    is Result.Success -> _operationError.value = Event(null)
+                    is Result.Error -> _operationError.value = Event(result.exception)
+                }
             }
         }
     }
 
     fun subscribe() {
-        val id = (detail.value as Result.Success).data.id
-        val title = (detail.value as Result.Success).data.title
-        viewModelScope.launch(Dispatchers.Main) {
-            when (val result = remoteLibraryRepository.postSubscription(source!!, id, title)) {
-                is Result.Success -> _operationError.value = Event(null)
-                is Result.Error -> _operationError.value = Event(result.exception)
+        (detail.value as? Result.Success)?.let {
+            val id = it.data.id
+            val title = it.data.title
+            viewModelScope.launch(Dispatchers.Main) {
+                when (val result = remoteLibraryRepository.postSubscription(source!!, id, title)) {
+                    is Result.Success -> _operationError.value = Event(null)
+                    is Result.Error -> _operationError.value = Event(result.exception)
+                }
             }
         }
     }

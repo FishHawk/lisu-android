@@ -159,12 +159,8 @@ class GalleryActivity : AppCompatActivity() {
                 } ?: navToReaderActivity(detail.id, detail.source)
             }
         }
-        binding.subscribeButton.setOnClickListener {
-            (viewModel.detail.value as? Result.Success)?.let { viewModel.subscribe() }
-        }
-        binding.downloadButton.setOnClickListener {
-            (viewModel.detail.value as? Result.Success)?.let { viewModel.download() }
-        }
+        binding.subscribeButton.setOnClickListener { viewModel.subscribe() }
+        binding.downloadButton.setOnClickListener { viewModel.download() }
     }
 
     private fun bindContent(adapter: ContentAdapter, collections: List<Collection>) {
