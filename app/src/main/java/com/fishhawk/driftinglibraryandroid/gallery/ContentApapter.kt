@@ -46,7 +46,7 @@ class ContentAdapter(
     fun unmarkChapter() {
         val index = list.indexOfFirst { it is ContentItem.ChapterMarked }
         if (index != -1) {
-            val item = list[index] as ContentItem.Chapter
+            val item = list[index] as ContentItem.ChapterMarked
             list[index] = ContentItem.Chapter(
                 item.title, item.collectionIndex, item.chapterIndex
             )
