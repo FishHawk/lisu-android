@@ -4,6 +4,7 @@
     <!--===========-->
 
     <style name="Theme.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="android:background">?attr/colorPrimary</item>
         <item name="buttonBarPositiveButtonStyle">@style/Theme.Widget.Button.TextButton</item>
         <item name="buttonBarNegativeButtonStyle">@style/Theme.Widget.Button.TextButton</item>
         <item name="buttonBarNeutralButtonStyle">@style/Theme.Widget.Button.TextButton</item>
