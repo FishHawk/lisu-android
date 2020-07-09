@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/library"
+    app:startDestination="@+id/nav_library">
+
+    <fragment
+        android:id="@+id/nav_library"
+        android:name="com.fishhawk.driftinglibraryandroid.library.LibraryFragment"
+        android:label="@string/label_library"
+        tools:layout="@layout/library_fragment" />
+</navigation>

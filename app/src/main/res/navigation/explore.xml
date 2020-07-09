@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/explore"
+    app:startDestination="@+id/nav_explore">
+
+    <fragment
+        android:id="@+id/nav_explore"
+        android:name="com.fishhawk.driftinglibraryandroid.explore.ExploreFragment"
+        android:label="@string/label_explore"
+        tools:layout="@layout/explore_fragment">
+        <action
+            android:id="@+id/action_explore_to_global_search"
+            app:destination="@id/nav_global_search" />
+        <action
+            android:id="@+id/action_explore_to_popular"
+            app:destination="@id/nav_popular" />
+        <action
+            android:id="@+id/action_explore_to_latest"
+            app:destination="@id/nav_latest" />
+        <action
+            android:id="@+id/action_explore_to_search"
+            app:destination="@id/nav_search" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_global_search"
+        android:name="com.fishhawk.driftinglibraryandroid.explore.GlobalSearchFragment"
+        android:label="@string/label_global_search"
+        tools:layout="@layout/global_search_fragment" />
+
+    <fragment
+        android:id="@+id/nav_popular"
+        android:name="com.fishhawk.driftinglibraryandroid.explore.PopularFragment"
+        android:label="@string/label_popular"
+        tools:layout="@layout/explore_popular_fragment">
+        <action
+            android:id="@+id/action_popular_to_search"
+            app:destination="@id/nav_search" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_latest"
+        android:name="com.fishhawk.driftinglibraryandroid.explore.LatestFragment"
+        android:label="@string/label_latest"
+        tools:layout="@layout/explore_latest_fragment">
+        <action
+            android:id="@+id/action_latest_to_search"
+            app:destination="@id/nav_search" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_search"
+        android:name="com.fishhawk.driftinglibraryandroid.explore.SearchFragment"
+        android:label="@string/label_search"
+        tools:layout="@layout/explore_search_fragment" />
+</navigation>

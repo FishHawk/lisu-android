@@ -2,18 +2,18 @@ package com.fishhawk.driftinglibraryandroid
 
 import android.os.Bundle
 import android.view.View
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupWithNavController
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.ui.NavigationUI
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.navigation.NavController
+import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityMainBinding
 import com.fishhawk.driftinglibraryandroid.util.setupTheme
+import com.fishhawk.driftinglibraryandroid.util.setupWithNavControllerT
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private var currentNavController: LiveData<NavController>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,29 +22,38 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
+        if (savedInstanceState == null) setupBottomNavigationBar()
+    }
 
-        val navController = findNavController(R.id.nav_host_fragment)
-        navController.setGraph(R.navigation.mobile_navigation, intent.extras)
-        binding.navView.setupWithNavController(navController)
-        val mainFragmentSet = setOf(
-            R.id.nav_library,
-            R.id.nav_history,
-            R.id.nav_explore,
-            R.id.nav_more
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        setupBottomNavigationBar()
+    }
+
+    private fun setupBottomNavigationBar() {
+        val bottomNavigationView = binding.navView
+
+        val navGraphIds = listOf(
+            R.navigation.library,
+            R.navigation.history,
+            R.navigation.explore,
+            R.navigation.more
         )
-        val appBarConfiguration = AppBarConfiguration(mainFragmentSet)
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
 
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            when (destination.id) {
-                in mainFragmentSet -> binding.navView.visibility = View.VISIBLE
-                else -> binding.navView.visibility = View.GONE
-            }
-        }
+        val controller = bottomNavigationView.setupWithNavControllerT(
+            navGraphIds = navGraphIds,
+            fragmentManager = supportFragmentManager,
+            containerId = R.id.nav_host_container,
+            intent = intent
+        )
+
+        controller.observe(this, Observer { navController ->
+            setupActionBarWithNavController(this, navController)
+        })
+        currentNavController = controller
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment)
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+        return currentNavController?.value?.navigateUp() ?: false
     }
 }

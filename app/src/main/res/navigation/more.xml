@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/more"
+    app:startDestination="@+id/nav_more">
+
+    <fragment
+        android:id="@+id/nav_more"
+        android:name="com.fishhawk.driftinglibraryandroid.more.MoreFragment"
+        android:label="@string/label_more">
+        <action
+            android:id="@+id/action_more_to_download"
+            app:destination="@id/nav_download" />
+        <action
+            android:id="@+id/action_more_to_subscription"
+            app:destination="@id/nav_subscription" />
+        <action
+            android:id="@+id/action_more_to_settings"
+            app:destination="@id/nav_settings" />
+        <action
+            android:id="@+id/action_more_to_about"
+            app:destination="@id/nav_about" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_download"
+        android:name="com.fishhawk.driftinglibraryandroid.more.DownloadFragment"
+        android:label="@string/label_download"
+        tools:layout="@layout/download_fragment" />
+
+    <fragment
+        android:id="@+id/nav_subscription"
+        android:name="com.fishhawk.driftinglibraryandroid.more.SubscriptionFragment"
+        android:label="@string/label_subscription"
+        tools:layout="@layout/subscription_fragment" />
+
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.fishhawk.driftinglibraryandroid.more.SettingsFragment"
+        android:label="@string/label_settings" />
+
+    <fragment
+        android:id="@+id/nav_about"
+        android:name="com.fishhawk.driftinglibraryandroid.more.AboutFragment"
+        android:label="@string/label_about" />
+</navigation>
