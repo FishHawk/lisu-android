@@ -2,10 +2,14 @@ package com.fishhawk.driftinglibraryandroid.util
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.classic.common.MultipleStatusView
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.base.*
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.hippo.refreshlayout.RefreshLayout
 
 
@@ -51,4 +55,21 @@ fun <T> Fragment.bindToListViewModel(
     })
 
     refreshLayout.bindingToViewModel(viewModel)
+}
+
+fun RecyclerView.changeMangaListDisplayMode(adapter: MangaListAdapter) {
+    val displayMode = SettingsHelper.displayMode.getValueDirectly()
+    if (displayMode == SettingsHelper.DISPLAY_MODE_GRID &&
+        layoutManager !is GridLayoutManager
+    ) {
+        adapter.setDisplayModeGrid()
+        layoutManager = GridLayoutManager(context, 3)
+        this.adapter = adapter
+    } else if (displayMode == SettingsHelper.DISPLAY_MODE_LINEAR &&
+        layoutManager !is LinearLayoutManager
+    ) {
+        adapter.setDisplayModeLinear()
+        layoutManager = LinearLayoutManager(context)
+        this.adapter = adapter
+    }
 }

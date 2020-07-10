@@ -8,14 +8,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.ExplorePopularFragmentBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.util.bindToListViewModel
+import com.fishhawk.driftinglibraryandroid.util.changeMangaListDisplayMode
 
 class PopularFragment : Fragment() {
     private val viewModel: PopularViewModel by viewModels {
@@ -48,19 +47,7 @@ class PopularFragment : Fragment() {
         binding.mangaList.list.adapter = adapter
 
         SettingsHelper.displayMode.observe(viewLifecycleOwner, Observer {
-            binding.mangaList.list.apply {
-                when (SettingsHelper.displayMode.getValueDirectly()) {
-                    SettingsHelper.DISPLAY_MODE_GRID -> {
-                        adapter.setDisplayModeGrid()
-                        layoutManager = GridLayoutManager(context, 3)
-                    }
-                    SettingsHelper.DISPLAY_MODE_LINEAR -> {
-                        adapter.setDisplayModeLinear()
-                        layoutManager = LinearLayoutManager(context)
-                    }
-                }
-                this.adapter = adapter
-            }
+            binding.mangaList.list.changeMangaListDisplayMode(adapter)
         })
 
         bindToListViewModel(
