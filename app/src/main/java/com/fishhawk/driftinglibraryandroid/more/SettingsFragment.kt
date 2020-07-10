@@ -1,34 +1,40 @@
 package com.fishhawk.driftinglibraryandroid.more
 
 import android.os.Bundle
+import androidx.navigation.fragment.findNavController
 import androidx.preference.EditTextPreference
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.bumptech.glide.Glide
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.util.makeSnackBar
 import com.google.android.material.snackbar.Snackbar
 
 class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val libraryAddressPreference: EditTextPreference = findPreference("library_address")!!
-        libraryAddressPreference.summary = libraryAddressPreference.text
-        libraryAddressPreference.setOnPreferenceChangeListener { preference, newValue ->
-            val address = newValue as String
-            val application = requireContext().applicationContext as MainApplication
-            if (application.setLibraryAddress(address)) {
-                val textPreference = preference as EditTextPreference
-                textPreference.summary = newValue
-                true
-            } else {
-                view?.let {
-                    Snackbar.make(
-                        it,
-                        getString(R.string.settings_library_address_error_hint),
-                        Snackbar.LENGTH_LONG
-                    ).show()
+        findPreference<EditTextPreference>("library_address")!!.apply {
+            summary = text
+            setOnPreferenceChangeListener { preference, newValue ->
+                val address = newValue as String
+                val application = requireContext().applicationContext as MainApplication
+                if (application.setLibraryAddress(address)) {
+                    val textPreference = preference as EditTextPreference
+                    textPreference.summary = newValue
+                    true
+                } else {
+                    view?.makeSnackBar(getString(R.string.settings_library_address_error_hint))
+                    false
                 }
-                false
+            }
+        }
+
+        findPreference<Preference>("clear_image_cache")!!.apply {
+            setOnPreferenceClickListener {
+                Glide.get(context).clearMemory()
+                true
             }
         }
     }

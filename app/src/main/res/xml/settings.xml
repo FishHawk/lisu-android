@@ -36,4 +36,9 @@
         app:key="history_filter"
         app:summary="%s"
         app:title="@string/settings_history_filter" />
+
+    <Preference
+        app:key="clear_image_cache"
+        app:summary="Clear thumb and chapter image cache"
+        app:title="Clear image cache" />
 </PreferenceScreen>
