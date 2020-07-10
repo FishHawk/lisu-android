@@ -43,7 +43,6 @@ class LibraryFragment : Fragment() {
 
         val adapter = MangaListAdapter(requireActivity(), null)
         adapter.onCardLongClicked = { id ->
-            println(id)
             AlertDialog.Builder(requireActivity())
                 .setTitle("Confirm to delete manga?")
                 .setPositiveButton("OK") { _, _ -> viewModel.deleteManga(id) }

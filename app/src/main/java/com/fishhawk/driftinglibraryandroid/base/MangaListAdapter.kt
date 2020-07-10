@@ -27,15 +27,7 @@ class MangaListAdapter(
         LINEAR(1)
     }
 
-    private var viewType = ViewType.GRID
-
-    fun setDisplayModeGrid() {
-        viewType = ViewType.GRID
-    }
-
-    fun setDisplayModeLinear() {
-        viewType = ViewType.LINEAR
-    }
+    var viewType = ViewType.GRID
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<MangaOutline> {
         return when (this.viewType) {
