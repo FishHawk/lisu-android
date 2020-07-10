@@ -100,6 +100,8 @@ class GalleryActivity : AppCompatActivity() {
                         else -> "Unknown"
                     }
 
+                    binding.author.text = detail.author?.joinToString(separator = ";")
+
                     if (detail.description == null || detail.description.isBlank())
                         binding.description.visibility = View.GONE
 

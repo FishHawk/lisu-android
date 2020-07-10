@@ -89,7 +89,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="@string/gallery_author_label"
-                            android:visibility="@{detail.author != null ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{(detail.author != null &amp;&amp; detail.author.size() > 0) ? View.VISIBLE : View.GONE}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/title" />
 
@@ -102,9 +102,8 @@
                             android:layout_marginTop="4dp"
                             android:ellipsize="end"
                             android:singleLine="true"
-                            android:text="@{detail.author}"
                             android:textIsSelectable="false"
-                            android:visibility="@{detail.author != null ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{(detail.author != null &amp;&amp; detail.author.size() > 0) ? View.VISIBLE : View.GONE}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/author_label"
                             app:layout_constraintTop_toBottomOf="@+id/title"
