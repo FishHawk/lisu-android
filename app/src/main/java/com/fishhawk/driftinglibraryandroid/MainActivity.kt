@@ -44,7 +44,8 @@ class MainActivity : AppCompatActivity() {
             navGraphIds = navGraphIds,
             fragmentManager = supportFragmentManager,
             containerId = R.id.nav_host_container,
-            intent = intent
+            intent = intent,
+            appBarLayout = binding.appBarLayout
         )
 
         controller.observe(this, Observer { navController ->

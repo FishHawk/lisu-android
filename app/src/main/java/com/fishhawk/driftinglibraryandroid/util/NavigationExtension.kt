@@ -12,6 +12,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.fishhawk.driftinglibraryandroid.R
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 /**
@@ -23,7 +24,8 @@ fun BottomNavigationView.setupWithNavControllerT(
     navGraphIds: List<Int>,
     fragmentManager: FragmentManager,
     containerId: Int,
-    intent: Intent
+    intent: Intent,
+    appBarLayout: AppBarLayout
 ): LiveData<NavController> {
 
     // Map of tags
@@ -58,6 +60,7 @@ fun BottomNavigationView.setupWithNavControllerT(
 
         // Hide bottom navigation when destination is not start destination
         navHostFragment.navController.addOnDestinationChangedListener { _, destination, _ ->
+            appBarLayout.setExpanded(true, true)
             if (destination.id == navHostFragment.navController.graph.startDestination)
                 this.visibility = View.VISIBLE
             else
@@ -80,6 +83,7 @@ fun BottomNavigationView.setupWithNavControllerT(
 
     // When a navigation item is selected
     setOnNavigationItemSelectedListener { item ->
+        appBarLayout.setExpanded(true, true)
         // Don't do anything if the state is state has already been saved.
         if (fragmentManager.isStateSaved) {
             false
