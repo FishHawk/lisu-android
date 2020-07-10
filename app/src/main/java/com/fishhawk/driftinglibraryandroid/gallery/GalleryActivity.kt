@@ -14,10 +14,8 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryActivityBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.repository.data.*
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
-import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
 import com.fishhawk.driftinglibraryandroid.util.*
 import com.google.android.flexbox.FlexboxLayout
 
@@ -95,9 +93,10 @@ class GalleryActivity : AppCompatActivity() {
                     binding.detail = detail
 
                     binding.status.text = when (detail.status) {
-                        0 -> "Completed"
-                        1 -> "Ongoing"
-                        else -> "Unknown"
+                        MangaStatus.COMPLETED -> "Completed"
+                        MangaStatus.ONGOING -> "Ongoing"
+                        MangaStatus.UNKNOWN -> "Unknown"
+                        else -> ""
                     }
 
                     binding.author.text = detail.author?.joinToString(separator = ";")

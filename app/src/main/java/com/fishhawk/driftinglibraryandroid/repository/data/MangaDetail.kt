@@ -28,7 +28,7 @@ data class MangaDetail(
     val id: String,
     val title: String,
     var thumb: String,
-    val status: Int?,
+    val status: MangaStatus?,
     val author: List<String>?,
     val update: String?,
     val description: String?,
