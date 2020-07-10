@@ -1,23 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.classic.common.MultipleStatusView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/multiple_status_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:errorView="@layout/status_error"
+    app:loadingView="@layout/status_loading"
     tools:context=".explore.ExploreFragment">
 
-    <com.classic.common.MultipleStatusView
-        android:id="@+id/multiple_status_view"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:errorView="@layout/status_error"
-        app:loadingView="@layout/status_loading">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/explore_source_card" />
-    </com.classic.common.MultipleStatusView>
-</FrameLayout>
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/explore_source_card" />
+</com.classic.common.MultipleStatusView>
