@@ -26,7 +26,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:contentDescription="@null"
-                android:scaleType="fitCenter"
+                android:scaleType="centerCrop"
                 app:layout_constraintDimensionRatio="H,4:3"
                 app:layout_constraintStart_toStartOf="parent" />
 
