@@ -116,14 +116,14 @@ class ContentAdapter(
         BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
 
         override fun bind(item: ContentItem) {
-            val item = item as ContentItem.Chapter
-            binding.button.text = item.title
+            val newItem = item as ContentItem.Chapter
+            binding.button.text = newItem.title
             binding.button.setOnClickListener {
                 (activity as AppCompatActivity).navToReaderActivity(
                     id,
                     source,
-                    item.collectionIndex,
-                    item.chapterIndex,
+                    newItem.collectionIndex,
+                    newItem.chapterIndex,
                     0
                 )
             }
@@ -134,15 +134,15 @@ class ContentAdapter(
         BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
 
         override fun bind(item: ContentItem) {
-            val item = item as ContentItem.ChapterMarked
-            binding.button.text = item.title
+            val newItem = item as ContentItem.ChapterMarked
+            binding.button.text = newItem.title
             binding.button.setOnClickListener {
                 (activity as AppCompatActivity).navToReaderActivity(
                     id,
                     source,
-                    item.collectionIndex,
-                    item.chapterIndex,
-                    item.pageIndex
+                    newItem.collectionIndex,
+                    newItem.chapterIndex,
+                    newItem.pageIndex
                 )
             }
         }
@@ -152,8 +152,8 @@ class ContentAdapter(
         BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
 
         override fun bind(item: ContentItem) {
-            val item = item as ContentItem.CollectionHeader
-            binding.title.text = item.title
+            val newItem = item as ContentItem.CollectionHeader
+            binding.title.text = newItem.title
         }
     }
 
