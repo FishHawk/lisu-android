@@ -1,7 +1,20 @@
 <resources>
+    <!--=======================-->
+    <!--Widgets.TextInputLayout-->
+    <!--=======================-->
 
-    <style name="Theme.TextInputLayout.OutlineBox" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+    <style name="Theme.TextInputLayout.FilledBox" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.TextInputEditText.FilledBox</item>
+        <item name="boxBackgroundColor">@android:color/transparent</item>
+        <item name="boxStrokeColor">?attr/colorSecondary</item>
+        <item name="hintTextColor">?attr/colorSecondary</item>
     </style>
+
+    <style name="ThemeOverlay.TextInputEditText.FilledBox" parent="ThemeOverlay.MaterialComponents.TextInputEditText.FilledBox">
+        <item name="colorControlActivated">?attr/colorSecondary</item>
+    </style>
+
+
     <!--===========-->
     <!--AlertDialog-->
     <!--===========-->

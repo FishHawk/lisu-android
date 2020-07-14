@@ -7,10 +7,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
-import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.ServerAddDialogBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ServerFragmentBinding
-import com.fishhawk.driftinglibraryandroid.history.HistoryListAdapter
+import com.fishhawk.driftinglibraryandroid.databinding.ServerInfoDialogBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 
@@ -42,7 +40,7 @@ class ServerFragment : Fragment() {
         val adapter = ServerInfoListAdapter(requireActivity())
         adapter.onEdit = {
             val dialogBinding =
-                ServerAddDialogBinding.inflate(LayoutInflater.from(context), null, false)
+                ServerInfoDialogBinding.inflate(LayoutInflater.from(context), null, false)
             dialogBinding.name.setText(it.name)
             dialogBinding.address.setText(it.address)
             AlertDialog.Builder(requireActivity())
@@ -73,7 +71,7 @@ class ServerFragment : Fragment() {
 
         binding.addButton.setOnClickListener {
             val dialogBinding =
-                ServerAddDialogBinding.inflate(LayoutInflater.from(context), null, false)
+                ServerInfoDialogBinding.inflate(LayoutInflater.from(context), null, false)
             AlertDialog.Builder(requireActivity())
                 .setTitle("Add server")
                 .setView(dialogBinding.root)
