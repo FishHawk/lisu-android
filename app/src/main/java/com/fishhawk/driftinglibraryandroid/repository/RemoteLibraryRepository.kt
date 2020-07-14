@@ -3,203 +3,129 @@ package com.fishhawk.driftinglibraryandroid.repository
 import com.fishhawk.driftinglibraryandroid.repository.data.*
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryService
 
-class RemoteLibraryRepository(
-    var url: String,
-    var service: RemoteLibraryService
-) {
-    suspend fun searchInLibrary(lastId: String, filter: String): Result<List<MangaOutline>> {
-        return try {
-            service.searchInLibrary(lastId, filter).let {
-                for (s in it) {
-                    s.thumb = "${url}library/image/${s.id}/${s.thumb}"
-                }
-                Result.Success(it)
+class RemoteLibraryRepository {
+    var url: String? = null
+    var service: RemoteLibraryService? = null
+
+    private inline fun <T> resultWrap(func: (RemoteLibraryService) -> T): Result<T> {
+        return service?.let {
+            try {
+                Result.Success(func(service!!))
+            } catch (e: Exception) {
+                Result.Error(e)
             }
-        } catch (he: Throwable) {
-            Result.Error(he)
-        }
+        } ?: Result.Error(IllegalAccessError())
     }
 
-    suspend fun getManga(id: String, source: String? = null): Result<MangaDetail> {
-        return try {
-            if (source == null) {
-                service.getMangaFromLibrary(id).let {
-                    it.thumb = "${url}library/image/${it.id}/${it.thumb}"
-                    Result.Success(it)
-                }
-            } else {
-                service.getMangaFromSource(source, id).let {
-                    Result.Success(it)
+    suspend fun searchInLibrary(lastId: String, filter: String): Result<List<MangaOutline>> =
+        resultWrap {
+            it.searchInLibrary(lastId, filter).apply {
+                for (outline in this) {
+                    outline.thumb = "${url}library/image/${outline.id}/${outline.thumb}"
                 }
             }
-        } catch (he: Throwable) {
-            Result.Error(he)
         }
-    }
 
-    suspend fun getMangaFromLibrary(id: String): Result<MangaDetail> = resultWrap {
-        service.getMangaFromLibrary(id).apply {
-            thumb = "${url}library/image/${id}/${thumb}"
+    suspend fun getMangaFromLibrary(id: String): Result<MangaDetail> =
+        resultWrap {
+            it.getMangaFromLibrary(id).apply { thumb = "${url}library/image/${id}/${thumb}" }
         }
-    }
 
-    suspend fun getMangaFromSource(source: String, id: String): Result<MangaDetail> = resultWrap {
-        service.getMangaFromSource(source, id)
-    }
+    suspend fun getMangaFromSource(source: String, id: String): Result<MangaDetail> =
+        resultWrap { it.getMangaFromSource(source, id) }
 
-    suspend fun deleteMangaFromLibrary(id: String): Result<String> = resultWrap {
-        service.deleteMangaFromLibrary(id)
-    }
+    suspend fun deleteMangaFromLibrary(id: String): Result<String> =
+        resultWrap { it.deleteMangaFromLibrary(id) }
 
     suspend fun getChapterContent(
         id: String,
         collection: String,
         chapter: String,
         source: String? = null
-    ): Result<List<String>> {
-        return try {
+    ): Result<List<String>> =
+        resultWrap { service ->
             if (source == null) {
-                service.getChapterContentFromLibrary(id, collection, chapter).let {
-                    Result.Success(it.map { "${url}library/image/$id/$collection/$chapter/$it" })
+                service.getChapterContentFromLibrary(id, collection, chapter).apply {
+                    map { "${url}library/image/$id/$collection/$chapter/$it" }
                 }
             } else {
-                service.getChapterContentFromSource(source, chapter).let {
-                    Result.Success(it.map { "${url}$it" })
+                service.getChapterContentFromSource(source, chapter).apply {
+                    map { "${url}$it" }
                 }
             }
-        } catch (he: Throwable) {
-            Result.Error(he)
         }
-    }
 
-    suspend fun getSources(): Result<List<Source>> {
-        return try {
-            service.getSources().let {
-                Result.Success(it)
-            }
-        } catch (he: Throwable) {
-            Result.Error(he)
-        }
-    }
+    suspend fun getSources(): Result<List<Source>> =
+        resultWrap { it.getSources() }
 
     suspend fun searchInSource(
         source: String,
         keywords: String,
         page: Int
-    ): Result<List<MangaOutline>> {
-        return try {
-            service.searchInSource(source, keywords, page).let {
-                Result.Success(it)
-            }
-        } catch (he: Throwable) {
-            Result.Error(he)
-        }
-    }
+    ): Result<List<MangaOutline>> =
+        resultWrap { it.searchInSource(source, keywords, page) }
 
-    suspend fun getPopularMangaList(
-        source: String,
-        page: Int
-    ): Result<List<MangaOutline>> {
-        return try {
-            service.getPopular(source, page).let {
-                Result.Success(it)
-            }
-        } catch (he: Throwable) {
-            Result.Error(he)
-        }
-    }
+    suspend fun getPopularMangaList(source: String, page: Int): Result<List<MangaOutline>> =
+        resultWrap { it.getPopular(source, page) }
 
-    suspend fun getLatestMangaList(
-        source: String,
-        page: Int
-    ): Result<List<MangaOutline>> {
-        return try {
-            service.getLatest(source, page).let {
-                Result.Success(it)
-            }
-        } catch (he: Throwable) {
-            Result.Error(he)
-        }
-    }
-
+    suspend fun getLatestMangaList(source: String, page: Int): Result<List<MangaOutline>> =
+        resultWrap { it.getLatest(source, page) }
 
     /*
      * download
      */
 
-    suspend fun getAllDownloadTasks(): Result<List<DownloadTask>> = resultWrap {
-        service.getAllDownloadTasks()
-    }
+    suspend fun getAllDownloadTasks(): Result<List<DownloadTask>> =
+        resultWrap { it.getAllDownloadTasks() }
 
-    suspend fun startAllDownloadTasks(): Result<List<DownloadTask>> = resultWrap {
-        service.startAllDownloadTasks()
-    }
+    suspend fun startAllDownloadTasks(): Result<List<DownloadTask>> =
+        resultWrap { it.startAllDownloadTasks() }
 
-    suspend fun pauseAllDownloadTasks(): Result<List<DownloadTask>> = resultWrap {
-        service.pauseAllDownloadTasks()
-    }
+    suspend fun pauseAllDownloadTasks(): Result<List<DownloadTask>> =
+        resultWrap { it.pauseAllDownloadTasks() }
 
     suspend fun postDownloadTask(
         source: String,
         sourceManga: String,
         targetManga: String
-    ): Result<DownloadTask> = resultWrap {
-        service.postDownloadTask(source, sourceManga, targetManga)
-    }
+    ): Result<DownloadTask> =
+        resultWrap { it.postDownloadTask(source, sourceManga, targetManga) }
 
-    suspend fun deleteDownloadTask(id: Int): Result<DownloadTask> = resultWrap {
-        service.deleteDownloadTask(id)
-    }
+    suspend fun deleteDownloadTask(id: Int): Result<DownloadTask> =
+        resultWrap { it.deleteDownloadTask(id) }
 
-    suspend fun startDownloadTask(id: Int): Result<DownloadTask> = resultWrap {
-        service.startDownloadTask(id)
-    }
+    suspend fun startDownloadTask(id: Int): Result<DownloadTask> =
+        resultWrap { it.startDownloadTask(id) }
 
-    suspend fun pauseDownloadTask(id: Int): Result<DownloadTask> = resultWrap {
-        service.pauseDownloadTask(id)
-    }
+    suspend fun pauseDownloadTask(id: Int): Result<DownloadTask> =
+        resultWrap { it.pauseDownloadTask(id) }
 
     /*
      * subscription
      */
 
-    suspend fun getAllSubscriptions(): Result<List<Subscription>> = resultWrap {
-        service.getAllSubscriptions()
-    }
+    suspend fun getAllSubscriptions(): Result<List<Subscription>> =
+        resultWrap { it.getAllSubscriptions() }
 
-    suspend fun enableAllSubscriptions(): Result<List<Subscription>> = resultWrap {
-        service.enableAllSubscriptions()
-    }
+    suspend fun enableAllSubscriptions(): Result<List<Subscription>> =
+        resultWrap { it.enableAllSubscriptions() }
 
-    suspend fun disableAllSubscriptions(): Result<List<Subscription>> = resultWrap {
-        service.disableAllSubscriptions()
-    }
+    suspend fun disableAllSubscriptions(): Result<List<Subscription>> =
+        resultWrap { it.disableAllSubscriptions() }
 
     suspend fun postSubscription(
         source: String,
         sourceManga: String,
         targetManga: String
-    ): Result<Subscription> = resultWrap {
-        service.postSubscription(source, sourceManga, targetManga)
-    }
+    ): Result<Subscription> =
+        resultWrap { it.postSubscription(source, sourceManga, targetManga) }
 
-    suspend fun deleteSubscription(id: Int): Result<Subscription> = resultWrap {
-        service.deleteSubscription(id)
-    }
+    suspend fun deleteSubscription(id: Int): Result<Subscription> =
+        resultWrap { it.deleteSubscription(id) }
 
-    suspend fun enableSubscription(id: Int): Result<Subscription> = resultWrap {
-        service.enableSubscription(id)
-    }
+    suspend fun enableSubscription(id: Int): Result<Subscription> =
+        resultWrap { it.enableSubscription(id) }
 
-    suspend fun disableSubscription(id: Int): Result<Subscription> = resultWrap {
-        service.disableSubscription(id)
-    }
-
-    private inline fun <T> resultWrap(func: () -> T): Result<T> {
-        return try {
-            Result.Success(func())
-        } catch (e: Exception) {
-            Result.Error(e)
-        }
-    }
+    suspend fun disableSubscription(id: Int): Result<Subscription> =
+        resultWrap { it.disableSubscription(id) }
 }

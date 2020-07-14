@@ -9,9 +9,6 @@ import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
 import com.fishhawk.driftinglibraryandroid.util.Event
 import kotlinx.coroutines.launch
-import java.lang.Exception
-
-class EmptyListException : Exception()
 
 class LibraryViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository

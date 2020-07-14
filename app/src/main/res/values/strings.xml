@@ -55,9 +55,6 @@
     <string name="more_about">About</string>
 
     <!-- setting fragment -->
-    <string name="settings_library_address">Library Address</string>
-    <string name="settings_library_address_error_hint">Illegal library address!</string>
-
     <string name="settings_reading_direction">Reading direction</string>
     <string name="settings_reading_direction_left_to_right">Left to right</string>
     <string name="settings_reading_direction_right_to_Left">Right to left</string>
@@ -103,4 +100,6 @@
     <string name="error_hint_empty_refresh_result">List is empty.</string>
     <string name="error_hint_empty_fetch_more_result">No more result.</string>
     <string name="dialog_filter_history">Filter reading history</string>
+    <string name="more_server">Manage Server</string>
+    <string name="label_server">Server</string>
 </resources>

@@ -11,14 +11,14 @@ object SettingsHelper {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     }
 
-    private const val KEY_LIBRARY_ADDRESS = "library_address"
-    private const val DEFAULT_LIBRARY_ADDRESS: String = "192.168.0.101:8080"
+    private const val KEY_SELECTED_LIBRARY = "selected_library"
+    private const val DEFAULT_SELECTED_LIBRARY: Int = 1
 
-    val libraryAddress by lazy {
-        PreferenceStringLiveData(
+    val selectedServer by lazy {
+        PreferenceIntLiveData(
             sharedPreferences,
-            KEY_LIBRARY_ADDRESS,
-            DEFAULT_LIBRARY_ADDRESS
+            KEY_SELECTED_LIBRARY,
+            DEFAULT_SELECTED_LIBRARY
         )
     }
 

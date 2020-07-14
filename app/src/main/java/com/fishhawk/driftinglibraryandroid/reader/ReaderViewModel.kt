@@ -44,7 +44,9 @@ class ReaderViewModel(
     init {
         viewModelScope.launch {
             isLoading.value = true
-            val detail = remoteLibraryRepository.getManga(id, source)
+            val detail =
+                if (source == null) remoteLibraryRepository.getMangaFromLibrary(id)
+                else remoteLibraryRepository.getMangaFromSource(id, source)
             mangaDetail.value = detail
             when (detail) {
                 is Result.Success -> openChapter(chapterIndex, pageIndex)

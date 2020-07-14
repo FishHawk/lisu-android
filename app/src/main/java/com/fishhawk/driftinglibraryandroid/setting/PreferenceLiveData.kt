@@ -45,3 +45,15 @@ class PreferenceStringLiveData(
     override fun setPreference(key: String, value: String) =
         sharedPreferences.edit().putString(key, value).apply()
 }
+
+class PreferenceIntLiveData(
+    sharedPrefs: SharedPreferences,
+    key: String,
+    defaultValue: Int
+) : PreferenceLiveData<Int>(sharedPrefs, key, defaultValue) {
+    override fun getPreference(key: String, defValue: Int): Int =
+        sharedPreferences.getInt(key, defaultValue)
+
+    override fun setPreference(key: String, value: Int) =
+        sharedPreferences.edit().putInt(key, value).apply()
+}

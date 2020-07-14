@@ -10,6 +10,13 @@ class MoreFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        findPreference<Preference>("server")!!.apply {
+            setOnPreferenceClickListener {
+                findNavController().navigate(R.id.action_more_to_server)
+                true
+            }
+        }
+
         findPreference<Preference>("download")!!.apply {
             setOnPreferenceClickListener {
                 findNavController().navigate(R.id.action_more_to_download)

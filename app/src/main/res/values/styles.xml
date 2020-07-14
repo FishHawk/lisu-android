@@ -1,4 +1,7 @@
 <resources>
+
+    <style name="Theme.TextInputLayout.OutlineBox" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+    </style>
     <!--===========-->
     <!--AlertDialog-->
     <!--===========-->

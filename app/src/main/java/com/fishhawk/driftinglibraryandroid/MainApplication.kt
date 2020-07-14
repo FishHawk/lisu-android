@@ -2,9 +2,13 @@ package com.fishhawk.driftinglibraryandroid
 
 import android.app.Application
 import android.webkit.URLUtil
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.switchMap
 import androidx.room.Room
 import com.fishhawk.driftinglibraryandroid.repository.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
+import com.fishhawk.driftinglibraryandroid.repository.ServerInfoRepository
+import com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo
 import com.fishhawk.driftinglibraryandroid.repository.local.ApplicationDatabase
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryService
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
@@ -16,7 +20,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MainApplication : Application() {
     private lateinit var database: ApplicationDatabase
     lateinit var readingHistoryRepository: ReadingHistoryRepository
-    lateinit var remoteLibraryRepository: RemoteLibraryRepository
+    lateinit var serverInfoRepository: ServerInfoRepository
+
+    private lateinit var selectedServerInfo: LiveData<ServerInfo>
+    val remoteLibraryRepository: RemoteLibraryRepository = RemoteLibraryRepository()
 
     override fun onCreate() {
         super.onCreate()
@@ -27,39 +34,34 @@ class MainApplication : Application() {
             ApplicationDatabase::class.java, "Test.db"
         ).build()
         readingHistoryRepository = ReadingHistoryRepository(database.readingHistoryDao())
+        serverInfoRepository = ServerInfoRepository(database.serverInfoDao())
 
-        var url = SettingsHelper.libraryAddress.getValueDirectly()
-        url = if (URLUtil.isNetworkUrl(url)) url else "http://${url}"
-        url = if (url.last() == '/') url else "$url/"
-        val retrofit = Retrofit.Builder()
-            .baseUrl(url)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        remoteLibraryRepository = RemoteLibraryRepository(
-            url, retrofit.create(RemoteLibraryService::class.java)
-        )
-    }
-
-    fun setLibraryAddress(inputUrl: String): Boolean {
-        var url = inputUrl
-        url = if (URLUtil.isNetworkUrl(url)) url else "http://${url}"
-        url = if (url.last() == '/') url else "$url/"
-        val retrofit = try {
-            Retrofit.Builder()
-                .baseUrl(url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-        } catch (e: Throwable) {
-            null
+        selectedServerInfo = SettingsHelper.selectedServer.switchMap {
+            serverInfoRepository.observeServerInfo(it)
         }
 
-        retrofit?.let {
-            remoteLibraryRepository.url = url
-            remoteLibraryRepository.service = retrofit.create(RemoteLibraryService::class.java)
-            GlobalScope.launch {
-                readingHistoryRepository.clearReadingHistory()
+        selectedServerInfo.observeForever { serverInfo ->
+            if (serverInfo == null) {
+                remoteLibraryRepository.url = null
+                remoteLibraryRepository.service = null
+            } else {
+                var url = serverInfo.address
+                url = if (URLUtil.isNetworkUrl(url)) url else "http://${url}"
+                url = if (url.last() == '/') url else "$url/"
+
+                remoteLibraryRepository.url = url
+                remoteLibraryRepository.service =
+                    try {
+                        Retrofit.Builder()
+                            .baseUrl(url)
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build()
+                    } catch (e: Throwable) {
+                        null
+                    }?.create(RemoteLibraryService::class.java)
+
+                GlobalScope.launch { readingHistoryRepository.clearReadingHistory() }
             }
         }
-        return retrofit != null
     }
 }

@@ -10,6 +10,9 @@
         android:name="com.fishhawk.driftinglibraryandroid.more.MoreFragment"
         android:label="@string/label_more">
         <action
+            android:id="@+id/action_more_to_server"
+            app:destination="@id/nav_server" />
+        <action
             android:id="@+id/action_more_to_download"
             app:destination="@id/nav_download" />
         <action
@@ -22,6 +25,12 @@
             android:id="@+id/action_more_to_about"
             app:destination="@id/nav_about" />
     </fragment>
+
+    <fragment
+        android:id="@+id/nav_server"
+        android:name="com.fishhawk.driftinglibraryandroid.more.ServerFragment"
+        android:label="@string/label_server"
+        tools:layout="@layout/server_fragment" />
 
     <fragment
         android:id="@+id/nav_download"
