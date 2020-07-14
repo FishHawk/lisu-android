@@ -66,15 +66,13 @@ class ReaderViewModel(
         val chapterTitle = collection.chapters[chapterIndex].title
 
         viewModelScope.launch {
-            val result = if (source == null)
-                remoteLibraryRepository.getChapterContent(
-                    id,
-                    collection.title,
-                    chapterTitle,
-                    source
-                )
-            else
-                remoteLibraryRepository.getChapterContent(id, collection.title, chapterId, source)
+            val result =
+                if (source == null)
+                    remoteLibraryRepository.getChapterContentFromLibrary(
+                        id, collection.title, chapterTitle
+                    )
+                else
+                    remoteLibraryRepository.getChapterContentFromSource(source, chapterId)
             when (result) {
                 is Result.Success -> {
                     self.chapterIndex = chapterIndex

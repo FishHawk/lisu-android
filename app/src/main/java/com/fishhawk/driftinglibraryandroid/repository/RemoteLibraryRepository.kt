@@ -31,29 +31,22 @@ class RemoteLibraryRepository {
             it.getMangaFromLibrary(id).apply { thumb = "${url}library/image/${id}/${thumb}" }
         }
 
-    suspend fun getMangaFromSource(source: String, id: String): Result<MangaDetail> =
-        resultWrap { it.getMangaFromSource(source, id) }
-
     suspend fun deleteMangaFromLibrary(id: String): Result<String> =
         resultWrap { it.deleteMangaFromLibrary(id) }
 
-    suspend fun getChapterContent(
+    suspend fun getChapterContentFromLibrary(
         id: String,
         collection: String,
-        chapter: String,
-        source: String? = null
+        chapter: String
     ): Result<List<String>> =
         resultWrap { service ->
-            if (source == null) {
-                service.getChapterContentFromLibrary(id, collection, chapter).apply {
-                    map { "${url}library/image/$id/$collection/$chapter/$it" }
-                }
-            } else {
-                service.getChapterContentFromSource(source, chapter).apply {
-                    map { "${url}$it" }
-                }
-            }
+            service.getChapterContentFromLibrary(id, collection, chapter)
+                .map { "${url}library/image/$id/$collection/$chapter/$it" }
         }
+
+    /*
+     * source
+     */
 
     suspend fun getSources(): Result<List<Source>> =
         resultWrap { it.getSources() }
@@ -70,6 +63,14 @@ class RemoteLibraryRepository {
 
     suspend fun getLatestMangaList(source: String, page: Int): Result<List<MangaOutline>> =
         resultWrap { it.getLatest(source, page) }
+
+    suspend fun getMangaFromSource(source: String, id: String): Result<MangaDetail> =
+        resultWrap { it.getMangaFromSource(source, id) }
+
+    suspend fun getChapterContentFromSource(source: String, chapter: String): Result<List<String>> =
+        resultWrap { service ->
+            service.getChapterContentFromSource(source, chapter).map { "${url}$it" }
+        }
 
     /*
      * download
