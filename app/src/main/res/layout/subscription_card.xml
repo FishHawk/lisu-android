@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="subscription"
             type="com.fishhawk.driftinglibraryandroid.repository.data.Subscription" />
@@ -108,18 +110,27 @@
                     android:orientation="vertical">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/switch_button"
-                        style="@style/Theme.Widget.Button.TextButton"
+                        android:id="@+id/disable_button"
+                        style="@style/Theme.Widget.Button.Icon.Textless"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Switch" />
+                        android:visibility="@{subscription.isEnabled ? View.VISIBLE : View.GONE}"
+                        app:icon="@drawable/ic_baseline_toggle_on_24" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/enable_button"
+                        style="@style/Theme.Widget.Button.Icon.Textless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="@{!subscription.isEnabled ? View.VISIBLE : View.GONE}"
+                        app:icon="@drawable/ic_baseline_toggle_off_24" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/delete_button"
-                        style="@style/Theme.Widget.Button.TextButton"
+                        style="@style/Theme.Widget.Button.Icon.Textless"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Delete" />
+                        app:icon="@drawable/ic_baseline_delete_forever_24" />
                 </LinearLayout>
 
                 <ProgressBar

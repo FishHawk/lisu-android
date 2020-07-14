@@ -50,16 +50,17 @@ class SubscriptionListAdapter(
             if (item.isEnabled) {
                 val color = ContextCompat.getColor(activity, R.color.loading_indicator_green)
                 binding.coloredHead.setBackgroundColor(color)
-                binding.switchButton.text = "Disable"
             } else {
                 val color = ContextCompat.getColor(activity, R.color.loading_indicator_red)
                 binding.coloredHead.setBackgroundColor(color)
-                binding.switchButton.text = "Enable"
             }
 
-            binding.switchButton.setOnClickListener {
-                if (item.isEnabled) onDisable(item.id)
-                else onEnable(item.id)
+            binding.enableButton.setOnClickListener {
+                onEnable(item.id)
+                hideActions()
+            }
+            binding.disableButton.setOnClickListener {
+                onDisable(item.id)
                 hideActions()
             }
             binding.deleteButton.setOnClickListener {
