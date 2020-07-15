@@ -35,8 +35,8 @@
         <item name="android:textColorHintInverse">@color/textColorHintDark</item>
         <item name="rippleColor">@color/rippleColorLight</item>
 
-        <item name="dialogTheme">@style/Theme.AlertDialog.Light</item>
-        <item name="alertDialogTheme">@style/Theme.AlertDialog.Light</item>
+        <item name="dialogTheme">@style/Theme.AlertDialog</item>
+        <item name="alertDialogTheme">@style/Theme.AlertDialog</item>
         <item name="textInputStyle">@style/Theme.TextInputLayout.FilledBox</item>
 
         <!-- Themes -->
@@ -93,8 +93,8 @@
         <item name="android:textColorHintInverse">@color/textColorHintLight</item>
         <item name="rippleColor">@color/rippleColorDark</item>
 
-        <item name="dialogTheme">@style/Theme.AlertDialog.Dark</item>
-        <item name="alertDialogTheme">@style/Theme.AlertDialog.Dark</item>
+        <item name="dialogTheme">@style/Theme.AlertDialog</item>
+        <item name="alertDialogTheme">@style/Theme.AlertDialog</item>
         <item name="textInputStyle">@style/Theme.TextInputLayout.FilledBox</item>
 
         <!-- Themes -->

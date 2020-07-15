@@ -12,6 +12,7 @@ import com.fishhawk.driftinglibraryandroid.databinding.ServerInfoDialogBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 
+
 class ServerFragment : Fragment() {
     private val viewModel: ServerViewModel by viewModels {
         val application = requireContext().applicationContext as MainApplication
@@ -39,20 +40,11 @@ class ServerFragment : Fragment() {
 
         val adapter = ServerInfoListAdapter(requireActivity())
         adapter.onEdit = {
-            val dialogBinding =
-                ServerInfoDialogBinding.inflate(LayoutInflater.from(context), null, false)
-            dialogBinding.name.setText(it.name)
-            dialogBinding.address.setText(it.address)
-            AlertDialog.Builder(requireActivity())
-                .setTitle("Edit server")
-                .setView(dialogBinding.root)
-                .setPositiveButton("OK") { _, _ ->
-                    it.name = dialogBinding.name.text.toString()
-                    it.address = dialogBinding.address.text.toString()
-                    viewModel.updateServer(it)
-                }
-                .setNegativeButton("Cancel") { _, _ -> }
-                .show()
+            createServerInfoDialog(it) { name, address ->
+                it.name = name
+                it.address = address
+                viewModel.updateServer(it)
+            }
         }
         adapter.onDelete = { viewModel.deleteServer(it) }
         adapter.onCardClicked = { SettingsHelper.selectedServer.setValue(it.id) }
@@ -70,21 +62,9 @@ class ServerFragment : Fragment() {
         })
 
         binding.addButton.setOnClickListener {
-            val dialogBinding =
-                ServerInfoDialogBinding.inflate(LayoutInflater.from(context), null, false)
-            AlertDialog.Builder(requireActivity())
-                .setTitle("Add server")
-                .setView(dialogBinding.root)
-                .setPositiveButton("OK") { _, _ ->
-                    viewModel.addServer(
-                        ServerInfo(
-                            dialogBinding.name.text.toString(),
-                            dialogBinding.address.text.toString()
-                        )
-                    )
-                }
-                .setNegativeButton("Cancel") { _, _ -> }
-                .show()
+            createServerInfoDialog { name, address ->
+                viewModel.addServer(ServerInfo(name, address))
+            }
         }
     }
 //
@@ -101,4 +81,33 @@ class ServerFragment : Fragment() {
 //        }
 //        return true
 //    }
+
+
+    private fun createServerInfoDialog(
+        serverInfo: ServerInfo? = null,
+        onAccept: (name: String, address: String) -> Unit
+    ) {
+        val dialogBinding =
+            ServerInfoDialogBinding
+                .inflate(LayoutInflater.from(context), null, false)
+
+        val title = if (serverInfo == null) "Add server" else "Edit server"
+
+        if (serverInfo != null) {
+            dialogBinding.name.setText(serverInfo.name)
+            dialogBinding.address.setText(serverInfo.address)
+        }
+
+        AlertDialog.Builder(requireActivity())
+            .setTitle(title)
+            .setView(dialogBinding.root)
+            .setPositiveButton("OK") { _, _ ->
+                onAccept(
+                    dialogBinding.name.text.toString(),
+                    dialogBinding.address.text.toString()
+                )
+            }
+            .setNegativeButton("Cancel") { _, _ -> }
+            .show()
+    }
 }

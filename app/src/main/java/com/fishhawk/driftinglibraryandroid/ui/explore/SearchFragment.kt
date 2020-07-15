@@ -43,6 +43,9 @@ class SearchFragment : Fragment() {
 
         val source = arguments?.getString("source")!!
         val adapter = MangaListAdapter(requireActivity(), source)
+        adapter.onCardLongClicked = { outline ->
+            createMangaOutlineActionDialog(source, outline, viewModel)
+        }
         binding.mangaList.list.adapter = adapter
 
         SettingsHelper.displayMode.observe(viewLifecycleOwner, Observer {

@@ -21,17 +21,22 @@
 
     <style name="Theme.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="android:background">?attr/colorPrimary</item>
+        <item name="title">?attr/colorPrimary</item>
         <item name="buttonBarPositiveButtonStyle">@style/Theme.Widget.Button.TextButton</item>
         <item name="buttonBarNegativeButtonStyle">@style/Theme.Widget.Button.TextButton</item>
         <item name="buttonBarNeutralButtonStyle">@style/Theme.Widget.Button.TextButton</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/Theme.AlertDialog.Title.Text</item>
+        <item name="colorAccent">?colorSecondary</item>
     </style>
 
-    <style name="Theme.AlertDialog.Light" parent="Theme.AlertDialog">
-        <item name="colorAccent">@color/colorAccentLight</item>
+    <style name="Theme.AlertDialog.Title.Text" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textAppearance">@style/Theme.AlertDialog.Title.TextAppearance</item>
     </style>
 
-    <style name="Theme.AlertDialog.Dark" parent="Theme.AlertDialog">
-        <item name="colorAccent">@color/colorAccentDark</item>
+    <style name="Theme.AlertDialog.Title.TextAppearance" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
 
@@ -104,17 +109,13 @@
         <item name="rippleColor">?attr/colorOnPrimary</item>
     </style>
 
-<!--    <style name="Theme.Widget.Button.TextButton.NoColor" parent="Widget.MaterialComponents.Button.TextButton">-->
-<!--        <item name="android:textColor">?attr/colorAccent</item>-->
-<!--        <item name="rippleColor">?attr/colorAccent</item>-->
-<!--    </style>-->
-
     <style name="Theme.Widget.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">?attr/colorAccent</item>
         <item name="rippleColor">?attr/colorAccent</item>
     </style>
 
     <style name="Theme.Widget.Button.TextButton.NoColor" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:gravity">start</item>
         <item name="android:minHeight">0dp</item>
         <item name="android:minWidth">0dp</item>
         <item name="iconTint">?colorOnPrimary</item>
