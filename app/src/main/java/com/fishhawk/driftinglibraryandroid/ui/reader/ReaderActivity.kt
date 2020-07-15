@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -27,7 +28,10 @@ import com.fishhawk.driftinglibraryandroid.extension.setupFullScreen
 import com.fishhawk.driftinglibraryandroid.extension.setupThemeWithTranslucentStatus
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.io.File
 
 
@@ -281,9 +285,28 @@ class ReaderActivity : AppCompatActivity() {
             dialog.dismiss()
         }
         dialogBinding.shareButton.setOnClickListener {
-            val runningTask = ShareTask(this)
-            runningTask.execute(url)
             dialog.dismiss()
+            val activity = this
+            lifecycleScope.launch {
+                val file = withContext(Dispatchers.IO) {
+                    Glide.with(activity)
+                        .downloadOnly()
+                        .load(url)
+                        .submit(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                        .get()
+                }
+
+                val uri = FileProvider.getUriForFile(
+                    activity, "$packageName.fileprovider", file
+                )
+
+                val shareIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    type = "image/*"
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                }
+                startActivity(Intent.createChooser(shareIntent, "Share image"))
+            }
         }
         dialogBinding.saveButton.setOnClickListener {
             dialog.dismiss()
@@ -292,41 +315,5 @@ class ReaderActivity : AppCompatActivity() {
             dialog.dismiss()
         }
         dialog.show()
-    }
-
-    internal class ShareTask(private val context: Context) :
-        AsyncTask<String?, Void?, File?>() {
-
-        override fun doInBackground(vararg params: String?): File? {
-            return try {
-                val url = params[0]
-                Glide
-                    .with(context)
-                    .downloadOnly()
-                    .load(url)
-                    .submit(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                    .get()
-            } catch (ex: Exception) {
-                null
-            }
-        }
-
-        override fun onPostExecute(result: File?) {
-            result?.let {
-                val uri = FileProvider.getUriForFile(
-                    context, context.packageName + ".fileprovider", it
-                )
-                share(uri)
-            }
-        }
-
-        private fun share(result: Uri) {
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "image/*"
-            intent.putExtra(Intent.EXTRA_SUBJECT, "Shared image")
-            intent.putExtra(Intent.EXTRA_TEXT, "Look what I found!")
-            intent.putExtra(Intent.EXTRA_STREAM, result)
-            context.startActivity(Intent.createChooser(intent, "Share image"))
-        }
     }
 }
