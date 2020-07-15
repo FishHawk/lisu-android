@@ -10,7 +10,6 @@ import com.bumptech.glide.request.RequestOptions
 import com.fishhawk.driftinglibraryandroid.databinding.MangaGridThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.databinding.MangaLinearThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
-import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
 
 
@@ -20,7 +19,7 @@ class MangaListAdapter(
 ) : BaseRecyclerViewAdapter<MangaOutline, BaseRecyclerViewAdapter.ViewHolder<MangaOutline>>(
     mutableListOf()
 ) {
-    var onCardLongClicked: (String) -> Unit = {}
+    var onCardLongClicked: (MangaOutline) -> Unit = {}
 
     enum class ViewType(val value: Int) {
         GRID(0),
@@ -66,7 +65,7 @@ class MangaListAdapter(
                 )
             }
             binding.root.setOnLongClickListener {
-                onCardLongClicked(item.id)
+                onCardLongClicked(item)
                 true
             }
         }
@@ -88,7 +87,7 @@ class MangaListAdapter(
                 )
             }
             binding.root.setOnLongClickListener {
-                onCardLongClicked(item.id)
+                onCardLongClicked(item)
                 true
             }
         }

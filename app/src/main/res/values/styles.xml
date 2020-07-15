@@ -104,9 +104,23 @@
         <item name="rippleColor">?attr/colorOnPrimary</item>
     </style>
 
+<!--    <style name="Theme.Widget.Button.TextButton.NoColor" parent="Widget.MaterialComponents.Button.TextButton">-->
+<!--        <item name="android:textColor">?attr/colorAccent</item>-->
+<!--        <item name="rippleColor">?attr/colorAccent</item>-->
+<!--    </style>-->
+
     <style name="Theme.Widget.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:textColor">?attr/colorAccent</item>
         <item name="rippleColor">?attr/colorAccent</item>
+    </style>
+
+    <style name="Theme.Widget.Button.TextButton.NoColor" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="iconTint">?colorOnPrimary</item>
+        <item name="rippleColor">?colorOnPrimary</item>
+        <item name="iconPadding">16dp</item>
+        <item name="android:textColor">?colorOnPrimary</item>
     </style>
 
     <style name="Theme.Widget.Button.Icon" parent="Widget.MaterialComponents.Button.OutlinedButton.Icon">
