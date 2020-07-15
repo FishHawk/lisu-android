@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.util
+package com.fishhawk.driftinglibraryandroid.extension
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -11,13 +11,17 @@ import com.fishhawk.driftinglibraryandroid.base.*
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.hippo.refreshlayout.RefreshLayout
+import com.fishhawk.driftinglibraryandroid.base.Notification
+import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 
 
-fun Fragment.showErrorMessage(throwable: Throwable) {
-    val message = when (throwable) {
-        is EmptyRefreshResultError -> getString(R.string.error_hint_empty_refresh_result)
-        is EmptyFetchMoreResultError -> getString(R.string.error_hint_empty_fetch_more_result)
-        else -> throwable.message ?: getString(R.string.library_unknown_error_hint)
+fun Fragment.showErrorMessage(notification: Notification) {
+    val message = when (notification) {
+        is ListEmptyNotification -> getString(R.string.error_hint_empty_refresh_result)
+        is ListReachEndNotification -> getString(R.string.error_hint_empty_fetch_more_result)
+        is NetworkErrorNotification ->
+            notification.throwable.message ?: getString(R.string.library_unknown_error_hint)
+        else -> getString(R.string.library_unknown_error_hint)
     }
     view?.makeSnackBar(message)
 }
@@ -25,7 +29,7 @@ fun Fragment.showErrorMessage(throwable: Throwable) {
 fun <T> Fragment.bindToListViewModel(
     multipleStatusView: MultipleStatusView,
     refreshLayout: RefreshLayout,
-    viewModel: BaseListViewModel<T>,
+    viewModel: RefreshableListViewModel<T>,
     adapter: BaseRecyclerViewAdapter<T, *>
 ) {
     viewModel.list.observe(viewLifecycleOwner, Observer { result ->
@@ -40,19 +44,22 @@ fun <T> Fragment.bindToListViewModel(
         }
     })
 
-    viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver {
-        refreshLayout.isHeaderRefreshing = false
-    })
-
-    if (viewModel is BasePartListViewModel) {
-        viewModel.fetchMoreFinish.observe(viewLifecycleOwner, EventObserver {
-            refreshLayout.isFooterRefreshing = false
+    viewModel.refreshFinish.observe(viewLifecycleOwner,
+        EventObserver {
+            refreshLayout.isHeaderRefreshing = false
         })
+
+    if (viewModel is RefreshableListViewModelWithFetchMore) {
+        viewModel.fetchMoreFinish.observe(viewLifecycleOwner,
+            EventObserver {
+                refreshLayout.isFooterRefreshing = false
+            })
     }
 
-    viewModel.operationError.observe(viewLifecycleOwner, EventObserver { exception ->
-        showErrorMessage(exception)
-    })
+    viewModel.notification.observe(viewLifecycleOwner,
+        EventObserver { notification ->
+            showErrorMessage(notification)
+        })
 
     refreshLayout.bindingToViewModel(viewModel)
 }

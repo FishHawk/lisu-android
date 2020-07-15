@@ -13,8 +13,8 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.ExplorePopularFragmentBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.util.bindToListViewModel
-import com.fishhawk.driftinglibraryandroid.util.changeMangaListDisplayMode
+import com.fishhawk.driftinglibraryandroid.extension.bindToListViewModel
+import com.fishhawk.driftinglibraryandroid.extension.changeMangaListDisplayMode
 
 class PopularFragment : Fragment() {
     private val viewModel: PopularViewModel by viewModels {

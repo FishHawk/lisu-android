@@ -1,10 +1,9 @@
-package com.fishhawk.driftinglibraryandroid.util;
+package com.fishhawk.driftinglibraryandroid.extension;
 
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.view.View
-import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer

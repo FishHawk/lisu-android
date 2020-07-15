@@ -6,7 +6,7 @@ import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.util.Event
+import com.fishhawk.driftinglibraryandroid.repository.Event
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -36,8 +36,12 @@ class GalleryViewModel(
             val title = it.data.title
             viewModelScope.launch(Dispatchers.Main) {
                 when (val result = remoteLibraryRepository.postDownloadTask(source!!, id, title)) {
-                    is Result.Success -> _operationError.value = Event(null)
-                    is Result.Error -> _operationError.value = Event(result.exception)
+                    is Result.Success -> _operationError.value =
+                        Event(null)
+                    is Result.Error -> _operationError.value =
+                        Event(
+                            result.exception
+                        )
                 }
             }
         }
@@ -49,8 +53,12 @@ class GalleryViewModel(
             val title = it.data.title
             viewModelScope.launch(Dispatchers.Main) {
                 when (val result = remoteLibraryRepository.postSubscription(source!!, id, title)) {
-                    is Result.Success -> _operationError.value = Event(null)
-                    is Result.Error -> _operationError.value = Event(result.exception)
+                    is Result.Success -> _operationError.value =
+                        Event(null)
+                    is Result.Error -> _operationError.value =
+                        Event(
+                            result.exception
+                        )
                 }
             }
         }

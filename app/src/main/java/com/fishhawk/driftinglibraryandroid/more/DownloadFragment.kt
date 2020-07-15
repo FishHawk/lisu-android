@@ -7,7 +7,7 @@ import androidx.fragment.app.viewModels
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.DownloadFragmentBinding
-import com.fishhawk.driftinglibraryandroid.util.*
+import com.fishhawk.driftinglibraryandroid.extension.*
 
 class DownloadFragment : Fragment() {
     private val viewModel: DownloadViewModel by viewModels {

@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.util
+package com.fishhawk.driftinglibraryandroid.repository
 
 import androidx.lifecycle.Observer
 

@@ -1,17 +1,17 @@
-package com.fishhawk.driftinglibraryandroid.util
+package com.fishhawk.driftinglibraryandroid.extension
 
 import android.view.View
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.base.BaseListViewModel
-import com.fishhawk.driftinglibraryandroid.base.BasePartListViewModel
+import com.fishhawk.driftinglibraryandroid.base.RefreshableListViewModel
+import com.fishhawk.driftinglibraryandroid.base.RefreshableListViewModelWithFetchMore
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
 
-fun RefreshLayout.bindingToViewModel(viewModel: BaseListViewModel<*>) {
+fun RefreshLayout.bindingToViewModel(viewModel: RefreshableListViewModel<*>) {
     setupDefaultColorSchemeResources()
 
     val listener = when (viewModel) {
-        is BasePartListViewModel<*> -> {
+        is RefreshableListViewModelWithFetchMore<*> -> {
             object : RefreshLayout.OnRefreshListener {
                 override fun onHeaderRefresh() = viewModel.refresh()
                 override fun onFooterRefresh() = viewModel.fetchMore()

@@ -7,8 +7,8 @@ import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityMainBinding
-import com.fishhawk.driftinglibraryandroid.util.setupTheme
-import com.fishhawk.driftinglibraryandroid.util.setupWithNavControllerT
+import com.fishhawk.driftinglibraryandroid.extension.setupTheme
+import com.fishhawk.driftinglibraryandroid.extension.setupWithNavControllerT
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding

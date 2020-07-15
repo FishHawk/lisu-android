@@ -10,7 +10,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.fishhawk.driftinglibraryandroid.databinding.MangaGridThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.databinding.MangaLinearThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
-import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
+import com.fishhawk.driftinglibraryandroid.extension.navToGalleryActivity
 
 
 class MangaListAdapter(

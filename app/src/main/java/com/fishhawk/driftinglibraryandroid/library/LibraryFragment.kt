@@ -12,8 +12,8 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.util.bindToListViewModel
-import com.fishhawk.driftinglibraryandroid.util.changeMangaListDisplayMode
+import com.fishhawk.driftinglibraryandroid.extension.bindToListViewModel
+import com.fishhawk.driftinglibraryandroid.extension.changeMangaListDisplayMode
 
 
 class LibraryFragment : Fragment() {

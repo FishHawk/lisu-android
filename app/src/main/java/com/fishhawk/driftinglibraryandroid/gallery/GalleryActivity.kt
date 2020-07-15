@@ -13,10 +13,11 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryActivityBinding
+import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.*
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
-import com.fishhawk.driftinglibraryandroid.util.*
+import com.fishhawk.driftinglibraryandroid.extension.*
 import com.google.android.flexbox.FlexboxLayout
 
 class GalleryActivity : AppCompatActivity() {
@@ -74,12 +75,13 @@ class GalleryActivity : AppCompatActivity() {
                 }
         }
 
-        viewModel.operationError.observe(this, EventObserver { exception ->
-            when (exception) {
-                null -> binding.root.makeSnackBar("Success")
-                else -> binding.root.makeSnackBar("Fail: ${exception.message}")
-            }
-        })
+        viewModel.operationError.observe(this,
+            EventObserver { exception ->
+                when (exception) {
+                    null -> binding.root.makeSnackBar("Success")
+                    else -> binding.root.makeSnackBar("Fail: ${exception.message}")
+                }
+            })
 
         viewModel.detail.observe(this, Observer { result ->
             binding.contentView.visibility = View.GONE

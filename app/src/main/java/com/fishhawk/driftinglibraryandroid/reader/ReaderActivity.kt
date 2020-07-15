@@ -14,9 +14,9 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderActivityBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.util.makeSnackBar
-import com.fishhawk.driftinglibraryandroid.util.setupFullScreen
-import com.fishhawk.driftinglibraryandroid.util.setupThemeWithTranslucentStatus
+import com.fishhawk.driftinglibraryandroid.extension.makeSnackBar
+import com.fishhawk.driftinglibraryandroid.extension.setupFullScreen
+import com.fishhawk.driftinglibraryandroid.extension.setupThemeWithTranslucentStatus
 import kotlinx.coroutines.runBlocking
 
 class ReaderActivity : AppCompatActivity() {

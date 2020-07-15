@@ -7,7 +7,7 @@ import androidx.fragment.app.viewModels
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.SubscriptionFragmentBinding
-import com.fishhawk.driftinglibraryandroid.util.*
+import com.fishhawk.driftinglibraryandroid.extension.*
 
 class SubscriptionFragment : Fragment() {
     private val viewModel: SubscriptionViewModel by viewModels {

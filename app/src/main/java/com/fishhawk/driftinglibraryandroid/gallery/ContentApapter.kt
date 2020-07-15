@@ -9,7 +9,7 @@ import com.fishhawk.driftinglibraryandroid.databinding.GalleryChapterBinding
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryChapterMarkedBinding
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryCollectionTitleBinding
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryNoChapterHintBinding
-import com.fishhawk.driftinglibraryandroid.util.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.extension.navToReaderActivity
 
 sealed class ContentItem {
     data class Chapter(

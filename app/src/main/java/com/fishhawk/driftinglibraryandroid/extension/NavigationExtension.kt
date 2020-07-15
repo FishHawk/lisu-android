@@ -1,11 +1,10 @@
-package com.fishhawk.driftinglibraryandroid.util
+package com.fishhawk.driftinglibraryandroid.extension
 
 import android.content.Intent
 import android.util.SparseArray
 import android.view.View
 import androidx.core.util.forEach
 import androidx.core.util.set
-import androidx.core.util.size
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

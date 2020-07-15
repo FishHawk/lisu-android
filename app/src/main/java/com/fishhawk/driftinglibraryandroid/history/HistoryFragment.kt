@@ -1,6 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.history
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
@@ -12,8 +11,8 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.util.navToGalleryActivity
-import com.fishhawk.driftinglibraryandroid.util.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.extension.navToGalleryActivity
+import com.fishhawk.driftinglibraryandroid.extension.navToReaderActivity
 
 class HistoryFragment : Fragment() {
     private val viewModel: HistoryViewModel by viewModels {
