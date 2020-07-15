@@ -21,6 +21,7 @@ class ReaderLayout : FrameLayout {
     var onClickLeftAreaListener: (() -> Unit)? = null
     var onClickRightAreaListener: (() -> Unit)? = null
     var onClickCenterAreaListener: (() -> Unit)? = null
+    var onLongClickListener: (() -> Unit)? = null
 
     private val detector = GestureDetectorCompat(context, object :
         GestureDetector.SimpleOnGestureListener() {
@@ -36,6 +37,10 @@ class ReaderLayout : FrameLayout {
                 }
             }
             return true
+        }
+
+        override fun onLongPress(e: MotionEvent?) {
+            onLongClickListener?.let { it() }
         }
     })
 

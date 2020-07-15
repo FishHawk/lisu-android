@@ -1,23 +1,35 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.AsyncTask
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.SeekBar
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.Target
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.databinding.DialogChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderActivityBinding
 import com.fishhawk.driftinglibraryandroid.extension.makeSnackBar
-import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.extension.setupFullScreen
 import com.fishhawk.driftinglibraryandroid.extension.setupThemeWithTranslucentStatus
+import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import kotlinx.coroutines.runBlocking
+import java.io.File
+
 
 class ReaderActivity : AppCompatActivity() {
     private val viewModel: ReaderViewModel by viewModels {
@@ -116,6 +128,15 @@ class ReaderActivity : AppCompatActivity() {
             }
         }
         binding.readerLayout.onClickCenterAreaListener = { viewModel.isMenuVisible.value = true }
+        binding.readerLayout.onLongClickListener = {
+            (viewModel.readerContent.value as? Result.Success)?.let {
+                if (viewModel.chapterPosition.value != null) {
+                    val page = viewModel.chapterPosition.value!!
+                    val url = it.data[page]
+                    createChapterImageActionDialog(page, url)
+                }
+            }
+        }
     }
 
     private fun setupMenuLayout() {
@@ -183,8 +204,6 @@ class ReaderActivity : AppCompatActivity() {
                 }
             })
         }
-
-
     }
 
     private fun setupVerticalReader() {
@@ -223,7 +242,6 @@ class ReaderActivity : AppCompatActivity() {
                 }
             })
         }
-
     }
 
     private fun openPrevChapter() {
@@ -247,5 +265,68 @@ class ReaderActivity : AppCompatActivity() {
         if (viewModel.readingDirection.value == SettingsHelper.READING_DIRECTION_VERTICAL)
             setVerticalReaderPage(position)
         else setHorizontalReaderPage(position)
+    }
+
+    private fun createChapterImageActionDialog(page: Int, url: String) {
+        val dialogBinding =
+            DialogChapterImageBinding
+                .inflate(LayoutInflater.from(this), null, false)
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Page ${page + 1}")
+            .setView(dialogBinding.root)
+            .create()
+
+        dialogBinding.refreshButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialogBinding.shareButton.setOnClickListener {
+            val runningTask = ShareTask(this)
+            runningTask.execute(url)
+            dialog.dismiss()
+        }
+        dialogBinding.saveButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialogBinding.saveToButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    internal class ShareTask(private val context: Context) :
+        AsyncTask<String?, Void?, File?>() {
+
+        override fun doInBackground(vararg params: String?): File? {
+            return try {
+                val url = params[0]
+                Glide
+                    .with(context)
+                    .downloadOnly()
+                    .load(url)
+                    .submit(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                    .get()
+            } catch (ex: Exception) {
+                null
+            }
+        }
+
+        override fun onPostExecute(result: File?) {
+            result?.let {
+                val uri = FileProvider.getUriForFile(
+                    context, context.packageName + ".fileprovider", it
+                )
+                share(uri)
+            }
+        }
+
+        private fun share(result: Uri) {
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "image/*"
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Shared image")
+            intent.putExtra(Intent.EXTRA_TEXT, "Look what I found!")
+            intent.putExtra(Intent.EXTRA_STREAM, result)
+            context.startActivity(Intent.createChooser(intent, "Share image"))
+        }
     }
 }

@@ -15,6 +15,17 @@
         android:theme="@style/Theme.App.Light"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.fishhawk.driftinglibraryandroid.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_path" />
+        </provider>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
