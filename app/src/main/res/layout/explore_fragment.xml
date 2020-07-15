@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     app:errorView="@layout/status_error"
     app:loadingView="@layout/status_loading"
-    tools:context=".explore.ExploreFragment">
+    tools:context=".ui.explore.ExploreFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"

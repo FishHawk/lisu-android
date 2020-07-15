@@ -9,15 +9,15 @@
 
         <variable
             name="viewModel"
-            type="com.fishhawk.driftinglibraryandroid.reader.ReaderViewModel" />
+            type="com.fishhawk.driftinglibraryandroid.ui.reader.ReaderViewModel" />
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".reader.ReaderActivity">
+        tools:context=".ui.reader.ReaderActivity">
 
-        <com.fishhawk.driftinglibraryandroid.reader.ReaderLayout
+        <com.fishhawk.driftinglibraryandroid.ui.reader.ReaderLayout
             android:id="@+id/reader_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -34,7 +34,7 @@
                 android:layout_height="match_parent"
                 android:visibility="@{viewModel.isReaderDirectionEqualVertical ? View.VISIBLE : View.GONE}"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-        </com.fishhawk.driftinglibraryandroid.reader.ReaderLayout>
+        </com.fishhawk.driftinglibraryandroid.ui.reader.ReaderLayout>
 
         <TextView
             android:layout_width="wrap_content"

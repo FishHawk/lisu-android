@@ -2,8 +2,8 @@ package com.fishhawk.driftinglibraryandroid.extension
 
 import android.view.View
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.base.RefreshableListViewModel
-import com.fishhawk.driftinglibraryandroid.base.RefreshableListViewModelWithFetchMore
+import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModel
+import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModelWithFetchMore
 import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
 

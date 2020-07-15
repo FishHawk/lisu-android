@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".library.LibraryFragment">
+    tools:context=".ui.library.LibraryFragment">
 
     <include
         android:id="@+id/manga_list"

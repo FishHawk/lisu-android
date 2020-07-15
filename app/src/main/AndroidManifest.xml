@@ -26,11 +26,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".reader.ReaderActivity"
+            android:name="com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.App.Light" />
         <activity
-            android:name=".gallery.GalleryActivity"
+            android:name="com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryActivity"
             android:label="@string/app_name"
             android:theme="@style/Theme.App.Light" />
     </application>

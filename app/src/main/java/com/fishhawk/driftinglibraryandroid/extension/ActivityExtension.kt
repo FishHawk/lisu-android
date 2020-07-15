@@ -9,8 +9,8 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainActivity
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.gallery.GalleryActivity
-import com.fishhawk.driftinglibraryandroid.reader.ReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryActivity
+import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActivity
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import java.lang.reflect.Method
 
