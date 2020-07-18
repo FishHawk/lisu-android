@@ -78,8 +78,8 @@ class GalleryActivity : AppCompatActivity() {
         viewModel.operationError.observe(this,
             EventObserver { exception ->
                 when (exception) {
-                    null -> binding.root.makeSnackBar("Success")
-                    else -> binding.root.makeSnackBar("Fail: ${exception.message}")
+                    null -> binding.root.makeToast("Success")
+                    else -> binding.root.makeToast("Fail: ${exception.message}")
                 }
             })
 

@@ -15,24 +15,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.Target
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.DialogChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderActivityBinding
-import com.fishhawk.driftinglibraryandroid.extension.makeSnackBar
 import com.fishhawk.driftinglibraryandroid.extension.makeToast
 import com.fishhawk.driftinglibraryandroid.extension.setupFullScreen
 import com.fishhawk.driftinglibraryandroid.extension.setupThemeWithTranslucentStatus
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.util.DiskUtil
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.lang.Exception
 
 
 class ReaderActivity : AppCompatActivity() {
@@ -249,11 +245,11 @@ class ReaderActivity : AppCompatActivity() {
     }
 
     private fun openPrevChapter() {
-        if (!viewModel.openPrevChapter()) binding.root.makeSnackBar(getString(R.string.reader_no_prev_chapter_hint))
+        if (!viewModel.openPrevChapter()) binding.root.makeToast(getString(R.string.reader_no_prev_chapter_hint))
     }
 
     private fun openNextChapter() {
-        if (!viewModel.openNextChapter()) binding.root.makeSnackBar(getString(R.string.reader_no_next_chapter_hint))
+        if (!viewModel.openNextChapter()) binding.root.makeToast(getString(R.string.reader_no_next_chapter_hint))
     }
 
     private fun setHorizontalReaderPage(position: Int) {

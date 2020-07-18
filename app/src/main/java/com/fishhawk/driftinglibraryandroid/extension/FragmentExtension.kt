@@ -23,7 +23,7 @@ fun Fragment.showErrorMessage(notification: Notification) {
             notification.throwable.message ?: getString(R.string.library_unknown_error_hint)
         else -> getString(R.string.library_unknown_error_hint)
     }
-    view?.makeSnackBar(message)
+    view?.makeToast(message)
 }
 
 fun <T> Fragment.bindToListViewModel(

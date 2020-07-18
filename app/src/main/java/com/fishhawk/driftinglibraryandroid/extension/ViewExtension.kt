@@ -5,7 +5,6 @@ import android.widget.Toast
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModelWithFetchMore
-import com.google.android.material.snackbar.Snackbar
 import com.hippo.refreshlayout.RefreshLayout
 
 fun RefreshLayout.bindingToViewModel(viewModel: RefreshableListViewModel<*>) {
@@ -45,10 +44,6 @@ fun RefreshLayout.setupDefaultColorSchemeResources() {
         R.color.loading_indicator_green,
         R.color.loading_indicator_orange
     )
-}
-
-fun View.makeSnackBar(content: String) {
-    Snackbar.make(this, content, Snackbar.LENGTH_SHORT).show()
 }
 
 fun View.makeToast(content: String) {
