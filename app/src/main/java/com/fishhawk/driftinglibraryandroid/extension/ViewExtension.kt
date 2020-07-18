@@ -1,6 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.extension
 
 import android.view.View
+import android.widget.Toast
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModelWithFetchMore
@@ -48,4 +49,8 @@ fun RefreshLayout.setupDefaultColorSchemeResources() {
 
 fun View.makeSnackBar(content: String) {
     Snackbar.make(this, content, Snackbar.LENGTH_SHORT).show()
+}
+
+fun View.makeToast(content: String) {
+    Toast.makeText(context, content, Toast.LENGTH_SHORT).show()
 }

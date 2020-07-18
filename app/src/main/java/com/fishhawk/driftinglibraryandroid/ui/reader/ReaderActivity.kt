@@ -21,6 +21,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.DialogChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderActivityBinding
 import com.fishhawk.driftinglibraryandroid.extension.makeSnackBar
+import com.fishhawk.driftinglibraryandroid.extension.makeToast
 import com.fishhawk.driftinglibraryandroid.extension.setupFullScreen
 import com.fishhawk.driftinglibraryandroid.extension.setupThemeWithTranslucentStatus
 import com.fishhawk.driftinglibraryandroid.repository.Result
@@ -282,13 +283,14 @@ class ReaderActivity : AppCompatActivity() {
 
         dialogBinding.refreshButton.setOnClickListener {
             dialog.dismiss()
+            if (SettingsHelper.readingDirection.getValueDirectly() == SettingsHelper.READING_DIRECTION_VERTICAL)
+                binding.verticalReader.adapter?.notifyItemChanged(page)
+            else
+                binding.horizontalReader.adapter?.notifyItemChanged(page)
         }
         dialogBinding.shareButton.setOnClickListener {
             dialog.dismiss()
-            val activity = this
-            lifecycleScope.launch {
-                shareImage(url)
-            }
+            lifecycleScope.launch { shareImage(url) }
         }
         dialogBinding.saveButton.setOnClickListener {
             dialog.dismiss()
@@ -322,13 +324,13 @@ class ReaderActivity : AppCompatActivity() {
     private suspend fun saveImage(url: String) {
         val filename = viewModel.makeImageFilename()
         if (filename == null) {
-            binding.root.makeSnackBar("Chapter not open.")
+            binding.root.makeToast("Chapter not open")
         } else {
             try {
                 DiskUtil.saveImage(this, url, filename)
-                binding.root.makeSnackBar("Image saved.")
+                binding.root.makeToast("Image saved")
             } catch (e: Throwable) {
-                binding.root.makeSnackBar(e.message ?: "Unknown error.")
+                binding.root.makeToast(e.message ?: "Unknown error")
             }
         }
     }
