@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_more"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.more.MoreFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.other.MoreFragment"
         android:label="@string/label_more">
         <action
             android:id="@+id/action_more_to_server"
@@ -28,29 +28,29 @@
 
     <fragment
         android:id="@+id/nav_server"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.more.ServerFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.server.ServerFragment"
         android:label="@string/label_server"
         tools:layout="@layout/server_fragment" />
 
     <fragment
         android:id="@+id/nav_download"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.more.DownloadFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.download.DownloadFragment"
         android:label="@string/label_download"
         tools:layout="@layout/download_fragment" />
 
     <fragment
         android:id="@+id/nav_subscription"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.more.SubscriptionFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.subscription.SubscriptionFragment"
         android:label="@string/label_subscription"
         tools:layout="@layout/subscription_fragment" />
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.more.SettingsFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.other.SettingsFragment"
         android:label="@string/label_settings" />
 
     <fragment
         android:id="@+id/nav_about"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.more.AboutFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.other.AboutFragment"
         android:label="@string/label_about" />
 </navigation>

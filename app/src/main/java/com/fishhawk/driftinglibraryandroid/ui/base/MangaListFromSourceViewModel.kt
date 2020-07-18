@@ -25,12 +25,12 @@ abstract class MangaListFromSourceViewModel(
     fun download(id: String, title: String) =
         viewModelScope.launch(Dispatchers.Main) {
             val result = remoteLibraryRepository.postDownloadTask(source, id, title)
-            networkOperationWarp(result) { notify(DownloadCreatedNotification()) }
+            resultWarp(result) { notify(DownloadCreatedNotification()) }
         }
 
     fun subscribe(id: String, title: String) =
         viewModelScope.launch(Dispatchers.Main) {
             val result = remoteLibraryRepository.postSubscription(source, id, title)
-            networkOperationWarp(result) { notify(SubscriptionCreatedNotification()) }
+            resultWarp(result) { notify(SubscriptionCreatedNotification()) }
         }
 }

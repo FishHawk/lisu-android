@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.more
+package com.fishhawk.driftinglibraryandroid.ui.subscription
 
 import android.app.Activity
 import android.view.LayoutInflater
@@ -6,9 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.SubscriptionCardBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.Subscription
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
+
 
 class SubscriptionListAdapter(
     private val activity: Activity
@@ -20,7 +21,7 @@ class SubscriptionListAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): SubscriptionListAdapter.ViewHolder {
+    ): ViewHolder {
         return ViewHolder(
             SubscriptionCardBinding.inflate(
                 LayoutInflater.from(activity),

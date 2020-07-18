@@ -8,8 +8,8 @@
         <import type="android.view.View" />
 
         <variable
-            name="detail"
-            type="com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail" />
+            name="info"
+            type="com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryInfo" />
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -61,7 +61,6 @@
                     </androidx.cardview.widget.CardView>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
-                        android:id="@+id/info"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_margin="16dp"
@@ -75,7 +74,7 @@
                             android:layout_height="wrap_content"
                             android:ellipsize="end"
                             android:maxLines="2"
-                            android:text="@{detail.title}"
+                            android:text="@{info.title}"
                             android:textIsSelectable="false"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
@@ -89,7 +88,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="@string/gallery_author_label"
-                            android:visibility="@{(detail.author != null &amp;&amp; detail.author.size() > 0) ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{info.author != null ? View.VISIBLE : View.GONE}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/title" />
 
@@ -102,8 +101,9 @@
                             android:layout_marginTop="4dp"
                             android:ellipsize="end"
                             android:singleLine="true"
+                            android:text="@{info.author}"
                             android:textIsSelectable="false"
-                            android:visibility="@{(detail.author != null &amp;&amp; detail.author.size() > 0) ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{info.author != null ? View.VISIBLE : View.GONE}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/author_label"
                             app:layout_constraintTop_toBottomOf="@+id/title"
@@ -116,7 +116,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="@string/gallery_status_label"
-                            android:visibility="@{detail.status != null ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{info.status != null ? View.VISIBLE : View.GONE}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/author_label" />
 
@@ -129,8 +129,9 @@
                             android:layout_marginTop="4dp"
                             android:ellipsize="end"
                             android:singleLine="true"
+                            android:text="@{info.status}"
                             android:textIsSelectable="false"
-                            android:visibility="@{detail.status != null ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{info.status != null ? View.VISIBLE : View.GONE}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/status_label"
                             app:layout_constraintTop_toBottomOf="@+id/author_label"
@@ -143,7 +144,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="@string/gallery_update_label"
-                            android:visibility="@{detail.update != null ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{info.update != null ? View.VISIBLE : View.GONE}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/status_label" />
 
@@ -156,9 +157,9 @@
                             android:layout_marginTop="4dp"
                             android:ellipsize="end"
                             android:singleLine="true"
-                            android:text="@{detail.update}"
+                            android:text="@{info.update}"
                             android:textIsSelectable="false"
-                            android:visibility="@{detail.update != null ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{info.update != null ? View.VISIBLE : View.GONE}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/update_label"
                             app:layout_constraintTop_toBottomOf="@+id/status_label"
@@ -171,7 +172,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="@string/gallery_source_label"
-                            android:visibility="@{detail.source != null ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{info.source != null ? View.VISIBLE : View.GONE}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/update_label" />
 
@@ -184,9 +185,9 @@
                             android:layout_marginTop="4dp"
                             android:ellipsize="end"
                             android:singleLine="true"
-                            android:text="@{detail.source}"
+                            android:text="@{info.source}"
                             android:textIsSelectable="false"
-                            android:visibility="@{detail.source != null ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{info.source != null ? View.VISIBLE : View.GONE}"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toEndOf="@+id/source_label"
                             app:layout_constraintTop_toBottomOf="@+id/update_label"
@@ -246,7 +247,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:visibility="@{detail.source != null ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{info.source != null ? View.VISIBLE : View.GONE}"
                             app:icon="@drawable/ic_baseline_cloud_download_24" />
 
                         <com.google.android.material.button.MaterialButton
@@ -255,7 +256,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:visibility="@{detail.source != null ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{info.source != null ? View.VISIBLE : View.GONE}"
                             app:icon="@drawable/ic_baseline_rss_feed_24" />
                     </LinearLayout>
 
@@ -264,8 +265,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@{detail.description}"
+                        android:text="@{info.description}"
                         android:textIsSelectable="false"
+                        android:visibility="@{info.description != null ? View.VISIBLE : View.GONE}"
                         tools:text="Sample description line 1\nSample description line 2" />
 
                     <LinearLayout
@@ -273,13 +275,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:orientation="vertical" />
+                        android:orientation="vertical"
+                        android:visibility="@{info.hasTag ? View.VISIBLE : View.GONE}" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/chapters"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:visibility="@{detail.collections.size() != 0 ? View.VISIBLE : View.GONE}"
+                        android:visibility="@{info.hasContent ? View.VISIBLE : View.GONE}"
                         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                         app:spanCount="3" />
 
@@ -291,7 +294,7 @@
                         android:layout_marginTop="4dp"
                         android:text="@string/gallery_no_chapters_hint"
                         android:textColor="?attr/colorSecondary"
-                        android:visibility="@{detail.collections.size() == 0 ? View.VISIBLE : View.GONE}" />
+                        android:visibility="@{!info.hasContent ? View.VISIBLE : View.GONE}" />
                 </LinearLayout>
             </FrameLayout>
         </LinearLayout>

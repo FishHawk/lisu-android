@@ -1,13 +1,12 @@
 package com.fishhawk.driftinglibraryandroid.ui.library
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModelWithFetchMore
 import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
+import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModelWithFetchMore
 import kotlinx.coroutines.launch
+
 
 class LibraryViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository
@@ -35,23 +34,8 @@ class LibraryViewModel(
         address = remoteLibraryRepository.url
     }
 
-    fun deleteManga(id: String) =
-        viewModelScope.launch {
-            val result = remoteLibraryRepository.deleteMangaFromLibrary(id)
-            networkOperationWarp(result) { load() }
-        }
-}
-
-@Suppress("UNCHECKED_CAST")
-class LibraryViewModelFactory(
-    private val remoteLibraryRepository: RemoteLibraryRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
-        when {
-            isAssignableFrom(LibraryViewModel::class.java) ->
-                LibraryViewModel(remoteLibraryRepository)
-            else ->
-                throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-        }
-    } as T
+    fun deleteManga(id: String) = viewModelScope.launch {
+        val result = remoteLibraryRepository.deleteMangaFromLibrary(id)
+        resultWarp(result) { load() }
+    }
 }

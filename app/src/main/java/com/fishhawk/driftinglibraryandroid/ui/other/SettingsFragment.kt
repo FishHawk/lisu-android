@@ -1,10 +1,11 @@
-package com.fishhawk.driftinglibraryandroid.ui.more
+package com.fishhawk.driftinglibraryandroid.ui.other
 
 import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.bumptech.glide.Glide
 import com.fishhawk.driftinglibraryandroid.R
+
 
 class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {

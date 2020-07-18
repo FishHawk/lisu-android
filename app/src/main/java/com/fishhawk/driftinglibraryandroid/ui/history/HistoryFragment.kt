@@ -2,23 +2,20 @@ package com.fishhawk.driftinglibraryandroid.ui.history
 
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.extension.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.extension.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
+
 
 class HistoryFragment : Fragment() {
-    private val viewModel: HistoryViewModel by viewModels {
-        val readingHistoryRepository =
-            (requireContext().applicationContext as MainApplication).readingHistoryRepository
-        HistoryViewModelFactory(readingHistoryRepository)
+    val viewModel: HistoryViewModel by viewModels {
+        ViewModelFactory(requireActivity().application as MainApplication)
     }
     private lateinit var binding: HistoryFragmentBinding
 
@@ -41,19 +38,19 @@ class HistoryFragment : Fragment() {
 
         val adapter = HistoryListAdapter(requireActivity())
         adapter.onThumbClicked = {
-            (requireActivity() as AppCompatActivity).navToGalleryActivity(
+            requireActivity().navToGalleryActivity(
                 it.id, it.title, it.thumb, it.source
             )
         }
         adapter.onCardClicked = {
-            (requireActivity() as AppCompatActivity).navToReaderActivity(
+            requireActivity().navToReaderActivity(
                 it.id, it.source, it.collectionIndex, it.chapterIndex, it.pageIndex
             )
         }
         binding.list.adapter = adapter
 
         viewModel.filteredReadingHistoryList.observe(viewLifecycleOwner, Observer { data ->
-            (binding.list.adapter as HistoryListAdapter).changeList(data.toMutableList())
+            adapter.changeList(data.toMutableList())
             if (data.isEmpty()) binding.multipleStatusView.showEmpty()
             else binding.multipleStatusView.showContent()
         })
@@ -66,39 +63,10 @@ class HistoryFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_filter -> createFilterSwitchDialog()
+            R.id.action_filter -> createHistoryFilterSwitchDialog()
             R.id.action_clear_history -> createClearHistoryDialog()
             else -> return super.onOptionsItemSelected(item)
         }
         return true
-    }
-
-    private fun createFilterSwitchDialog() {
-        val checkedItem = when (SettingsHelper.historyFilter.getValueDirectly()) {
-            SettingsHelper.HISTORY_FILTER_ALL -> 0
-            SettingsHelper.HISTORY_FILTER_FROM_LIBRARY -> 1
-            SettingsHelper.HISTORY_FILTER_FROM_SOURCES -> 2
-            else -> -1
-        }
-        AlertDialog.Builder(requireActivity())
-            .setTitle(R.string.dialog_filter_history)
-            .setSingleChoiceItems(
-                R.array.settings_history_filter_entries,
-                checkedItem
-            ) { _, which ->
-                when (which) {
-                    0 -> SettingsHelper.historyFilter.setValue(SettingsHelper.HISTORY_FILTER_ALL)
-                    1 -> SettingsHelper.historyFilter.setValue(SettingsHelper.HISTORY_FILTER_FROM_LIBRARY)
-                    2 -> SettingsHelper.historyFilter.setValue(SettingsHelper.HISTORY_FILTER_FROM_SOURCES)
-                }
-            }
-            .show()
-    }
-
-    private fun createClearHistoryDialog() {
-        AlertDialog.Builder(requireActivity())
-            .setTitle(R.string.dialog_clear_history)
-            .setPositiveButton(R.string.dialog_clear_history_positive) { _, _ -> viewModel.clearReadingHistory() }
-            .show()
     }
 }

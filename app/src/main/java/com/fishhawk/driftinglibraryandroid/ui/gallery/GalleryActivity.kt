@@ -13,24 +13,19 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryActivityBinding
+import com.fishhawk.driftinglibraryandroid.extension.*
 import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.data.*
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
-import com.fishhawk.driftinglibraryandroid.extension.*
+import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
+import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
 import com.google.android.flexbox.FlexboxLayout
+
 
 class GalleryActivity : AppCompatActivity() {
     private val viewModel: GalleryViewModel by viewModels {
-        val arguments = intent.extras!!
-        val id = arguments.getString("id")!!
-        val source = arguments.getString("source")
-
         val application = applicationContext as MainApplication
-        val remoteLibraryRepository = application.remoteLibraryRepository
-        val readingHistoryRepository = application.readingHistoryRepository
-
-        GalleryViewModelFactory(id, source, remoteLibraryRepository, readingHistoryRepository)
+        ViewModelFactory(application)
     }
     private lateinit var binding: GalleryActivityBinding
 
@@ -45,18 +40,12 @@ class GalleryActivity : AppCompatActivity() {
         val arguments = intent.extras!!
         val id: String = arguments.getString("id")!!
         val title: String = arguments.getString("title")!!
-        val thumb: String = arguments.getString("thumb")!!
         val source: String? = arguments.getString("source")
 
-        binding.detail = MangaDetail(
-            source, id, title, thumb,
-            null,
-            null,
-            null,
-            null,
-            null,
-            mutableListOf()
-        )
+        if (source == null) viewModel.openMangaFromLibrary(id)
+        else viewModel.openMangaFromSource(source, id)
+
+        binding.info = GalleryInfo(source, title)
         setupThumb()
         setupActionButton()
 
@@ -75,13 +64,9 @@ class GalleryActivity : AppCompatActivity() {
                 }
         }
 
-        viewModel.operationError.observe(this,
-            EventObserver { exception ->
-                when (exception) {
-                    null -> binding.root.makeToast("Success")
-                    else -> binding.root.makeToast("Fail: ${exception.message}")
-                }
-            })
+        viewModel.notification.observe(this, EventObserver {
+            binding.root.makeToast(getNotificationMessage(it))
+        })
 
         viewModel.detail.observe(this, Observer { result ->
             binding.contentView.visibility = View.GONE
@@ -90,30 +75,10 @@ class GalleryActivity : AppCompatActivity() {
             when (result) {
                 is Result.Success -> {
                     binding.contentView.visibility = View.VISIBLE
-
                     val detail = result.data
-                    binding.detail = detail
-
-                    binding.status.text = when (detail.status) {
-                        MangaStatus.COMPLETED -> "Completed"
-                        MangaStatus.ONGOING -> "Ongoing"
-                        MangaStatus.UNKNOWN -> "Unknown"
-                        else -> ""
-                    }
-
-                    binding.author.text = detail.author?.joinToString(separator = ";")
-
-                    if (detail.description == null || detail.description.isBlank())
-                        binding.description.visibility = View.GONE
-
-                    if (detail.tags == null || detail.tags.isEmpty())
-                        binding.tags.visibility = View.GONE
-                    else bindTags(detail.tags, binding.tags)
-
-                    if (detail.collections.isEmpty()) {
-                        binding.chapters
-                    }
-                    bindContent(adapter, detail.collections)
+                    binding.info = GalleryInfo(detail)
+                    if (!detail.tags.isNullOrEmpty()) bindTags(detail.tags, binding.tags)
+                    if (detail.collections.isNotEmpty()) bindContent(adapter, detail.collections)
                 }
                 is Result.Error -> {
                     binding.errorView.visibility = View.VISIBLE
@@ -123,7 +88,7 @@ class GalleryActivity : AppCompatActivity() {
             }
         })
 
-        viewModel.readingHistory.observe(this, Observer { history ->
+        viewModel.history.observe(this, Observer { history ->
             if (history != null)
                 history.let {
                     adapter.markChapter(it.collectionIndex, it.chapterIndex, it.pageIndex)
@@ -151,7 +116,7 @@ class GalleryActivity : AppCompatActivity() {
         binding.readButton.setOnClickListener {
             (viewModel.detail.value as? Result.Success)?.let { result ->
                 val detail = result.data
-                viewModel.readingHistory.value?.let { history ->
+                viewModel.history.value?.let { history ->
                     navToReaderActivity(
                         detail.id,
                         detail.source,

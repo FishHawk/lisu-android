@@ -1,13 +1,14 @@
-package com.fishhawk.driftinglibraryandroid.ui.more
+package com.fishhawk.driftinglibraryandroid.ui.server
 
 import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.ServerInfoCardBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
+
 
 class ServerInfoListAdapter(
     private val activity: Activity
@@ -25,7 +26,7 @@ class ServerInfoListAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): ServerInfoListAdapter.ViewHolder {
+    ): ViewHolder {
         return ViewHolder(
             ServerInfoCardBinding.inflate(
                 LayoutInflater.from(activity),

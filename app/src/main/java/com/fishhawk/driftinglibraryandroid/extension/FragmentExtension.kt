@@ -7,12 +7,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.classic.common.MultipleStatusView
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.ui.base.*
+import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.hippo.refreshlayout.RefreshLayout
-import com.fishhawk.driftinglibraryandroid.ui.base.Notification
-import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 
 
 fun Fragment.showErrorMessage(notification: Notification) {

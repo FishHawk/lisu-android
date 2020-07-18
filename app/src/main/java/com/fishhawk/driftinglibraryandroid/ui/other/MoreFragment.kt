@@ -1,10 +1,11 @@
-package com.fishhawk.driftinglibraryandroid.ui.more
+package com.fishhawk.driftinglibraryandroid.ui.other
 
 import android.os.Bundle
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.fishhawk.driftinglibraryandroid.R
+
 
 class MoreFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {

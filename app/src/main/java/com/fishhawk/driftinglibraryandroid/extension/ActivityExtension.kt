@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.extension;
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -9,13 +10,17 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainActivity
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.ui.base.ListEmptyNotification
+import com.fishhawk.driftinglibraryandroid.ui.base.ListReachEndNotification
+import com.fishhawk.driftinglibraryandroid.ui.base.NetworkErrorNotification
+import com.fishhawk.driftinglibraryandroid.ui.base.Notification
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryActivity
 import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActivity
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import java.lang.reflect.Method
 
 
-fun AppCompatActivity.navToGalleryActivity(
+fun Activity.navToGalleryActivity(
     id: String,
     title: String,
     thumb: String,
@@ -33,7 +38,7 @@ fun AppCompatActivity.navToGalleryActivity(
     startActivity(intent)
 }
 
-fun AppCompatActivity.navToReaderActivity(
+fun Activity.navToReaderActivity(
     id: String,
     source: String?,
     collectionIndex: Int = 0,
@@ -53,7 +58,7 @@ fun AppCompatActivity.navToReaderActivity(
     startActivity(intent)
 }
 
-fun AppCompatActivity.navToMainActivity(
+fun Activity.navToMainActivity(
     filter: String
 ) {
     val bundle = bundleOf("filter" to filter)
@@ -124,4 +129,15 @@ fun AppCompatActivity.setupTheme() {
         }
     })
 }
+
+fun Activity.getNotificationMessage(notification: Notification): String {
+    return when (notification) {
+        is ListEmptyNotification -> getString(R.string.error_hint_empty_refresh_result)
+        is ListReachEndNotification -> getString(R.string.error_hint_empty_fetch_more_result)
+        is NetworkErrorNotification ->
+            notification.throwable.message ?: getString(R.string.library_unknown_error_hint)
+        else -> getString(R.string.library_unknown_error_hint)
+    }
+}
+
 

@@ -4,10 +4,10 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchGroupBinding
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 data class SearchResultGroup(
     val source: String,

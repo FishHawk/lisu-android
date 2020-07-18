@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.more
+package com.fishhawk.driftinglibraryandroid.ui.download
 
 import android.os.Bundle
 import android.view.*
@@ -7,13 +7,13 @@ import androidx.fragment.app.viewModels
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.DownloadFragmentBinding
-import com.fishhawk.driftinglibraryandroid.extension.*
+import com.fishhawk.driftinglibraryandroid.extension.bindToListViewModel
+import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
+
 
 class DownloadFragment : Fragment() {
     private val viewModel: DownloadViewModel by viewModels {
-        val application = requireContext().applicationContext as MainApplication
-        val remoteLibraryRepository = application.remoteLibraryRepository
-        DownloadViewModelFactory(remoteLibraryRepository)
+        ViewModelFactory(requireActivity().application as MainApplication)
     }
     private lateinit var binding: DownloadFragmentBinding
 
@@ -34,7 +34,10 @@ class DownloadFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = DownloadTaskListAdapter(requireActivity())
+        val adapter =
+            DownloadTaskListAdapter(
+                requireActivity()
+            )
         adapter.onStart = { id -> viewModel.startDownloadTask(id) }
         adapter.onPause = { id -> viewModel.pauseDownloadTask(id) }
         adapter.onDelete = { id -> viewModel.deleteDownloadTask(id) }

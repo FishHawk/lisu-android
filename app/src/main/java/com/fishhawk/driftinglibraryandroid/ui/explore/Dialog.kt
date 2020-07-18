@@ -5,10 +5,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.fishhawk.driftinglibraryandroid.databinding.DialogMangaOutlineBinding
-import com.fishhawk.driftinglibraryandroid.databinding.ServerInfoDialogBinding
 import com.fishhawk.driftinglibraryandroid.extension.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
-import com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListFromSourceViewModel
 
 

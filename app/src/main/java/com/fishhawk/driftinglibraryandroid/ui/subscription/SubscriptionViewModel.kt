@@ -1,11 +1,12 @@
-package com.fishhawk.driftinglibraryandroid.ui.more
+package com.fishhawk.driftinglibraryandroid.ui.subscription
 
-import androidx.lifecycle.*
-import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModel
+import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.Subscription
+import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModel
 import kotlinx.coroutines.launch
+
 
 class SubscriptionViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository
@@ -37,8 +38,9 @@ class SubscriptionViewModel(
         updateList(result)
     }
 
+
     private fun deleteItem(id: Int, result: Result<Subscription>) {
-        networkOperationWarp(result) { _ ->
+        resultWarp(result) { _ ->
             (_list.value as? Result.Success)?.data?.let { taskList ->
                 val index = taskList.indexOfFirst { it.id == id }
                 taskList.removeAt(index)
@@ -48,7 +50,7 @@ class SubscriptionViewModel(
     }
 
     private fun updateItem(id: Int, result: Result<Subscription>) {
-        networkOperationWarp(result) { subscription ->
+        resultWarp(result) { subscription ->
             (_list.value as? Result.Success)?.data?.let { taskList ->
                 val index = taskList.indexOfFirst { it.id == id }
                 taskList[index] = subscription
@@ -63,18 +65,4 @@ class SubscriptionViewModel(
             is Result.Error -> _list.value = result
         }
     }
-}
-
-@Suppress("UNCHECKED_CAST")
-class SubscriptionViewModelFactory(
-    private val remoteLibraryRepository: RemoteLibraryRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
-        when {
-            isAssignableFrom(SubscriptionViewModel::class.java) ->
-                SubscriptionViewModel(remoteLibraryRepository)
-            else ->
-                throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-        }
-    } as T
 }

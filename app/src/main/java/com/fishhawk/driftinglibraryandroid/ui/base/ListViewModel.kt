@@ -3,8 +3,8 @@ package com.fishhawk.driftinglibraryandroid.ui.base
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.Event
+import com.fishhawk.driftinglibraryandroid.repository.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

@@ -22,7 +22,7 @@ open class NotificationViewModel : ViewModel() {
             )
     }
 
-    protected fun <T> networkOperationWarp(result: Result<T>, runIfSuccess: (T) -> Unit) {
+    protected fun <T> resultWarp(result: Result<T>, runIfSuccess: (T) -> Unit) {
         when (result) {
             is Result.Success -> runIfSuccess(result.data)
             is Result.Error -> notifyNetworkError(result.exception)

@@ -1,10 +1,14 @@
 package com.fishhawk.driftinglibraryandroid.ui.history
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.repository.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import kotlinx.coroutines.launch
+
 
 class HistoryViewModel(
     private val readingHistoryRepository: ReadingHistoryRepository
@@ -25,6 +29,10 @@ class HistoryViewModel(
         }
     }
 
+    fun clearReadingHistory() = viewModelScope.launch {
+        readingHistoryRepository.clearReadingHistory()
+    }
+
     private fun filterList(list: List<ReadingHistory>, filter: String): List<ReadingHistory> {
         return when (filter) {
             SettingsHelper.HISTORY_FILTER_ALL -> list
@@ -33,24 +41,4 @@ class HistoryViewModel(
             else -> throw InternalError("Shouldn't reach here")
         }
     }
-
-    fun clearReadingHistory() {
-        viewModelScope.launch {
-            readingHistoryRepository.clearReadingHistory()
-        }
-    }
-}
-
-@Suppress("UNCHECKED_CAST")
-class HistoryViewModelFactory(
-    private val readingHistoryRepository: ReadingHistoryRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
-        when {
-            isAssignableFrom(HistoryViewModel::class.java) ->
-                HistoryViewModel(readingHistoryRepository)
-            else ->
-                throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-        }
-    } as T
 }

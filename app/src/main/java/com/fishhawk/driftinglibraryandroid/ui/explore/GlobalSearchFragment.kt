@@ -9,8 +9,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchFragmentBinding
+import com.fishhawk.driftinglibraryandroid.repository.Result
 import kotlinx.coroutines.launch
 
 class GlobalSearchFragment : Fragment() {

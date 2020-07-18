@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchThumbnailBinding
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
 import com.fishhawk.driftinglibraryandroid.extension.navToGalleryActivity
+import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 class GlobalSearchGroupAdapter(
     private val activity: Activity,

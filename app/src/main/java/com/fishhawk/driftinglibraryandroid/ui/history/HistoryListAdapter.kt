@@ -7,11 +7,12 @@ import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class HistoryListAdapter(
     private val activity: Activity

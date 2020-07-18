@@ -4,12 +4,13 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryChapterBinding
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryChapterMarkedBinding
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryCollectionTitleBinding
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryNoChapterHintBinding
 import com.fishhawk.driftinglibraryandroid.extension.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
+
 
 sealed class ContentItem {
     data class Chapter(

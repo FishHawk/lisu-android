@@ -1,13 +1,13 @@
-package com.fishhawk.driftinglibraryandroid.ui.more
+package com.fishhawk.driftinglibraryandroid.ui.download
 
 import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.DownloadTaskCardBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.DownloadTask
 import com.fishhawk.driftinglibraryandroid.repository.data.DownloadTaskStatus
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 
 class DownloadTaskListAdapter(
@@ -20,7 +20,7 @@ class DownloadTaskListAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): DownloadTaskListAdapter.ViewHolder {
+    ): ViewHolder {
         return ViewHolder(
             DownloadTaskCardBinding.inflate(
                 LayoutInflater.from(activity),

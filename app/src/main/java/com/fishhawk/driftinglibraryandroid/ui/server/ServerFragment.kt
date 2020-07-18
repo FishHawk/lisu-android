@@ -1,7 +1,9 @@
-package com.fishhawk.driftinglibraryandroid.ui.more
+package com.fishhawk.driftinglibraryandroid.ui.server
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -11,13 +13,12 @@ import com.fishhawk.driftinglibraryandroid.databinding.ServerFragmentBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ServerInfoDialogBinding
 import com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
 
 
 class ServerFragment : Fragment() {
     private val viewModel: ServerViewModel by viewModels {
-        val application = requireContext().applicationContext as MainApplication
-        val serverInfoRepository = application.serverInfoRepository
-        ServerViewModelFactory(serverInfoRepository)
+        ViewModelFactory(requireActivity().application as MainApplication)
     }
     private lateinit var binding: ServerFragmentBinding
 
@@ -38,7 +39,10 @@ class ServerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = ServerInfoListAdapter(requireActivity())
+        val adapter =
+            ServerInfoListAdapter(
+                requireActivity()
+            )
         adapter.onEdit = {
             createServerInfoDialog(it) { name, address ->
                 it.name = name

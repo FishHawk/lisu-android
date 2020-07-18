@@ -9,11 +9,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.databinding.ExplorePopularFragmentBinding
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.extension.bindToListViewModel
 import com.fishhawk.driftinglibraryandroid.extension.changeMangaListDisplayMode
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
 
 class SearchFragment : Fragment() {
     private val viewModel: SearchViewModel by viewModels {
