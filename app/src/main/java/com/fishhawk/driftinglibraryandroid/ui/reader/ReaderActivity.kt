@@ -84,11 +84,19 @@ class ReaderActivity : AppCompatActivity() {
                     val content = result.data
                     if (viewModel.isReaderDirectionEqualVertical.value!!)
                         binding.verticalReader.apply {
-                            adapter = ImageVerticalListAdapter(context, content)
+                            adapter = ImageVerticalListAdapter(context, content).apply {
+                                onCardLongClicked = { page, url ->
+                                    createChapterImageActionDialog(page, url)
+                                }
+                            }
                         }
                     else
                         binding.horizontalReader.apply {
-                            adapter = ImageHorizontalListAdapter(context, content)
+                            adapter = ImageHorizontalListAdapter(context, content).apply {
+                                onCardLongClicked = { page, url ->
+                                    createChapterImageActionDialog(page, url)
+                                }
+                            }
                         }
                     viewModel.chapterPosition.value?.let { setReaderPage(it) }
                 }
@@ -128,15 +136,7 @@ class ReaderActivity : AppCompatActivity() {
             }
         }
         binding.readerLayout.onClickCenterAreaListener = { viewModel.isMenuVisible.value = true }
-        binding.readerLayout.onLongClickListener = {
-            (viewModel.readerContent.value as? Result.Success)?.let {
-                if (viewModel.chapterPosition.value != null) {
-                    val page = viewModel.chapterPosition.value!!
-                    val url = it.data[page]
-                    createChapterImageActionDialog(page, url)
-                }
-            }
-        }
+
     }
 
     private fun setupMenuLayout() {
@@ -290,7 +290,7 @@ class ReaderActivity : AppCompatActivity() {
         }
         dialogBinding.saveButton.setOnClickListener {
             dialog.dismiss()
-            lifecycleScope.launch { saveImage(url) }
+            lifecycleScope.launch { saveImage(page, url) }
         }
         dialog.show()
     }
@@ -317,13 +317,13 @@ class ReaderActivity : AppCompatActivity() {
         startActivity(Intent.createChooser(shareIntent, "Share image"))
     }
 
-    private suspend fun saveImage(url: String) {
-        val filename = viewModel.makeImageFilename()
-        if (filename == null) {
+    private suspend fun saveImage(page: Int, url: String) {
+        val prefix = viewModel.makeImageFilenamePrefix()
+        if (prefix == null) {
             binding.root.makeToast("Chapter not open")
         } else {
             try {
-                DiskUtil.saveImage(this, url, filename)
+                DiskUtil.saveImage(this, url, "$prefix-$page")
                 binding.root.makeToast("Image saved")
             } catch (e: Throwable) {
                 binding.root.makeToast(e.message ?: "Unknown error")

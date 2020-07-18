@@ -133,16 +133,15 @@ class ReaderViewModel(
         }
     }
 
-    fun makeImageFilename(): String? {
+    fun makeImageFilenamePrefix(): String? {
         val detail = (mangaDetail.value as? Result.Success)?.data ?: return null
         val collection = detail.collections[collectionIndex]
 
         val mangaTitle = detail.title
         val collectionTitle = collection.title
         val chapterTitle = collection.chapters[chapterIndex].title
-        val page = chapterPosition.value ?: return null
 
-        return "$mangaTitle-$collectionTitle-$chapterTitle-$page"
+        return "$mangaTitle-$collectionTitle-$chapterTitle"
     }
 }
 

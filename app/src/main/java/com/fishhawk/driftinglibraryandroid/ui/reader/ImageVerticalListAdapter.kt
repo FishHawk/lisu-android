@@ -22,6 +22,7 @@ class ImageVerticalListAdapter(
     private val context: Context,
     private var data: List<String>
 ) : RecyclerView.Adapter<ImageVerticalListAdapter.ViewHolder>() {
+    var onCardLongClicked: ((Int, String) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
@@ -45,6 +46,10 @@ class ImageVerticalListAdapter(
             binding.errorHint.visibility = View.GONE
 
             binding.number.text = (position + 1).toString()
+            binding.content.setOnLongClickListener {
+                onCardLongClicked?.invoke(position, item)
+                true
+            }
             Glide.with(context)
                 .asBitmap()
                 .load(item)
