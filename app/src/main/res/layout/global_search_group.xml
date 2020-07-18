@@ -7,7 +7,7 @@
 
         <variable
             name="searchResultGroup"
-            type="com.fishhawk.driftinglibraryandroid.ui.explore.SearchResultGroup" />
+            type="com.fishhawk.driftinglibraryandroid.ui.explore.globalsearch.SearchResultGroup" />
     </data>
 
     <androidx.cardview.widget.CardView

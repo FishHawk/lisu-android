@@ -12,12 +12,11 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ExploreFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
 
 class ExploreFragment : Fragment() {
     private val viewModel: ExploreViewModel by viewModels {
-        val application = requireContext().applicationContext as MainApplication
-        val remoteLibraryRepository = application.remoteLibraryRepository
-        ExploreViewModelFactory("", remoteLibraryRepository)
+        ViewModelFactory(requireActivity().application as MainApplication)
     }
     private lateinit var binding: ExploreFragmentBinding
 

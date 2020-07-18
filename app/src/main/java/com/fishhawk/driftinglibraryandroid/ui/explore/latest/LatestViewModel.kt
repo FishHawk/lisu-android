@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.explore
+package com.fishhawk.driftinglibraryandroid.ui.explore.latest
 
 import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListFromSourceViewModel

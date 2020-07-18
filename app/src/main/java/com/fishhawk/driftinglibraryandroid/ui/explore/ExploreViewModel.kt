@@ -4,9 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.liveData
+import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.Source
+import com.fishhawk.driftinglibraryandroid.ui.explore.globalsearch.GlobalSearchViewModel
+import com.fishhawk.driftinglibraryandroid.ui.explore.latest.LatestViewModel
+import com.fishhawk.driftinglibraryandroid.ui.explore.popular.PopularViewModel
+import com.fishhawk.driftinglibraryandroid.ui.explore.search.SearchViewModel
 
 class ExploreViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository
@@ -15,27 +20,4 @@ class ExploreViewModel(
         emit(Result.Loading)
         emit(remoteLibraryRepository.getSources())
     }
-}
-
-@Suppress("UNCHECKED_CAST")
-class ExploreViewModelFactory(
-    private val source: String,
-    private val remoteLibraryRepository: RemoteLibraryRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
-        when {
-            isAssignableFrom(ExploreViewModel::class.java) ->
-                ExploreViewModel(remoteLibraryRepository)
-            isAssignableFrom(GlobalSearchViewModel::class.java) ->
-                GlobalSearchViewModel(remoteLibraryRepository)
-            isAssignableFrom(LatestViewModel::class.java) ->
-                LatestViewModel(source, remoteLibraryRepository)
-            isAssignableFrom(PopularViewModel::class.java) ->
-                PopularViewModel(source, remoteLibraryRepository)
-            isAssignableFrom(SearchViewModel::class.java) ->
-                SearchViewModel(source, remoteLibraryRepository)
-            else ->
-                throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-        }
-    } as T
 }

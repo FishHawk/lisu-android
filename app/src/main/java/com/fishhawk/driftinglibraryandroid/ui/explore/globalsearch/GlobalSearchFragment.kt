@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.explore
+package com.fishhawk.driftinglibraryandroid.ui.explore.globalsearch
 
 import android.os.Bundle
 import android.view.*
@@ -11,13 +11,12 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
 import kotlinx.coroutines.launch
 
 class GlobalSearchFragment : Fragment() {
     private val viewModel: GlobalSearchViewModel by viewModels {
-        val application = requireContext().applicationContext as MainApplication
-        val remoteLibraryRepository = application.remoteLibraryRepository
-        ExploreViewModelFactory("", remoteLibraryRepository)
+        ViewModelFactory(requireActivity().application as MainApplication)
     }
     private lateinit var binding: GlobalSearchFragmentBinding
 
@@ -47,7 +46,10 @@ class GlobalSearchFragment : Fragment() {
     private fun search() {
         val keywords = viewModel.keywords
         val sourceList = (viewModel.sourceList.value as? Result.Success)?.data ?: return
-        val adapter = GlobalSearchGroupListAdapter(requireActivity())
+        val adapter =
+            GlobalSearchGroupListAdapter(
+                requireActivity()
+            )
         binding.list.adapter = adapter
 
         for (source in sourceList) {

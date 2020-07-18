@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.ui.download.DownloadViewModel
+import com.fishhawk.driftinglibraryandroid.ui.explore.ExploreViewModel
+import com.fishhawk.driftinglibraryandroid.ui.explore.globalsearch.GlobalSearchViewModel
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.history.HistoryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.library.LibraryViewModel
@@ -21,6 +23,12 @@ class ViewModelFactory constructor(
 
             isAssignableFrom(HistoryViewModel::class.java) ->
                 HistoryViewModel(application.readingHistoryRepository)
+
+            isAssignableFrom(ExploreViewModel::class.java) ->
+                ExploreViewModel(application.remoteLibraryRepository)
+
+            isAssignableFrom(GlobalSearchViewModel::class.java) ->
+                GlobalSearchViewModel(application.remoteLibraryRepository)
 
             isAssignableFrom(ServerViewModel::class.java) ->
                 ServerViewModel(application.serverInfoRepository)

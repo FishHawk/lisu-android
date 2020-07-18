@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.explore
+package com.fishhawk.driftinglibraryandroid.ui.explore.globalsearch
 
 import android.app.Activity
 import android.view.LayoutInflater
@@ -18,7 +18,7 @@ class GlobalSearchGroupAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): GlobalSearchGroupAdapter.ViewHolder {
+    ): ViewHolder {
         return ViewHolder(
             GlobalSearchThumbnailBinding.inflate(
                 LayoutInflater.from(activity),

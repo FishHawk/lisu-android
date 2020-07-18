@@ -26,13 +26,13 @@
 
     <fragment
         android:id="@+id/nav_global_search"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.explore.GlobalSearchFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.explore.globalsearch.GlobalSearchFragment"
         android:label="@string/label_global_search"
         tools:layout="@layout/global_search_fragment" />
 
     <fragment
         android:id="@+id/nav_popular"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.explore.PopularFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.explore.popular.PopularFragment"
         android:label="@string/label_popular"
         tools:layout="@layout/explore_popular_fragment">
         <action
@@ -42,7 +42,7 @@
 
     <fragment
         android:id="@+id/nav_latest"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.explore.LatestFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.explore.latest.LatestFragment"
         android:label="@string/label_latest"
         tools:layout="@layout/explore_latest_fragment">
         <action
@@ -52,7 +52,7 @@
 
     <fragment
         android:id="@+id/nav_search"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.explore.SearchFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.explore.search.SearchFragment"
         android:label="@string/label_search"
         tools:layout="@layout/explore_search_fragment" />
 </navigation>

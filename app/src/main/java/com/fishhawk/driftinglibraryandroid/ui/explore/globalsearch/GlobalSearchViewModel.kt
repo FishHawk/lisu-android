@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.explore
+package com.fishhawk.driftinglibraryandroid.ui.explore.globalsearch
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel

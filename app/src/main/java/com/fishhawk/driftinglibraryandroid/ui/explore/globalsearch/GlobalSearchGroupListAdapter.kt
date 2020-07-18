@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.explore
+package com.fishhawk.driftinglibraryandroid.ui.explore.globalsearch
 
 import android.app.Activity
 import android.view.LayoutInflater
@@ -23,7 +23,7 @@ class GlobalSearchGroupListAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): GlobalSearchGroupListAdapter.ViewHolder {
+    ): ViewHolder {
         return ViewHolder(
             GlobalSearchGroupBinding.inflate(
                 LayoutInflater.from(activity),
@@ -34,7 +34,12 @@ class GlobalSearchGroupListAdapter(
     }
 
     fun addResultGroup(source: String) {
-        list.add(SearchResultGroup(source, Result.Loading))
+        list.add(
+            SearchResultGroup(
+                source,
+                Result.Loading
+            )
+        )
     }
 
     fun updateResultFromSource(source: String, result: Result<List<MangaOutline>>) {
@@ -50,7 +55,11 @@ class GlobalSearchGroupListAdapter(
 
         override fun bind(item: SearchResultGroup) {
             binding.searchResultGroup = item
-            val adapter = GlobalSearchGroupAdapter(activity, item.source)
+            val adapter =
+                GlobalSearchGroupAdapter(
+                    activity,
+                    item.source
+                )
             binding.list.adapter = adapter
             when (val result = item.result) {
                 is Result.Success -> {
