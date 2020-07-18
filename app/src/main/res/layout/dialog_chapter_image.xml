@@ -30,12 +30,5 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Save" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/save_to_button"
-            style="@style/Theme.Widget.Button.TextButton.NoColor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Save to..." />
     </LinearLayout>
 </layout>

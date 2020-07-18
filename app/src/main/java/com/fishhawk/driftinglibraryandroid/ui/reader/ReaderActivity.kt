@@ -1,11 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
-import android.content.ContentValues
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.SeekBar
@@ -30,12 +26,12 @@ import com.fishhawk.driftinglibraryandroid.extension.setupThemeWithTranslucentSt
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.util.DiskUtil
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileInputStream
+import java.lang.Exception
 
 
 class ReaderActivity : AppCompatActivity() {
@@ -291,38 +287,49 @@ class ReaderActivity : AppCompatActivity() {
             dialog.dismiss()
             val activity = this
             lifecycleScope.launch {
-                val file = withContext(Dispatchers.IO) {
-                    Glide.with(activity)
-                        .downloadOnly()
-                        .load(url)
-                        .submit(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                        .get()
-                }
-
-                val uri = FileProvider.getUriForFile(
-                    activity, "$packageName.fileprovider", file
-                )
-
-                val shareIntent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    type = "image/*"
-                    putExtra(Intent.EXTRA_STREAM, uri)
-                }
-                startActivity(Intent.createChooser(shareIntent, "Share image"))
+                shareImage(url)
             }
         }
         dialogBinding.saveButton.setOnClickListener {
             dialog.dismiss()
-            val activity = this
-
-            lifecycleScope.launch {
-                val imageFilename = viewModel.makeImageFilename(page)
-                imageFilename?.let { DiskUtil.saveImage(activity, url, it) }
-            }
-        }
-        dialogBinding.saveToButton.setOnClickListener {
-            dialog.dismiss()
+            lifecycleScope.launch { saveImage(url) }
         }
         dialog.show()
+    }
+
+    private suspend fun shareImage(url: String) {
+        val activity = this
+        val file = withContext(Dispatchers.IO) {
+            Glide.with(activity)
+                .downloadOnly()
+                .load(url)
+                .submit()
+                .get()
+        }
+
+        val uri = FileProvider.getUriForFile(
+            this, "$packageName.fileprovider", file
+        )
+
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            type = "image/*"
+            putExtra(Intent.EXTRA_STREAM, uri)
+        }
+        startActivity(Intent.createChooser(shareIntent, "Share image"))
+    }
+
+    private suspend fun saveImage(url: String) {
+        val filename = viewModel.makeImageFilename()
+        if (filename == null) {
+            binding.root.makeSnackBar("Chapter not open.")
+        } else {
+            try {
+                DiskUtil.saveImage(this, url, filename)
+                binding.root.makeSnackBar("Image saved.")
+            } catch (e: Throwable) {
+                binding.root.makeSnackBar(e.message ?: "Unknown error.")
+            }
+        }
     }
 }
