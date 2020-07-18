@@ -132,6 +132,17 @@ class ReaderViewModel(
             readingHistoryRepository.updateReadingHistory(readingHistory)
         }
     }
+
+    fun makeImageFilename(pageIndex: Int): String? {
+        val detail = (mangaDetail.value as? Result.Success)?.data ?: return null
+        val collection = detail.collections[collectionIndex]
+
+        val mangaTitle = detail.title
+        val collectionTitle = collection.title
+        val chapterTitle = collection.chapters[chapterIndex].title
+
+        return "$mangaTitle-$collectionTitle-$chapterTitle-$pageIndex"
+    }
 }
 
 

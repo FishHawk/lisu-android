@@ -1,10 +1,11 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
-import android.content.Context
+import android.content.ContentValues
 import android.content.Intent
-import android.net.Uri
-import android.os.AsyncTask
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.SeekBar
@@ -28,11 +29,13 @@ import com.fishhawk.driftinglibraryandroid.extension.setupFullScreen
 import com.fishhawk.driftinglibraryandroid.extension.setupThemeWithTranslucentStatus
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.util.DiskUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileInputStream
 
 
 class ReaderActivity : AppCompatActivity() {
@@ -310,6 +313,12 @@ class ReaderActivity : AppCompatActivity() {
         }
         dialogBinding.saveButton.setOnClickListener {
             dialog.dismiss()
+            val activity = this
+
+            lifecycleScope.launch {
+                val imageFilename = viewModel.makeImageFilename(page)
+                imageFilename?.let { DiskUtil.saveImage(activity, url, it) }
+            }
         }
         dialogBinding.saveToButton.setOnClickListener {
             dialog.dismiss()
