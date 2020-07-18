@@ -10,18 +10,21 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 
-object DiskUtil {
-    suspend fun saveImage(context: Context, url: String, filename: String) =
+object FileUtil {
+    suspend fun downloadImage(context: Context, url: String): File =
         withContext(Dispatchers.IO) {
-            val srcFile = Glide.with(context)
+            Glide.with(context)
                 .downloadOnly()
                 .load(url)
                 .submit()
                 .get()
+        }
 
-            val type =
-                ImageUtil.findImageType(FileInputStream(srcFile))
-                    ?: throw Exception("Not an image")
+    suspend fun saveImage(context: Context, url: String, filename: String) =
+        withContext(Dispatchers.IO) {
+            val srcFile = downloadImage(context, url)
+            val type = ImageUtil.findImageType(FileInputStream(srcFile))
+                ?: throw Exception("Not an image")
 
             val destDir = File(
                 Environment.getExternalStorageDirectory().absolutePath +

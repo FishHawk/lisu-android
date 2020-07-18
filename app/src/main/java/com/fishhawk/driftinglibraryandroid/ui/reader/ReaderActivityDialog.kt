@@ -5,14 +5,12 @@ import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
-import com.bumptech.glide.Glide
 import com.fishhawk.driftinglibraryandroid.databinding.DialogChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.extension.makeToast
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.util.DiskUtil
-import kotlinx.coroutines.Dispatchers
+import com.fishhawk.driftinglibraryandroid.util.FileUtil
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+
 
 fun ReaderActivity.createChapterImageActionDialog(page: Int, url: String) {
     val dialogBinding =
@@ -43,19 +41,11 @@ fun ReaderActivity.createChapterImageActionDialog(page: Int, url: String) {
 }
 
 private suspend fun ReaderActivity.shareImage(url: String) {
-    val activity = this
-    val file = withContext(Dispatchers.IO) {
-        Glide.with(activity)
-            .downloadOnly()
-            .load(url)
-            .submit()
-            .get()
-    }
+    val file = FileUtil.downloadImage(this, url)
 
     val uri = FileProvider.getUriForFile(
         this, "$packageName.fileprovider", file
     )
-
     val shareIntent = Intent().apply {
         action = Intent.ACTION_SEND
         type = "image/*"
@@ -70,7 +60,7 @@ private suspend fun ReaderActivity.saveImage(page: Int, url: String) {
         binding.root.makeToast("Chapter not open")
     } else {
         try {
-            DiskUtil.saveImage(this, url, "$prefix-$page")
+            FileUtil.saveImage(this, url, "$prefix-$page")
             binding.root.makeToast("Image saved")
         } catch (e: Throwable) {
             binding.root.makeToast(e.message ?: "Unknown error")
