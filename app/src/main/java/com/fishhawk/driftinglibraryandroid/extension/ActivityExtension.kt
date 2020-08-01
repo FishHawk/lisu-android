@@ -17,6 +17,7 @@ import com.fishhawk.driftinglibraryandroid.ui.base.NetworkErrorNotification
 import com.fishhawk.driftinglibraryandroid.ui.base.Notification
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryActivity
 import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActivity
+import java.lang.Error
 import java.lang.reflect.Method
 
 
@@ -102,7 +103,6 @@ fun AppCompatActivity.setupThemeWithTranslucentStatus() {
             else -> lightThemeId
         }
         if (getThemeResId() != themeId) {
-            setTheme(themeId)
             recreate()
         }
     })
@@ -121,10 +121,9 @@ fun AppCompatActivity.setupTheme() {
         val themeId = when (it) {
             SettingsHelper.THEME_LIGHT -> lightThemeId
             SettingsHelper.THEME_DARK -> darkThemeId
-            else -> lightThemeId
+            else -> throw InternalError()
         }
         if (getThemeResId() != themeId) {
-            setTheme(themeId)
             recreate()
         }
     })

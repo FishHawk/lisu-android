@@ -30,8 +30,8 @@ class GalleryActivity : AppCompatActivity() {
     private lateinit var binding: GalleryActivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         setupThemeWithTranslucentStatus()
+        super.onCreate(savedInstanceState)
         setupFullScreen()
 
         binding = GalleryActivityBinding.inflate(layoutInflater)

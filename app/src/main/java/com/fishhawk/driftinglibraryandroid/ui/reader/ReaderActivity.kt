@@ -46,8 +46,8 @@ class ReaderActivity : AppCompatActivity() {
     lateinit var binding: ReaderActivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         setupThemeWithTranslucentStatus()
+        super.onCreate(savedInstanceState)
         setupFullScreen()
 
         binding = ReaderActivityBinding.inflate(layoutInflater)
