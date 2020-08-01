@@ -39,7 +39,7 @@ class ServerInfoListAdapter(
     inner class ViewHolder(private val binding: ServerInfoCardBinding) :
         BaseRecyclerViewAdapter.ViewHolder<ServerInfo>(binding) {
 
-        override fun bind(item: ServerInfo) {
+        override fun bind(item: ServerInfo, position: Int) {
             binding.serverInfo = item
             if (item.id == selectedId) {
                 val color = ContextCompat.getColor(activity, R.color.loading_indicator_green)

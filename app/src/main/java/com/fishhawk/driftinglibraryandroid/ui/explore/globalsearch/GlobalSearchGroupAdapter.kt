@@ -31,7 +31,7 @@ class GlobalSearchGroupAdapter(
     inner class ViewHolder(private val binding: GlobalSearchThumbnailBinding) :
         BaseRecyclerViewAdapter.ViewHolder<MangaOutline>(binding) {
 
-        override fun bind(item: MangaOutline) {
+        override fun bind(item: MangaOutline, position: Int) {
             binding.outline = item
 
             Glide.with(activity).load(item.thumb)

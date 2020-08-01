@@ -6,7 +6,9 @@ import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import androidx.appcompat.app.AlertDialog
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -15,41 +17,54 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageVerticalBinding
+import com.fishhawk.driftinglibraryandroid.databinding.DialogChapterImageBinding
+import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageBinding
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 
-class ImageVerticalListAdapter(
-    private val context: Context,
-    private var data: List<String>
-) : RecyclerView.Adapter<ImageVerticalListAdapter.ViewHolder>() {
-    var onCardLongClicked: ((Int, String) -> Unit)? = null
+class ImageListAdapter(
+    private val context: Context
+) : BaseRecyclerViewAdapter<String, ImageListAdapter.ViewHolder>(mutableListOf()) {
+    var onImageSave: ((Int, String) -> Unit)? = null
+    var onImageShare: ((Int, String) -> Unit)? = null
+
+    var isContinuous = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ReaderChapterImageVerticalBinding.inflate(LayoutInflater.from(context), parent, false)
+            ReaderChapterImageBinding.inflate(
+                LayoutInflater.from(context),
+                parent,
+                false
+            )
         )
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(data[position], position)
-    }
+    inner class ViewHolder(private val binding: ReaderChapterImageBinding) :
+        BaseRecyclerViewAdapter.ViewHolder<String>(binding) {
 
-    override fun getItemCount() = data.size
+        override fun bind(item: String, position: Int) {
+            if (!isContinuous) {
+                binding.root.layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                )
+                binding.root.requestLayout()
+            }
 
-    inner class ViewHolder(private val binding: ReaderChapterImageVerticalBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(item: String, position: Int) {
+            binding.content.setZoomable(!isContinuous)
             binding.content.setImageResource(android.R.color.transparent)
+
             binding.background.visibility = View.VISIBLE
             binding.progress.visibility = View.VISIBLE
             binding.errorHint.visibility = View.GONE
 
             binding.number.text = (position + 1).toString()
-            binding.content.setOnLongClickListener {
-                onCardLongClicked?.invoke(position, item)
+            binding.card.setOnLongClickListener {
+                createChapterImageActionDialog(position, item)
                 true
             }
+
             Glide.with(context)
                 .asBitmap()
                 .load(item)
@@ -84,15 +99,41 @@ class ImageVerticalListAdapter(
                         resource: Bitmap,
                         transition: Transition<in Bitmap>?
                     ) {
-                        binding.content.requestLayout()
-                        binding.content.layoutParams.height =
-                            resource.height * binding.content.width / resource.width
-                        binding.content.setImageBitmap(resource);
+                        if (isContinuous) {
+                            binding.content.requestLayout()
+                            binding.content.layoutParams.height =
+                                resource.height * binding.content.width / resource.width
+                        }
+                        binding.content.setImageBitmap(resource)
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {
                     }
                 })
         }
+    }
+
+    fun createChapterImageActionDialog(page: Int, url: String) {
+        val dialogBinding =
+            DialogChapterImageBinding.inflate(LayoutInflater.from(context), null, false)
+
+        val dialog = AlertDialog.Builder(context)
+            .setTitle("Page ${page + 1}")
+            .setView(dialogBinding.root)
+            .create()
+
+        dialogBinding.refreshButton.setOnClickListener {
+            dialog.dismiss()
+            notifyItemChanged(page)
+        }
+        dialogBinding.shareButton.setOnClickListener {
+            dialog.dismiss()
+            onImageShare?.invoke(page, url)
+        }
+        dialogBinding.saveButton.setOnClickListener {
+            dialog.dismiss()
+            onImageSave?.invoke(page, url)
+        }
+        dialog.show()
     }
 }

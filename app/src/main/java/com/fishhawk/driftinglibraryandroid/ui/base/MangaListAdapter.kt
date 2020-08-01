@@ -50,7 +50,7 @@ class MangaListAdapter(
     inner class GridViewHolder(private val binding: MangaGridThumbnailBinding) :
         BaseRecyclerViewAdapter.ViewHolder<MangaOutline>(binding) {
 
-        override fun bind(item: MangaOutline) {
+        override fun bind(item: MangaOutline, position: Int) {
             binding.outline = item
 
             Glide.with(activity).load(item.thumb)
@@ -74,7 +74,7 @@ class MangaListAdapter(
     inner class LinearViewHolder(private val binding: MangaLinearThumbnailBinding) :
         BaseRecyclerViewAdapter.ViewHolder<MangaOutline>(binding) {
 
-        override fun bind(item: MangaOutline) {
+        override fun bind(item: MangaOutline, position: Int) {
             binding.outline = item
 
             Glide.with(activity).load(item.thumb)

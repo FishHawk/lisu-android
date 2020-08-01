@@ -1,22 +1,23 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.SeekBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
+import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderActivityBinding
 import com.fishhawk.driftinglibraryandroid.extension.makeToast
 import com.fishhawk.driftinglibraryandroid.extension.setupFullScreen
 import com.fishhawk.driftinglibraryandroid.extension.setupThemeWithTranslucentStatus
-import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.util.FileUtil
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
@@ -55,39 +56,32 @@ class ReaderActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        setupReaderLayout()
+        binding.reader.onRequestPrevChapter = { openPrevChapter() }
+        binding.reader.onRequestNextChapter = { openNextChapter() }
+        binding.reader.onRequestMenu = { viewModel.isMenuVisible.value = true }
+        binding.reader.onScrolled = { viewModel.chapterPosition.value = it }
         setupMenuLayout()
-        setupHorizontalReader()
-        setupVerticalReader()
 
-        viewModel.isReaderDirectionEqualRightToLeft.observe(this, Observer {
-            binding.horizontalReader.layoutDirection =
-                if (it) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
-            viewModel.readerContent.value = viewModel.readerContent.value
+        binding.reader.adapter.apply {
+            onImageShare = { page, url -> lifecycleScope.launch { shareImage(page, url) } }
+            onImageSave = { page, url -> lifecycleScope.launch { saveImage(page, url) } }
+        }
+
+        SettingsHelper.readingDirection.observe(this, Observer {
+            binding.reader.mode = when (it) {
+                SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT -> ReaderView.Mode.LTR
+                SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT -> ReaderView.Mode.RTL
+                SettingsHelper.READING_DIRECTION_VERTICAL -> ReaderView.Mode.VERTICAL
+                else -> ReaderView.Mode.LTR
+            }
         })
-
 
         viewModel.readerContent.observe(this, Observer { result ->
             when (result) {
                 is Result.Success -> {
                     val content = result.data
-                    if (viewModel.isReaderDirectionEqualVertical.value!!)
-                        binding.verticalReader.apply {
-                            adapter = ImageVerticalListAdapter(context, content).apply {
-                                onCardLongClicked = { page, url ->
-                                    createChapterImageActionDialog(page, url)
-                                }
-                            }
-                        }
-                    else
-                        binding.horizontalReader.apply {
-                            adapter = ImageHorizontalListAdapter(context, content).apply {
-                                onCardLongClicked = { page, url ->
-                                    createChapterImageActionDialog(page, url)
-                                }
-                            }
-                        }
-                    viewModel.chapterPosition.value?.let { setReaderPage(it) }
+                    binding.reader.setContent(content)
+                    viewModel.chapterPosition.value?.let { binding.reader.setPage(it) }
                 }
             }
         })
@@ -98,34 +92,6 @@ class ReaderActivity : AppCompatActivity() {
         runBlocking {
             viewModel.updateReadingHistory()
         }
-    }
-
-    private fun setupReaderLayout() {
-        val gotoPrevPage = {
-            if (viewModel.chapterPosition.value!! == 0) openPrevChapter()
-            else setHorizontalReaderPage(viewModel.chapterPosition.value!! - 1)
-        }
-        val gotoNextPage = {
-            if (viewModel.chapterPosition.value!! == viewModel.chapterSize.value!! - 1) openNextChapter()
-            else setHorizontalReaderPage(viewModel.chapterPosition.value!! + 1)
-        }
-
-        binding.readerLayout.onClickLeftAreaListener = {
-            when (viewModel.readingDirection.value) {
-                SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT -> gotoPrevPage()
-                SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT -> gotoNextPage()
-                SettingsHelper.READING_DIRECTION_VERTICAL -> viewModel.isMenuVisible.value = true
-            }
-        }
-        binding.readerLayout.onClickRightAreaListener = {
-            when (viewModel.readingDirection.value) {
-                SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT -> gotoNextPage()
-                SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT -> gotoPrevPage()
-                SettingsHelper.READING_DIRECTION_VERTICAL -> viewModel.isMenuVisible.value = true
-            }
-        }
-        binding.readerLayout.onClickCenterAreaListener = { viewModel.isMenuVisible.value = true }
-
     }
 
     private fun setupMenuLayout() {
@@ -165,94 +131,48 @@ class ReaderActivity : AppCompatActivity() {
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}
             override fun onStartTrackingTouch(seek: SeekBar) {}
-            override fun onStopTrackingTouch(seek: SeekBar) = setReaderPage(seek.progress)
+            override fun onStopTrackingTouch(seek: SeekBar) {
+                binding.reader.setPage(seek.progress)
+            }
         })
     }
 
-    private fun setupHorizontalReader() {
-        binding.horizontalReader.apply {
-            offscreenPageLimit = 5
-            registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-                private var isEdge: Boolean = true
-
-                override fun onPageScrollStateChanged(state: Int) {
-                    when (state) {
-                        ViewPager2.SCROLL_STATE_IDLE -> {
-                            if (!isEdge && !viewModel.isLoading.value!!) {
-                                if (currentItem == 0) openPrevChapter()
-                                else if (currentItem == adapter!!.itemCount - 1) openNextChapter()
-                            }
-                        }
-                        ViewPager2.SCROLL_STATE_DRAGGING -> isEdge = false
-                        ViewPager2.SCROLL_STATE_SETTLING -> isEdge = true
-                    }
-                }
-
-                override fun onPageSelected(position: Int) {
-                    viewModel.chapterPosition.value = position
-                }
-            })
-        }
-    }
-
-    private fun setupVerticalReader() {
-        binding.verticalReader.apply {
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                private var isTopReached: Boolean = false
-                private var isBottomReached: Boolean = false
-
-                override fun onScrollStateChanged(recyclerView: RecyclerView, state: Int) {
-                    when (state) {
-                        RecyclerView.SCROLL_STATE_DRAGGING -> {
-                            isTopReached = !recyclerView.canScrollVertically(-1)
-                            isBottomReached = !recyclerView.canScrollVertically(1)
-                        }
-                        RecyclerView.SCROLL_STATE_SETTLING -> {
-                            isTopReached = isTopReached && !recyclerView.canScrollVertically(-1)
-                            isBottomReached =
-                                isBottomReached && !recyclerView.canScrollVertically(1)
-                        }
-                        RecyclerView.SCROLL_STATE_IDLE -> {
-                            isTopReached = isTopReached && !recyclerView.canScrollVertically(-1)
-                            isBottomReached =
-                                isBottomReached && !recyclerView.canScrollVertically(1)
-
-                            if (!viewModel.isLoading.value!!) {
-                                if (isTopReached) openPrevChapter()
-                                if (isBottomReached) openNextChapter()
-                            }
-                        }
-                    }
-                }
-
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    viewModel.chapterPosition.value =
-                        (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                }
-            })
-        }
-    }
-
     private fun openPrevChapter() {
+        if (viewModel.isLoading) return
         if (!viewModel.openPrevChapter()) binding.root.makeToast(getString(R.string.reader_no_prev_chapter_hint))
     }
 
     private fun openNextChapter() {
+        if (viewModel.isLoading) return
         if (!viewModel.openNextChapter()) binding.root.makeToast(getString(R.string.reader_no_next_chapter_hint))
     }
 
-    private fun setHorizontalReaderPage(position: Int) {
-        binding.horizontalReader.setCurrentItem(position, false)
+
+    private suspend fun shareImage(page: Int, url: String) {
+        val file = FileUtil.downloadImage(this, url)
+
+        val uri = FileProvider.getUriForFile(
+            this, "$packageName.fileprovider", file
+        )
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            type = "image/*"
+            putExtra(Intent.EXTRA_STREAM, uri)
+        }
+        startActivity(Intent.createChooser(shareIntent, "Share image"))
     }
 
-    private fun setVerticalReaderPage(position: Int) {
-        (binding.verticalReader.layoutManager as LinearLayoutManager)
-            .scrollToPositionWithOffset(position, 0)
-    }
-
-    private fun setReaderPage(position: Int) {
-        if (viewModel.readingDirection.value == SettingsHelper.READING_DIRECTION_VERTICAL)
-            setVerticalReaderPage(position)
-        else setHorizontalReaderPage(position)
+    private suspend fun saveImage(page: Int, url: String) {
+        val prefix = viewModel.makeImageFilenamePrefix()
+        if (prefix == null) {
+            binding.root.makeToast("Chapter not open")
+        } else {
+            try {
+                FileUtil.saveImage(this, url, "$prefix-$page")
+                binding.root.makeToast("Image saved")
+            } catch (e: Throwable) {
+                binding.root.makeToast(e.message ?: "Unknown error")
+            }
+        }
     }
 }

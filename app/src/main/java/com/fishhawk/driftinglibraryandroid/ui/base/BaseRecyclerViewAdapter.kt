@@ -8,7 +8,7 @@ abstract class BaseRecyclerViewAdapter<ITEM, VH : BaseRecyclerViewAdapter.ViewHo
 ) : RecyclerView.Adapter<VH>() {
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        holder.bind(list[position])
+        holder.bind(list[position], position)
     }
 
     override fun getItemCount() = list.size
@@ -21,6 +21,6 @@ abstract class BaseRecyclerViewAdapter<ITEM, VH : BaseRecyclerViewAdapter.ViewHo
 
     abstract class ViewHolder<ITEM>(binding: ViewDataBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        open fun bind(item: ITEM) {}
+        open fun bind(item: ITEM, position: Int) {}
     }
 }

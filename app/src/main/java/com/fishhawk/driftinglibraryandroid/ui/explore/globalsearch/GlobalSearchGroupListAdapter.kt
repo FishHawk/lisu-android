@@ -53,7 +53,7 @@ class GlobalSearchGroupListAdapter(
     inner class ViewHolder(private val binding: GlobalSearchGroupBinding) :
         BaseRecyclerViewAdapter.ViewHolder<SearchResultGroup>(binding) {
 
-        override fun bind(item: SearchResultGroup) {
+        override fun bind(item: SearchResultGroup, position: Int) {
             binding.searchResultGroup = item
             val adapter =
                 GlobalSearchGroupAdapter(

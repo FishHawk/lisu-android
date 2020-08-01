@@ -44,7 +44,7 @@ class SubscriptionListAdapter(
             binding.actionPanel.visibility = View.VISIBLE
         }
 
-        override fun bind(item: Subscription) {
+        override fun bind(item: Subscription, position: Int) {
             binding.subscription = item
             showActions()
 

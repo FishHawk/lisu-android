@@ -22,12 +22,8 @@ class ReaderViewModel(
 ) : ViewModel() {
     // reading direction
     val readingDirection: PreferenceStringLiveData = SettingsHelper.readingDirection
-    val isReaderDirectionEqualLeftToRight: LiveData<Boolean> =
-        Transformations.map(readingDirection) { it == SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT }
     val isReaderDirectionEqualRightToLeft: LiveData<Boolean> =
         Transformations.map(readingDirection) { it == SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT }
-    val isReaderDirectionEqualVertical: LiveData<Boolean> =
-        Transformations.map(readingDirection) { it == SettingsHelper.READING_DIRECTION_VERTICAL }
 
     // menu
     val isMenuVisible: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -36,14 +32,13 @@ class ReaderViewModel(
     private val mangaDetail: MutableLiveData<Result<MangaDetail>> = MutableLiveData()
     val readerContent: MutableLiveData<Result<List<String>>> = MutableLiveData(Result.Loading)
 
-    val isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    var isLoading: Boolean = true
     val chapterPosition: MutableLiveData<Int> = MutableLiveData(0)
     val chapterSize: MutableLiveData<Int> = MutableLiveData(0)
     val chapterTitle: MutableLiveData<String> = MutableLiveData("")
 
     init {
         viewModelScope.launch {
-            isLoading.value = true
             val detail =
                 if (source == null) remoteLibraryRepository.getMangaFromLibrary(id)
                 else remoteLibraryRepository.getMangaFromSource(source, id)
@@ -56,7 +51,7 @@ class ReaderViewModel(
     }
 
     private fun openChapter(chapterIndex: Int, startPage: Int = 0) {
-        isLoading.value = true
+        isLoading = true
 
         val detail = (mangaDetail.value as? Result.Success)?.data ?: return
         val collection = detail.collections[collectionIndex]
@@ -85,7 +80,7 @@ class ReaderViewModel(
                 }
             }
             self.readerContent.value = result
-            isLoading.value = false
+            isLoading = false
         }
     }
 

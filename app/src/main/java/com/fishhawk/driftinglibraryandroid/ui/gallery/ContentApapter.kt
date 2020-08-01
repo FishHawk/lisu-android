@@ -116,7 +116,7 @@ class ContentAdapter(
     inner class ChapterViewHolder(private val binding: GalleryChapterBinding) :
         BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
 
-        override fun bind(item: ContentItem) {
+        override fun bind(item: ContentItem, position: Int) {
             val newItem = item as ContentItem.Chapter
             binding.button.text = newItem.title
             binding.button.setOnClickListener {
@@ -134,7 +134,7 @@ class ContentAdapter(
     inner class ChapterMarkedViewHolder(private val binding: GalleryChapterMarkedBinding) :
         BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
 
-        override fun bind(item: ContentItem) {
+        override fun bind(item: ContentItem, position: Int) {
             val newItem = item as ContentItem.ChapterMarked
             binding.button.text = newItem.title
             binding.button.setOnClickListener {
@@ -152,7 +152,7 @@ class ContentAdapter(
     inner class CollectionHeaderViewHolder(private val binding: GalleryCollectionTitleBinding) :
         BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
 
-        override fun bind(item: ContentItem) {
+        override fun bind(item: ContentItem, position: Int) {
             val newItem = item as ContentItem.CollectionHeader
             binding.title.text = newItem.title
         }

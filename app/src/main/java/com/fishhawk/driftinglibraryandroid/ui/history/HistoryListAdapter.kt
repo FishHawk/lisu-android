@@ -31,7 +31,7 @@ class HistoryListAdapter(
         private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
         @SuppressLint("SetTextI18n")
-        override fun bind(item: ReadingHistory) {
+        override fun bind(item: ReadingHistory, position: Int) {
             binding.readingHistory = item
 
             val seenHint = when {

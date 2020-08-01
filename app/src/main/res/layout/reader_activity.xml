@@ -17,24 +17,10 @@
         android:layout_height="match_parent"
         tools:context=".ui.reader.ReaderActivity">
 
-        <com.fishhawk.driftinglibraryandroid.ui.reader.ReaderLayout
-            android:id="@+id/reader_layout"
+        <com.fishhawk.driftinglibraryandroid.ui.reader.ReaderView
+            android:id="@+id/reader"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/horizontal_reader"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="@{!viewModel.isReaderDirectionEqualVertical ? View.VISIBLE : View.GONE}" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/vertical_reader"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="@{viewModel.isReaderDirectionEqualVertical ? View.VISIBLE : View.GONE}"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-        </com.fishhawk.driftinglibraryandroid.ui.reader.ReaderLayout>
+            android:layout_height="match_parent" />
 
         <TextView
             android:layout_width="wrap_content"

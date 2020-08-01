@@ -42,7 +42,7 @@ class DownloadTaskListAdapter(
             binding.actionPanel.visibility = View.VISIBLE
         }
 
-        override fun bind(item: DownloadTask) {
+        override fun bind(item: DownloadTask, position: Int) {
             binding.downloadTask = item
             showActions()
 
