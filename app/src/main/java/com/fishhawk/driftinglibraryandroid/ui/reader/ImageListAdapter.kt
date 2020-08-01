@@ -60,7 +60,11 @@ class ImageListAdapter(
             binding.errorHint.visibility = View.GONE
 
             binding.number.text = (position + 1).toString()
-            binding.card.setOnLongClickListener {
+            binding.background.setOnLongClickListener {
+                createChapterImageActionDialog(position, item)
+                true
+            }
+            binding.content.setOnLongClickListener {
                 createChapterImageActionDialog(position, item)
                 true
             }
