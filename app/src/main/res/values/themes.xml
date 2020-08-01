@@ -35,6 +35,7 @@
         <item name="android:textColorHintInverse">@color/textColorHintDark</item>
         <item name="rippleColor">@color/rippleColorLight</item>
 
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>
         <item name="dialogTheme">@style/Theme.AlertDialog</item>
         <item name="alertDialogTheme">@style/Theme.AlertDialog</item>
         <item name="textInputStyle">@style/Theme.TextInputLayout.FilledBox</item>
@@ -42,7 +43,6 @@
         <!-- Themes -->
         <!--        <item name="windowActionModeOverlay">true</item>-->
         <!--        <item name="elevationOverlayEnabled">false</item>-->
-        <!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>-->
         <!--        <item name="toolbarNavigationButtonStyle">@style/Theme.Toolbar.Navigation</item>-->
         <!--        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
         <!--        <item name="chipStyle">@style/Theme.Widget.Chip</item>-->
@@ -93,6 +93,7 @@
         <item name="android:textColorHintInverse">@color/textColorHintLight</item>
         <item name="rippleColor">@color/rippleColorDark</item>
 
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>
         <item name="dialogTheme">@style/Theme.AlertDialog</item>
         <item name="alertDialogTheme">@style/Theme.AlertDialog</item>
         <item name="textInputStyle">@style/Theme.TextInputLayout.FilledBox</item>
@@ -102,7 +103,6 @@
         <!--        <item name="windowActionModeOverlay">true</item>-->
         <!--        <item name="elevationOverlayEnabled">false</item>-->
         <!--        <item name="actionBarTheme">@style/ThemeOverlay.MaterialComponents.Dark.ActionBar</item>-->
-        <!--        <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>-->
         <!--        <item name="toolbarNavigationButtonStyle">@style/Theme.Toolbar.Navigation</item>-->
         <!--        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>-->
         <!--        <item name="chipStyle">@style/Theme.Widget.Chip</item>-->
