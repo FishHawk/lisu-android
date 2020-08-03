@@ -7,7 +7,6 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
@@ -16,7 +15,6 @@ import com.fishhawk.driftinglibraryandroid.databinding.GalleryActivityBinding
 import com.fishhawk.driftinglibraryandroid.extension.*
 import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
@@ -55,6 +53,9 @@ class GalleryActivity : AppCompatActivity() {
         binding.displayModeButton.setOnClickListener {
             SettingsHelper.chapterDisplayMode.setNextValue()
         }
+        binding.displayOrderButton.setOnClickListener {
+            SettingsHelper.chapterDisplayOrder.setNextValue()
+        }
 
         SettingsHelper.chapterDisplayMode.observe(this, Observer {
             binding.chapters.viewMode = when (it) {
@@ -63,6 +64,12 @@ class GalleryActivity : AppCompatActivity() {
             }
         })
 
+        SettingsHelper.chapterDisplayOrder.observe(this, Observer {
+            binding.chapters.viewOrder = when (it) {
+                SettingsHelper.ChapterDisplayOrder.ASCEND -> ContentView.ViewOrder.ASCEND
+                SettingsHelper.ChapterDisplayOrder.DESCEND -> ContentView.ViewOrder.DESCEND
+            }
+        })
 
         viewModel.notification.observe(this, EventObserver {
             binding.root.makeToast(getNotificationMessage(it))
@@ -78,7 +85,8 @@ class GalleryActivity : AppCompatActivity() {
                     val detail = result.data
                     binding.info = GalleryInfo(detail)
                     if (!detail.tags.isNullOrEmpty()) bindTags(detail.tags, binding.tags)
-                    if (detail.collections.isNotEmpty()) bindContent(adapter, detail.collections)
+                    if (detail.collections.isNotEmpty())
+                        binding.chapters.collections = detail.collections
                 }
                 is Result.Error -> {
                     binding.errorView.visibility = View.VISIBLE
@@ -129,25 +137,6 @@ class GalleryActivity : AppCompatActivity() {
         }
         binding.subscribeButton.setOnClickListener { viewModel.subscribe() }
         binding.downloadButton.setOnClickListener { viewModel.download() }
-    }
-
-    private fun bindContent(adapter: ContentAdapter, collections: List<Collection>) {
-        val items = mutableListOf<ContentItem>()
-        for ((collectionIndex, collection) in collections.withIndex()) {
-            if (collection.title.isNotEmpty())
-                items.add(ContentItem.CollectionHeader(collection.title))
-            for ((chapterIndex, chapter) in collection.chapters.withIndex()) {
-                items.add(
-                    ContentItem.Chapter(
-                        chapter.name,
-                        chapter.title,
-                        collectionIndex,
-                        chapterIndex
-                    )
-                )
-            }
-        }
-        adapter.changeList(items)
     }
 
     private fun bindTags(

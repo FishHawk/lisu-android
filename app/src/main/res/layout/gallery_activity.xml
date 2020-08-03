@@ -315,14 +315,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:visibility="@{info.hasContent ? View.VISIBLE : View.GONE}" />
-                        <!--                        <androidx.recyclerview.widget.RecyclerView-->
-                        <!--                            android:id="@+id/chapters"-->
-                        <!--                            android:layout_width="match_parent"-->
-                        <!--                            android:layout_height="match_parent"-->
-                        <!--                            android:visibility="@{info.hasContent ? View.VISIBLE : View.GONE}"-->
-                        <!--                            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"-->
-                        <!--                            app:spanCount="3"-->
-                        <!--                            tools:listitem="@layout/gallery_chapter_grid" />-->
 
                         <TextView
                             android:id="@+id/no_chapter_hint"
@@ -335,7 +327,6 @@
                             android:visibility="@{!info.hasContent ? View.VISIBLE : View.GONE}" />
                     </LinearLayout>
                 </LinearLayout>
-
             </FrameLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

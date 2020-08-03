@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 
 class ContentView @JvmOverloads constructor(
     context: Context,
@@ -28,13 +29,12 @@ class ContentView @JvmOverloads constructor(
         layoutManager = gridLayoutManager
     }
 
-    enum class ViewMode(val value: Int) {
-        GRID(0),
-        LINEAR(1)
-    }
+    enum class ViewMode { GRID, LINEAR }
+    enum class ViewOrder { ASCEND, DESCEND }
 
     var viewMode = ViewMode.GRID
         set(value) {
+            field = value
             adapter?.viewMode = when (value) {
                 ViewMode.GRID -> ContentAdapter.ViewMode.GRID
                 ViewMode.LINEAR -> ContentAdapter.ViewMode.LINEAR
@@ -44,12 +44,46 @@ class ContentView @JvmOverloads constructor(
                 ViewMode.LINEAR -> linearLayoutManager
             }
             adapter = adapter
+        }
+
+    var viewOrder = ViewOrder.ASCEND
+        set(value) {
             field = value
+            adapter = adapter
         }
 
     var adapter: ContentAdapter? = null
         set(value) {
-            super.setAdapter(value)
             field = value
+            updateAdapterContent()
+            super.setAdapter(value)
         }
+
+    var collections: List<Collection>? = null
+        set(value) {
+            field = value
+            adapter = adapter
+        }
+
+    private fun updateAdapterContent() {
+        if (adapter == null || collections == null) return
+
+        val items = mutableListOf<ContentItem>()
+
+        for ((collectionIndex, collection) in collections!!.withIndex()) {
+            if (viewMode == ViewMode.GRID && collection.title.isNotEmpty())
+                items.add(ContentItem.CollectionHeader(collection.title))
+
+            val it = when (viewOrder) {
+                ViewOrder.ASCEND -> collection.chapters.withIndex()
+                ViewOrder.DESCEND -> collection.chapters.asReversed().withIndex()
+            }
+            for ((chapterIndex, chapter) in it) {
+                items.add(
+                    ContentItem.Chapter(chapter.name, chapter.title, collectionIndex, chapterIndex)
+                )
+            }
+        }
+        adapter!!.changeList(items)
+    }
 }
