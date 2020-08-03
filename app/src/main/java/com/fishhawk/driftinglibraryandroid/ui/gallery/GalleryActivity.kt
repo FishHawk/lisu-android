@@ -84,6 +84,10 @@ class GalleryActivity : AppCompatActivity() {
                     binding.contentView.visibility = View.VISIBLE
                     val detail = result.data
                     binding.info = GalleryInfo(detail)
+                    binding.description.setOnClickListener {
+                        binding.description.maxLines =
+                            if (binding.description.maxLines < Int.MAX_VALUE) Int.MAX_VALUE else 3
+                    }
                     if (!detail.tags.isNullOrEmpty()) bindTags(detail.tags, binding.tags)
                     if (detail.collections.isNotEmpty())
                         binding.chapters.collections = detail.collections

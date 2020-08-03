@@ -260,27 +260,46 @@
                             app:icon="@drawable/ic_baseline_rss_feed_24" />
                     </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/description"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@{info.description}"
-                        android:textIsSelectable="false"
-                        android:visibility="@{info.description != null ? View.VISIBLE : View.GONE}"
-                        tools:text="Sample description line 1\nSample description line 2" />
-
-                    <LinearLayout
-                        android:id="@+id/tags"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:orientation="vertical"
-                        android:visibility="@{info.hasTag ? View.VISIBLE : View.GONE}" />
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/Theme.TextAppearance.Subtitle1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="About:" />
+
+                        <TextView
+                            android:id="@+id/description"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:clickable="true"
+                            android:ellipsize="end"
+                            android:focusable="true"
+                            android:maxLines="3"
+                            android:text="@{info.description}"
+                            android:textIsSelectable="false"
+                            android:visibility="@{info.description != null ? View.VISIBLE : View.GONE}"
+                            tools:text="Sample description line 1\nSample description line 2" />
+
+                        <LinearLayout
+                            android:id="@+id/tags"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:orientation="vertical"
+                            android:visibility="@{info.hasTag ? View.VISIBLE : View.GONE}" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
                         android:orientation="vertical">
 
                         <LinearLayout
@@ -293,7 +312,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Chapters" />
+                                android:text="Chapters:" />
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/display_mode_button"
