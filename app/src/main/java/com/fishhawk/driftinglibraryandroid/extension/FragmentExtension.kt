@@ -65,17 +65,24 @@ fun <T> Fragment.bindToListViewModel(
 
 fun RecyclerView.changeMangaListDisplayMode(adapter: MangaListAdapter) {
     val displayMode = SettingsHelper.displayMode.getValueDirectly()
-    if (displayMode == SettingsHelper.DISPLAY_MODE_GRID &&
+    if (displayMode == SettingsHelper.DisplayMode.GRID &&
         (adapter.viewMode != MangaListAdapter.ViewMode.GRID || layoutManager == null)
     ) {
         adapter.viewMode = MangaListAdapter.ViewMode.GRID
         layoutManager = GridLayoutManager(context, 3)
         this.adapter = adapter
-    } else if (displayMode == SettingsHelper.DISPLAY_MODE_LINEAR &&
+    } else if (displayMode == SettingsHelper.DisplayMode.LINEAR &&
         (adapter.viewMode != MangaListAdapter.ViewMode.LINEAR || layoutManager == null)
     ) {
         adapter.viewMode = MangaListAdapter.ViewMode.LINEAR
         layoutManager = LinearLayoutManager(context)
         this.adapter = adapter
+    }
+}
+
+fun getDisplayModeIcon(): Int {
+    return when (SettingsHelper.displayMode.getValueDirectly()) {
+        SettingsHelper.DisplayMode.GRID -> R.drawable.ic_baseline_view_list_24
+        SettingsHelper.DisplayMode.LINEAR -> R.drawable.ic_baseline_view_module_24
     }
 }

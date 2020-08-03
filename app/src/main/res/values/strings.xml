@@ -65,8 +65,13 @@
     <string name="settings_theme_dark">Dark</string>
 
     <string name="settings_display_mode">Display mode</string>
+    <string name="settings_chapter_display_mode">Chapter display mode</string>
     <string name="settings_display_mode_gird">Grid</string>
     <string name="settings_display_mode_linear">Linear</string>
+
+    <string name="settings_chapter_display_order">Chapter display order</string>
+    <string name="settings_display_order_ascend">Ascend</string>
+    <string name="settings_display_order_descend">Descend</string>
 
     <string name="settings_history_filter">History filter</string>
     <string name="settings_history_filter_all">All</string>
@@ -102,6 +107,4 @@
     <string name="dialog_filter_history">Filter reading history</string>
     <string name="more_server">Manage Server</string>
     <string name="label_server">Server</string>
-    <string name="settings_chapter_display_mode">Chapter display mode</string>
-    <string name="settings_chapter_display_order">Chapter display order</string>
 </resources>

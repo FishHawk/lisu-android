@@ -13,6 +13,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ExplorePopularFragmentBinding
 import com.fishhawk.driftinglibraryandroid.extension.bindToListViewModel
 import com.fishhawk.driftinglibraryandroid.extension.changeMangaListDisplayMode
+import com.fishhawk.driftinglibraryandroid.extension.getDisplayModeIcon
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.ExploreViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
@@ -84,30 +85,14 @@ class PopularFragment : Fragment() {
 
 
         val item = menu.findItem(R.id.action_display_mode)
-        when (SettingsHelper.displayMode.getValueDirectly()) {
-            SettingsHelper.DISPLAY_MODE_GRID -> {
-                item.setIcon(R.drawable.ic_baseline_view_list_24)
-            }
-            SettingsHelper.DISPLAY_MODE_LINEAR -> {
-                item.setIcon(R.drawable.ic_baseline_view_module_24)
-            }
-        }
-
+        item.setIcon(getDisplayModeIcon())
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_display_mode -> {
-                when (SettingsHelper.displayMode.getValueDirectly()) {
-                    SettingsHelper.DISPLAY_MODE_GRID -> {
-                        item.setIcon(R.drawable.ic_baseline_view_module_24)
-                        SettingsHelper.displayMode.setValue(SettingsHelper.DISPLAY_MODE_LINEAR)
-                    }
-                    SettingsHelper.DISPLAY_MODE_LINEAR -> {
-                        item.setIcon(R.drawable.ic_baseline_view_list_24)
-                        SettingsHelper.displayMode.setValue(SettingsHelper.DISPLAY_MODE_GRID)
-                    }
-                }
+                SettingsHelper.displayMode.setNextValue()
+                item.setIcon(getDisplayModeIcon())
                 true
             }
             else -> super.onOptionsItemSelected(item)

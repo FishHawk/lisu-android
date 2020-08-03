@@ -69,9 +69,9 @@ class ReaderActivity : AppCompatActivity() {
 
         SettingsHelper.readingDirection.observe(this, Observer {
             binding.reader.mode = when (it) {
-                SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT -> ReaderView.Mode.LTR
-                SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT -> ReaderView.Mode.RTL
-                SettingsHelper.READING_DIRECTION_VERTICAL -> ReaderView.Mode.VERTICAL
+                SettingsHelper.ReadingDirection.LTR -> ReaderView.Mode.LTR
+                SettingsHelper.ReadingDirection.RTL -> ReaderView.Mode.RTL
+                SettingsHelper.ReadingDirection.VERTICAL -> ReaderView.Mode.VERTICAL
                 else -> ReaderView.Mode.LTR
             }
         })
@@ -98,30 +98,20 @@ class ReaderActivity : AppCompatActivity() {
         binding.menuLayout.setOnClickListener { viewModel.isMenuVisible.value = false }
 
         binding.buttonReadingDirection.setOnClickListener {
-            val direction = when (viewModel.readingDirection.value) {
-                SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT ->
-                    SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT
-                SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT ->
-                    SettingsHelper.READING_DIRECTION_VERTICAL
-                SettingsHelper.READING_DIRECTION_VERTICAL ->
-                    SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT
-                else ->
-                    SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT
-            }
-            viewModel.readingDirection.setValue(direction)
+            SettingsHelper.readingDirection.setNextValue()
         }
 
-        viewModel.readingDirection.observe(this, Observer {
+        SettingsHelper.readingDirection.observe(this, Observer {
             when (it) {
-                SettingsHelper.READING_DIRECTION_LEFT_TO_RIGHT -> {
+                SettingsHelper.ReadingDirection.LTR -> {
                     binding.buttonReadingDirection.setImageResource(R.drawable.ic_baseline_keyboard_arrow_right_24)
                     binding.hintReadingDirection.setText(R.string.hint_reading_direction_left_to_right)
                 }
-                SettingsHelper.READING_DIRECTION_RIGHT_TO_LEFT -> {
+                SettingsHelper.ReadingDirection.RTL -> {
                     binding.buttonReadingDirection.setImageResource(R.drawable.ic_baseline_keyboard_arrow_left_24)
                     binding.hintReadingDirection.setText(R.string.hint_reading_direction_right_to_Left)
                 }
-                SettingsHelper.READING_DIRECTION_VERTICAL -> {
+                SettingsHelper.ReadingDirection.VERTICAL -> {
                     binding.buttonReadingDirection.setImageResource(R.drawable.ic_baseline_keyboard_arrow_down_24)
                     binding.hintReadingDirection.setText(R.string.hint_reading_direction_vertical)
                 }

@@ -34,6 +34,28 @@ abstract class PreferenceLiveData<T>(
     }
 }
 
+class PreferenceEnumLiveData<T : Enum<T>>(
+    sharedPrefs: SharedPreferences,
+    key: String,
+    defaultValue: T,
+    private val clazz: Class<T>
+) : PreferenceLiveData<T>(sharedPrefs, key, defaultValue) {
+    override fun getPreference(key: String, defValue: T): T {
+        val enumName = sharedPreferences.getString(key, null)
+        return clazz.enumConstants?.find { it.name == enumName } ?: defaultValue
+    }
+
+    override fun setPreference(key: String, value: T) =
+        sharedPreferences.edit().putString(key, value.name).apply()
+
+    fun setNextValue() {
+        val current = getValueDirectly()
+        val next = clazz.enumConstants?.let { it[(current.ordinal + 1) % it.size] } ?: defaultValue
+        setValue(next)
+    }
+}
+
+
 class PreferenceStringLiveData(
     sharedPrefs: SharedPreferences,
     key: String,

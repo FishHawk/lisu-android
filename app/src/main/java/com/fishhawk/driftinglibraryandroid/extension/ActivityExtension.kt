@@ -92,14 +92,14 @@ fun AppCompatActivity.setupThemeWithTranslucentStatus() {
     val darkThemeId = R.style.Theme_App_Dark_TranslucentStatus
 
     when (SettingsHelper.theme.getValueDirectly()) {
-        SettingsHelper.THEME_LIGHT -> setTheme(lightThemeId)
-        SettingsHelper.THEME_DARK -> setTheme(darkThemeId)
+        SettingsHelper.Theme.LIGHT -> setTheme(lightThemeId)
+        SettingsHelper.Theme.DARK -> setTheme(darkThemeId)
     }
 
     SettingsHelper.theme.observe(this, Observer {
         val themeId = when (it) {
-            SettingsHelper.THEME_LIGHT -> lightThemeId
-            SettingsHelper.THEME_DARK -> darkThemeId
+            SettingsHelper.Theme.LIGHT -> lightThemeId
+            SettingsHelper.Theme.DARK -> darkThemeId
             else -> lightThemeId
         }
         if (getThemeResId() != themeId) {
@@ -113,14 +113,14 @@ fun AppCompatActivity.setupTheme() {
     val darkThemeId = R.style.Theme_App_Dark
 
     when (SettingsHelper.theme.getValueDirectly()) {
-        SettingsHelper.THEME_LIGHT -> setTheme(lightThemeId)
-        SettingsHelper.THEME_DARK -> setTheme(darkThemeId)
+        SettingsHelper.Theme.LIGHT -> setTheme(lightThemeId)
+        SettingsHelper.Theme.DARK-> setTheme(darkThemeId)
     }
 
     SettingsHelper.theme.observe(this, Observer {
         val themeId = when (it) {
-            SettingsHelper.THEME_LIGHT -> lightThemeId
-            SettingsHelper.THEME_DARK -> darkThemeId
+            SettingsHelper.Theme.LIGHT -> lightThemeId
+            SettingsHelper.Theme.DARK -> darkThemeId
             else -> throw InternalError()
         }
         if (getThemeResId() != themeId) {

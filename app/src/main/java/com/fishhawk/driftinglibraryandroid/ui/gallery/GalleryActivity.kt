@@ -53,20 +53,13 @@ class GalleryActivity : AppCompatActivity() {
         val adapter = ContentAdapter(this, id, source)
         binding.chapters.adapter = adapter
         binding.displayModeButton.setOnClickListener {
-            SettingsHelper.chapterDisplayMode.setValue(
-                when (SettingsHelper.chapterDisplayMode.value) {
-                    SettingsHelper.CHAPTER_DISPLAY_MODE_GRID -> SettingsHelper.CHAPTER_DISPLAY_MODE_LINEAR
-                    SettingsHelper.CHAPTER_DISPLAY_MODE_LINEAR -> SettingsHelper.CHAPTER_DISPLAY_MODE_GRID
-                    else -> SettingsHelper.CHAPTER_DISPLAY_MODE_LINEAR
-                }
-            )
+            SettingsHelper.chapterDisplayMode.setNextValue()
         }
 
         SettingsHelper.chapterDisplayMode.observe(this, Observer {
             binding.chapters.viewMode = when (it) {
-                SettingsHelper.CHAPTER_DISPLAY_MODE_GRID -> ContentView.ViewMode.GRID
-                SettingsHelper.CHAPTER_DISPLAY_MODE_LINEAR -> ContentView.ViewMode.LINEAR
-                else -> ContentView.ViewMode.GRID
+                SettingsHelper.ChapterDisplayMode.GRID -> ContentView.ViewMode.GRID
+                SettingsHelper.ChapterDisplayMode.LINEAR -> ContentView.ViewMode.LINEAR
             }
         })
 

@@ -7,10 +7,9 @@ import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 
 fun HistoryFragment.createHistoryFilterSwitchDialog() {
     val checkedItem = when (SettingsHelper.historyFilter.getValueDirectly()) {
-        SettingsHelper.HISTORY_FILTER_ALL -> 0
-        SettingsHelper.HISTORY_FILTER_FROM_LIBRARY -> 1
-        SettingsHelper.HISTORY_FILTER_FROM_SOURCES -> 2
-        else -> -1
+        SettingsHelper.HistoryFilter.ALL -> 0
+        SettingsHelper.HistoryFilter.FROM_LIBRARY -> 1
+        SettingsHelper.HistoryFilter.FROM_SOURCES -> 2
     }
     AlertDialog.Builder(requireContext())
         .setTitle(R.string.dialog_filter_history)
@@ -18,11 +17,14 @@ fun HistoryFragment.createHistoryFilterSwitchDialog() {
             R.array.settings_history_filter_entries,
             checkedItem
         ) { _, which ->
-            when (which) {
-                0 -> SettingsHelper.historyFilter.setValue(SettingsHelper.HISTORY_FILTER_ALL)
-                1 -> SettingsHelper.historyFilter.setValue(SettingsHelper.HISTORY_FILTER_FROM_LIBRARY)
-                2 -> SettingsHelper.historyFilter.setValue(SettingsHelper.HISTORY_FILTER_FROM_SOURCES)
-            }
+            SettingsHelper.historyFilter.setValue(
+                when (which) {
+                    0 -> SettingsHelper.HistoryFilter.ALL
+                    1 -> SettingsHelper.HistoryFilter.FROM_LIBRARY
+                    2 -> SettingsHelper.HistoryFilter.FROM_SOURCES
+                    else -> throw Error()
+                }
+            )
         }
         .show()
 }

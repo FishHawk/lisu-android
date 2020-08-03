@@ -6,9 +6,9 @@
         <item>@string/settings_reading_direction_vertical</item>
     </string-array>
     <string-array name="reading_direction_entry_values" translatable="false">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
+        <item>LTR</item>
+        <item>RTL</item>
+        <item>VERTICAL</item>
     </string-array>
 
     <string-array name="theme_entries">
@@ -16,8 +16,8 @@
         <item>@string/settings_theme_dark</item>
     </string-array>
     <string-array name="theme_entry_values" translatable="false">
-        <item>0</item>
-        <item>1</item>
+        <item>LIGHT</item>
+        <item>DARK</item>
     </string-array>
 
     <string-array name="display_mode_entries">
@@ -25,8 +25,8 @@
         <item>@string/settings_display_mode_linear</item>
     </string-array>
     <string-array name="display_mode_entry_values" translatable="false">
-        <item>0</item>
-        <item>1</item>
+        <item>GRID</item>
+        <item>LINEAR</item>
     </string-array>
 
     <string-array name="display_order_entries">
@@ -34,8 +34,8 @@
         <item>@string/settings_display_order_descend</item>
     </string-array>
     <string-array name="display_order_entry_values" translatable="false">
-        <item>0</item>
-        <item>1</item>
+        <item>ASCEND</item>
+        <item>DESCEND</item>
     </string-array>
 
     <string-array name="settings_history_filter_entries">
@@ -44,10 +44,8 @@
         <item>@string/settings_history_filter_from_sources</item>
     </string-array>
     <string-array name="settings_history_filter_entry_values" translatable="false">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
+        <item>ALL</item>
+        <item>FROM_LIBRARY</item>
+        <item>FROM_SOURCES</item>
     </string-array>
-    <string name="settings_display_order_ascend">Ascend</string>
-    <string name="settings_display_order_descend">Descend</string>
 </resources>

@@ -33,12 +33,14 @@ class HistoryViewModel(
         readingHistoryRepository.clearReadingHistory()
     }
 
-    private fun filterList(list: List<ReadingHistory>, filter: String): List<ReadingHistory> {
+    private fun filterList(
+        list: List<ReadingHistory>,
+        filter: SettingsHelper.HistoryFilter
+    ): List<ReadingHistory> {
         return when (filter) {
-            SettingsHelper.HISTORY_FILTER_ALL -> list
-            SettingsHelper.HISTORY_FILTER_FROM_LIBRARY -> list.filter { it.source == null }
-            SettingsHelper.HISTORY_FILTER_FROM_SOURCES -> list.filter { it.source != null }
-            else -> throw InternalError("Shouldn't reach here")
+            SettingsHelper.HistoryFilter.ALL -> list
+            SettingsHelper.HistoryFilter.FROM_LIBRARY -> list.filter { it.source == null }
+            SettingsHelper.HistoryFilter.FROM_SOURCES -> list.filter { it.source != null }
         }
     }
 }

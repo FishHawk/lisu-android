@@ -11,100 +11,56 @@ object SettingsHelper {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     }
 
-    private const val KEY_SELECTED_LIBRARY = "selected_library"
-    private const val DEFAULT_SELECTED_LIBRARY: Int = 1
+    private inline fun <reified T : Enum<T>> preferenceEnumLiveData(key: String, defaultValue: T) =
+        PreferenceEnumLiveData(sharedPreferences, key, defaultValue, T::class.java)
+
+    private fun preferenceIntLiveData(key: String, defaultValue: Int) =
+        PreferenceIntLiveData(sharedPreferences, key, defaultValue)
+
+    private fun preferenceStringLiveData(key: String, defaultValue: String) =
+        PreferenceStringLiveData(sharedPreferences, key, defaultValue)
+
+
+    // Settings
 
     val selectedServer by lazy {
-        PreferenceIntLiveData(
-            sharedPreferences,
-            KEY_SELECTED_LIBRARY,
-            DEFAULT_SELECTED_LIBRARY
-        )
+        preferenceIntLiveData("selected_library", 1)
     }
 
-    const val READING_DIRECTION_LEFT_TO_RIGHT: String = "0"
-    const val READING_DIRECTION_RIGHT_TO_LEFT: String = "1"
-    const val READING_DIRECTION_VERTICAL: String = "2"
-
-    private const val KEY_READING_DIRECTION = "reading_direction"
-    private const val DEFAULT_READING_DIRECTION: String = READING_DIRECTION_RIGHT_TO_LEFT
+    enum class ReadingDirection { LTR, RTL, VERTICAL }
 
     val readingDirection by lazy {
-        PreferenceStringLiveData(
-            sharedPreferences,
-            KEY_READING_DIRECTION,
-            DEFAULT_READING_DIRECTION
-        )
+        preferenceEnumLiveData("reading_direction", ReadingDirection.LTR)
     }
 
-    const val THEME_LIGHT: String = "0"
-    const val THEME_DARK: String = "1"
-
-    private const val KEY_THEME = "theme"
-    private const val DEFAULT_THEME: String = THEME_LIGHT
+    enum class Theme { LIGHT, DARK }
 
     val theme by lazy {
-        PreferenceStringLiveData(
-            sharedPreferences,
-            KEY_THEME,
-            DEFAULT_THEME
-        )
+        preferenceEnumLiveData("theme", Theme.LIGHT)
     }
 
-    const val DISPLAY_MODE_GRID: String = "0"
-    const val DISPLAY_MODE_LINEAR: String = "1"
-
-    private const val KEY_DISPLAY_MODE = "display_mode"
-    private const val DEFAULT_DISPLAY_MODE: String = DISPLAY_MODE_GRID
+    enum class DisplayMode { GRID, LINEAR }
 
     val displayMode by lazy {
-        PreferenceStringLiveData(
-            sharedPreferences,
-            KEY_DISPLAY_MODE,
-            DEFAULT_DISPLAY_MODE
-        )
+        preferenceEnumLiveData("display_mode", DisplayMode.GRID)
     }
 
-    const val HISTORY_FILTER_ALL: String = "0"
-    const val HISTORY_FILTER_FROM_LIBRARY: String = "1"
-    const val HISTORY_FILTER_FROM_SOURCES: String = "2"
-
-    private const val KEY_HISTORY_FILTER = "history_filter"
-    private const val DEFAULT_HISTORY_FILTER: String = HISTORY_FILTER_FROM_LIBRARY
+    enum class HistoryFilter { ALL, FROM_LIBRARY, FROM_SOURCES }
 
     val historyFilter by lazy {
-        PreferenceStringLiveData(
-            sharedPreferences,
-            KEY_HISTORY_FILTER,
-            DEFAULT_HISTORY_FILTER
-        )
+        preferenceEnumLiveData("history_filter", HistoryFilter.FROM_LIBRARY)
     }
 
-    const val CHAPTER_DISPLAY_MODE_GRID: String = "0"
-    const val CHAPTER_DISPLAY_MODE_LINEAR: String = "1"
 
-    private const val KEY_CHAPTER_DISPLAY_MODE = "display_mode"
-    private const val DEFAULT_CHAPTER_DISPLAY_MODE: String = CHAPTER_DISPLAY_MODE_GRID
+    enum class ChapterDisplayMode { GRID, LINEAR }
 
     val chapterDisplayMode by lazy {
-        PreferenceStringLiveData(
-            sharedPreferences,
-            KEY_CHAPTER_DISPLAY_MODE,
-            DEFAULT_CHAPTER_DISPLAY_MODE
-        )
+        preferenceEnumLiveData("chapter_display_mode", ChapterDisplayMode.GRID)
     }
 
-    const val CHAPTER_DISPLAY_ORDER_ASCEND: String = "0"
-    const val CHAPTER_DISPLAY_ORDER_DESCEND: String = "1"
-
-    private const val KEY_CHAPTER_DISPLAY_ORDER = "display_mode"
-    private const val DEFAULT_CHAPTER_DISPLAY_ORDER: String = CHAPTER_DISPLAY_ORDER_ASCEND
+    enum class ChapterDisplayOrder { ASCEND, DESCEND }
 
     val chapterDisplayOrder by lazy {
-        PreferenceStringLiveData(
-            sharedPreferences,
-            KEY_CHAPTER_DISPLAY_ORDER,
-            DEFAULT_CHAPTER_DISPLAY_ORDER
-        )
+        preferenceEnumLiveData("chapter_display_order", ChapterDisplayOrder.ASCEND)
     }
 }
