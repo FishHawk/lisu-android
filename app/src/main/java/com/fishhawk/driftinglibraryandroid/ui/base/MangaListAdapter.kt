@@ -21,23 +21,23 @@ class MangaListAdapter(
 ) {
     var onCardLongClicked: (MangaOutline) -> Unit = {}
 
-    enum class ViewType(val value: Int) {
+    enum class ViewMode(val value: Int) {
         GRID(0),
         LINEAR(1)
     }
 
-    var viewType = ViewType.GRID
+    var viewMode = ViewMode.GRID
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<MangaOutline> {
-        return when (this.viewType) {
-            ViewType.GRID ->
+        return when (this.viewMode) {
+            ViewMode.GRID ->
                 GridViewHolder(
                     MangaGridThumbnailBinding.inflate(
                         LayoutInflater.from(activity),
                         parent, false
                     )
                 )
-            ViewType.LINEAR ->
+            ViewMode.LINEAR ->
                 LinearViewHolder(
                     MangaLinearThumbnailBinding.inflate(
                         LayoutInflater.from(activity),

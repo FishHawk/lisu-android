@@ -66,15 +66,15 @@ fun <T> Fragment.bindToListViewModel(
 fun RecyclerView.changeMangaListDisplayMode(adapter: MangaListAdapter) {
     val displayMode = SettingsHelper.displayMode.getValueDirectly()
     if (displayMode == SettingsHelper.DISPLAY_MODE_GRID &&
-        (adapter.viewType != MangaListAdapter.ViewType.GRID || layoutManager == null)
+        (adapter.viewMode != MangaListAdapter.ViewMode.GRID || layoutManager == null)
     ) {
-        adapter.viewType = MangaListAdapter.ViewType.GRID
+        adapter.viewMode = MangaListAdapter.ViewMode.GRID
         layoutManager = GridLayoutManager(context, 3)
         this.adapter = adapter
     } else if (displayMode == SettingsHelper.DISPLAY_MODE_LINEAR &&
-        (adapter.viewType != MangaListAdapter.ViewType.LINEAR || layoutManager == null)
+        (adapter.viewMode != MangaListAdapter.ViewMode.LINEAR || layoutManager == null)
     ) {
-        adapter.viewType = MangaListAdapter.ViewType.LINEAR
+        adapter.viewMode = MangaListAdapter.ViewMode.LINEAR
         layoutManager = LinearLayoutManager(context)
         this.adapter = adapter
     }

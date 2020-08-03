@@ -18,6 +18,7 @@ import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.Collection
 import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
 import com.google.android.flexbox.FlexboxLayout
 
@@ -51,18 +52,24 @@ class GalleryActivity : AppCompatActivity() {
 
         val adapter = ContentAdapter(this, id, source)
         binding.chapters.adapter = adapter
-        binding.chapters.apply {
-            (layoutManager as GridLayoutManager).spanSizeLookup =
-                object : GridLayoutManager.SpanSizeLookup() {
-                    override fun getSpanSize(position: Int): Int {
-                        return when (adapter.getItemViewType(position)) {
-                            ContentAdapter.ViewType.CHAPTER.value -> 1
-                            ContentAdapter.ViewType.CHAPTER_MARKED.value -> 1
-                            else -> 3
-                        }
-                    }
+        binding.displayModeButton.setOnClickListener {
+            SettingsHelper.chapterDisplayMode.setValue(
+                when (SettingsHelper.chapterDisplayMode.value) {
+                    SettingsHelper.CHAPTER_DISPLAY_MODE_GRID -> SettingsHelper.CHAPTER_DISPLAY_MODE_LINEAR
+                    SettingsHelper.CHAPTER_DISPLAY_MODE_LINEAR -> SettingsHelper.CHAPTER_DISPLAY_MODE_GRID
+                    else -> SettingsHelper.CHAPTER_DISPLAY_MODE_LINEAR
                 }
+            )
         }
+
+        SettingsHelper.chapterDisplayMode.observe(this, Observer {
+            binding.chapters.viewMode = when (it) {
+                SettingsHelper.CHAPTER_DISPLAY_MODE_GRID -> ContentView.ViewMode.GRID
+                SettingsHelper.CHAPTER_DISPLAY_MODE_LINEAR -> ContentView.ViewMode.LINEAR
+                else -> ContentView.ViewMode.GRID
+            }
+        })
+
 
         viewModel.notification.observe(this, EventObserver {
             binding.root.makeToast(getNotificationMessage(it))
@@ -137,7 +144,14 @@ class GalleryActivity : AppCompatActivity() {
             if (collection.title.isNotEmpty())
                 items.add(ContentItem.CollectionHeader(collection.title))
             for ((chapterIndex, chapter) in collection.chapters.withIndex()) {
-                items.add(ContentItem.Chapter(chapter.name, chapter.title, collectionIndex, chapterIndex))
+                items.add(
+                    ContentItem.Chapter(
+                        chapter.name,
+                        chapter.title,
+                        collectionIndex,
+                        chapterIndex
+                    )
+                )
             }
         }
         adapter.changeList(items)

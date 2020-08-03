@@ -4,10 +4,7 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import com.fishhawk.driftinglibraryandroid.databinding.GalleryChapterBinding
-import com.fishhawk.driftinglibraryandroid.databinding.GalleryChapterMarkedBinding
-import com.fishhawk.driftinglibraryandroid.databinding.GalleryCollectionTitleBinding
-import com.fishhawk.driftinglibraryandroid.databinding.GalleryNoChapterHintBinding
+import com.fishhawk.driftinglibraryandroid.databinding.*
 import com.fishhawk.driftinglibraryandroid.extension.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
@@ -47,6 +44,13 @@ class ContentAdapter(
 ) : BaseRecyclerViewAdapter<ContentItem, BaseRecyclerViewAdapter.ViewHolder<ContentItem>>(
     mutableListOf()
 ) {
+    enum class ViewMode(val value: Int) {
+        GRID(0),
+        LINEAR(1)
+    }
+
+    var viewMode = ViewMode.GRID
+
     enum class ViewType(val value: Int) {
         CHAPTER(0),
         CHAPTER_MARKED(1),
@@ -79,10 +83,10 @@ class ContentAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<ContentItem> {
         return when (viewType) {
             ViewType.CHAPTER.value -> ChapterViewHolder(
-                GalleryChapterBinding.inflate(LayoutInflater.from(activity), parent, false)
+                GalleryChapterGridBinding.inflate(LayoutInflater.from(activity), parent, false)
             )
             ViewType.CHAPTER_MARKED.value -> ChapterMarkedViewHolder(
-                GalleryChapterMarkedBinding.inflate(LayoutInflater.from(activity), parent, false)
+                GalleryChapterGridMarkedBinding.inflate(LayoutInflater.from(activity), parent, false)
             )
             ViewType.COLLECTION_HEADER.value -> CollectionHeaderViewHolder(
                 GalleryCollectionTitleBinding.inflate(LayoutInflater.from(activity), parent, false)
@@ -106,7 +110,7 @@ class ContentAdapter(
     override fun getItemCount() = list.size
 
 
-    inner class ChapterViewHolder(private val binding: GalleryChapterBinding) :
+    inner class ChapterViewHolder(private val binding: GalleryChapterGridBinding) :
         BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
 
         override fun bind(item: ContentItem, position: Int) {
@@ -124,7 +128,7 @@ class ContentAdapter(
         }
     }
 
-    inner class ChapterMarkedViewHolder(private val binding: GalleryChapterMarkedBinding) :
+    inner class ChapterMarkedViewHolder(private val binding: GalleryChapterGridMarkedBinding) :
         BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
 
         override fun bind(item: ContentItem, position: Int) {

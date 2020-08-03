@@ -79,4 +79,32 @@ object SettingsHelper {
             DEFAULT_HISTORY_FILTER
         )
     }
+
+    const val CHAPTER_DISPLAY_MODE_GRID: String = "0"
+    const val CHAPTER_DISPLAY_MODE_LINEAR: String = "1"
+
+    private const val KEY_CHAPTER_DISPLAY_MODE = "display_mode"
+    private const val DEFAULT_CHAPTER_DISPLAY_MODE: String = CHAPTER_DISPLAY_MODE_GRID
+
+    val chapterDisplayMode by lazy {
+        PreferenceStringLiveData(
+            sharedPreferences,
+            KEY_CHAPTER_DISPLAY_MODE,
+            DEFAULT_CHAPTER_DISPLAY_MODE
+        )
+    }
+
+    const val CHAPTER_DISPLAY_ORDER_ASCEND: String = "0"
+    const val CHAPTER_DISPLAY_ORDER_DESCEND: String = "1"
+
+    private const val KEY_CHAPTER_DISPLAY_ORDER = "display_mode"
+    private const val DEFAULT_CHAPTER_DISPLAY_ORDER: String = CHAPTER_DISPLAY_ORDER_ASCEND
+
+    val chapterDisplayOrder by lazy {
+        PreferenceStringLiveData(
+            sharedPreferences,
+            KEY_CHAPTER_DISPLAY_ORDER,
+            DEFAULT_CHAPTER_DISPLAY_ORDER
+        )
+    }
 }

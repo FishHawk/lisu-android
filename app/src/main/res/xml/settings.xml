@@ -37,4 +37,20 @@
         app:key="clear_image_cache"
         app:summary="Clear thumb and chapter image cache"
         app:title="Clear image cache" />
+
+    <ListPreference
+        app:defaultValue="0"
+        app:entries="@array/display_mode_entries"
+        app:entryValues="@array/display_mode_entry_values"
+        app:key="chapter_display_mode"
+        app:summary="%s"
+        app:title="@string/settings_chapter_display_mode" />
+
+    <ListPreference
+        app:defaultValue="0"
+        app:entries="@array/display_order_entries"
+        app:entryValues="@array/display_order_entry_values"
+        app:key="chapter_display_mode"
+        app:summary="%s"
+        app:title="@string/settings_chapter_display_order" />
 </PreferenceScreen>
