@@ -32,7 +32,7 @@
             android:paddingTop="@dimen/baseline_4dp"
             android:paddingEnd="@dimen/baseline_8dp"
             android:paddingBottom="@dimen/baseline_4dp"
-            android:text="@{String.format(`%s %s/%s`,viewModel.chapterTitle, viewModel.chapterPosition+1, viewModel.chapterSize)}"
+            android:text="@{String.format(`%s %s %s/%s`, viewModel.chapterName, viewModel.chapterTitle, viewModel.chapterPosition+1, viewModel.chapterSize)}"
             android:textColor="#ffffff"
             android:visibility="@{!viewModel.isMenuVisible ? View.VISIBLE : View.GONE}" />
 

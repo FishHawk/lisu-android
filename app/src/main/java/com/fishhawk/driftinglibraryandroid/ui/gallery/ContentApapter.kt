@@ -14,17 +14,27 @@ import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 sealed class ContentItem {
     data class Chapter(
+        val name: String,
         val title: String,
         val collectionIndex: Int,
         val chapterIndex: Int
-    ) : ContentItem()
+    ) : ContentItem() {
+        fun marked(pageIndex: Int): ChapterMarked {
+            return ChapterMarked(name, title, collectionIndex, chapterIndex, pageIndex)
+        }
+    }
 
     data class ChapterMarked(
+        val name: String,
         val title: String,
         val collectionIndex: Int,
         val chapterIndex: Int,
         val pageIndex: Int
-    ) : ContentItem()
+    ) : ContentItem() {
+        fun unmarked(): Chapter {
+            return Chapter(name, title, collectionIndex, chapterIndex)
+        }
+    }
 
     data class CollectionHeader(val title: String) : ContentItem()
     object NoChapterHint : ContentItem()
@@ -47,10 +57,7 @@ class ContentAdapter(
     fun unmarkChapter() {
         val index = list.indexOfFirst { it is ContentItem.ChapterMarked }
         if (index != -1) {
-            val item = list[index] as ContentItem.ChapterMarked
-            list[index] = ContentItem.Chapter(
-                item.title, item.collectionIndex, item.chapterIndex
-            )
+            list[index] = (list[index] as ContentItem.ChapterMarked).unmarked()
             notifyItemChanged(index)
         }
     }
@@ -64,10 +71,7 @@ class ContentAdapter(
                     it.chapterIndex == chapterIndex
         }
         if (index != -1) {
-            val item = list[index] as ContentItem.Chapter
-            list[index] = ContentItem.ChapterMarked(
-                item.title, item.collectionIndex, item.chapterIndex, pageIndex
-            )
+            list[index] = (list[index] as ContentItem.Chapter).marked(pageIndex)
             notifyItemChanged(index)
         }
     }
@@ -89,17 +93,6 @@ class ContentAdapter(
             else -> throw IllegalAccessError()
         }
     }
-//
-//    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-//        when (holder.itemViewType) {
-//            ViewType.COLLECTION_HEADER.value ->
-//                (holder as CollectionHeaderViewHolder).bind(data[position] as ContentItem.CollectionHeader)
-//            ViewType.CHAPTER.value ->
-//                (holder as ChapterViewHolder).bind(data[position] as ContentItem.Chapter)
-//            ViewType.CHAPTER_MARKED.value ->
-//                (holder as ChapterMarkedViewHolder).bind(data[position] as ContentItem.ChapterMarked)
-//        }
-//    }
 
     override fun getItemViewType(position: Int): Int {
         return when (list[position]) {
@@ -118,7 +111,7 @@ class ContentAdapter(
 
         override fun bind(item: ContentItem, position: Int) {
             val newItem = item as ContentItem.Chapter
-            binding.button.text = newItem.title
+            binding.button.text = newItem.name
             binding.button.setOnClickListener {
                 (activity as AppCompatActivity).navToReaderActivity(
                     id,
@@ -136,7 +129,7 @@ class ContentAdapter(
 
         override fun bind(item: ContentItem, position: Int) {
             val newItem = item as ContentItem.ChapterMarked
-            binding.button.text = newItem.title
+            binding.button.text = newItem.name
             binding.button.setOnClickListener {
                 (activity as AppCompatActivity).navToReaderActivity(
                     id,

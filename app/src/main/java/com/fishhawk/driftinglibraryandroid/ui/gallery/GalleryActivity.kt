@@ -137,7 +137,7 @@ class GalleryActivity : AppCompatActivity() {
             if (collection.title.isNotEmpty())
                 items.add(ContentItem.CollectionHeader(collection.title))
             for ((chapterIndex, chapter) in collection.chapters.withIndex()) {
-                items.add(ContentItem.Chapter(chapter.name, collectionIndex, chapterIndex))
+                items.add(ContentItem.Chapter(chapter.name, chapter.title, collectionIndex, chapterIndex))
             }
         }
         adapter.changeList(items)

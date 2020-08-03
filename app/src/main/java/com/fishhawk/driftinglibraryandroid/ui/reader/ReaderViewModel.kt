@@ -35,6 +35,7 @@ class ReaderViewModel(
     var isLoading: Boolean = true
     val chapterPosition: MutableLiveData<Int> = MutableLiveData(0)
     val chapterSize: MutableLiveData<Int> = MutableLiveData(0)
+    val chapterName: MutableLiveData<String> = MutableLiveData("")
     val chapterTitle: MutableLiveData<String> = MutableLiveData("")
 
     init {
@@ -58,6 +59,7 @@ class ReaderViewModel(
 
         val self = this
         val chapterId = collection.chapters[chapterIndex].id
+        val chapterName = collection.chapters[chapterIndex].name
         val chapterTitle = collection.chapters[chapterIndex].title
 
         viewModelScope.launch {
@@ -71,6 +73,7 @@ class ReaderViewModel(
             when (result) {
                 is Result.Success -> {
                     self.chapterIndex = chapterIndex
+                    self.chapterName.value = chapterName
                     self.chapterTitle.value = chapterTitle
                     self.chapterSize.value = result.data.size
                     self.chapterPosition.value = when {
