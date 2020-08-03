@@ -48,7 +48,7 @@
 
                 <TextView
                     android:id="@+id/source_label"
-                    style="@style/Theme.TextAppearance.Subtitle2"
+                    style="@style/Theme.TextAppearance.Body1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/baseline_4dp"
@@ -58,7 +58,7 @@
 
                 <TextView
                     android:id="@+id/source"
-                    style="@style/Theme.TextAppearance.Subtitle1"
+                    style="@style/Theme.TextAppearance.Body2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/baseline_8dp"
@@ -73,7 +73,7 @@
 
                 <TextView
                     android:id="@+id/source_manga_label"
-                    style="@style/Theme.TextAppearance.Subtitle2"
+                    style="@style/Theme.TextAppearance.Body1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/baseline_4dp"
@@ -83,7 +83,7 @@
 
                 <TextView
                     android:id="@+id/source_manga"
-                    style="@style/Theme.TextAppearance.Subtitle1"
+                    style="@style/Theme.TextAppearance.Body2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/baseline_8dp"

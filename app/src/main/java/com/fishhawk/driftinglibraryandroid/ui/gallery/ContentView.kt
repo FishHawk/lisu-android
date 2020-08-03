@@ -37,7 +37,7 @@ class ContentView @JvmOverloads constructor(
         set(value) {
             adapter?.viewMode = when (value) {
                 ViewMode.GRID -> ContentAdapter.ViewMode.GRID
-                ViewMode.LINEAR -> ContentAdapter.ViewMode.GRID
+                ViewMode.LINEAR -> ContentAdapter.ViewMode.LINEAR
             }
             layoutManager = when (value) {
                 ViewMode.GRID -> gridLayoutManager

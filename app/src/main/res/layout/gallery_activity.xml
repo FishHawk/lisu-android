@@ -83,7 +83,7 @@
 
                         <TextView
                             android:id="@+id/author_label"
-                            style="@style/Theme.TextAppearance.Subtitle2"
+                            style="@style/Theme.TextAppearance.Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
@@ -94,7 +94,7 @@
 
                         <TextView
                             android:id="@+id/author"
-                            style="@style/Theme.TextAppearance.Subtitle1"
+                            style="@style/Theme.TextAppearance.Body2"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
@@ -111,7 +111,7 @@
 
                         <TextView
                             android:id="@+id/status_label"
-                            style="@style/Theme.TextAppearance.Subtitle2"
+                            style="@style/Theme.TextAppearance.Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
@@ -122,7 +122,7 @@
 
                         <TextView
                             android:id="@+id/status"
-                            style="@style/Theme.TextAppearance.Subtitle1"
+                            style="@style/Theme.TextAppearance.Body2"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
@@ -139,7 +139,7 @@
 
                         <TextView
                             android:id="@+id/update_label"
-                            style="@style/Theme.TextAppearance.Subtitle2"
+                            style="@style/Theme.TextAppearance.Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
@@ -150,7 +150,7 @@
 
                         <TextView
                             android:id="@+id/update"
-                            style="@style/Theme.TextAppearance.Subtitle1"
+                            style="@style/Theme.TextAppearance.Body2"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
@@ -167,7 +167,7 @@
 
                         <TextView
                             android:id="@+id/source_label"
-                            style="@style/Theme.TextAppearance.Subtitle2"
+                            style="@style/Theme.TextAppearance.Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
@@ -178,7 +178,7 @@
 
                         <TextView
                             android:id="@+id/source"
-                            style="@style/Theme.TextAppearance.Subtitle1"
+                            style="@style/Theme.TextAppearance.Body2"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
@@ -289,7 +289,7 @@
                             android:orientation="horizontal">
 
                             <TextView
-                                style="@style/Theme.TextAppearance.Subtitle2"
+                                style="@style/Theme.TextAppearance.Subtitle1"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"

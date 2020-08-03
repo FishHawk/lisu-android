@@ -82,12 +82,37 @@ class ContentAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<ContentItem> {
         return when (viewType) {
-            ViewType.CHAPTER.value -> ChapterViewHolder(
-                GalleryChapterGridBinding.inflate(LayoutInflater.from(activity), parent, false)
-            )
-            ViewType.CHAPTER_MARKED.value -> ChapterMarkedViewHolder(
-                GalleryChapterGridMarkedBinding.inflate(LayoutInflater.from(activity), parent, false)
-            )
+            ViewType.CHAPTER.value ->
+                when (viewMode) {
+                    ViewMode.GRID ->
+                        ChapterViewHolder(
+                            GalleryChapterGridBinding.inflate(
+                                LayoutInflater.from(activity), parent, false
+                            )
+                        )
+                    ViewMode.LINEAR ->
+                        ChapterLinearViewHolder(
+                            GalleryChapterLinearBinding.inflate(
+                                LayoutInflater.from(activity), parent, false
+                            )
+                        )
+                }
+            ViewType.CHAPTER_MARKED.value ->
+
+                when (viewMode) {
+                    ViewMode.GRID ->
+                        ChapterMarkedViewHolder(
+                            GalleryChapterGridMarkedBinding.inflate(
+                                LayoutInflater.from(activity), parent, false
+                            )
+                        )
+                    ViewMode.LINEAR ->
+                        ChapterLinearMarkedViewHolder(
+                            GalleryChapterLinearMarkedBinding.inflate(
+                                LayoutInflater.from(activity), parent, false
+                            )
+                        )
+                }
             ViewType.COLLECTION_HEADER.value -> CollectionHeaderViewHolder(
                 GalleryCollectionTitleBinding.inflate(LayoutInflater.from(activity), parent, false)
             )
@@ -141,6 +166,44 @@ class ContentAdapter(
                     newItem.collectionIndex,
                     newItem.chapterIndex,
                     newItem.pageIndex
+                )
+            }
+        }
+    }
+
+    inner class ChapterLinearViewHolder(private val binding: GalleryChapterLinearBinding) :
+        BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
+
+        override fun bind(item: ContentItem, position: Int) {
+            val newItem = item as ContentItem.Chapter
+            binding.name.text = newItem.name
+            binding.title.text = newItem.title
+            binding.root.setOnClickListener {
+                (activity as AppCompatActivity).navToReaderActivity(
+                    id,
+                    source,
+                    newItem.collectionIndex,
+                    newItem.chapterIndex,
+                    0
+                )
+            }
+        }
+    }
+
+    inner class ChapterLinearMarkedViewHolder(private val binding: GalleryChapterLinearMarkedBinding) :
+        BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
+
+        override fun bind(item: ContentItem, position: Int) {
+            val newItem = item as ContentItem.ChapterMarked
+            binding.name.text = newItem.name
+            binding.title.text = newItem.title
+            binding.root.setOnClickListener {
+                (activity as AppCompatActivity).navToReaderActivity(
+                    id,
+                    source,
+                    newItem.collectionIndex,
+                    newItem.chapterIndex,
+                    0
                 )
             }
         }
