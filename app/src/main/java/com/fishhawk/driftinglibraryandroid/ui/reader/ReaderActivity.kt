@@ -96,9 +96,9 @@ class ReaderActivity : AppCompatActivity() {
         binding.reader.onRequestNextChapter = { openNextChapter() }
         binding.reader.onRequestMenu = { viewModel.isMenuVisible.value = true }
         binding.reader.onScrolled = { viewModel.chapterPosition.value = it }
-
         binding.reader.onPageLongClicked = { position, url ->
-            ReaderPageSheet(this, position, url).show()
+            if (SettingsHelper.longTapDialog.getValueDirectly())
+                ReaderPageSheet(this, position, url).show()
         }
     }
 

@@ -30,5 +30,10 @@ class ReaderSettingsSheet(activity: ReaderActivity) : BottomSheetDialog(activity
         binding.keepScreenOn.setOnCheckedChangeListener { _, isChecked ->
             SettingsHelper.keepScreenOn.setValue(isChecked)
         }
+
+        binding.longTapDialog.isChecked = SettingsHelper.longTapDialog.getValueDirectly()
+        binding.longTapDialog.setOnCheckedChangeListener { _, isChecked ->
+            SettingsHelper.longTapDialog.setValue(isChecked)
+        }
     }
 }

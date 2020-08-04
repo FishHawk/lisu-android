@@ -70,4 +70,8 @@ object SettingsHelper {
     val keepScreenOn by lazy {
         preferenceBooleanLiveData("keep_screen_on", false)
     }
+
+    val longTapDialog by lazy {
+        preferenceBooleanLiveData("long_tap_dialog", true)
+    }
 }

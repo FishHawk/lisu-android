@@ -88,6 +88,7 @@
         android:id="@+id/long_tap_dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:text="Long tap dialog"
         android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintTop_toBottomOf="@id/use_volume_key" />
