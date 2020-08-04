@@ -25,9 +25,7 @@ class ReaderSettingsSheet(activity: ReaderActivity) : BottomSheetDialog(activity
     private val binding = ReaderSettingsSheetBinding.inflate(activity.layoutInflater, null, false)
 
     init {
-        val scroll = NestedScrollView(activity)
-        scroll.addView(binding.root)
-        setContentView(scroll)
+        setContentView(binding.root)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

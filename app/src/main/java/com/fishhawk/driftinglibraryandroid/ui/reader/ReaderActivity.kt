@@ -56,16 +56,8 @@ class ReaderActivity : AppCompatActivity() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        binding.reader.onRequestPrevChapter = { openPrevChapter() }
-        binding.reader.onRequestNextChapter = { openNextChapter() }
-        binding.reader.onRequestMenu = { viewModel.isMenuVisible.value = true }
-        binding.reader.onScrolled = { viewModel.chapterPosition.value = it }
+        setupReaderView()
         setupMenuLayout()
-
-        binding.reader.adapter.apply {
-            onImageShare = { page, url -> lifecycleScope.launch { shareImage(page, url) } }
-            onImageSave = { page, url -> lifecycleScope.launch { saveImage(page, url) } }
-        }
 
         SettingsHelper.readingDirection.observe(this, Observer {
             binding.reader.mode = when (it) {
@@ -95,31 +87,22 @@ class ReaderActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupReaderView() {
+        binding.reader.onRequestPrevChapter = { openPrevChapter() }
+        binding.reader.onRequestNextChapter = { openNextChapter() }
+        binding.reader.onRequestMenu = { viewModel.isMenuVisible.value = true }
+        binding.reader.onScrolled = { viewModel.chapterPosition.value = it }
+
+        binding.reader.adapter.apply {
+            onImageShare = { page, url -> lifecycleScope.launch { shareImage(page, url) } }
+            onImageSave = { page, url -> lifecycleScope.launch { saveImage(page, url) } }
+        }
+    }
+
     private fun setupMenuLayout() {
         binding.menuLayout.setOnClickListener { viewModel.isMenuVisible.value = false }
 
         binding.settingButton.setOnClickListener { ReaderSettingsSheet(this).show() }
-
-        binding.buttonReadingDirection.setOnClickListener {
-            SettingsHelper.readingDirection.setNextValue()
-        }
-
-        SettingsHelper.readingDirection.observe(this, Observer {
-            when (it) {
-                SettingsHelper.ReadingDirection.LTR -> {
-                    binding.buttonReadingDirection.setImageResource(R.drawable.ic_baseline_keyboard_arrow_right_24)
-                    binding.hintReadingDirection.setText(R.string.hint_reading_direction_left_to_right)
-                }
-                SettingsHelper.ReadingDirection.RTL -> {
-                    binding.buttonReadingDirection.setImageResource(R.drawable.ic_baseline_keyboard_arrow_left_24)
-                    binding.hintReadingDirection.setText(R.string.hint_reading_direction_right_to_Left)
-                }
-                SettingsHelper.ReadingDirection.VERTICAL -> {
-                    binding.buttonReadingDirection.setImageResource(R.drawable.ic_baseline_keyboard_arrow_down_24)
-                    binding.hintReadingDirection.setText(R.string.hint_reading_direction_vertical)
-                }
-            }
-        })
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}

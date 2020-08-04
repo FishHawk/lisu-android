@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipToPadding="false"
+    android:background="?android:attr/colorBackground"
     android:orientation="vertical"
-    android:paddingStart="24dp"
-    android:paddingTop="0dp"
-    android:paddingEnd="24dp"
-    android:paddingBottom="24dp">
+    android:padding="16dp">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/verticalcenter"
@@ -20,11 +16,13 @@
 
     <TextView
         android:id="@+id/direction_label"
+        style="@style/Theme.TextAppearance.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Direction"
         app:layout_constraintBaseline_toBaselineOf="@id/direction"
         app:layout_constraintEnd_toStartOf="@id/verticalcenter"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatSpinner
@@ -36,4 +34,49 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/verticalcenter"
         app:layout_constraintTop_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/orientation_label"
+        style="@style/Theme.TextAppearance.Body1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Orientation"
+        app:layout_constraintBaseline_toBaselineOf="@id/orientation"
+        app:layout_constraintEnd_toStartOf="@id/verticalcenter"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatSpinner
+        android:id="@+id/orientation"
+        android:layout_width="0dp"
+        android:layout_height="24dp"
+        android:layout_marginTop="20dp"
+        android:entries="@array/reading_direction_entries"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/verticalcenter"
+        app:layout_constraintTop_toBottomOf="@id/direction" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/keep_screen_on"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Keep screen on"
+        android:textColor="?android:attr/textColorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/orientation" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/use_volume_key"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Use volume key to turn pages"
+        android:textColor="?android:attr/textColorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/keep_screen_on" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/long_tap_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Long tap dialog"
+        android:textColor="?android:attr/textColorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/use_volume_key" />
 </androidx.constraintlayout.widget.ConstraintLayout>
