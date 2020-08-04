@@ -82,7 +82,14 @@ fun RecyclerView.changeMangaListDisplayMode(adapter: MangaListAdapter) {
 
 fun getDisplayModeIcon(): Int {
     return when (SettingsHelper.displayMode.getValueDirectly()) {
-        SettingsHelper.DisplayMode.GRID -> R.drawable.ic_baseline_view_list_24
-        SettingsHelper.DisplayMode.LINEAR -> R.drawable.ic_baseline_view_module_24
+        SettingsHelper.DisplayMode.GRID -> R.drawable.ic_baseline_view_module_24
+        SettingsHelper.DisplayMode.LINEAR -> R.drawable.ic_baseline_view_list_24
+    }
+}
+
+fun getChapterDisplayModeIcon(): Int {
+    return when (SettingsHelper.chapterDisplayMode.getValueDirectly()) {
+        SettingsHelper.ChapterDisplayMode.GRID -> R.drawable.ic_baseline_view_module_24
+        SettingsHelper.ChapterDisplayMode.LINEAR -> R.drawable.ic_baseline_view_list_24
     }
 }

@@ -58,6 +58,7 @@ class GalleryActivity : AppCompatActivity() {
         }
 
         SettingsHelper.chapterDisplayMode.observe(this, Observer {
+            binding.displayModeButton.setIconResource(getChapterDisplayModeIcon())
             binding.chapters.viewMode = when (it) {
                 SettingsHelper.ChapterDisplayMode.GRID -> ContentView.ViewMode.GRID
                 SettingsHelper.ChapterDisplayMode.LINEAR -> ContentView.ViewMode.LINEAR
