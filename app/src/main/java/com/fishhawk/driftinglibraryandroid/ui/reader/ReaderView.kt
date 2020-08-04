@@ -64,11 +64,20 @@ class ReaderView @JvmOverloads constructor(
     var onRequestNextChapter: (() -> Unit)? = null
     var onRequestMenu: (() -> Unit)? = null
     var onScrolled: ((Int) -> Unit)? = null
+    var onPageLongClicked: ((Int, String) -> Unit)?
+        set(value) {
+            adapter.onPageLongClicked = value
+        }
+        get() = adapter.onPageLongClicked
 
     fun getPage(): Int = layoutManager.findFirstVisibleItemPosition()
     fun setPage(page: Int) {
         if (adapter.itemCount != 0 && page >= 0 && page < adapter.itemCount)
             recyclerView.scrollToPosition(page)
+    }
+
+    fun refreshPage(page: Int) {
+        adapter.notifyItemChanged(page)
     }
 
     fun setContent(content: List<String>) {

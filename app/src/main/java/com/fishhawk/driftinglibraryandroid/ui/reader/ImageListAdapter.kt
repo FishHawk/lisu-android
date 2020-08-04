@@ -7,8 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.LinearLayout
-import androidx.appcompat.app.AlertDialog
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -17,7 +15,6 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.DialogChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
@@ -25,9 +22,7 @@ import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 class ImageListAdapter(
     private val context: Context
 ) : BaseRecyclerViewAdapter<String, ImageListAdapter.ViewHolder>(mutableListOf()) {
-    var onImageSave: ((Int, String) -> Unit)? = null
-    var onImageShare: ((Int, String) -> Unit)? = null
-
+    var onPageLongClicked: ((Int, String) -> Unit)? = null
     var isContinuous = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -60,12 +55,8 @@ class ImageListAdapter(
             binding.errorHint.visibility = View.GONE
 
             binding.number.text = (position + 1).toString()
-            binding.background.setOnLongClickListener {
-                createChapterImageActionDialog(position, item)
-                true
-            }
             binding.content.setOnLongClickListener {
-                createChapterImageActionDialog(position, item)
+                onPageLongClicked?.invoke(position, item)
                 true
             }
 
@@ -116,28 +107,28 @@ class ImageListAdapter(
                 })
         }
     }
-
-    fun createChapterImageActionDialog(page: Int, url: String) {
-        val dialogBinding =
-            DialogChapterImageBinding.inflate(LayoutInflater.from(context), null, false)
-
-        val dialog = AlertDialog.Builder(context)
-            .setTitle("Page ${page + 1}")
-            .setView(dialogBinding.root)
-            .create()
-
-        dialogBinding.refreshButton.setOnClickListener {
-            dialog.dismiss()
-            notifyItemChanged(page)
-        }
-        dialogBinding.shareButton.setOnClickListener {
-            dialog.dismiss()
-            onImageShare?.invoke(page, url)
-        }
-        dialogBinding.saveButton.setOnClickListener {
-            dialog.dismiss()
-            onImageSave?.invoke(page, url)
-        }
-        dialog.show()
-    }
+//
+//    fun createChapterImageActionDialog(page: Int, url: String) {
+//        val dialogBinding =
+//            DialogChapterImageBinding.inflate(LayoutInflater.from(context), null, false)
+//
+//        val dialog = AlertDialog.Builder(context)
+//            .setTitle("Page ${page + 1}")
+//            .setView(dialogBinding.root)
+//            .create()
+//
+//        dialogBinding.refreshButton.setOnClickListener {
+//            dialog.dismiss()
+//            notifyItemChanged(page)
+//        }
+//        dialogBinding.shareButton.setOnClickListener {
+//            dialog.dismiss()
+//            onImageShare?.invoke(page, url)
+//        }
+//        dialogBinding.saveButton.setOnClickListener {
+//            dialog.dismiss()
+//            onImageSave?.invoke(page, url)
+//        }
+//        dialog.show()
+//    }
 }

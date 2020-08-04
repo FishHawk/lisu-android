@@ -93,9 +93,8 @@ class ReaderActivity : AppCompatActivity() {
         binding.reader.onRequestMenu = { viewModel.isMenuVisible.value = true }
         binding.reader.onScrolled = { viewModel.chapterPosition.value = it }
 
-        binding.reader.adapter.apply {
-            onImageShare = { page, url -> lifecycleScope.launch { shareImage(page, url) } }
-            onImageSave = { page, url -> lifecycleScope.launch { saveImage(page, url) } }
+        binding.reader.onPageLongClicked = { position, url ->
+            ReaderPageSheet(this, position, url).show()
         }
     }
 
@@ -124,7 +123,11 @@ class ReaderActivity : AppCompatActivity() {
     }
 
 
-    private suspend fun shareImage(page: Int, url: String) {
+    fun refreshImage(page: Int) {
+        binding.reader.refreshPage(page)
+    }
+
+    suspend fun shareImage(url: String) {
         val file = FileUtil.downloadImage(this, url)
 
         val uri = FileProvider.getUriForFile(
@@ -138,7 +141,7 @@ class ReaderActivity : AppCompatActivity() {
         startActivity(Intent.createChooser(shareIntent, "Share image"))
     }
 
-    private suspend fun saveImage(page: Int, url: String) {
+    suspend fun saveImage(page: Int, url: String) {
         val prefix = viewModel.makeImageFilenamePrefix()
         if (prefix == null) {
             binding.root.makeToast("Chapter not open")

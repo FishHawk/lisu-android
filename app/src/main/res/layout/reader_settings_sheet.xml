@@ -7,6 +7,14 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <TextView
+        android:id="@+id/title"
+        style="@style/Theme.TextAppearance.Subtitle1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Menu"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/verticalcenter"
         android:layout_width="wrap_content"
@@ -19,6 +27,7 @@
         style="@style/Theme.TextAppearance.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:text="Direction"
         app:layout_constraintBaseline_toBaselineOf="@id/direction"
         app:layout_constraintEnd_toStartOf="@id/verticalcenter"
@@ -33,13 +42,14 @@
         android:entries="@array/reading_direction_entries"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/verticalcenter"
-        app:layout_constraintTop_toBottomOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/title" />
 
     <TextView
         android:id="@+id/orientation_label"
         style="@style/Theme.TextAppearance.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:text="Orientation"
         app:layout_constraintBaseline_toBaselineOf="@id/orientation"
         app:layout_constraintEnd_toStartOf="@id/verticalcenter"
@@ -59,6 +69,7 @@
         android:id="@+id/keep_screen_on"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="10dp"
         android:text="Keep screen on"
         android:textColor="?android:attr/textColorPrimary"
@@ -68,6 +79,7 @@
         android:id="@+id/use_volume_key"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:text="Use volume key to turn pages"
         android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintTop_toBottomOf="@id/keep_screen_on" />
