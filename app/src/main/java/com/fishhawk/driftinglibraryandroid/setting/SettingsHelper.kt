@@ -20,6 +20,9 @@ object SettingsHelper {
     private fun preferenceStringLiveData(key: String, defaultValue: String) =
         PreferenceStringLiveData(sharedPreferences, key, defaultValue)
 
+    private fun preferenceBooleanLiveData(key: String, defaultValue: Boolean) =
+        PreferenceBooleanLiveData(sharedPreferences, key, defaultValue)
+
 
     // Settings
 
@@ -62,5 +65,9 @@ object SettingsHelper {
 
     val chapterDisplayOrder by lazy {
         preferenceEnumLiveData("chapter_display_order", ChapterDisplayOrder.ASCEND)
+    }
+
+    val keepScreenOn by lazy {
+        preferenceBooleanLiveData("keep_screen_on", false)
     }
 }

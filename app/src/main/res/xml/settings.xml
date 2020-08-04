@@ -53,4 +53,9 @@
         app:key="chapter_display_mode"
         app:summary="%s"
         app:title="@string/settings_chapter_display_order" />
+
+    <SwitchPreference
+        app:defaultValue="false"
+        app:key="keep_screen_on"
+        app:title="Keep screen on" />
 </PreferenceScreen>

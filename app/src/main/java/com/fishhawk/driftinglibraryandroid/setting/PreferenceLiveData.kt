@@ -81,3 +81,15 @@ class PreferenceIntLiveData(
     override fun setPreference(key: String, value: Int) =
         sharedPreferences.edit().putInt(key, value).apply()
 }
+
+class PreferenceBooleanLiveData(
+    sharedPrefs: SharedPreferences,
+    key: String,
+    defaultValue: Boolean
+) : PreferenceLiveData<Boolean>(sharedPrefs, key, defaultValue) {
+    override fun getPreference(key: String, defValue: Boolean): Boolean =
+        sharedPreferences.getBoolean(key, defaultValue)
+
+    override fun setPreference(key: String, value: Boolean) =
+        sharedPreferences.edit().putBoolean(key, value).apply()
+}

@@ -25,5 +25,10 @@ class ReaderSettingsSheet(activity: ReaderActivity) : BottomSheetDialog(activity
         binding.direction.setSelection(
             SettingsHelper.readingDirection.getOrdinal(), false
         )
+
+        binding.keepScreenOn.isChecked = SettingsHelper.keepScreenOn.getValueDirectly()
+        binding.keepScreenOn.setOnCheckedChangeListener { _, isChecked ->
+            SettingsHelper.keepScreenOn.setValue(isChecked)
+        }
     }
 }

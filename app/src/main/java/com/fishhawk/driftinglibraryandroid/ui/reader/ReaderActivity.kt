@@ -68,6 +68,10 @@ class ReaderActivity : AppCompatActivity() {
             }
         })
 
+        SettingsHelper.keepScreenOn.observe(this, Observer {
+            binding.root.keepScreenOn = it
+        })
+
         viewModel.readerContent.observe(this, Observer { result ->
             binding.title.text = viewModel.mangaTitle
             when (result) {
