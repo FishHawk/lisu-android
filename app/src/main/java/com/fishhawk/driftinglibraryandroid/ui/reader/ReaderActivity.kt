@@ -2,6 +2,7 @@ package com.fishhawk.driftinglibraryandroid.ui.reader
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.SeekBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +18,7 @@ import com.fishhawk.driftinglibraryandroid.extension.setupThemeWithTranslucentSt
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.util.FileUtil
+import kotlinx.android.synthetic.main.reader_settings_sheet.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -69,7 +71,9 @@ class ReaderActivity : AppCompatActivity() {
         })
 
         SettingsHelper.keepScreenOn.observe(this, Observer {
-            binding.root.keepScreenOn = it
+            val flag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+            if (it) window.addFlags(flag)
+            else window.clearFlags(flag)
         })
 
         viewModel.readerContent.observe(this, Observer { result ->
