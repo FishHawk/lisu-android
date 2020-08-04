@@ -33,6 +33,9 @@ class ReaderViewModel(
     private val mangaDetail: MutableLiveData<Result<MangaDetail>> = MutableLiveData()
     val readerContent: MutableLiveData<Result<List<String>>> = MutableLiveData(Result.Loading)
 
+    val mangaTitle: String?
+        get() = (mangaDetail.value as? Result.Success)?.data?.title
+
     var isLoading: Boolean = true
     val chapterPosition: MutableLiveData<Int> = MutableLiveData(0)
     val chapterSize: MutableLiveData<Int> = MutableLiveData(0)

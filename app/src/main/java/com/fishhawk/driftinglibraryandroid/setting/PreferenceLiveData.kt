@@ -48,13 +48,15 @@ class PreferenceEnumLiveData<T : Enum<T>>(
     override fun setPreference(key: String, value: T) =
         sharedPreferences.edit().putString(key, value.name).apply()
 
+    fun setValue(ordinal: Int) = setValue(clazz.enumConstants?.getOrNull(ordinal) ?: defaultValue)
+    fun getOrdinal() = getValueDirectly().ordinal
+
     fun setNextValue() {
         val current = getValueDirectly()
         val next = clazz.enumConstants?.let { it[(current.ordinal + 1) % it.size] } ?: defaultValue
         setValue(next)
     }
 }
-
 
 class PreferenceStringLiveData(
     sharedPrefs: SharedPreferences,

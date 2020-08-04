@@ -77,6 +77,7 @@ class ReaderActivity : AppCompatActivity() {
         })
 
         viewModel.readerContent.observe(this, Observer { result ->
+            binding.title.text = viewModel.mangaTitle
             when (result) {
                 is Result.Success -> {
                     val content = result.data
@@ -96,6 +97,8 @@ class ReaderActivity : AppCompatActivity() {
 
     private fun setupMenuLayout() {
         binding.menuLayout.setOnClickListener { viewModel.isMenuVisible.value = false }
+
+        binding.settingButton.setOnClickListener { ReaderSettingsSheet(this).show() }
 
         binding.buttonReadingDirection.setOnClickListener {
             SettingsHelper.readingDirection.setNextValue()
