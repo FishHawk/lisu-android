@@ -107,28 +107,4 @@ class ImageListAdapter(
                 })
         }
     }
-//
-//    fun createChapterImageActionDialog(page: Int, url: String) {
-//        val dialogBinding =
-//            DialogChapterImageBinding.inflate(LayoutInflater.from(context), null, false)
-//
-//        val dialog = AlertDialog.Builder(context)
-//            .setTitle("Page ${page + 1}")
-//            .setView(dialogBinding.root)
-//            .create()
-//
-//        dialogBinding.refreshButton.setOnClickListener {
-//            dialog.dismiss()
-//            notifyItemChanged(page)
-//        }
-//        dialogBinding.shareButton.setOnClickListener {
-//            dialog.dismiss()
-//            onImageShare?.invoke(page, url)
-//        }
-//        dialogBinding.saveButton.setOnClickListener {
-//            dialog.dismiss()
-//            onImageSave?.invoke(page, url)
-//        }
-//        dialog.show()
-//    }
 }
