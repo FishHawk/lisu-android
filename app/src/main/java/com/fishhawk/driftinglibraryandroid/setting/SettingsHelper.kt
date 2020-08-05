@@ -71,6 +71,10 @@ object SettingsHelper {
         preferenceBooleanLiveData("keep_screen_on", false)
     }
 
+    val useVolumeKey by lazy {
+        preferenceBooleanLiveData("use_volume_key", false)
+    }
+
     val longTapDialog by lazy {
         preferenceBooleanLiveData("long_tap_dialog", true)
     }

@@ -158,7 +158,7 @@ class ReaderView @JvmOverloads constructor(
 
     private val smoothScrollFactor = 0.8
 
-    private fun gotoNextPage() {
+    fun gotoNextPage() {
         if (isSnapAttached) {
             val currentItem = layoutManager.findFirstVisibleItemPosition()
             if (currentItem == adapter.itemCount - 1) onRequestNextChapter?.invoke()
@@ -172,7 +172,7 @@ class ReaderView @JvmOverloads constructor(
         }
     }
 
-    private fun gotoPrevPage() {
+    fun gotoPrevPage() {
         if (isSnapAttached) {
             val currentItem = layoutManager.findFirstVisibleItemPosition()
             if (currentItem == 0) onRequestPrevChapter?.invoke()

@@ -60,6 +60,11 @@
         app:title="Keep screen on" />
 
     <SwitchPreference
+        app:defaultValue="false"
+        app:key="use_volume_key"
+        app:title="Use volume key to turn pages" />
+
+    <SwitchPreference
         app:defaultValue="true"
         app:key="long_tap_dialog"
         app:title="Long tap dialog" />

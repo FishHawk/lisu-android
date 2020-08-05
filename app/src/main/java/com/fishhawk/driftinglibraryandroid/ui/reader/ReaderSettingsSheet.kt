@@ -2,8 +2,10 @@ package com.fishhawk.driftinglibraryandroid.ui.reader
 
 import android.os.Bundle
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderSettingsSheetBinding
+import com.fishhawk.driftinglibraryandroid.setting.PreferenceBooleanLiveData
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 
 class ReaderSettingsSheet(activity: ReaderActivity) : BottomSheetDialog(activity) {
@@ -26,14 +28,18 @@ class ReaderSettingsSheet(activity: ReaderActivity) : BottomSheetDialog(activity
             SettingsHelper.readingDirection.getOrdinal(), false
         )
 
-        binding.keepScreenOn.isChecked = SettingsHelper.keepScreenOn.getValueDirectly()
-        binding.keepScreenOn.setOnCheckedChangeListener { _, isChecked ->
-            SettingsHelper.keepScreenOn.setValue(isChecked)
-        }
+        bindingBoolPreference(binding.keepScreenOn, SettingsHelper.keepScreenOn)
+        bindingBoolPreference(binding.useVolumeKey, SettingsHelper.useVolumeKey)
+        bindingBoolPreference(binding.longTapDialog, SettingsHelper.longTapDialog)
+    }
 
-        binding.longTapDialog.isChecked = SettingsHelper.longTapDialog.getValueDirectly()
-        binding.longTapDialog.setOnCheckedChangeListener { _, isChecked ->
-            SettingsHelper.longTapDialog.setValue(isChecked)
+    private fun bindingBoolPreference(
+        switch: SwitchMaterial,
+        preference: PreferenceBooleanLiveData
+    ) {
+        switch.isChecked = preference.getValueDirectly()
+        switch.setOnCheckedChangeListener { _, isChecked ->
+            preference.setValue(isChecked)
         }
     }
 }

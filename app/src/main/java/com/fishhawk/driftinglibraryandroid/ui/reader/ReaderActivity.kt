@@ -2,24 +2,22 @@ package com.fishhawk.driftinglibraryandroid.ui.reader
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.SeekBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderActivityBinding
 import com.fishhawk.driftinglibraryandroid.extension.makeToast
 import com.fishhawk.driftinglibraryandroid.extension.setupFullScreen
 import com.fishhawk.driftinglibraryandroid.extension.setupThemeWithTranslucentStatus
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.util.FileUtil
-import kotlinx.android.synthetic.main.reader_settings_sheet.*
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
@@ -118,6 +116,15 @@ class ReaderActivity : AppCompatActivity() {
                 binding.reader.setPage(seek.progress)
             }
         })
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        val useVolumeKey = SettingsHelper.useVolumeKey.getValueDirectly()
+        return when (event.keyCode) {
+            KeyEvent.KEYCODE_VOLUME_UP -> useVolumeKey.also { if (it) binding.reader.gotoPrevPage() }
+            KeyEvent.KEYCODE_VOLUME_DOWN -> useVolumeKey.also { if (it) binding.reader.gotoNextPage() }
+            else -> super.dispatchKeyEvent(event)
+        }
     }
 
     private fun openPrevChapter() {
