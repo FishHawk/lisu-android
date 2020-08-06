@@ -47,7 +47,7 @@ class ImageListAdapter(
                 binding.root.requestLayout()
             }
 
-            binding.content.setZoomable(!isContinuous)
+            binding.content.zoomable = !isContinuous
             binding.content.setImageResource(android.R.color.transparent)
 
             binding.background.visibility = View.VISIBLE

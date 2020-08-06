@@ -39,7 +39,8 @@
                 android:textSize="30sp" />
         </LinearLayout>
 
-        <com.github.chrisbanes.photoview.PhotoView
+        <!--        <com.github.chrisbanes.photoview.PhotoView-->
+        <com.fishhawk.comicimageview.ComicImageView
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
