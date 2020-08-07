@@ -14,6 +14,8 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryServic
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import okhttp3.internal.format
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -36,32 +38,53 @@ class MainApplication : Application() {
         readingHistoryRepository = ReadingHistoryRepository(database.readingHistoryDao())
         serverInfoRepository = ServerInfoRepository(database.serverInfoDao())
 
+        runBlocking {
+            val selectedServerInfoValue = serverInfoRepository.selectServerInfo(
+                SettingsHelper.selectedServer.getValueDirectly()
+            )
+            selectServer(selectedServerInfoValue)
+        }
+
         selectedServerInfo = SettingsHelper.selectedServer.switchMap {
             serverInfoRepository.observeServerInfo(it)
         }
 
         selectedServerInfo.observeForever { serverInfo ->
-            if (serverInfo == null) {
-                remoteLibraryRepository.url = null
-                remoteLibraryRepository.service = null
-            } else {
-                var url = serverInfo.address
-                url = if (URLUtil.isNetworkUrl(url)) url else "http://${url}"
-                url = if (url.last() == '/') url else "$url/"
+            selectServer(serverInfo)
+        }
+    }
 
-                remoteLibraryRepository.url = url
-                remoteLibraryRepository.service =
-                    try {
-                        Retrofit.Builder()
-                            .baseUrl(url)
-                            .addConverterFactory(GsonConverterFactory.create())
-                            .build()
-                    } catch (e: Throwable) {
-                        null
-                    }?.create(RemoteLibraryService::class.java)
+    private fun selectServer(serverInfo: ServerInfo?) {
+        if (serverInfo == null) {
+            remoteLibraryRepository.url = null
+            remoteLibraryRepository.service = null
+        } else {
+            val url = formatAddress(serverInfo.address)
+            rebuildRemoteLibraryRepositoryIfNeeded(url)
+        }
+    }
 
-                GlobalScope.launch { readingHistoryRepository.clearReadingHistory() }
-            }
+    private fun formatAddress(url: String): String {
+        var newUrl = url
+        newUrl = if (URLUtil.isNetworkUrl(newUrl)) newUrl else "http://${newUrl}"
+        newUrl = if (newUrl.last() == '/') newUrl else "$newUrl/"
+        return newUrl
+    }
+
+    private fun rebuildRemoteLibraryRepositoryIfNeeded(url: String) {
+        if (remoteLibraryRepository.url != url) {
+            remoteLibraryRepository.url = url
+            remoteLibraryRepository.service =
+                try {
+                    Retrofit.Builder()
+                        .baseUrl(url)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
+                } catch (e: Throwable) {
+                    null
+                }?.create(RemoteLibraryService::class.java)
+
+            GlobalScope.launch { readingHistoryRepository.clearReadingHistory() }
         }
     }
 }

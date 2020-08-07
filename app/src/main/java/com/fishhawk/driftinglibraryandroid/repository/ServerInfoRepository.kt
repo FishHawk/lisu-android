@@ -12,8 +12,11 @@ class ServerInfoRepository(
 ) {
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
-    fun observeServerInfo(id: Int): LiveData<ServerInfo> = dao.observe(id)
     fun observeAllServerInfo(): LiveData<List<ServerInfo>> = dao.observeAll()
+    fun observeServerInfo(id: Int): LiveData<ServerInfo> = dao.observe(id)
+
+    suspend fun selectServerInfo(id: Int): ServerInfo? =
+        withContext(ioDispatcher) { dao.select(id) }
 
     suspend fun insertServerInfo(serverInfo: ServerInfo) =
         withContext(ioDispatcher) { dao.insert(serverInfo) }
