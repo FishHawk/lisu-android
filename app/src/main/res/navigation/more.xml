@@ -65,7 +65,7 @@
     <fragment
         android:id="@+id/nav_setting_advanced"
         android:name="com.fishhawk.driftinglibraryandroid.ui.other.SettingAdvancedFragment"
-        android:label="@string/label_settings_reader" />
+        android:label="@string/label_settings_advanced" />
 
     <fragment
         android:id="@+id/nav_about"

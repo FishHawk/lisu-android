@@ -11,6 +11,17 @@
         <item>VERTICAL</item>
     </string-array>
 
+    <string-array name="start_screen_entries">
+        <item>@string/settings_start_screen_library</item>
+        <item>@string/settings_start_screen_history</item>
+        <item>@string/settings_start_screen_explore</item>
+    </string-array>
+    <string-array name="start_screen_entry_values" translatable="false">
+        <item>LIBRARY</item>
+        <item>HISTORY</item>
+        <item>EXPLORE</item>
+    </string-array>
+
     <string-array name="theme_entries">
         <item>@string/settings_theme_light</item>
         <item>@string/settings_theme_dark</item>

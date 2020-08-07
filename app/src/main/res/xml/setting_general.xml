@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <ListPreference
+        app:defaultValue="LIBRARY"
+        app:entries="@array/start_screen_entries"
+        app:entryValues="@array/start_screen_entry_values"
+        app:iconSpaceReserved="false"
+        app:key="start_screen"
+        app:summary="%s"
+        app:title="@string/settings_start_screen" />
 
     <ListPreference
         app:defaultValue="0"

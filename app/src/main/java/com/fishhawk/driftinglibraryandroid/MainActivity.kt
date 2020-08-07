@@ -9,6 +9,7 @@ import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityMainBinding
 import com.fishhawk.driftinglibraryandroid.extension.setupTheme
 import com.fishhawk.driftinglibraryandroid.extension.setupWithNavControllerT
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -51,6 +52,13 @@ class MainActivity : AppCompatActivity() {
             setupActionBarWithNavController(this, navController)
         })
         currentNavController = controller
+
+        bottomNavigationView.selectedItemId =
+            when (SettingsHelper.startScreen.getValueDirectly()) {
+                SettingsHelper.StartScreen.LIBRARY -> R.id.library
+                SettingsHelper.StartScreen.HISTORY -> R.id.history
+                SettingsHelper.StartScreen.EXPLORE -> R.id.explore
+            }
     }
 
     override fun onSupportNavigateUp(): Boolean {

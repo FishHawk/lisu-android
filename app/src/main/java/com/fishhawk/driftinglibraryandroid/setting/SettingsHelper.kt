@@ -30,6 +30,12 @@ object SettingsHelper {
         preferenceIntLiveData("selected_library", 1)
     }
 
+    enum class StartScreen { LIBRARY, HISTORY, EXPLORE }
+
+    val startScreen by lazy {
+        preferenceEnumLiveData("start_screen", StartScreen.LIBRARY)
+    }
+
     enum class ReadingDirection { LTR, RTL, VERTICAL }
 
     val readingDirection by lazy {
