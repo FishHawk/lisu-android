@@ -115,6 +115,14 @@
     <string name="dialog_clear_history">Clear all history?</string>
     <string name="dialog_clear_history_positive">Clear all</string>
 
+    <string name="page_action_refresh">Refresh</string>
+    <string name="page_action_share">Share</string>
+    <string name="page_action_save">Save</string>
+
+    <string name="thumb_action_read">Read</string>
+    <string name="thumb_action_download">Download</string>
+    <string name="thumb_action_subscribe">Subscribe</string>
+
     <!-- misc-->
     <string name="error_hint_unknown">Unknown error.</string>
     <string name="error_hint_empty_refresh_result">List is empty.</string>

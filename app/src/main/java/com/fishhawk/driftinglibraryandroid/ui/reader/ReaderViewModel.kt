@@ -7,7 +7,6 @@ import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.setting.PreferenceEnumLiveData
-import com.fishhawk.driftinglibraryandroid.setting.PreferenceStringLiveData
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import kotlinx.coroutines.launch
 import java.util.*

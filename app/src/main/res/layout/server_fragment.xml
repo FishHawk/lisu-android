@@ -24,7 +24,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="16dp"
-        android:contentDescription="Add"
         android:src="@drawable/ic_baseline_add_24"
         android:tint="@color/colorAccent" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

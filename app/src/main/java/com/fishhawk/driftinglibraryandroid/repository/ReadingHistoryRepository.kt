@@ -1,7 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.repository.local.ReadingHistoryDao
 import kotlinx.coroutines.CoroutineDispatcher

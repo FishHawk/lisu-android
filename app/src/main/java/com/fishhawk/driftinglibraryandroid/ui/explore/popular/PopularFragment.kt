@@ -71,7 +71,7 @@ class PopularFragment : Fragment() {
         searchView.queryHint = getString(R.string.menu_search_hint)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                searchView.setQuery("", false);
+                searchView.setQuery("", false)
                 val bundle = bundleOf(
                     "source" to arguments?.getString("source")!!,
                     "keywords" to (query ?: "")

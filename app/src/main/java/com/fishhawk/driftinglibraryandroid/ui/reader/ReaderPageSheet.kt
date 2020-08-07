@@ -3,8 +3,6 @@ package com.fishhawk.driftinglibraryandroid.ui.reader
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderPageSheetBinding
-import com.fishhawk.driftinglibraryandroid.databinding.ReaderSettingsSheetBinding
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.launch
 

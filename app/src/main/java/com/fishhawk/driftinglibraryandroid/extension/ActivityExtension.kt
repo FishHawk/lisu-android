@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.extension;
+package com.fishhawk.driftinglibraryandroid.extension
 
 import android.app.Activity
 import android.content.Context
@@ -17,7 +17,6 @@ import com.fishhawk.driftinglibraryandroid.ui.base.NetworkErrorNotification
 import com.fishhawk.driftinglibraryandroid.ui.base.Notification
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryActivity
 import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActivity
-import java.lang.Error
 import java.lang.reflect.Method
 
 

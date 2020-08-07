@@ -16,7 +16,7 @@
             style="@style/Theme.Widget.Button.TextButton.NoColor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Read"
+            android:text="@string/thumb_action_read"
             app:icon="@drawable/ic_baseline_menu_book_24" />
 
         <com.google.android.material.button.MaterialButton
@@ -24,7 +24,7 @@
             style="@style/Theme.Widget.Button.TextButton.NoColor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Download"
+            android:text="@string/thumb_action_download"
             app:icon="@drawable/ic_baseline_cloud_download_24" />
 
         <com.google.android.material.button.MaterialButton
@@ -32,7 +32,7 @@
             style="@style/Theme.Widget.Button.TextButton.NoColor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Subscribe"
+            android:text="@string/thumb_action_subscribe"
             app:icon="@drawable/ic_baseline_rss_feed_24" />
     </LinearLayout>
 </layout>
