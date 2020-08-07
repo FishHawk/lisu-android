@@ -9,6 +9,7 @@ import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.DownloadCreatedNotification
 import com.fishhawk.driftinglibraryandroid.ui.base.NotificationViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.SubscriptionCreatedNotification
@@ -23,7 +24,10 @@ class GalleryViewModel(
     val detail: LiveData<Result<MangaDetail>> = _detail
 
     val history: LiveData<ReadingHistory> = detail.switchMap {
-        if (it is Result.Success) readingHistoryRepository.observeReadingHistory(it.data.id)
+        if (it is Result.Success) readingHistoryRepository.observeReadingHistory(
+            SettingsHelper.selectedServer.getValueDirectly(),
+            it.data.id
+        )
         else MutableLiveData()
     }
 

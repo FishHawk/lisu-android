@@ -12,12 +12,10 @@ import com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo
 import com.fishhawk.driftinglibraryandroid.repository.local.ApplicationDatabase
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryService
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import okhttp3.internal.format
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+
 
 class MainApplication : Application() {
     private lateinit var database: ApplicationDatabase
@@ -83,8 +81,6 @@ class MainApplication : Application() {
                 } catch (e: Throwable) {
                     null
                 }?.create(RemoteLibraryService::class.java)
-
-            GlobalScope.launch { readingHistoryRepository.clearReadingHistory() }
         }
     }
 }

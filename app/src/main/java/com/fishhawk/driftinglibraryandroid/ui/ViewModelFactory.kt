@@ -31,7 +31,10 @@ class ViewModelFactory constructor(
                 GlobalSearchViewModel(application.remoteLibraryRepository)
 
             isAssignableFrom(ServerViewModel::class.java) ->
-                ServerViewModel(application.serverInfoRepository)
+                ServerViewModel(
+                    application.readingHistoryRepository,
+                    application.serverInfoRepository
+                )
 
             isAssignableFrom(DownloadViewModel::class.java) ->
                 DownloadViewModel(application.remoteLibraryRepository)

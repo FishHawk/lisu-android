@@ -14,7 +14,9 @@ class HistoryViewModel(
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModel() {
     private val readingHistoryList: LiveData<List<ReadingHistory>> =
-        readingHistoryRepository.observeAllReadingHistory()
+        readingHistoryRepository.observeAllReadingHistoryOfServer(
+            SettingsHelper.selectedServer.getValueDirectly()
+        )
 
     val filteredReadingHistoryList: MediatorLiveData<List<ReadingHistory>> = MediatorLiveData()
 
@@ -30,7 +32,9 @@ class HistoryViewModel(
     }
 
     fun clearReadingHistory() = viewModelScope.launch {
-        readingHistoryRepository.clearReadingHistory()
+        readingHistoryRepository.clearReadingHistoryOfServer(
+            SettingsHelper.selectedServer.getValueDirectly()
+        )
     }
 
     private fun filterList(

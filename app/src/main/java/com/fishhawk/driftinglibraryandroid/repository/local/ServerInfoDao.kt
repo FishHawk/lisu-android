@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo
 
+
 @Dao
 interface ServerInfoDao {
     @Query("SELECT * FROM ServerInfo")

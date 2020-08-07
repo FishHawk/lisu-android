@@ -4,16 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 
+
 @Dao
 interface ReadingHistoryDao {
-    @Query("SELECT * FROM ReadingHistory ORDER BY date DESC")
-    fun observeAll(): LiveData<List<ReadingHistory>>
+    @Query("SELECT * FROM ReadingHistory WHERE serverId = :serverId AND mangaId = :mangaId")
+    fun observe(serverId: Int, mangaId: String): LiveData<ReadingHistory>
 
-    @Query("SELECT * FROM ReadingHistory WHERE id = :id")
-    fun findById(id: String): ReadingHistory
-
-    @Query("SELECT * FROM ReadingHistory WHERE id = :id")
-    fun observe(id: String): LiveData<ReadingHistory>
+    @Query("SELECT * FROM ReadingHistory WHERE serverId = :serverId ORDER BY date DESC")
+    fun observeAllOfServer(serverId: Int): LiveData<List<ReadingHistory>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(history: ReadingHistory)
@@ -21,7 +19,7 @@ interface ReadingHistoryDao {
     @Update
     fun update(history: ReadingHistory)
 
-    @Query("DELETE FROM ReadingHistory")
-    fun deleteAll()
+    @Query("DELETE FROM ReadingHistory WHERE serverId = :id")
+    fun deleteAllOfServer(id: Int)
 }
 

@@ -121,14 +121,17 @@ class ReaderViewModel(
             val collection = detail.collections[collectionIndex]
             val readingHistory = ReadingHistory(
                 it.id,
+                SettingsHelper.selectedServer.getValueDirectly(),
+
                 it.title,
                 it.thumb,
                 it.source,
                 Calendar.getInstance().time.time,
-                collectionIndex,
+
                 collection.title,
-                chapterIndex,
+                collectionIndex,
                 collection.chapters[chapterIndex].name,
+                chapterIndex,
                 chapterPosition.value ?: 0
             )
             readingHistoryRepository.updateReadingHistory(readingHistory)

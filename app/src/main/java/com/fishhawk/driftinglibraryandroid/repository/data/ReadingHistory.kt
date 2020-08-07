@@ -1,18 +1,21 @@
 package com.fishhawk.driftinglibraryandroid.repository.data
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
-@Entity
+
+@Entity(primaryKeys = ["mangaId", "serverId"])
 data class ReadingHistory(
-    @PrimaryKey val id: String,
+    val mangaId: String,
+    val serverId: Int,
+
     var title: String,
     var thumb: String,
     var source: String?,
     var date: Long,
-    var collectionIndex: Int,
+
     var collectionTitle: String,
-    var chapterIndex: Int,
+    var collectionIndex: Int,
     var chapterTitle: String,
+    var chapterIndex: Int,
     var pageIndex: Int
 )
