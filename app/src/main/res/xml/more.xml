@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:key="control_category">
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="manage_category"
+        app:title="Manage">
 
         <Preference
             app:icon="@drawable/ic_baseline_storage_24"
@@ -19,12 +22,31 @@
             app:title="@string/more_subscribe" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:key="setting_category">
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="setting_category"
+        app:title="Setting">
 
         <Preference
-            app:icon="@drawable/ic_settings_black_24dp"
-            app:key="settings"
-            app:title="@string/more_settings" />
+            app:icon="@drawable/ic_baseline_tune_24"
+            app:key="setting_general"
+            app:title="@string/more_setting_general" />
+
+        <Preference
+            app:icon="@drawable/ic_baseline_menu_book_24"
+            app:key="setting_reader"
+            app:title="@string/more_setting_reader" />
+
+        <Preference
+            app:icon="@drawable/ic_baseline_code_24"
+            app:key="setting_advanced"
+            app:title="@string/more_setting_advanced" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="other_category"
+        app:title="Other">
 
         <Preference
             app:icon="@drawable/ic_baseline_error_24"

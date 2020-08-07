@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ListPreference
+        app:defaultValue="1"
+        app:entries="@array/reading_direction_entries"
+        app:entryValues="@array/reading_direction_entry_values"
+        app:iconSpaceReserved="false"
+        app:key="reading_direction"
+        app:summary="%s"
+        app:title="@string/settings_reading_direction" />
+
+    <SwitchPreference
+        app:defaultValue="false"
+        app:iconSpaceReserved="false"
+        app:key="keep_screen_on"
+        app:title="Keep screen on" />
+
+    <SwitchPreference
+        app:defaultValue="false"
+        app:iconSpaceReserved="false"
+        app:key="use_volume_key"
+        app:title="Use volume key to turn pages" />
+
+    <SwitchPreference
+        app:defaultValue="true"
+        app:iconSpaceReserved="false"
+        app:key="long_tap_dialog"
+        app:title="Long tap dialog" />
+</PreferenceScreen>

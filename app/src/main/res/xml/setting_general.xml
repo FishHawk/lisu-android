@@ -2,17 +2,10 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ListPreference
-        app:defaultValue="1"
-        app:entries="@array/reading_direction_entries"
-        app:entryValues="@array/reading_direction_entry_values"
-        app:key="reading_direction"
-        app:summary="%s"
-        app:title="@string/settings_reading_direction" />
-
-    <ListPreference
         app:defaultValue="0"
         app:entries="@array/theme_entries"
         app:entryValues="@array/theme_entry_values"
+        app:iconSpaceReserved="false"
         app:key="theme"
         app:summary="%s"
         app:title="@string/settings_theme" />
@@ -21,6 +14,7 @@
         app:defaultValue="0"
         app:entries="@array/display_mode_entries"
         app:entryValues="@array/display_mode_entry_values"
+        app:iconSpaceReserved="false"
         app:key="display_mode"
         app:summary="%s"
         app:title="@string/settings_display_mode" />
@@ -29,19 +23,16 @@
         app:defaultValue="1"
         app:entries="@array/settings_history_filter_entries"
         app:entryValues="@array/settings_history_filter_entry_values"
+        app:iconSpaceReserved="false"
         app:key="history_filter"
         app:summary="%s"
         app:title="@string/settings_history_filter" />
-
-    <Preference
-        app:key="clear_image_cache"
-        app:summary="Clear thumb and chapter image cache"
-        app:title="Clear image cache" />
 
     <ListPreference
         app:defaultValue="0"
         app:entries="@array/display_mode_entries"
         app:entryValues="@array/display_mode_entry_values"
+        app:iconSpaceReserved="false"
         app:key="chapter_display_mode"
         app:summary="%s"
         app:title="@string/settings_chapter_display_mode" />
@@ -50,22 +41,8 @@
         app:defaultValue="0"
         app:entries="@array/display_order_entries"
         app:entryValues="@array/display_order_entry_values"
-        app:key="chapter_display_mode"
+        app:iconSpaceReserved="false"
+        app:key="chapter_display_order"
         app:summary="%s"
         app:title="@string/settings_chapter_display_order" />
-
-    <SwitchPreference
-        app:defaultValue="false"
-        app:key="keep_screen_on"
-        app:title="Keep screen on" />
-
-    <SwitchPreference
-        app:defaultValue="false"
-        app:key="use_volume_key"
-        app:title="Use volume key to turn pages" />
-
-    <SwitchPreference
-        app:defaultValue="true"
-        app:key="long_tap_dialog"
-        app:title="Long tap dialog" />
 </PreferenceScreen>

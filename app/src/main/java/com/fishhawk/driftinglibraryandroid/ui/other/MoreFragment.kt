@@ -11,43 +11,27 @@ class MoreFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        findPreference<Preference>("server")!!.apply {
-            setOnPreferenceClickListener {
-                findNavController().navigate(R.id.action_more_to_server)
-                true
-            }
-        }
+        setPreferenceNavigation("server", R.id.action_more_to_server)
+        setPreferenceNavigation("download", R.id.action_more_to_download)
+        setPreferenceNavigation("subscription", R.id.action_more_to_subscription)
 
-        findPreference<Preference>("download")!!.apply {
-            setOnPreferenceClickListener {
-                findNavController().navigate(R.id.action_more_to_download)
-                true
-            }
-        }
+        setPreferenceNavigation("setting_general", R.id.action_more_to_setting_general)
+        setPreferenceNavigation("setting_reader", R.id.action_more_to_setting_reader)
+        setPreferenceNavigation("setting_advanced", R.id.action_more_to_setting_advanced)
 
-        findPreference<Preference>("subscription")!!.apply {
-            setOnPreferenceClickListener {
-                findNavController().navigate(R.id.action_more_to_subscription)
-                true
-            }
-        }
-
-        findPreference<Preference>("settings")!!.apply {
-            setOnPreferenceClickListener {
-                findNavController().navigate(R.id.action_more_to_settings)
-                true
-            }
-        }
-
-        findPreference<Preference>("about")!!.apply {
-            setOnPreferenceClickListener {
-                findNavController().navigate(R.id.action_more_to_about)
-                true
-            }
-        }
+        setPreferenceNavigation("about", R.id.action_more_to_about)
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.more, rootKey)
+    }
+
+    private fun setPreferenceNavigation(key: String, action: Int) {
+        findPreference<Preference>(key)!!.apply {
+            setOnPreferenceClickListener {
+                findNavController().navigate(action)
+                true
+            }
+        }
     }
 }

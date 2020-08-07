@@ -7,7 +7,19 @@ import com.bumptech.glide.Glide
 import com.fishhawk.driftinglibraryandroid.R
 
 
-class SettingsFragment : PreferenceFragmentCompat() {
+class SettingGeneralFragment : PreferenceFragmentCompat() {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        setPreferencesFromResource(R.xml.setting_general, rootKey)
+    }
+}
+
+class SettingReaderFragment : PreferenceFragmentCompat() {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        setPreferencesFromResource(R.xml.setting_reader, rootKey)
+    }
+}
+
+class SettingAdvancedFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -20,6 +32,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.settings, rootKey)
+        setPreferencesFromResource(R.xml.setting_advanced, rootKey)
     }
 }

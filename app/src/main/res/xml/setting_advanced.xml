@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        app:iconSpaceReserved="false"
+        app:key="clear_image_cache"
+        app:summary="Clear thumb and chapter image cache"
+        app:title="Clear image cache" />
+</PreferenceScreen>

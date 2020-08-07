@@ -18,9 +18,17 @@
         <action
             android:id="@+id/action_more_to_subscription"
             app:destination="@id/nav_subscription" />
+
         <action
-            android:id="@+id/action_more_to_settings"
-            app:destination="@id/nav_settings" />
+            android:id="@+id/action_more_to_setting_general"
+            app:destination="@id/nav_setting_general" />
+        <action
+            android:id="@+id/action_more_to_setting_reader"
+            app:destination="@id/nav_setting_reader" />
+        <action
+            android:id="@+id/action_more_to_setting_advanced"
+            app:destination="@id/nav_setting_advanced" />
+
         <action
             android:id="@+id/action_more_to_about"
             app:destination="@id/nav_about" />
@@ -45,9 +53,19 @@
         tools:layout="@layout/subscription_fragment" />
 
     <fragment
-        android:id="@+id/nav_settings"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.other.SettingsFragment"
-        android:label="@string/label_settings" />
+        android:id="@+id/nav_setting_general"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.other.SettingGeneralFragment"
+        android:label="@string/label_settings_general" />
+
+    <fragment
+        android:id="@+id/nav_setting_reader"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.other.SettingReaderFragment"
+        android:label="@string/label_settings_reader" />
+
+    <fragment
+        android:id="@+id/nav_setting_advanced"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.other.SettingAdvancedFragment"
+        android:label="@string/label_settings_reader" />
 
     <fragment
         android:id="@+id/nav_about"
