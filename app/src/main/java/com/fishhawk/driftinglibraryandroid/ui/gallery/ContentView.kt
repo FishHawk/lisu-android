@@ -74,15 +74,17 @@ class ContentView @JvmOverloads constructor(
             if (viewMode == ViewMode.GRID && collection.title.isNotEmpty())
                 items.add(ContentItem.CollectionHeader(collection.title))
 
-            val it = when (viewOrder) {
-                ViewOrder.ASCEND -> collection.chapters.withIndex()
-                ViewOrder.DESCEND -> collection.chapters.asReversed().withIndex()
-            }
-            for ((chapterIndex, chapter) in it) {
-                items.add(
-                    ContentItem.Chapter(chapter.name, chapter.title, collectionIndex, chapterIndex)
+            val itemsInCollection = mutableListOf<ContentItem>()
+            for ((chapterIndex, chapter) in collection.chapters.withIndex()) {
+                val contentItem = ContentItem.Chapter(
+                    chapter.name, chapter.title, collectionIndex, chapterIndex
                 )
+                when (viewOrder) {
+                    ViewOrder.ASCEND -> itemsInCollection.add(contentItem)
+                    ViewOrder.DESCEND -> itemsInCollection.add(0, contentItem)
+                }
             }
+            items.addAll(itemsInCollection)
         }
         adapter!!.changeList(items)
     }
