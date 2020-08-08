@@ -1,9 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.history
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.repository.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
@@ -14,9 +11,9 @@ class HistoryViewModel(
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModel() {
     private val readingHistoryList: LiveData<List<ReadingHistory>> =
-        readingHistoryRepository.observeAllReadingHistoryOfServer(
-            SettingsHelper.selectedServer.getValueDirectly()
-        )
+        SettingsHelper.selectedServer.switchMap {
+            readingHistoryRepository.observeAllReadingHistoryOfServer(it)
+        }
 
     val filteredReadingHistoryList: MediatorLiveData<List<ReadingHistory>> = MediatorLiveData()
 
