@@ -68,7 +68,6 @@
                 android:ellipsize="end"
                 android:gravity="end"
                 android:singleLine="true"
-                android:text="@{outline.update}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/thumb"

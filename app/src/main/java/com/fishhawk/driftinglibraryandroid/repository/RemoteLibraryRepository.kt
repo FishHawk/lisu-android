@@ -17,9 +17,9 @@ class RemoteLibraryRepository {
         } ?: Result.Error(IllegalAccessError())
     }
 
-    suspend fun searchInLibrary(lastId: String, filter: String): Result<List<MangaOutline>> =
+    suspend fun searchInLibrary(lastTime: Long?, filter: String): Result<List<MangaOutline>> =
         resultWrap {
-            it.searchInLibrary(lastId, filter).apply {
+            it.searchInLibrary(lastTime, filter).apply {
                 for (outline in this) {
                     outline.thumb = "${url}library/image/${outline.id}/${outline.thumb}"
                 }

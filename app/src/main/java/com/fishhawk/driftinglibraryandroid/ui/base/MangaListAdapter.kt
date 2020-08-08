@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.base
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,6 +12,8 @@ import com.fishhawk.driftinglibraryandroid.databinding.MangaGridThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.databinding.MangaLinearThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.extension.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class MangaListAdapter(
@@ -74,8 +77,15 @@ class MangaListAdapter(
     inner class LinearViewHolder(private val binding: MangaLinearThumbnailBinding) :
         BaseRecyclerViewAdapter.ViewHolder<MangaOutline>(binding) {
 
+        @SuppressLint("SimpleDateFormat")
         override fun bind(item: MangaOutline, position: Int) {
             binding.outline = item
+
+            binding.update.text = item.update?.let {
+                val date = Date(item.update)
+                val format = SimpleDateFormat("yyyy-MM-dd")
+                format.format(date)
+            }
 
             Glide.with(activity).load(item.thumb)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)

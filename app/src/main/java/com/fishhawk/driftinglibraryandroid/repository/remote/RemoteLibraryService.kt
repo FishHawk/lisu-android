@@ -11,7 +11,7 @@ interface RemoteLibraryService {
 
     @GET("library/search")
     suspend fun searchInLibrary(
-        @Query("lastId") lastId: String,
+        @Query("lastTime") lastTime: Long?,
         @Query("keywords") filter: String
     ): List<MangaOutline>
 

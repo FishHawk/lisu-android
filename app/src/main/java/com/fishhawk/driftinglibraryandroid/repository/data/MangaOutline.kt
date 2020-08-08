@@ -22,5 +22,5 @@ data class MangaOutline(
     var thumb: String,
     val author: String?,
     val status: MangaStatus?,
-    val update: String?
+    val update: Long?
 ) : Parcelable
