@@ -69,7 +69,7 @@ class ReaderViewModel(
             val result =
                 if (source == null)
                     remoteLibraryRepository.getChapterContentFromLibrary(
-                        id, collection.title, chapterTitle
+                        id, collection.title, chapterId
                     )
                 else
                     remoteLibraryRepository.getChapterContentFromSource(source, chapterId)
