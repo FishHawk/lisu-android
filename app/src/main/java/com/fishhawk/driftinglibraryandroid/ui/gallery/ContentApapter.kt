@@ -9,6 +9,12 @@ import com.fishhawk.driftinglibraryandroid.extension.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 
+data class MarkedPosition(
+    val collectionIndex: Int,
+    val chapterIndex: Int,
+    val pageIndex: Int
+)
+
 sealed class ContentItem {
     data class Chapter(
         val name: String,
@@ -66,16 +72,16 @@ class ContentAdapter(
         }
     }
 
-    fun markChapter(collectionIndex: Int, chapterIndex: Int, pageIndex: Int) {
+    fun markChapter(markedPosition: MarkedPosition) {
         unmarkChapter()
 
         val index = list.indexOfFirst {
             it is ContentItem.Chapter &&
-                    it.collectionIndex == collectionIndex &&
-                    it.chapterIndex == chapterIndex
+                    it.collectionIndex == markedPosition.collectionIndex &&
+                    it.chapterIndex == markedPosition.chapterIndex
         }
         if (index != -1) {
-            list[index] = (list[index] as ContentItem.Chapter).marked(pageIndex)
+            list[index] = (list[index] as ContentItem.Chapter).marked(markedPosition.pageIndex)
             notifyItemChanged(index)
         }
     }

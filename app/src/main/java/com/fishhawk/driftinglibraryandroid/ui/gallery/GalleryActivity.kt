@@ -19,6 +19,7 @@ import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
 import com.google.android.flexbox.FlexboxLayout
+import kotlinx.android.synthetic.main.gallery_activity.view.*
 
 
 class GalleryActivity : AppCompatActivity() {
@@ -102,11 +103,9 @@ class GalleryActivity : AppCompatActivity() {
         })
 
         viewModel.history.observe(this, Observer { history ->
-            if (history != null)
-                history.let {
-                    adapter.markChapter(it.collectionIndex, it.chapterIndex, it.pageIndex)
-                }
-            else adapter.unmarkChapter()
+            binding.contentView.chapters.markedPosition = history?.let {
+                MarkedPosition(it.collectionIndex, it.chapterIndex, it.pageIndex)
+            }
         })
     }
 

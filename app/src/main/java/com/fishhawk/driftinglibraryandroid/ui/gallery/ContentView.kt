@@ -56,8 +56,21 @@ class ContentView @JvmOverloads constructor(
         set(value) {
             field = value
             updateAdapterContent()
+            updateAdapterMarkedPosition()
             super.setAdapter(value)
         }
+
+    var markedPosition: MarkedPosition? = null
+        set(value) {
+            field = value
+            updateAdapterMarkedPosition()
+        }
+
+    private fun updateAdapterMarkedPosition() {
+        markedPosition?.let {
+            adapter?.markChapter(it)
+        } ?: adapter?.unmarkChapter()
+    }
 
     var collections: List<Collection>? = null
         set(value) {
