@@ -1,6 +1,9 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery
 
+import android.annotation.SuppressLint
 import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class GalleryInfo {
@@ -24,6 +27,7 @@ class GalleryInfo {
         hasContent = false
     }
 
+    @SuppressLint("SimpleDateFormat")
     constructor(detail: MangaDetail) {
         source = detail.source
         title = detail.title
@@ -32,7 +36,11 @@ class GalleryInfo {
             else it.joinToString(separator = ";")
         }
         status = detail.status.toString()
-        update = detail.update
+        update = detail.update?.let {
+            val date = Date(it)
+            val format = SimpleDateFormat("yyyy-MM-dd")
+            format.format(date)
+        }
         description = detail.description?.let {
             if (it.isBlank()) null
             else it
