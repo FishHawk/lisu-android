@@ -46,6 +46,7 @@ class DownloadTaskListAdapter(
             binding.downloadTask = item
             showActions()
 
+            binding.status.text = item.status.value
             when (item.status) {
                 DownloadTaskStatus.PAUSED, DownloadTaskStatus.ERROR -> {
                     binding.pauseButton.visibility = View.GONE
