@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="reading_direction_entries">
-        <item>@string/settings_reading_direction_left_to_right</item>
-        <item>@string/settings_reading_direction_right_to_Left</item>
-        <item>@string/settings_reading_direction_vertical</item>
-    </string-array>
-    <string-array name="reading_direction_entry_values" translatable="false">
-        <item>LTR</item>
-        <item>RTL</item>
-        <item>VERTICAL</item>
-    </string-array>
-
+    <!-- general -->
     <string-array name="start_screen_entries">
         <item>@string/settings_start_screen_library</item>
         <item>@string/settings_start_screen_history</item>
@@ -58,5 +48,31 @@
         <item>ALL</item>
         <item>FROM_LIBRARY</item>
         <item>FROM_SOURCES</item>
+    </string-array>
+
+
+    <!-- reader -->
+    <string-array name="reading_direction_entries">
+        <item>@string/settings_reading_direction_left_to_right</item>
+        <item>@string/settings_reading_direction_right_to_Left</item>
+        <item>@string/settings_reading_direction_vertical</item>
+    </string-array>
+    <string-array name="reading_direction_entry_values" translatable="false">
+        <item>LTR</item>
+        <item>RTL</item>
+        <item>VERTICAL</item>
+    </string-array>
+
+    <string-array name="screen_orientation_entries">
+        <item>@string/settings_screen_orientation_default</item>
+        <item>@string/settings_screen_orientation_lock</item>
+        <item>@string/settings_screen_orientation_portrait</item>
+        <item>@string/settings_screen_orientation_landscape</item>
+    </string-array>
+    <string-array name="screen_orientation_entry_values" translatable="false">
+        <item>DEFAULT</item>
+        <item>LOCK</item>
+        <item>PORTRAIT</item>
+        <item>LANDSCAPE</item>
     </string-array>
 </resources>

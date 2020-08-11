@@ -24,22 +24,17 @@ object SettingsHelper {
         PreferenceBooleanLiveData(sharedPreferences, key, defaultValue)
 
 
-    // Settings
-
+    // Settings internal
     val selectedServer by lazy {
         preferenceIntLiveData("selected_library", 1)
     }
 
+
+    // Settings general
     enum class StartScreen { LIBRARY, HISTORY, EXPLORE }
 
     val startScreen by lazy {
         preferenceEnumLiveData("start_screen", StartScreen.LIBRARY)
-    }
-
-    enum class ReadingDirection { LTR, RTL, VERTICAL }
-
-    val readingDirection by lazy {
-        preferenceEnumLiveData("reading_direction", ReadingDirection.LTR)
     }
 
     enum class Theme { LIGHT, DARK }
@@ -60,7 +55,6 @@ object SettingsHelper {
         preferenceEnumLiveData("history_filter", HistoryFilter.FROM_LIBRARY)
     }
 
-
     enum class ChapterDisplayMode { GRID, LINEAR }
 
     val chapterDisplayMode by lazy {
@@ -71,6 +65,20 @@ object SettingsHelper {
 
     val chapterDisplayOrder by lazy {
         preferenceEnumLiveData("chapter_display_order", ChapterDisplayOrder.ASCEND)
+    }
+
+
+    // Settings reading
+    enum class ReadingDirection { LTR, RTL, VERTICAL }
+
+    val readingDirection by lazy {
+        preferenceEnumLiveData("reading_direction", ReadingDirection.LTR)
+    }
+
+    enum class ScreenOrientation { DEFAULT, LOCK, PORTRAIT, LANDSCAPE }
+
+    val screenOrientation by lazy {
+        preferenceEnumLiveData("screen_orientation", ScreenOrientation.DEFAULT)
     }
 
     val keepScreenOn by lazy {

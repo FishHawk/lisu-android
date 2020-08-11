@@ -10,6 +10,15 @@
         app:summary="%s"
         app:title="@string/settings_reading_direction" />
 
+    <ListPreference
+        app:defaultValue="0"
+        app:entries="@array/screen_orientation_entries"
+        app:entryValues="@array/screen_orientation_entry_values"
+        app:iconSpaceReserved="false"
+        app:key="screen_orientation"
+        app:summary="%s"
+        app:title="@string/settings_screen_orientation" />
+
     <SwitchPreference
         app:defaultValue="false"
         app:iconSpaceReserved="false"

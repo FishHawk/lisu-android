@@ -1,6 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.WindowManager
@@ -65,6 +66,18 @@ class ReaderActivity : AppCompatActivity() {
                 SettingsHelper.ReadingDirection.RTL -> ReaderView.Mode.RTL
                 SettingsHelper.ReadingDirection.VERTICAL -> ReaderView.Mode.VERTICAL
                 else -> ReaderView.Mode.LTR
+            }
+        })
+
+        SettingsHelper.screenOrientation.observe(this, Observer {
+            val newOrientation = when (it) {
+                SettingsHelper.ScreenOrientation.DEFAULT -> ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                SettingsHelper.ScreenOrientation.LOCK -> ActivityInfo.SCREEN_ORIENTATION_LOCKED
+                SettingsHelper.ScreenOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                SettingsHelper.ScreenOrientation.LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            }
+            if (newOrientation != requestedOrientation) {
+                requestedOrientation = newOrientation
             }
         })
 
