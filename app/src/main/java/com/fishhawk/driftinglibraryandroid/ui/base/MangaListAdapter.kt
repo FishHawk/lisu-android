@@ -56,10 +56,9 @@ class MangaListAdapter(
         override fun bind(item: MangaOutline, position: Int) {
             binding.outline = item
 
-            Glide.with(activity).load(item.thumb)
-                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .override(300, 400)
-                .apply(RequestOptions().dontTransform())
+            Glide.with(activity)
+                .load(item.thumb)
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(binding.thumb)
 
             binding.root.setOnClickListener {
@@ -87,8 +86,9 @@ class MangaListAdapter(
                 format.format(date)
             }
 
-            Glide.with(activity).load(item.thumb)
-                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+            Glide.with(activity)
+                .load(item.thumb)
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(binding.thumb)
 
             binding.root.setOnClickListener {

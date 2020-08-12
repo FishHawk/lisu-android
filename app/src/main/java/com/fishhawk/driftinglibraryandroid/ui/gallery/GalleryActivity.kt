@@ -1,5 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
@@ -9,6 +11,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryActivityBinding
@@ -41,12 +46,13 @@ class GalleryActivity : AppCompatActivity() {
         val id: String = arguments.getString("id")!!
         val title: String = arguments.getString("title")!!
         val source: String? = arguments.getString("source")
+        val thumb: String = arguments.getString("thumb")!!
 
         if (source == null) viewModel.openMangaFromLibrary(id)
         else viewModel.openMangaFromSource(source, id)
 
         binding.info = GalleryInfo(source, title)
-        setupThumb()
+        setupThumb(thumb)
         setupActionButton()
 
         val adapter = ContentAdapter(this, id, source)
@@ -109,19 +115,16 @@ class GalleryActivity : AppCompatActivity() {
         })
     }
 
-    private fun setupThumb() {
-        val arguments = intent.extras!!
-        val thumb: String = arguments.getString("thumb")!!
-        binding.thumb.apply {
-            Glide.with(this).load(thumb)
-                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .into(this)
-        }
-        binding.backdrop.apply {
-            Glide.with(this).load(thumb)
-                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .into(this)
-        }
+    private fun setupThumb(thumb: String) {
+        Glide.with(this)
+            .load(thumb)
+            .diskCacheStrategy(DiskCacheStrategy.DATA)
+            .into(binding.thumb)
+
+        Glide.with(this)
+            .load(thumb)
+            .diskCacheStrategy(DiskCacheStrategy.DATA)
+            .into(binding.backdrop)
     }
 
     private fun setupActionButton() {
