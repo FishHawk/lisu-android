@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.repository.data
+package com.fishhawk.driftinglibraryandroid.repository.local.model
 
 import androidx.room.Entity
 
@@ -10,7 +10,7 @@ data class ReadingHistory(
 
     var title: String,
     var thumb: String,
-    var source: String?,
+    var providerId: String?,
     var date: Long,
 
     var collectionTitle: String,

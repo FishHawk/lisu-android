@@ -1,11 +1,11 @@
-package com.fishhawk.driftinglibraryandroid.repository
+package com.fishhawk.driftinglibraryandroid.repository.local
 
 import androidx.lifecycle.LiveData
-import com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo
-import com.fishhawk.driftinglibraryandroid.repository.local.ServerInfoDao
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.fishhawk.driftinglibraryandroid.repository.local.dao.ServerInfoDao
+import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
 
 class ServerInfoRepository(
     private val dao: ServerInfoDao

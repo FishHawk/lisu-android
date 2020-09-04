@@ -7,20 +7,34 @@ import com.fishhawk.driftinglibraryandroid.ui.explore.latest.LatestViewModel
 import com.fishhawk.driftinglibraryandroid.ui.explore.popular.PopularViewModel
 import com.fishhawk.driftinglibraryandroid.ui.explore.search.SearchViewModel
 
-
 @Suppress("UNCHECKED_CAST")
 class ExploreViewModelFactory(
-    private val source: String,
+    private val providerId: String,
     private val application: MainApplication
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
         when {
             isAssignableFrom(LatestViewModel::class.java) ->
-                LatestViewModel(source, application.remoteLibraryRepository)
+                LatestViewModel(
+                    providerId,
+                    application.remoteProviderRepository,
+                    application.remoteDownloadRepository,
+                    application.remoteSubscriptionRepository
+                )
             isAssignableFrom(PopularViewModel::class.java) ->
-                PopularViewModel(source, application.remoteLibraryRepository)
+                PopularViewModel(
+                    providerId,
+                    application.remoteProviderRepository,
+                    application.remoteDownloadRepository,
+                    application.remoteSubscriptionRepository
+                )
             isAssignableFrom(SearchViewModel::class.java) ->
-                SearchViewModel(source, application.remoteLibraryRepository)
+                SearchViewModel(
+                    providerId,
+                    application.remoteProviderRepository,
+                    application.remoteDownloadRepository,
+                    application.remoteSubscriptionRepository
+                )
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

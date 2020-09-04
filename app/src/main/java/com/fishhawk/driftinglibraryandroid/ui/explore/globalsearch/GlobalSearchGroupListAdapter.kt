@@ -6,11 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchGroupBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 data class SearchResultGroup(
-    val source: String,
+    val providerId: String,
     var result: Result<List<MangaOutline>>
 )
 
@@ -33,17 +33,17 @@ class GlobalSearchGroupListAdapter(
         )
     }
 
-    fun addResultGroup(source: String) {
+    fun addResultGroup(providerId: String) {
         list.add(
             SearchResultGroup(
-                source,
+                providerId,
                 Result.Loading
             )
         )
     }
 
-    fun updateResultFromSource(source: String, result: Result<List<MangaOutline>>) {
-        val index = list.indexOfFirst { it.source == source }
+    fun updateResultFromProvider(providerId: String, result: Result<List<MangaOutline>>) {
+        val index = list.indexOfFirst { it.providerId == providerId }
         if (index != -1) {
             list[index].result = result
             notifyItemChanged(index)
@@ -58,7 +58,7 @@ class GlobalSearchGroupListAdapter(
             val adapter =
                 GlobalSearchGroupAdapter(
                     activity,
-                    item.source
+                    item.providerId
                 )
             binding.list.adapter = adapter
             when (val result = item.result) {

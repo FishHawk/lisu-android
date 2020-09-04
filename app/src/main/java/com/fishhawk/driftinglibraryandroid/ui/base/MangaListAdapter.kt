@@ -7,18 +7,16 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
+import java.text.SimpleDateFormat
+import java.util.*
 import com.fishhawk.driftinglibraryandroid.databinding.MangaGridThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.databinding.MangaLinearThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.extension.navToGalleryActivity
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
-import java.text.SimpleDateFormat
-import java.util.*
-
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 
 class MangaListAdapter(
     private val activity: Activity,
-    private val source: String?
+    private val providerId: String?
 ) : BaseRecyclerViewAdapter<MangaOutline, BaseRecyclerViewAdapter.ViewHolder<MangaOutline>>(
     mutableListOf()
 ) {
@@ -63,7 +61,7 @@ class MangaListAdapter(
 
             binding.root.setOnClickListener {
                 (activity as AppCompatActivity).navToGalleryActivity(
-                    item.id, item.title, item.thumb, source
+                    item.id, item.title, item.thumb ?: "", providerId
                 )
             }
             binding.root.setOnLongClickListener {
@@ -80,8 +78,8 @@ class MangaListAdapter(
         override fun bind(item: MangaOutline, position: Int) {
             binding.outline = item
 
-            binding.update.text = item.update?.let {
-                val date = Date(item.update)
+            binding.update.text = item.updateTime?.let {
+                val date = Date(item.updateTime)
                 val format = SimpleDateFormat("yyyy-MM-dd")
                 format.format(date)
             }
@@ -93,7 +91,7 @@ class MangaListAdapter(
 
             binding.root.setOnClickListener {
                 (activity as AppCompatActivity).navToGalleryActivity(
-                    item.id, item.title, item.thumb, source
+                    item.id, item.title, item.thumb ?: "", providerId
                 )
             }
             binding.root.setOnLongClickListener {

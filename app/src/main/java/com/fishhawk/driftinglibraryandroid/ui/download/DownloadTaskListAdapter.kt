@@ -5,10 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.fishhawk.driftinglibraryandroid.databinding.DownloadTaskCardBinding
-import com.fishhawk.driftinglibraryandroid.repository.data.DownloadTask
-import com.fishhawk.driftinglibraryandroid.repository.data.DownloadTaskStatus
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadTask
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadTaskStatus
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
-
 
 class DownloadTaskListAdapter(
     private val activity: Activity

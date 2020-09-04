@@ -3,7 +3,6 @@ package com.fishhawk.driftinglibraryandroid.ui.reader
 import android.view.View
 import android.widget.AdapterView
 
-
 class IgnoreFirstSpinnerListener(
     private val onSelected: (Int) -> Unit
 ) : AdapterView.OnItemSelectedListener {

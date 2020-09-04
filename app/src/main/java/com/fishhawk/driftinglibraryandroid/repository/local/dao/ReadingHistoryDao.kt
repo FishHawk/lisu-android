@@ -1,9 +1,8 @@
-package com.fishhawk.driftinglibraryandroid.repository.local
+package com.fishhawk.driftinglibraryandroid.repository.local.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
-
+import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
 
 @Dao
 interface ReadingHistoryDao {

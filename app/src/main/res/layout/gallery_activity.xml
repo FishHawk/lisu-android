@@ -166,18 +166,18 @@
                             tools:text="Sample update" />
 
                         <TextView
-                            android:id="@+id/source_label"
+                            android:id="@+id/provider_label"
                             style="@style/Theme.TextAppearance.Body1"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="@string/gallery_source_label"
-                            android:visibility="@{info.source != null ? View.VISIBLE : View.GONE}"
+                            android:text="@string/gallery_provider_label"
+                            android:visibility="@{info.providerId != null ? View.VISIBLE : View.GONE}"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/update_label" />
 
                         <TextView
-                            android:id="@+id/source"
+                            android:id="@+id/provider"
                             style="@style/Theme.TextAppearance.Body2"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -185,13 +185,13 @@
                             android:layout_marginTop="4dp"
                             android:ellipsize="end"
                             android:singleLine="true"
-                            android:text="@{info.source}"
+                            android:text="@{info.providerId}"
                             android:textIsSelectable="false"
-                            android:visibility="@{info.source != null ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{info.providerId != null ? View.VISIBLE : View.GONE}"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/source_label"
+                            app:layout_constraintStart_toEndOf="@+id/provider_label"
                             app:layout_constraintTop_toBottomOf="@+id/update_label"
-                            tools:text="Sample source" />
+                            tools:text="Sample provider" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </FrameLayout>
@@ -248,7 +248,7 @@
                                 style="@style/Theme.Widget.Button.Icon.Textless"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:visibility="@{info.source != null ? View.VISIBLE : View.GONE}"
+                                android:visibility="@{info.providerId != null ? View.VISIBLE : View.GONE}"
                                 app:icon="@drawable/ic_baseline_cloud_download_24" />
 
                             <com.google.android.material.button.MaterialButton
@@ -256,7 +256,7 @@
                                 style="@style/Theme.Widget.Button.Icon.Textless"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:visibility="@{info.source != null ? View.VISIBLE : View.GONE}"
+                                android:visibility="@{info.providerId != null ? View.VISIBLE : View.GONE}"
                                 app:icon="@drawable/ic_baseline_rss_feed_24" />
 
                             <com.google.android.material.button.MaterialButton

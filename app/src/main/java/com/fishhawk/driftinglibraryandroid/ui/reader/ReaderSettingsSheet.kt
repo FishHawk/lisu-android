@@ -9,7 +9,6 @@ import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.switchmaterial.SwitchMaterial
 
-
 class ReaderSettingsSheet(activity: ReaderActivity) : BottomSheetDialog(activity) {
     private val binding = ReaderSettingsSheetBinding.inflate(activity.layoutInflater, null, false)
 

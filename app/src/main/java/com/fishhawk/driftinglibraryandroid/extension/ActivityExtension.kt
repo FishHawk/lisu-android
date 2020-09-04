@@ -8,7 +8,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
-import com.fishhawk.driftinglibraryandroid.MainActivity
+import com.fishhawk.driftinglibraryandroid.ui.MainActivity
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.ListEmptyNotification
@@ -24,13 +24,13 @@ fun Activity.navToGalleryActivity(
     id: String,
     title: String,
     thumb: String,
-    source: String?
+    providerId: String?
 ) {
     val bundle = bundleOf(
         "id" to id,
         "title" to title,
         "thumb" to thumb,
-        "source" to source
+        "providerId" to providerId
     )
 
     val intent = Intent(this, GalleryActivity::class.java)
@@ -40,14 +40,14 @@ fun Activity.navToGalleryActivity(
 
 fun Activity.navToReaderActivity(
     id: String,
-    source: String?,
+    providerId: String?,
     collectionIndex: Int = 0,
     chapterIndex: Int = 0,
     pageIndex: Int = 0
 ) {
     val bundle = bundleOf(
         "id" to id,
-        "source" to source,
+        "providerId" to providerId,
         "collectionIndex" to collectionIndex,
         "chapterIndex" to chapterIndex,
         "pageIndex" to pageIndex

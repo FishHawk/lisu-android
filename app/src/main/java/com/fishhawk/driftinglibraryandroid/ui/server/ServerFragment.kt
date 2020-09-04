@@ -9,10 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.databinding.ServerFragmentBinding
-import com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo
+import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
-
 
 class ServerFragment : Fragment() {
     private val viewModel: ServerViewModel by viewModels {
@@ -62,7 +61,12 @@ class ServerFragment : Fragment() {
 
         binding.addButton.setOnClickListener {
             createServerInfoDialog { name, address ->
-                viewModel.addServer(ServerInfo(name, address))
+                viewModel.addServer(
+                    ServerInfo(
+                        name,
+                        address
+                    )
+                )
             }
         }
     }

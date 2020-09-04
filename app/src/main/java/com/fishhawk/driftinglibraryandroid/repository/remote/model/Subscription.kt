@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.repository.data
+package com.fishhawk.driftinglibraryandroid.repository.remote.model
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
@@ -6,7 +6,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class Subscription(
     val id: Int,
-    val source: String,
+    val providerId: String,
     val sourceManga: String,
     val targetManga: String,
     var isEnabled: Boolean

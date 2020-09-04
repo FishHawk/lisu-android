@@ -12,7 +12,6 @@ import com.fishhawk.driftinglibraryandroid.extension.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.extension.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
 
-
 class HistoryFragment : Fragment() {
     val viewModel: HistoryViewModel by viewModels {
         ViewModelFactory(requireActivity().application as MainApplication)
@@ -39,12 +38,12 @@ class HistoryFragment : Fragment() {
         val adapter = HistoryListAdapter(requireActivity())
         adapter.onThumbClicked = {
             requireActivity().navToGalleryActivity(
-                it.mangaId, it.title, it.thumb, it.source
+                it.mangaId, it.title, it.thumb, it.providerId
             )
         }
         adapter.onCardClicked = {
             requireActivity().navToReaderActivity(
-                it.mangaId, it.source, it.collectionIndex, it.chapterIndex, it.pageIndex
+                it.mangaId, it.providerId, it.collectionIndex, it.chapterIndex, it.pageIndex
             )
         }
         binding.list.adapter = adapter

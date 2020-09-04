@@ -1,40 +1,39 @@
 package com.fishhawk.driftinglibraryandroid.ui.subscription
 
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.data.Subscription
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.Subscription
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModel
 import kotlinx.coroutines.launch
 
-
 class SubscriptionViewModel(
-    private val remoteLibraryRepository: RemoteLibraryRepository
+    private val repository: RemoteSubscriptionRepository
 ) : RefreshableListViewModel<Subscription>() {
-    override suspend fun loadResult() = remoteLibraryRepository.getAllSubscriptions()
+    override suspend fun loadResult() = repository.getAllSubscriptions()
 
     fun enableSubscription(id: Int) = viewModelScope.launch {
-        val result = remoteLibraryRepository.enableSubscription(id)
+        val result = repository.enableSubscription(id)
         updateItem(id, result)
     }
 
     fun disableSubscription(id: Int) = viewModelScope.launch {
-        val result = remoteLibraryRepository.disableSubscription(id)
+        val result = repository.disableSubscription(id)
         updateItem(id, result)
     }
 
     fun deleteSubscription(id: Int) = viewModelScope.launch {
-        val result = remoteLibraryRepository.deleteSubscription(id)
+        val result = repository.deleteSubscription(id)
         deleteItem(id, result)
     }
 
     fun enableAllSubscription() = viewModelScope.launch {
-        val result = remoteLibraryRepository.enableAllSubscriptions()
+        val result = repository.enableAllSubscriptions()
         updateList(result)
     }
 
     fun disableAllSubscription() = viewModelScope.launch {
-        val result = remoteLibraryRepository.disableAllSubscriptions()
+        val result = repository.disableAllSubscriptions()
         updateList(result)
     }
 

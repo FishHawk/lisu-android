@@ -18,30 +18,27 @@ import com.fishhawk.driftinglibraryandroid.extension.setupFullScreen
 import com.fishhawk.driftinglibraryandroid.extension.setupThemeWithTranslucentStatus
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.ui.ReaderViewModelFactory
 import com.fishhawk.driftinglibraryandroid.util.FileUtil
 import kotlinx.coroutines.runBlocking
-
 
 class ReaderActivity : AppCompatActivity() {
     val viewModel: ReaderViewModel by viewModels {
         val arguments = intent.extras!!
 
         val id = arguments.getString("id")!!
-        val source = arguments.getString("source")
+        val providerId = arguments.getString("providerId")
         val collectionIndex = arguments.getInt("collectionIndex")
         val chapterIndex = arguments.getInt("chapterIndex")
         val pageIndex = arguments.getInt("pageIndex")
         val application = applicationContext as MainApplication
-        val remoteLibraryRepository = application.remoteLibraryRepository
-        val readingHistoryRepository = application.readingHistoryRepository
         ReaderViewModelFactory(
             id,
-            source,
+            providerId,
             collectionIndex,
             chapterIndex,
             pageIndex,
-            remoteLibraryRepository,
-            readingHistoryRepository
+            application
         )
     }
     lateinit var binding: ReaderActivityBinding

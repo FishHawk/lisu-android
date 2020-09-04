@@ -1,7 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery
 
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
@@ -11,21 +9,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.SimpleTarget
-import com.bumptech.glide.request.transition.Transition
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryActivityBinding
 import com.fishhawk.driftinglibraryandroid.extension.*
 import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.data.TagGroup
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.TagGroup
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
 import com.google.android.flexbox.FlexboxLayout
 import kotlinx.android.synthetic.main.gallery_activity.view.*
-
 
 class GalleryActivity : AppCompatActivity() {
     private val viewModel: GalleryViewModel by viewModels {
@@ -45,17 +39,17 @@ class GalleryActivity : AppCompatActivity() {
         val arguments = intent.extras!!
         val id: String = arguments.getString("id")!!
         val title: String = arguments.getString("title")!!
-        val source: String? = arguments.getString("source")
+        val providerId: String? = arguments.getString("providerId")
         val thumb: String = arguments.getString("thumb")!!
 
-        if (source == null) viewModel.openMangaFromLibrary(id)
-        else viewModel.openMangaFromSource(source, id)
+        if (providerId == null) viewModel.openMangaFromLibrary(id)
+        else viewModel.openMangaFromProvider(providerId, id)
 
-        binding.info = GalleryInfo(source, title)
+        binding.info = GalleryInfo(providerId, title)
         setupThumb(thumb)
         setupActionButton()
 
-        val adapter = ContentAdapter(this, id, source)
+        val adapter = ContentAdapter(this, id, providerId)
         binding.chapters.adapter = adapter
         binding.displayModeButton.setOnClickListener {
             SettingsHelper.chapterDisplayMode.setNextValue()
@@ -96,7 +90,10 @@ class GalleryActivity : AppCompatActivity() {
                         binding.description.maxLines =
                             if (binding.description.maxLines < Int.MAX_VALUE) Int.MAX_VALUE else 3
                     }
-                    if (!detail.tags.isNullOrEmpty()) bindTags(detail.tags, binding.tags)
+                    if (!detail.metadata.tags.isNullOrEmpty()) bindTags(
+                        detail.metadata.tags,
+                        binding.tags
+                    )
                     if (detail.collections.isNotEmpty())
                         binding.chapters.collections = detail.collections
                 }
@@ -134,12 +131,12 @@ class GalleryActivity : AppCompatActivity() {
                 viewModel.history.value?.let { history ->
                     navToReaderActivity(
                         detail.id,
-                        detail.source,
+                        detail.providerId,
                         history.collectionIndex,
                         history.chapterIndex,
                         history.pageIndex
                     )
-                } ?: navToReaderActivity(detail.id, detail.source)
+                } ?: navToReaderActivity(detail.id, detail.providerId)
             }
         }
         binding.subscribeButton.setOnClickListener { viewModel.subscribe() }

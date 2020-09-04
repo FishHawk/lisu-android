@@ -17,7 +17,6 @@ import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
 
-
 class LibraryFragment : Fragment() {
     private val viewModel: LibraryViewModel by viewModels {
         ViewModelFactory(requireActivity().application as MainApplication)

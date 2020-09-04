@@ -25,10 +25,10 @@ class ViewModelFactory constructor(
                 HistoryViewModel(application.readingHistoryRepository)
 
             isAssignableFrom(ExploreViewModel::class.java) ->
-                ExploreViewModel(application.remoteLibraryRepository)
+                ExploreViewModel(application.remoteProviderRepository)
 
             isAssignableFrom(GlobalSearchViewModel::class.java) ->
-                GlobalSearchViewModel(application.remoteLibraryRepository)
+                GlobalSearchViewModel(application.remoteProviderRepository)
 
             isAssignableFrom(ServerViewModel::class.java) ->
                 ServerViewModel(
@@ -37,14 +37,17 @@ class ViewModelFactory constructor(
                 )
 
             isAssignableFrom(DownloadViewModel::class.java) ->
-                DownloadViewModel(application.remoteLibraryRepository)
+                DownloadViewModel(application.remoteDownloadRepository)
 
             isAssignableFrom(SubscriptionViewModel::class.java) ->
-                SubscriptionViewModel(application.remoteLibraryRepository)
+                SubscriptionViewModel(application.remoteSubscriptionRepository)
 
             isAssignableFrom(GalleryViewModel::class.java) ->
                 GalleryViewModel(
                     application.remoteLibraryRepository,
+                    application.remoteProviderRepository,
+                    application.remoteDownloadRepository,
+                    application.remoteSubscriptionRepository,
                     application.readingHistoryRepository
                 )
             else ->

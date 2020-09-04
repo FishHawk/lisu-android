@@ -4,7 +4,6 @@ import androidx.appcompat.app.AlertDialog
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 
-
 fun HistoryFragment.createHistoryFilterSwitchDialog() {
     val checkedItem = when (SettingsHelper.historyFilter.getValueDirectly()) {
         SettingsHelper.HistoryFilter.ALL -> 0

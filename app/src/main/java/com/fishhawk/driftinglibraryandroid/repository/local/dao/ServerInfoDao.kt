@@ -1,9 +1,8 @@
-package com.fishhawk.driftinglibraryandroid.repository.local
+package com.fishhawk.driftinglibraryandroid.repository.local.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo
-
+import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
 
 @Dao
 interface ServerInfoDao {

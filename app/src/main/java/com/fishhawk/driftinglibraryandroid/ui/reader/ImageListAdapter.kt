@@ -19,7 +19,6 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
-
 class ImageListAdapter(
     private val context: Context
 ) : BaseRecyclerViewAdapter<String, ImageListAdapter.ViewHolder>(mutableListOf()) {

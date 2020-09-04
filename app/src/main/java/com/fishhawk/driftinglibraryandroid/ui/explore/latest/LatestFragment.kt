@@ -21,8 +21,8 @@ import com.fishhawk.driftinglibraryandroid.ui.explore.createMangaOutlineActionDi
 
 class LatestFragment : Fragment() {
     private val viewModel: LatestViewModel by viewModels {
-        val source = arguments?.getString("source")!!
-        ExploreViewModelFactory(source, requireActivity().application as MainApplication)
+        val providerId = arguments?.getString("providerId")!!
+        ExploreViewModelFactory(providerId, requireActivity().application as MainApplication)
     }
     private lateinit var binding: ExploreLatestFragmentBinding
 
@@ -43,10 +43,10 @@ class LatestFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val source = arguments?.getString("source")!!
-        val adapter = MangaListAdapter(requireActivity(), source)
+        val providerId = arguments?.getString("providerId")!!
+        val adapter = MangaListAdapter(requireActivity(), providerId)
         adapter.onCardLongClicked = { outline ->
-            createMangaOutlineActionDialog(source, outline, viewModel)
+            createMangaOutlineActionDialog(providerId, outline, viewModel)
         }
         binding.mangaList.list.adapter = adapter
 
@@ -73,7 +73,7 @@ class LatestFragment : Fragment() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 searchView.setQuery("", false)
                 val bundle = bundleOf(
-                    "source" to arguments?.getString("source")!!,
+                    "providerId" to arguments?.getString("providerId")!!,
                     "keywords" to (query ?: "")
                 )
                 binding.root.findNavController().navigate(R.id.action_latest_to_search, bundle)

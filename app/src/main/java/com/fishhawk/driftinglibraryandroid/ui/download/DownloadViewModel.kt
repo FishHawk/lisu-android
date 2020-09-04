@@ -1,40 +1,39 @@
 package com.fishhawk.driftinglibraryandroid.ui.download
 
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
-import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.data.DownloadTask
-import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModel
 import kotlinx.coroutines.launch
-
+import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadTask
+import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModel
 
 class DownloadViewModel(
-    private val remoteLibraryRepository: RemoteLibraryRepository
+    private val repository: RemoteDownloadRepository
 ) : RefreshableListViewModel<DownloadTask>() {
-    override suspend fun loadResult() = remoteLibraryRepository.getAllDownloadTasks()
+    override suspend fun loadResult() = repository.getAllDownloadTasks()
 
     fun startDownloadTask(id: Int) = viewModelScope.launch {
-        val result = remoteLibraryRepository.startDownloadTask(id)
+        val result = repository.startDownloadTask(id)
         updateItem(id, result)
     }
 
     fun pauseDownloadTask(id: Int) = viewModelScope.launch {
-        val result = remoteLibraryRepository.pauseDownloadTask(id)
+        val result = repository.pauseDownloadTask(id)
         updateItem(id, result)
     }
 
     fun deleteDownloadTask(id: Int) = viewModelScope.launch {
-        val result = remoteLibraryRepository.deleteDownloadTask(id)
+        val result = repository.deleteDownloadTask(id)
         deleteItem(id, result)
     }
 
     fun startAllDownloadTasks() = viewModelScope.launch {
-        val result = remoteLibraryRepository.startAllDownloadTasks()
+        val result = repository.startAllDownloadTasks()
         updateList(result)
     }
 
     fun pauseAllDownloadTasks() = viewModelScope.launch {
-        val result = remoteLibraryRepository.pauseAllDownloadTasks()
+        val result = repository.pauseAllDownloadTasks()
         updateList(result)
     }
 

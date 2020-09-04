@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.repository.data
+package com.fishhawk.driftinglibraryandroid.repository.remote.model
 
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
@@ -21,7 +21,7 @@ enum class DownloadTaskStatus(val value: String) {
 @Parcelize
 data class DownloadTask(
     val id: Int,
-    val source: String,
+    val providerId: String,
     val sourceManga: String,
     val targetManga: String,
     val status: DownloadTaskStatus,

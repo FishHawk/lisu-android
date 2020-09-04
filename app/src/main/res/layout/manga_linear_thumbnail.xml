@@ -7,7 +7,7 @@
 
         <variable
             name="outline"
-            type="com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline" />
+            type="com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -39,7 +39,7 @@
                 android:layout_marginTop="@dimen/baseline_4dp"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:text="@{outline.title}"
+                android:text="@{outline.metadata.title}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/thumb"
                 app:layout_constraintTop_toTopOf="parent"
@@ -53,7 +53,7 @@
                 android:layout_marginStart="@dimen/baseline_8dp"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="@{outline.author}"
+                android:text="@{outline.metadata.authors[0]}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/thumb"
                 app:layout_constraintTop_toBottomOf="@+id/title"

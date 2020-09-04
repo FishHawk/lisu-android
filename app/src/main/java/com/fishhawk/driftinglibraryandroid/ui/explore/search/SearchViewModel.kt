@@ -1,19 +1,27 @@
 package com.fishhawk.driftinglibraryandroid.ui.explore.search
 
-import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
-import com.fishhawk.driftinglibraryandroid.ui.base.MangaListFromSourceViewModel
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
+import com.fishhawk.driftinglibraryandroid.ui.base.MangaListFromProviderViewModel
 
 class SearchViewModel(
-    private val source: String,
-    private val remoteLibraryRepository: RemoteLibraryRepository
-) : MangaListFromSourceViewModel(source, remoteLibraryRepository) {
+    private val providerId: String,
+    private val remoteProviderRepository: RemoteProviderRepository,
+    remoteDownloadRepository: RemoteDownloadRepository,
+    remoteSubscriptionRepository: RemoteSubscriptionRepository
+) : MangaListFromProviderViewModel(
+    providerId,
+    remoteDownloadRepository,
+    remoteSubscriptionRepository
+) {
     private var keywords = ""
 
     override suspend fun loadResult() =
-        remoteLibraryRepository.searchInSource(source, keywords, 1)
+        remoteProviderRepository.search(providerId, keywords, 1)
 
     override suspend fun fetchMoreResult() =
-        remoteLibraryRepository.searchInSource(source, keywords, page + 1)
+        remoteProviderRepository.search(providerId, keywords, page + 1)
 
     fun search(keywords: String) {
         this.keywords = keywords

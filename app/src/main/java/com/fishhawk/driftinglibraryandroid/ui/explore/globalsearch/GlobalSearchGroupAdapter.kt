@@ -8,12 +8,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.extension.navToGalleryActivity
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 class GlobalSearchGroupAdapter(
     private val activity: Activity,
-    private val source: String
+    private val providerId: String
 ) : BaseRecyclerViewAdapter<MangaOutline, GlobalSearchGroupAdapter.ViewHolder>(mutableListOf()) {
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -40,7 +40,7 @@ class GlobalSearchGroupAdapter(
 
             binding.root.setOnClickListener {
                 (activity as AppCompatActivity).navToGalleryActivity(
-                    item.id, item.title, item.thumb, source
+                    item.id, item.metadata.title ?: item.id, item.thumb ?: "", providerId
                 )
             }
         }

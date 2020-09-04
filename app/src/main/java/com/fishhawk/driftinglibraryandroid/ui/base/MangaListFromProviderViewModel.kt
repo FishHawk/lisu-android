@@ -1,14 +1,16 @@
 package com.fishhawk.driftinglibraryandroid.ui.base
 
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
 
-abstract class MangaListFromSourceViewModel(
-    private val source: String,
-    private val remoteLibraryRepository: RemoteLibraryRepository
+abstract class MangaListFromProviderViewModel(
+    private val providerId: String,
+    private val remoteDownloadRepository: RemoteDownloadRepository,
+    private val remoteSubscriptionRepository: RemoteSubscriptionRepository
 ) :
     RefreshableListViewModelWithFetchMore<MangaOutline>() {
     protected var page = 1
@@ -24,13 +26,13 @@ abstract class MangaListFromSourceViewModel(
 
     fun download(id: String, title: String) =
         viewModelScope.launch(Dispatchers.Main) {
-            val result = remoteLibraryRepository.postDownloadTask(source, id, title)
+            val result = remoteDownloadRepository.postDownloadTask(providerId, id, title)
             resultWarp(result) { notify(DownloadCreatedNotification()) }
         }
 
     fun subscribe(id: String, title: String) =
         viewModelScope.launch(Dispatchers.Main) {
-            val result = remoteLibraryRepository.postSubscription(source, id, title)
+            val result = remoteSubscriptionRepository.postSubscription(providerId, id, title)
             resultWarp(result) { notify(SubscriptionCreatedNotification()) }
         }
 }

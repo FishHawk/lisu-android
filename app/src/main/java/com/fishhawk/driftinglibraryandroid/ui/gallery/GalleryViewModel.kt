@@ -4,20 +4,25 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.repository.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
+import com.fishhawk.driftinglibraryandroid.repository.local.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
-import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail
+import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.DownloadCreatedNotification
 import com.fishhawk.driftinglibraryandroid.ui.base.NotificationViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.SubscriptionCreatedNotification
 import kotlinx.coroutines.launch
 
-
 class GalleryViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository,
+    private val remoteProviderRepository: RemoteProviderRepository,
+    private val remoteDownloadRepository: RemoteDownloadRepository,
+    private val remoteSubscriptionRepository: RemoteSubscriptionRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : NotificationViewModel() {
     private val _detail: MutableLiveData<Result<MangaDetail>> = MutableLiveData(Result.Loading)
@@ -32,20 +37,20 @@ class GalleryViewModel(
     }
 
     fun openMangaFromLibrary(id: String) = viewModelScope.launch {
-        _detail.value = remoteLibraryRepository.getMangaFromLibrary(id)
+        _detail.value = remoteLibraryRepository.getManga(id)
     }
 
-    fun openMangaFromSource(source: String, id: String) = viewModelScope.launch {
-        _detail.value = remoteLibraryRepository.getMangaFromSource(source, id)
+    fun openMangaFromProvider(providerId: String, id: String) = viewModelScope.launch {
+        _detail.value = remoteProviderRepository.getManga(providerId, id)
     }
 
     fun download() {
         (detail.value as? Result.Success)?.let {
             val id = it.data.id
-            val title = it.data.title
-            val source = it.data.source ?: return
+            val title = it.data.metadata.title ?: id
+            val providerId = it.data.providerId ?: return
             viewModelScope.launch {
-                val result = remoteLibraryRepository.postDownloadTask(source, id, title)
+                val result = remoteDownloadRepository.postDownloadTask(providerId, id, title)
                 resultWarp(result) { notify(DownloadCreatedNotification()) }
             }
         }
@@ -54,10 +59,10 @@ class GalleryViewModel(
     fun subscribe() {
         (detail.value as? Result.Success)?.let {
             val id = it.data.id
-            val title = it.data.title
-            val source = it.data.source ?: return
+            val title = it.data.metadata.title ?: id
+            val providerId = it.data.providerId ?: return
             viewModelScope.launch {
-                val result = remoteLibraryRepository.postSubscription(source, id, title)
+                val result = remoteSubscriptionRepository.postSubscription(providerId, id, title)
                 resultWarp(result) { notify(SubscriptionCreatedNotification()) }
             }
         }

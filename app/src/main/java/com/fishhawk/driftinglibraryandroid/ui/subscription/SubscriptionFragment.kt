@@ -10,7 +10,6 @@ import com.fishhawk.driftinglibraryandroid.databinding.SubscriptionFragmentBindi
 import com.fishhawk.driftinglibraryandroid.extension.bindToListViewModel
 import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
 
-
 class SubscriptionFragment : Fragment() {
     private val viewModel: SubscriptionViewModel by viewModels {
         ViewModelFactory(requireActivity().application as MainApplication)

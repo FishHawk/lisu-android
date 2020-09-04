@@ -9,16 +9,16 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ExploreSourceCardBinding
-import com.fishhawk.driftinglibraryandroid.repository.data.Source
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
 
-class SourceListAdapter(
+class ProviderListAdapter(
     private val activity: Activity,
-    private var data: List<Source>
-) : RecyclerView.Adapter<SourceListAdapter.ViewHolder>() {
+    private var data: List<ProviderInfo>
+) : RecyclerView.Adapter<ProviderListAdapter.ViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): SourceListAdapter.ViewHolder {
+    ): ProviderListAdapter.ViewHolder {
         return ViewHolder(
             ExploreSourceCardBinding.inflate(
                 LayoutInflater.from(activity),
@@ -27,7 +27,7 @@ class SourceListAdapter(
         )
     }
 
-    override fun onBindViewHolder(holder: SourceListAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ProviderListAdapter.ViewHolder, position: Int) {
         holder.bind(data[position])
     }
 
@@ -36,22 +36,22 @@ class SourceListAdapter(
     inner class ViewHolder(private val binding: ExploreSourceCardBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Source) {
+        fun bind(item: ProviderInfo) {
             binding.name.text = item.name
 
             binding.root.setOnClickListener {
-                val bundle = bundleOf("source" to item.name, "keywords" to "")
+                val bundle = bundleOf("providerId" to item.id, "keywords" to "")
                 binding.root.findNavController().navigate(R.id.action_explore_to_search, bundle)
             }
 
             if (!item.isLatestSupport) binding.latest.visibility = View.INVISIBLE
             binding.latest.setOnClickListener {
-                val bundle = bundleOf("source" to item.name)
+                val bundle = bundleOf("providerId" to item.id)
                 binding.root.findNavController().navigate(R.id.action_explore_to_latest, bundle)
             }
 
             binding.popular.setOnClickListener {
-                val bundle = bundleOf("source" to item.name)
+                val bundle = bundleOf("providerId" to item.id)
                 binding.root.findNavController().navigate(R.id.action_explore_to_popular, bundle)
             }
         }

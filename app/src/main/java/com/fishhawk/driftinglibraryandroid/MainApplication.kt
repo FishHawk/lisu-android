@@ -5,25 +5,32 @@ import android.webkit.URLUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.switchMap
 import androidx.room.Room
-import com.fishhawk.driftinglibraryandroid.repository.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
-import com.fishhawk.driftinglibraryandroid.repository.ServerInfoRepository
-import com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo
-import com.fishhawk.driftinglibraryandroid.repository.local.ApplicationDatabase
-import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryService
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import kotlinx.coroutines.runBlocking
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-
+import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
+import com.fishhawk.driftinglibraryandroid.repository.local.ApplicationDatabase
+import com.fishhawk.driftinglibraryandroid.repository.local.ReadingHistoryRepository
+import com.fishhawk.driftinglibraryandroid.repository.local.ServerInfoRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 
 class MainApplication : Application() {
     private lateinit var database: ApplicationDatabase
+    private lateinit var selectedServerInfo: LiveData<ServerInfo>
+    private var selectedUrl: String? = null
+
     lateinit var readingHistoryRepository: ReadingHistoryRepository
     lateinit var serverInfoRepository: ServerInfoRepository
 
-    private lateinit var selectedServerInfo: LiveData<ServerInfo>
-    val remoteLibraryRepository: RemoteLibraryRepository = RemoteLibraryRepository()
+    var url: String? = null
+    val remoteLibraryRepository = RemoteLibraryRepository()
+    val remoteProviderRepository = RemoteProviderRepository()
+    val remoteDownloadRepository = RemoteDownloadRepository()
+    val remoteSubscriptionRepository = RemoteSubscriptionRepository()
 
     override fun onCreate() {
         super.onCreate()
@@ -31,8 +38,10 @@ class MainApplication : Application() {
 
         database = Room.databaseBuilder(
             applicationContext,
-            ApplicationDatabase::class.java, "Test.db"
+            ApplicationDatabase::class.java,
+            "Test.db"
         ).build()
+
         readingHistoryRepository = ReadingHistoryRepository(database.readingHistoryDao())
         serverInfoRepository = ServerInfoRepository(database.serverInfoDao())
 
@@ -53,34 +62,30 @@ class MainApplication : Application() {
     }
 
     private fun selectServer(serverInfo: ServerInfo?) {
-        if (serverInfo == null) {
-            remoteLibraryRepository.url = null
-            remoteLibraryRepository.service = null
-        } else {
-            val url = formatAddress(serverInfo.address)
-            rebuildRemoteLibraryRepositoryIfNeeded(url)
+        val url = serverInfo?.address?.let {
+            var newUrl = it
+            newUrl = if (URLUtil.isNetworkUrl(newUrl)) newUrl else "http://${newUrl}"
+            newUrl = if (newUrl.last() == '/') newUrl else "$newUrl/"
+            newUrl
         }
-    }
 
-    private fun formatAddress(url: String): String {
-        var newUrl = url
-        newUrl = if (URLUtil.isNetworkUrl(newUrl)) newUrl else "http://${newUrl}"
-        newUrl = if (newUrl.last() == '/') newUrl else "$newUrl/"
-        return newUrl
-    }
+        if (selectedUrl == url) return
+        else selectedUrl = url
 
-    private fun rebuildRemoteLibraryRepositoryIfNeeded(url: String) {
-        if (remoteLibraryRepository.url != url) {
-            remoteLibraryRepository.url = url
-            remoteLibraryRepository.service =
-                try {
-                    Retrofit.Builder()
-                        .baseUrl(url)
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build()
-                } catch (e: Throwable) {
-                    null
-                }?.create(RemoteLibraryService::class.java)
+        val retrofit = url?.let {
+            try {
+                Retrofit.Builder()
+                    .baseUrl(url)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+            } catch (e: Throwable) {
+                null
+            }
         }
+
+        remoteLibraryRepository.connect(url, retrofit)
+        remoteProviderRepository.connect(url, retrofit)
+        remoteDownloadRepository.connect(url, retrofit)
+        remoteSubscriptionRepository.connect(url, retrofit)
     }
 }

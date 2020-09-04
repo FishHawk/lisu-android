@@ -8,7 +8,6 @@ import com.fishhawk.driftinglibraryandroid.databinding.*
 import com.fishhawk.driftinglibraryandroid.extension.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
-
 data class MarkedPosition(
     val collectionIndex: Int,
     val chapterIndex: Int,
@@ -46,7 +45,7 @@ sealed class ContentItem {
 class ContentAdapter(
     private val activity: Activity,
     private val id: String,
-    private val source: String?
+    private val providerId: String?
 ) : BaseRecyclerViewAdapter<ContentItem, BaseRecyclerViewAdapter.ViewHolder<ContentItem>>(
     mutableListOf()
 ) {
@@ -150,7 +149,7 @@ class ContentAdapter(
             binding.button.setOnClickListener {
                 (activity as AppCompatActivity).navToReaderActivity(
                     id,
-                    source,
+                    providerId,
                     newItem.collectionIndex,
                     newItem.chapterIndex,
                     0
@@ -168,7 +167,7 @@ class ContentAdapter(
             binding.button.setOnClickListener {
                 (activity as AppCompatActivity).navToReaderActivity(
                     id,
-                    source,
+                    providerId,
                     newItem.collectionIndex,
                     newItem.chapterIndex,
                     newItem.pageIndex
@@ -187,7 +186,7 @@ class ContentAdapter(
             binding.root.setOnClickListener {
                 (activity as AppCompatActivity).navToReaderActivity(
                     id,
-                    source,
+                    providerId,
                     newItem.collectionIndex,
                     newItem.chapterIndex,
                     0
@@ -206,7 +205,7 @@ class ContentAdapter(
             binding.root.setOnClickListener {
                 (activity as AppCompatActivity).navToReaderActivity(
                     id,
-                    source,
+                    providerId,
                     newItem.collectionIndex,
                     newItem.chapterIndex,
                     0

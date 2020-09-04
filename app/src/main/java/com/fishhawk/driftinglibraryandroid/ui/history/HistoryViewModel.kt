@@ -1,11 +1,10 @@
 package com.fishhawk.driftinglibraryandroid.ui.history
 
 import androidx.lifecycle.*
-import com.fishhawk.driftinglibraryandroid.repository.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import kotlinx.coroutines.launch
-
+import com.fishhawk.driftinglibraryandroid.repository.local.ReadingHistoryRepository
+import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 
 class HistoryViewModel(
     private val readingHistoryRepository: ReadingHistoryRepository
@@ -40,8 +39,8 @@ class HistoryViewModel(
     ): List<ReadingHistory> {
         return when (filter) {
             SettingsHelper.HistoryFilter.ALL -> list
-            SettingsHelper.HistoryFilter.FROM_LIBRARY -> list.filter { it.source == null }
-            SettingsHelper.HistoryFilter.FROM_SOURCES -> list.filter { it.source != null }
+            SettingsHelper.HistoryFilter.FROM_LIBRARY -> list.filter { it.providerId == null }
+            SettingsHelper.HistoryFilter.FROM_SOURCES -> list.filter { it.providerId != null }
         }
     }
 }

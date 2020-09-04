@@ -7,7 +7,7 @@
 
         <variable
             name="outline"
-            type="com.fishhawk.driftinglibraryandroid.repository.data.MangaOutline" />
+            type="com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -51,7 +51,7 @@
                     android:ellipsize="end"
                     android:maxLines="2"
                     android:padding="8dp"
-                    android:text="@{outline.title}"
+                    android:text="@{outline.metadata.title}"
                     tools:text="Sample name" />
             </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

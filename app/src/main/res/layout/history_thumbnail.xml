@@ -8,7 +8,7 @@
 
         <variable
             name="readingHistory"
-            type="com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory" />
+            type="com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -93,19 +93,19 @@
                 app:layout_constraintTop_toBottomOf="@+id/seen_label" />
 
             <TextView
-                android:id="@+id/source_label"
+                android:id="@+id/provider_label"
                 style="@style/Theme.TextAppearance.Body1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/baseline_8dp"
                 android:layout_marginTop="@dimen/baseline_4dp"
-                android:text="@string/history_thumbnail_source"
-                android:visibility="@{readingHistory.source != null ? View.VISIBLE : View.GONE}"
+                android:text="@string/history_thumbnail_provider"
+                android:visibility="@{readingHistory.providerId != null ? View.VISIBLE : View.GONE}"
                 app:layout_constraintStart_toEndOf="@+id/thumb"
                 app:layout_constraintTop_toBottomOf="@+id/date_label" />
 
             <TextView
-                android:id="@+id/source"
+                android:id="@+id/provider"
                 style="@style/Theme.TextAppearance.Body2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -113,9 +113,9 @@
                 android:layout_marginTop="@dimen/baseline_4dp"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="@{readingHistory.source}"
+                android:text="@{readingHistory.providerId}"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/source_label"
+                app:layout_constraintStart_toEndOf="@+id/provider_label"
                 app:layout_constraintTop_toBottomOf="@+id/date_label" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

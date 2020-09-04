@@ -1,15 +1,23 @@
 package com.fishhawk.driftinglibraryandroid.ui.explore.latest
 
-import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
-import com.fishhawk.driftinglibraryandroid.ui.base.MangaListFromSourceViewModel
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
+import com.fishhawk.driftinglibraryandroid.ui.base.MangaListFromProviderViewModel
 
 class LatestViewModel(
-    private val source: String,
-    private val remoteLibraryRepository: RemoteLibraryRepository
-) : MangaListFromSourceViewModel(source, remoteLibraryRepository) {
+    private val providerId: String,
+    private val remoteProviderRepository: RemoteProviderRepository,
+    remoteDownloadRepository: RemoteDownloadRepository,
+    remoteSubscriptionRepository: RemoteSubscriptionRepository
+) : MangaListFromProviderViewModel(
+    providerId,
+    remoteDownloadRepository,
+    remoteSubscriptionRepository
+) {
     override suspend fun loadResult() =
-        remoteLibraryRepository.getLatestMangaList(source, 1)
+        remoteProviderRepository.getLatestMangaList(providerId, 1)
 
     override suspend fun fetchMoreResult() =
-        remoteLibraryRepository.getLatestMangaList(source, page + 1)
+        remoteProviderRepository.getLatestMangaList(providerId, page + 1)
 }

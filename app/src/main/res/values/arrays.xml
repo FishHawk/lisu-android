@@ -42,12 +42,12 @@
     <string-array name="settings_history_filter_entries">
         <item>@string/settings_history_filter_all</item>
         <item>@string/settings_history_filter_from_library</item>
-        <item>@string/settings_history_filter_from_sources</item>
+        <item>@string/settings_history_filter_from_provider</item>
     </string-array>
     <string-array name="settings_history_filter_entry_values" translatable="false">
         <item>ALL</item>
         <item>FROM_LIBRARY</item>
-        <item>FROM_SOURCES</item>
+        <item>FROM_PROVIDER</item>
     </string-array>
 
 

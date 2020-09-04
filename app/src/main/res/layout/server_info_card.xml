@@ -9,7 +9,7 @@
 
         <variable
             name="serverInfo"
-            type="com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo" />
+            type="com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo" />
     </data>
 
     <androidx.cardview.widget.CardView

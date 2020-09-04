@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.repository.data
+package com.fishhawk.driftinglibraryandroid.repository.local.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

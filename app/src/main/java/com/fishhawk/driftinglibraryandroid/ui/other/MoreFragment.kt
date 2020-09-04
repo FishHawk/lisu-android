@@ -6,7 +6,6 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.fishhawk.driftinglibraryandroid.R
 
-
 class MoreFragment : PreferenceFragmentCompat() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

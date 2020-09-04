@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.fishhawk.driftinglibraryandroid.repository.data.Collection
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.Collection
 
 class ContentView @JvmOverloads constructor(
     context: Context,
@@ -84,8 +84,8 @@ class ContentView @JvmOverloads constructor(
         val items = mutableListOf<ContentItem>()
 
         for ((collectionIndex, collection) in collections!!.withIndex()) {
-            if (viewMode == ViewMode.GRID && collection.title.isNotEmpty())
-                items.add(ContentItem.CollectionHeader(collection.title))
+            if (viewMode == ViewMode.GRID && collection.id.isNotEmpty())
+                items.add(ContentItem.CollectionHeader(collection.id))
 
             val itemsInCollection = mutableListOf<ContentItem>()
             for ((chapterIndex, chapter) in collection.chapters.withIndex()) {

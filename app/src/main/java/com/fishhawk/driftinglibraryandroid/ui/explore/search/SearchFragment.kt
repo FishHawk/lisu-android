@@ -1,6 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.ui.explore.search
 
-
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
@@ -20,8 +19,8 @@ import com.fishhawk.driftinglibraryandroid.ui.explore.createMangaOutlineActionDi
 
 class SearchFragment : Fragment() {
     private val viewModel: SearchViewModel by viewModels {
-        val source = arguments?.getString("source")!!
-        ExploreViewModelFactory(source, requireActivity().application as MainApplication)
+        val providerId = arguments?.getString("providerId")!!
+        ExploreViewModelFactory(providerId, requireActivity().application as MainApplication)
     }
     private lateinit var binding: ExplorePopularFragmentBinding
 
@@ -42,10 +41,10 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val source = arguments?.getString("source")!!
-        val adapter = MangaListAdapter(requireActivity(), source)
+        val providerId = arguments?.getString("providerId")!!
+        val adapter = MangaListAdapter(requireActivity(), providerId)
         adapter.onCardLongClicked = { outline ->
-            createMangaOutlineActionDialog(source, outline, viewModel)
+            createMangaOutlineActionDialog(providerId, outline, viewModel)
         }
         binding.mangaList.list.adapter = adapter
 

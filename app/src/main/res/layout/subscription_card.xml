@@ -9,7 +9,7 @@
 
         <variable
             name="subscription"
-            type="com.fishhawk.driftinglibraryandroid.repository.data.Subscription" />
+            type="com.fishhawk.driftinglibraryandroid.repository.remote.model.Subscription" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -49,17 +49,17 @@
                     tools:text="Sample target manga" />
 
                 <TextView
-                    android:id="@+id/source_label"
+                    android:id="@+id/provider_label"
                     style="@style/Theme.TextAppearance.Body1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/baseline_4dp"
-                    android:text="Source:"
+                    android:text="Provider:"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/target_manga" />
 
                 <TextView
-                    android:id="@+id/source"
+                    android:id="@+id/provider"
                     style="@style/Theme.TextAppearance.Body2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -67,11 +67,11 @@
                     android:layout_marginTop="@dimen/baseline_4dp"
                     android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="@{subscription.source}"
+                    android:text="@{subscription.providerId}"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/source_label"
+                    app:layout_constraintStart_toEndOf="@+id/provider_label"
                     app:layout_constraintTop_toBottomOf="@+id/target_manga"
-                    tools:text="Sample source" />
+                    tools:text="Sample provider" />
 
                 <TextView
                     android:id="@+id/source_manga_label"
@@ -81,7 +81,7 @@
                     android:layout_marginTop="@dimen/baseline_4dp"
                     android:text="Source manga:"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/source_label" />
+                    app:layout_constraintTop_toBottomOf="@+id/provider_label" />
 
                 <TextView
                     android:id="@+id/source_manga"
@@ -95,7 +95,7 @@
                     android:text="@{subscription.sourceManga}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/source_manga_label"
-                    app:layout_constraintTop_toBottomOf="@+id/source_label"
+                    app:layout_constraintTop_toBottomOf="@+id/provider_label"
                     tools:text="Sample source manga" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 

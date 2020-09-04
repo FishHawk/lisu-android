@@ -38,25 +38,25 @@ class GlobalSearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.keywords = arguments?.getString("keywords")!!
-        viewModel.sourceList.observe(viewLifecycleOwner, Observer { result ->
+        viewModel.providerList.observe(viewLifecycleOwner, Observer { result ->
             if (result is Result.Success) search()
         })
     }
 
     private fun search() {
         val keywords = viewModel.keywords
-        val sourceList = (viewModel.sourceList.value as? Result.Success)?.data ?: return
+        val providerList = (viewModel.providerList.value as? Result.Success)?.data ?: return
         val adapter =
             GlobalSearchGroupListAdapter(
                 requireActivity()
             )
         binding.list.adapter = adapter
 
-        for (source in sourceList) {
+        for (provider in providerList) {
             viewLifecycleOwner.lifecycleScope.launch {
-                adapter.addResultGroup(source.name)
-                val result = viewModel.search(source.name, keywords)
-                adapter.updateResultFromSource(source.name, result)
+                adapter.addResultGroup(provider.name)
+                val result = viewModel.search(provider.name, keywords)
+                adapter.updateResultFromProvider(provider.name, result)
             }
         }
     }

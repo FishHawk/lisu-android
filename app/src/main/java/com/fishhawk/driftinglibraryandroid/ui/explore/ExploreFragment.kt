@@ -37,10 +37,10 @@ class ExploreFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.sourceList.observe(viewLifecycleOwner, Observer { result ->
+        viewModel.providerList.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is Result.Success -> {
-                    binding.list.adapter = SourceListAdapter(requireActivity(), result.data)
+                    binding.list.adapter = ProviderListAdapter(requireActivity(), result.data)
                     if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
                     else binding.multipleStatusView.showContent()
                 }

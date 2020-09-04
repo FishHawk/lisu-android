@@ -3,11 +3,10 @@ package com.fishhawk.driftinglibraryandroid.ui.server
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.repository.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.repository.ServerInfoRepository
-import com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo
+import com.fishhawk.driftinglibraryandroid.repository.local.ReadingHistoryRepository
+import com.fishhawk.driftinglibraryandroid.repository.local.ServerInfoRepository
+import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
 import kotlinx.coroutines.launch
-
 
 class ServerViewModel(
     private val readingHistoryRepository: ReadingHistoryRepository,

@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid
+package com.fishhawk.driftinglibraryandroid.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
+import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityMainBinding
 import com.fishhawk.driftinglibraryandroid.extension.setupTheme
 import com.fishhawk.driftinglibraryandroid.extension.setupWithNavControllerT

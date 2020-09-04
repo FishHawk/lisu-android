@@ -1,11 +1,12 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
 import androidx.lifecycle.*
-import com.fishhawk.driftinglibraryandroid.repository.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.repository.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.data.MangaDetail
-import com.fishhawk.driftinglibraryandroid.repository.data.ReadingHistory
+import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
+import com.fishhawk.driftinglibraryandroid.repository.local.ReadingHistoryRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.setting.PreferenceEnumLiveData
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import kotlinx.coroutines.launch
@@ -13,11 +14,12 @@ import java.util.*
 
 class ReaderViewModel(
     private val id: String,
-    private val source: String?,
+    private val providerId: String?,
     private val collectionIndex: Int,
     private var chapterIndex: Int,
     pageIndex: Int,
     private val remoteLibraryRepository: RemoteLibraryRepository,
+    private val remoteProviderRepository: RemoteProviderRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModel() {
     // reading direction
@@ -44,8 +46,8 @@ class ReaderViewModel(
     init {
         viewModelScope.launch {
             val detail =
-                if (source == null) remoteLibraryRepository.getMangaFromLibrary(id)
-                else remoteLibraryRepository.getMangaFromSource(source, id)
+                if (providerId == null) remoteLibraryRepository.getManga(id)
+                else remoteProviderRepository.getManga(providerId, id)
             mangaDetail.value = detail
             when (detail) {
                 is Result.Success -> openChapter(chapterIndex, pageIndex)
@@ -67,12 +69,9 @@ class ReaderViewModel(
 
         viewModelScope.launch {
             val result =
-                if (source == null)
-                    remoteLibraryRepository.getChapterContentFromLibrary(
-                        id, collection.title, chapterId
-                    )
-                else
-                    remoteLibraryRepository.getChapterContentFromSource(source, chapterId)
+                if (providerId == null)
+                    remoteLibraryRepository.getChapterContent(id, collection.id, chapterId)
+                else remoteProviderRepository.getChapterContent(providerId, id, chapterId)
             when (result) {
                 is Result.Success -> {
                     self.chapterIndex = chapterIndex
@@ -118,21 +117,22 @@ class ReaderViewModel(
 
         detail?.let {
             val collection = detail.collections[collectionIndex]
-            val readingHistory = ReadingHistory(
-                it.id,
-                SettingsHelper.selectedServer.getValueDirectly(),
+            val readingHistory =
+                ReadingHistory(
+                    it.id,
+                    SettingsHelper.selectedServer.getValueDirectly(),
 
-                it.title,
-                it.thumb,
-                it.source,
-                Calendar.getInstance().time.time,
+                    it.title,
+                    it.thumb ?: "",
+                    it.providerId,
+                    Calendar.getInstance().time.time,
 
-                collection.title,
-                collectionIndex,
-                collection.chapters[chapterIndex].name,
-                chapterIndex,
-                chapterPosition.value ?: 0
-            )
+                    collection.id,
+                    collectionIndex,
+                    collection.chapters[chapterIndex].name,
+                    chapterIndex,
+                    chapterPosition.value ?: 0
+                )
             readingHistoryRepository.updateReadingHistory(readingHistory)
         }
     }
@@ -142,7 +142,7 @@ class ReaderViewModel(
         val collection = detail.collections[collectionIndex]
 
         val mangaTitle = detail.title
-        val collectionTitle = collection.title
+        val collectionTitle = collection.id
         val chapterTitle = collection.chapters[chapterIndex].title
 
         return "$mangaTitle-$collectionTitle-$chapterTitle"
@@ -150,30 +150,3 @@ class ReaderViewModel(
 }
 
 
-@Suppress("UNCHECKED_CAST")
-class ReaderViewModelFactory(
-    private val id: String,
-    private val source: String?,
-    private val collectionIndex: Int,
-    private val chapterIndex: Int,
-    private val pageIndex: Int,
-    private val remoteLibraryRepository: RemoteLibraryRepository,
-    private val readingHistoryRepository: ReadingHistoryRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
-        when {
-            isAssignableFrom(ReaderViewModel::class.java) ->
-                ReaderViewModel(
-                    id,
-                    source,
-                    collectionIndex,
-                    chapterIndex,
-                    pageIndex,
-                    remoteLibraryRepository,
-                    readingHistoryRepository
-                )
-            else ->
-                throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
-        }
-    } as T
-}

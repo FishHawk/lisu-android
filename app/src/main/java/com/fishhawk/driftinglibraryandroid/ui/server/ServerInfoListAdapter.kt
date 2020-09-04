@@ -6,9 +6,8 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ServerInfoCardBinding
-import com.fishhawk.driftinglibraryandroid.repository.data.ServerInfo
+import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
-
 
 class ServerInfoListAdapter(
     private val activity: Activity

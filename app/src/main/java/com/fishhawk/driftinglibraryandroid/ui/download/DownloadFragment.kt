@@ -10,7 +10,6 @@ import com.fishhawk.driftinglibraryandroid.databinding.DownloadFragmentBinding
 import com.fishhawk.driftinglibraryandroid.extension.bindToListViewModel
 import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
 
-
 class DownloadFragment : Fragment() {
     private val viewModel: DownloadViewModel by viewModels {
         ViewModelFactory(requireActivity().application as MainApplication)
