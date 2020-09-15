@@ -20,10 +20,9 @@ enum class DownloadTaskStatus(val value: String) {
 
 @Parcelize
 data class DownloadTask(
-    val id: Int,
+    val id: String,
     val providerId: String,
     val sourceManga: String,
-    val targetManga: String,
     val status: DownloadTaskStatus,
     val isCreatedBySubscription: Boolean
 ) : Parcelable

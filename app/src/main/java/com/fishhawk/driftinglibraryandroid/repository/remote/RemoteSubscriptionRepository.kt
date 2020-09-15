@@ -27,12 +27,12 @@ class RemoteSubscriptionRepository : BaseRemoteRepository<RemoteSubscriptionServ
     ): Result<Subscription> =
         resultWrap { it.postSubscription(providerId, sourceManga, targetManga) }
 
-    suspend fun deleteSubscription(id: Int): Result<Subscription> =
+    suspend fun deleteSubscription(id: String): Result<Subscription> =
         resultWrap { it.deleteSubscription(id) }
 
-    suspend fun enableSubscription(id: Int): Result<Subscription> =
+    suspend fun enableSubscription(id: String): Result<Subscription> =
         resultWrap { it.enableSubscription(id) }
 
-    suspend fun disableSubscription(id: Int): Result<Subscription> =
+    suspend fun disableSubscription(id: String): Result<Subscription> =
         resultWrap { it.disableSubscription(id) }
 }

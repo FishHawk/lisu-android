@@ -5,9 +5,8 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class Subscription(
-    val id: Int,
+    val id: String,
     val providerId: String,
     val sourceManga: String,
-    val targetManga: String,
     var isEnabled: Boolean
 ) : Parcelable

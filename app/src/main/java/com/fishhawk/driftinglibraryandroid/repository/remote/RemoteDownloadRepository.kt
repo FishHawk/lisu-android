@@ -27,12 +27,12 @@ class RemoteDownloadRepository : BaseRemoteRepository<RemoteDownloadService>() {
     ): Result<DownloadTask> =
         resultWrap { it.postDownloadTask(providerId, sourceManga, targetManga) }
 
-    suspend fun deleteDownloadTask(id: Int): Result<DownloadTask> =
+    suspend fun deleteDownloadTask(id: String): Result<DownloadTask> =
         resultWrap { it.deleteDownloadTask(id) }
 
-    suspend fun startDownloadTask(id: Int): Result<DownloadTask> =
+    suspend fun startDownloadTask(id: String): Result<DownloadTask> =
         resultWrap { it.startDownloadTask(id) }
 
-    suspend fun pauseDownloadTask(id: Int): Result<DownloadTask> =
+    suspend fun pauseDownloadTask(id: String): Result<DownloadTask> =
         resultWrap { it.pauseDownloadTask(id) }
 }

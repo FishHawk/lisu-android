@@ -10,8 +10,9 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 interface RemoteLibraryService {
     @GET("library/search")
     suspend fun search(
-        @Query("lastTime") lastTime: Long?,
-        @Query("keywords") keywords: String
+        @Query("lastTime") lastTime: Long,
+        @Query("keywords") keywords: String,
+        @Query("limit") limit: Int
     ): List<MangaOutline>
 
     @GET("library/manga/{mangaId}")

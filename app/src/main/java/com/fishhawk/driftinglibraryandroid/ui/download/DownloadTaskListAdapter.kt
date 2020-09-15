@@ -12,9 +12,9 @@ import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 class DownloadTaskListAdapter(
     private val activity: Activity
 ) : BaseRecyclerViewAdapter<DownloadTask, DownloadTaskListAdapter.ViewHolder>(mutableListOf()) {
-    var onDelete: (Int) -> Unit = {}
-    var onStart: (Int) -> Unit = {}
-    var onPause: (Int) -> Unit = {}
+    var onDelete: (String) -> Unit = {}
+    var onStart: (String) -> Unit = {}
+    var onPause: (String) -> Unit = {}
 
     override fun onCreateViewHolder(
         parent: ViewGroup,

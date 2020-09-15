@@ -22,11 +22,11 @@ interface RemoteDownloadService {
     ): DownloadTask
 
     @DELETE("/download/{id}")
-    suspend fun deleteDownloadTask(@Path("id") id: Int): DownloadTask
+    suspend fun deleteDownloadTask(@Path("id") id: String): DownloadTask
 
     @PATCH("/download/{id}/start")
-    suspend fun startDownloadTask(@Path("id") id: Int): DownloadTask
+    suspend fun startDownloadTask(@Path("id") id: String): DownloadTask
 
     @PATCH("/download/{id}/pause")
-    suspend fun pauseDownloadTask(@Path("id") id: Int): DownloadTask
+    suspend fun pauseDownloadTask(@Path("id") id: String): DownloadTask
 }

@@ -13,9 +13,9 @@ import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 class SubscriptionListAdapter(
     private val activity: Activity
 ) : BaseRecyclerViewAdapter<Subscription, SubscriptionListAdapter.ViewHolder>(mutableListOf()) {
-    var onDelete: (Int) -> Unit = {}
-    var onEnable: (Int) -> Unit = {}
-    var onDisable: (Int) -> Unit = {}
+    var onDelete: (String) -> Unit = {}
+    var onEnable: (String) -> Unit = {}
+    var onDisable: (String) -> Unit = {}
 
     override fun onCreateViewHolder(
         parent: ViewGroup,

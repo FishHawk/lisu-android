@@ -12,17 +12,17 @@ class DownloadViewModel(
 ) : RefreshableListViewModel<DownloadTask>() {
     override suspend fun loadResult() = repository.getAllDownloadTasks()
 
-    fun startDownloadTask(id: Int) = viewModelScope.launch {
+    fun startDownloadTask(id: String) = viewModelScope.launch {
         val result = repository.startDownloadTask(id)
         updateItem(id, result)
     }
 
-    fun pauseDownloadTask(id: Int) = viewModelScope.launch {
+    fun pauseDownloadTask(id: String) = viewModelScope.launch {
         val result = repository.pauseDownloadTask(id)
         updateItem(id, result)
     }
 
-    fun deleteDownloadTask(id: Int) = viewModelScope.launch {
+    fun deleteDownloadTask(id: String) = viewModelScope.launch {
         val result = repository.deleteDownloadTask(id)
         deleteItem(id, result)
     }
@@ -38,7 +38,7 @@ class DownloadViewModel(
     }
 
 
-    private fun deleteItem(id: Int, result: Result<DownloadTask>) {
+    private fun deleteItem(id: String, result: Result<DownloadTask>) {
         resultWarp(result) { _ ->
             (_list.value as? Result.Success)?.data?.let { taskList ->
                 val index = taskList.indexOfFirst { it.id == id }
@@ -48,7 +48,7 @@ class DownloadViewModel(
         _list.value = _list.value
     }
 
-    private fun updateItem(id: Int, result: Result<DownloadTask>) {
+    private fun updateItem(id: String, result: Result<DownloadTask>) {
         resultWarp(result) { task ->
             (_list.value as? Result.Success)?.data?.let { taskList ->
                 val index = taskList.indexOfFirst { it.id == id }

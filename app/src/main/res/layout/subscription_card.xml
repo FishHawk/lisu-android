@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="2"
-                    android:text="@{subscription.targetManga}"
+                    android:text="@{subscription.id}"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="Sample target manga" />

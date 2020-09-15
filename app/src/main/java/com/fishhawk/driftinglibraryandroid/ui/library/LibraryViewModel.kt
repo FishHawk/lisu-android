@@ -13,13 +13,13 @@ class LibraryViewModel(
     private var address = repository.url
     var filter: String = ""
 
-    override suspend fun loadResult() = repository.search(null, filter)
+    override suspend fun loadResult() = repository.search(Long.MAX_VALUE, filter)
     override suspend fun fetchMoreResult(): Result<List<MangaOutline>> {
         val lastTime = when (val result = _list.value) {
             is Result.Success -> result.data.lastOrNull()?.updateTime
             else -> null
         }
-        return repository.search(lastTime, filter)
+        return repository.search(lastTime ?: Long.MAX_VALUE, filter)
     }
 
     fun reload(filter: String) {

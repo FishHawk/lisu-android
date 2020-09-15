@@ -22,11 +22,11 @@ interface RemoteSubscriptionService {
     ): Subscription
 
     @DELETE("/subscription/{id}")
-    suspend fun deleteSubscription(@Path("id") id: Int): Subscription
+    suspend fun deleteSubscription(@Path("id") id: String): Subscription
 
     @PATCH("/subscription/{id}/enable")
-    suspend fun enableSubscription(@Path("id") id: Int): Subscription
+    suspend fun enableSubscription(@Path("id") id: String): Subscription
 
     @PATCH("/subscription/{id}/disable")
-    suspend fun disableSubscription(@Path("id") id: Int): Subscription
+    suspend fun disableSubscription(@Path("id") id: String): Subscription
 }

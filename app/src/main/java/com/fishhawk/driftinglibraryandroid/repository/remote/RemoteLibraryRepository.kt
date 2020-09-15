@@ -12,9 +12,13 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
         this.service = builder?.create(RemoteLibraryService::class.java)
     }
 
-    suspend fun search(lastTime: Long?, filter: String): Result<List<MangaOutline>> =
+    suspend fun search(
+        lastTime: Long,
+        filter: String,
+        limit: Int = 20
+    ): Result<List<MangaOutline>> =
         resultWrap {
-            it.search(lastTime, filter).apply {
+            it.search(lastTime, filter, limit).apply {
                 for (outline in this) {
                     outline.thumb = "${url}library/image/${outline.id}/${outline.thumb}"
                 }

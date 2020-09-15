@@ -12,17 +12,17 @@ class SubscriptionViewModel(
 ) : RefreshableListViewModel<Subscription>() {
     override suspend fun loadResult() = repository.getAllSubscriptions()
 
-    fun enableSubscription(id: Int) = viewModelScope.launch {
+    fun enableSubscription(id: String) = viewModelScope.launch {
         val result = repository.enableSubscription(id)
         updateItem(id, result)
     }
 
-    fun disableSubscription(id: Int) = viewModelScope.launch {
+    fun disableSubscription(id: String) = viewModelScope.launch {
         val result = repository.disableSubscription(id)
         updateItem(id, result)
     }
 
-    fun deleteSubscription(id: Int) = viewModelScope.launch {
+    fun deleteSubscription(id: String) = viewModelScope.launch {
         val result = repository.deleteSubscription(id)
         deleteItem(id, result)
     }
@@ -38,7 +38,7 @@ class SubscriptionViewModel(
     }
 
 
-    private fun deleteItem(id: Int, result: Result<Subscription>) {
+    private fun deleteItem(id: String, result: Result<Subscription>) {
         resultWarp(result) { _ ->
             (_list.value as? Result.Success)?.data?.let { taskList ->
                 val index = taskList.indexOfFirst { it.id == id }
@@ -48,7 +48,7 @@ class SubscriptionViewModel(
         _list.value = _list.value
     }
 
-    private fun updateItem(id: Int, result: Result<Subscription>) {
+    private fun updateItem(id: String, result: Result<Subscription>) {
         resultWarp(result) { subscription ->
             (_list.value as? Result.Success)?.data?.let { taskList ->
                 val index = taskList.indexOfFirst { it.id == id }
