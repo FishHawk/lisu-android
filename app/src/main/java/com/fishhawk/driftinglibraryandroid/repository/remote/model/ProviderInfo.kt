@@ -7,7 +7,6 @@ import kotlinx.android.parcel.Parcelize
 data class ProviderInfo(
     val id: String,
     val name: String,
-    val lang: String,
-    val isLatestSupport: Boolean
+    val lang: String
 ) : Parcelable
 

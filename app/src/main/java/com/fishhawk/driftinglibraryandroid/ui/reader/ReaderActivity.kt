@@ -18,7 +18,6 @@ import com.fishhawk.driftinglibraryandroid.extension.setupFullScreen
 import com.fishhawk.driftinglibraryandroid.extension.setupThemeWithTranslucentStatus
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.ui.ReaderViewModelFactory
 import com.fishhawk.driftinglibraryandroid.util.FileUtil
 import kotlinx.coroutines.runBlocking
 

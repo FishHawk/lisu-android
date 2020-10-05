@@ -8,7 +8,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
-import com.fishhawk.driftinglibraryandroid.ui.MainActivity
+import com.fishhawk.driftinglibraryandroid.ui.main.MainActivity
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.ListEmptyNotification
@@ -16,6 +16,7 @@ import com.fishhawk.driftinglibraryandroid.ui.base.ListReachEndNotification
 import com.fishhawk.driftinglibraryandroid.ui.base.NetworkErrorNotification
 import com.fishhawk.driftinglibraryandroid.ui.base.Notification
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryActivity
+import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActivity
 import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActivity
 import java.lang.reflect.Method
 
@@ -54,6 +55,13 @@ fun Activity.navToReaderActivity(
     )
 
     val intent = Intent(this, ReaderActivity::class.java)
+    intent.putExtras(bundle)
+    startActivity(intent)
+}
+
+fun Activity.navToProviderActivity(providerId: String) {
+    val bundle = bundleOf("providerId" to providerId)
+    val intent = Intent(this, ProviderActivity::class.java)
     intent.putExtras(bundle)
     startActivity(intent)
 }
@@ -113,7 +121,7 @@ fun AppCompatActivity.setupTheme() {
 
     when (SettingsHelper.theme.getValueDirectly()) {
         SettingsHelper.Theme.LIGHT -> setTheme(lightThemeId)
-        SettingsHelper.Theme.DARK-> setTheme(darkThemeId)
+        SettingsHelper.Theme.DARK -> setTheme(darkThemeId)
     }
 
     SettingsHelper.theme.observe(this, Observer {

@@ -4,29 +4,29 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.model.Subscription
 import retrofit2.http.*
 
 interface RemoteSubscriptionService {
-    @GET("/subscriptions")
+    @GET("/subscription/list")
     suspend fun getAllSubscriptions(): List<Subscription>
 
-    @PATCH("/subscriptions/enable")
+    @PATCH("/subscription/list/enable")
     suspend fun enableAllSubscriptions(): List<Subscription>
 
-    @PATCH("/subscriptions/disable")
+    @PATCH("/subscription/list/disable")
     suspend fun disableAllSubscriptions(): List<Subscription>
 
     @FormUrlEncoded
-    @POST("/subscription")
+    @POST("/subscription/item")
     suspend fun postSubscription(
         @Field("providerId") providerId: String,
         @Field("sourceManga") sourceManga: String,
         @Field("targetManga") targetManga: String
     ): Subscription
 
-    @DELETE("/subscription/{id}")
+    @DELETE("/subscription/item/{id}")
     suspend fun deleteSubscription(@Path("id") id: String): Subscription
 
-    @PATCH("/subscription/{id}/enable")
+    @PATCH("/subscription/item/{id}/enable")
     suspend fun enableSubscription(@Path("id") id: String): Subscription
 
-    @PATCH("/subscription/{id}/disable")
+    @PATCH("/subscription/item/{id}/disable")
     suspend fun disableSubscription(@Path("id") id: String): Subscription
 }

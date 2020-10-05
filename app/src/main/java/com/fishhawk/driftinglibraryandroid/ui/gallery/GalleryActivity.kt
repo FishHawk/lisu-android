@@ -17,14 +17,13 @@ import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.TagGroup
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.ui.ViewModelFactory
 import com.google.android.flexbox.FlexboxLayout
 import kotlinx.android.synthetic.main.gallery_activity.view.*
 
 class GalleryActivity : AppCompatActivity() {
     private val viewModel: GalleryViewModel by viewModels {
         val application = applicationContext as MainApplication
-        ViewModelFactory(application)
+        GalleryViewModelFactory(application)
     }
     private lateinit var binding: GalleryActivityBinding
 

@@ -1,40 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/Theme.Widget.CardView"
-    android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:layout_margin="@dimen/baseline_8dp">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="providerInfo"
+            type="com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        style="@style/Theme.Widget.CardView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/baseline_8dp"
-        android:orientation="horizontal">
+        android:layout_height="50dp"
+        android:layout_margin="@dimen/baseline_8dp">
 
-        <TextView
-            android:id="@+id/name"
-            style="@style/Theme.TextAppearance.LinearThumbnailTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:ellipsize="end"
-            android:maxLines="1" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/baseline_8dp"
+            android:orientation="horizontal">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/latest"
-            style="@style/Theme.Widget.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/explore_card_latest" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/popular"
-            style="@style/Theme.Widget.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/explore_card_popular" />
-    </LinearLayout>
-</androidx.cardview.widget.CardView>
+            <TextView
+                android:id="@+id/name"
+                style="@style/Theme.TextAppearance.LinearThumbnailTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="@{providerInfo.name}" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

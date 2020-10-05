@@ -4,6 +4,7 @@ import retrofit2.Retrofit
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.repository.remote.service.RemoteProviderService
 import java.net.URLEncoder
@@ -17,6 +18,9 @@ class RemoteProviderRepository : BaseRemoteRepository<RemoteProviderService>() {
     suspend fun getProvidersInfo(): Result<List<ProviderInfo>> =
         resultWrap { it.getProviders() }
 
+    suspend fun getProvidersDetail(providerId: String): Result<ProviderDetail> =
+        resultWrap { it.getProviderDetail(providerId) }
+
     suspend fun search(
         providerId: String,
         keywords: String,
@@ -27,15 +31,33 @@ class RemoteProviderRepository : BaseRemoteRepository<RemoteProviderService>() {
                 .map { outline -> processMangaOutline(providerId, outline) }
         }
 
-    suspend fun getPopularMangaList(providerId: String, page: Int): Result<List<MangaOutline>> =
+    suspend fun getPopularMangaList(
+        providerId: String,
+        page: Int,
+        option: Map<String, Int>
+    ): Result<List<MangaOutline>> =
         resultWrap {
-            it.getPopular(providerId, page)
+            it.getPopular(providerId, page, option)
                 .map { outline -> processMangaOutline(providerId, outline) }
         }
 
-    suspend fun getLatestMangaList(providerId: String, page: Int): Result<List<MangaOutline>> =
+    suspend fun getLatestMangaList(
+        providerId: String,
+        page: Int,
+        option: Map<String, Int>
+    ): Result<List<MangaOutline>> =
         resultWrap {
-            it.getLatest(providerId, page)
+            it.getLatest(providerId, page, option)
+                .map { outline -> processMangaOutline(providerId, outline) }
+        }
+
+    suspend fun getCategoryMangaList(
+        providerId: String,
+        page: Int,
+        option: Map<String, Int>
+    ): Result<List<MangaOutline>> =
+        resultWrap {
+            it.getCategory(providerId, page, option)
                 .map { outline -> processMangaOutline(providerId, outline) }
         }
 
@@ -59,7 +81,6 @@ class RemoteProviderRepository : BaseRemoteRepository<RemoteProviderService>() {
 
     private fun processImageUrl(providerId: String, imageUrl: String): String {
         val encoded = URLEncoder.encode(imageUrl, "UTF-8")
-        return "${url}provider/${providerId}/image/${encoded}"
+        return "${url}provider/item/${providerId}/image/${encoded}"
     }
-
 }
