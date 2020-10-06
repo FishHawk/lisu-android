@@ -26,7 +26,7 @@ class OptionGroupListAdapter(
 
         override fun bind(item: Pair<String, List<String>>, position: Int) {
             val adapter = OptionGroupAdapter(activity)
-            adapter.changeList(item.second.toMutableList())
+            adapter.setList(item.second.toMutableList())
             adapter.onOptionSelected = { onOptionSelected(item.first, it) }
             adapter.selectOption(0)
             binding.options.adapter = adapter

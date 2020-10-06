@@ -8,8 +8,8 @@ import androidx.navigation.NavController
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityMainBinding
-import com.fishhawk.driftinglibraryandroid.extension.setupTheme
-import com.fishhawk.driftinglibraryandroid.extension.setupWithNavControllerT
+import com.fishhawk.driftinglibraryandroid.ui.extension.setupTheme
+import com.fishhawk.driftinglibraryandroid.ui.extension.setupWithNavControllerT
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 
 class MainActivity : AppCompatActivity() {

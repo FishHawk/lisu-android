@@ -9,9 +9,9 @@ import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderPopularFragmentBinding
-import com.fishhawk.driftinglibraryandroid.extension.bindToListViewModel
-import com.fishhawk.driftinglibraryandroid.extension.changeMangaListDisplayMode
-import com.fishhawk.driftinglibraryandroid.extension.getDisplayModeIcon
+import com.fishhawk.driftinglibraryandroid.ui.extension.bindToListViewModel
+import com.fishhawk.driftinglibraryandroid.ui.extension.changeMangaListDisplayMode
+import com.fishhawk.driftinglibraryandroid.ui.extension.getDisplayModeIcon
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderViewModelFactory
@@ -74,7 +74,7 @@ class PopularFragment : Fragment() {
         providerViewModel.detail.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Result.Success -> {
-                    optionGroupListAdapter.changeList(
+                    optionGroupListAdapter.setList(
                         it.data.optionModels.popular.toList().toMutableList()
                     )
                     it.data.optionModels.popular.forEach { (key, _value) ->

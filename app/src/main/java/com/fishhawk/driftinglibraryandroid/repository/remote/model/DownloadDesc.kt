@@ -4,7 +4,7 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
-enum class DownloadTaskStatus(val value: String) {
+enum class DownloadStatus(val value: String) {
     @SerializedName("waiting")
     WAITING("waiting"),
 
@@ -19,10 +19,9 @@ enum class DownloadTaskStatus(val value: String) {
 }
 
 @Parcelize
-data class DownloadTask(
+data class DownloadDesc(
     val id: String,
     val providerId: String,
     val sourceManga: String,
-    val status: DownloadTaskStatus,
-    val isCreatedBySubscription: Boolean
+    val status: DownloadStatus
 ) : Parcelable

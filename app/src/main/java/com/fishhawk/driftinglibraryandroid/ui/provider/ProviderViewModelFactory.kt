@@ -20,6 +20,7 @@ class ProviderViewModelFactory(
                     providerId,
                     application.remoteProviderRepository
                 )
+
             isAssignableFrom(PopularViewModel::class.java) ->
                 PopularViewModel(
                     providerId,
@@ -27,6 +28,7 @@ class ProviderViewModelFactory(
                     application.remoteDownloadRepository,
                     application.remoteSubscriptionRepository
                 )
+
             isAssignableFrom(LatestViewModel::class.java) ->
                 LatestViewModel(
                     providerId,
@@ -34,6 +36,7 @@ class ProviderViewModelFactory(
                     application.remoteDownloadRepository,
                     application.remoteSubscriptionRepository
                 )
+
             isAssignableFrom(CategoryViewModel::class.java) ->
                 CategoryViewModel(
                     providerId,
@@ -41,6 +44,7 @@ class ProviderViewModelFactory(
                     application.remoteDownloadRepository,
                     application.remoteSubscriptionRepository
                 )
+
             isAssignableFrom(SearchViewModel::class.java) ->
                 SearchViewModel(
                     providerId,
@@ -48,6 +52,7 @@ class ProviderViewModelFactory(
                     application.remoteDownloadRepository,
                     application.remoteSubscriptionRepository
                 )
+
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

@@ -14,12 +14,10 @@ import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 
 class ServerFragment : Fragment() {
-    private val viewModel: ServerViewModel by viewModels {
-        MainViewModelFactory(
-            requireActivity().application as MainApplication
-        )
-    }
     private lateinit var binding: ServerFragmentBinding
+    private val viewModel: ServerViewModel by viewModels {
+        MainViewModelFactory(requireActivity().application as MainApplication)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,15 +37,15 @@ class ServerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = ServerInfoListAdapter(requireActivity())
-        adapter.onEdit = {
+        adapter.onEdited = {
             createServerInfoDialog(it) { name, address ->
                 it.name = name
                 it.address = address
                 viewModel.updateServer(it)
             }
         }
-        adapter.onDelete = { viewModel.deleteServer(it) }
-        adapter.onCardClicked = { SettingsHelper.selectedServer.setValue(it.id) }
+        adapter.onDeleted = { viewModel.deleteServer(it) }
+        adapter.onItemClicked = { SettingsHelper.selectedServer.setValue(it.id) }
         binding.list.adapter = adapter
 
         SettingsHelper.selectedServer.observe(viewLifecycleOwner, Observer { id ->
@@ -56,19 +54,14 @@ class ServerFragment : Fragment() {
 
         viewModel.serverInfoList.observe(viewLifecycleOwner, Observer { data ->
             if (data.size == 1) SettingsHelper.selectedServer.setValue(data.first().id)
-            adapter.changeList(data.toMutableList())
+            adapter.setList(data.toMutableList())
             if (data.isEmpty()) binding.multipleStatusView.showEmpty()
             else binding.multipleStatusView.showContent()
         })
 
         binding.addButton.setOnClickListener {
             createServerInfoDialog { name, address ->
-                viewModel.addServer(
-                    ServerInfo(
-                        name,
-                        address
-                    )
-                )
+                viewModel.addServer(ServerInfo(name, address))
             }
         }
     }

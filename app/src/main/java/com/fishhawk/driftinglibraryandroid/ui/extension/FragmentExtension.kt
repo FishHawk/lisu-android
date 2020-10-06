@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.extension
+package com.fishhawk.driftinglibraryandroid.ui.extension
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -34,7 +34,7 @@ fun <T> Fragment.bindToListViewModel(
     viewModel.list.observe(viewLifecycleOwner, Observer { result ->
         when (result) {
             is Result.Success -> {
-                adapter.changeList(result.data)
+                adapter.setList(result.data)
                 if (result.data.isEmpty()) multipleStatusView.showEmpty()
                 else multipleStatusView.showContent()
             }
@@ -49,16 +49,14 @@ fun <T> Fragment.bindToListViewModel(
         })
 
     if (viewModel is RefreshableListViewModelWithFetchMore) {
-        viewModel.fetchMoreFinish.observe(viewLifecycleOwner,
-            EventObserver {
-                refreshLayout.isFooterRefreshing = false
-            })
+        viewModel.fetchMoreFinish.observe(viewLifecycleOwner, EventObserver {
+            refreshLayout.isFooterRefreshing = false
+        })
     }
 
-    viewModel.notification.observe(viewLifecycleOwner,
-        EventObserver { notification ->
-            showErrorMessage(notification)
-        })
+    viewModel.notification.observe(viewLifecycleOwner, EventObserver { notification ->
+        showErrorMessage(notification)
+    })
 
     refreshLayout.bindingToViewModel(viewModel)
 }

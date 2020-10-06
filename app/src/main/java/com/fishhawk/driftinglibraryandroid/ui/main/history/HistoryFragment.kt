@@ -8,17 +8,15 @@ import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
-import com.fishhawk.driftinglibraryandroid.extension.navToGalleryActivity
-import com.fishhawk.driftinglibraryandroid.extension.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.extension.navToGalleryActivity
+import com.fishhawk.driftinglibraryandroid.ui.extension.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 
 class HistoryFragment : Fragment() {
-    val viewModel: HistoryViewModel by viewModels {
-        MainViewModelFactory(
-            requireActivity().application as MainApplication
-        )
-    }
     private lateinit var binding: HistoryFragmentBinding
+    val viewModel: HistoryViewModel by viewModels {
+        MainViewModelFactory(requireActivity().application as MainApplication)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,9 +48,9 @@ class HistoryFragment : Fragment() {
         }
         binding.list.adapter = adapter
 
-        viewModel.filteredReadingHistoryList.observe(viewLifecycleOwner, Observer { data ->
-            adapter.changeList(data.toMutableList())
-            if (data.isEmpty()) binding.multipleStatusView.showEmpty()
+        viewModel.filteredReadingHistoryList.observe(viewLifecycleOwner, Observer {
+            adapter.setList(it)
+            if (it.isEmpty()) binding.multipleStatusView.showEmpty()
             else binding.multipleStatusView.showContent()
         })
     }

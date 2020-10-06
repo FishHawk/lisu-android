@@ -21,7 +21,7 @@ import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 class ImageListAdapter(
     private val context: Context
-) : BaseRecyclerViewAdapter<String, ImageListAdapter.ViewHolder>(mutableListOf()) {
+) : BaseRecyclerViewAdapter<String, ImageListAdapter.ViewHolder>() {
     var onPageLongClicked: ((Int, String) -> Unit)? = null
     var isContinuous = false
 

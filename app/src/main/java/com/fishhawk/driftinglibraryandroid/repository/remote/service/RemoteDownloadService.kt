@@ -1,17 +1,17 @@
 package com.fishhawk.driftinglibraryandroid.repository.remote.service
 
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadTask
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadDesc
 import retrofit2.http.*
 
 interface RemoteDownloadService {
     @GET("/download/list")
-    suspend fun getAllDownloadTasks(): List<DownloadTask>
+    suspend fun getAllDownloadTasks(): List<DownloadDesc>
 
     @PATCH("/download/list/start")
-    suspend fun startAllDownloadTasks(): List<DownloadTask>
+    suspend fun startAllDownloadTasks(): List<DownloadDesc>
 
     @PATCH("/download/list/pause")
-    suspend fun pauseAllDownloadTasks(): List<DownloadTask>
+    suspend fun pauseAllDownloadTasks(): List<DownloadDesc>
 
     @FormUrlEncoded
     @POST("/download/item")
@@ -19,14 +19,14 @@ interface RemoteDownloadService {
         @Field("providerId") providerId: String,
         @Field("sourceManga") sourceManga: String,
         @Field("targetManga") targetManga: String
-    ): DownloadTask
+    ): DownloadDesc
 
     @DELETE("/download/item/{id}")
-    suspend fun deleteDownloadTask(@Path("id") id: String): DownloadTask
+    suspend fun deleteDownloadTask(@Path("id") id: String): DownloadDesc
 
     @PATCH("/download/item/{id}/start")
-    suspend fun startDownloadTask(@Path("id") id: String): DownloadTask
+    suspend fun startDownloadTask(@Path("id") id: String): DownloadDesc
 
     @PATCH("/download/item/{id}/pause")
-    suspend fun pauseDownloadTask(@Path("id") id: String): DownloadTask
+    suspend fun pauseDownloadTask(@Path("id") id: String): DownloadDesc
 }

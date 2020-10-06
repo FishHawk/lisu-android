@@ -12,7 +12,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryActivityBinding
-import com.fishhawk.driftinglibraryandroid.extension.*
+import com.fishhawk.driftinglibraryandroid.ui.extension.*
 import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.TagGroup

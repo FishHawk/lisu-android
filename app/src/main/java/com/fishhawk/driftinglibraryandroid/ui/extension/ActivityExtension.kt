@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.extension
+package com.fishhawk.driftinglibraryandroid.ui.extension
 
 import android.app.Activity
 import android.content.Context
@@ -10,6 +10,8 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.ui.main.MainActivity
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.ListEmptyNotification
 import com.fishhawk.driftinglibraryandroid.ui.base.ListReachEndNotification
@@ -22,9 +24,21 @@ import java.lang.reflect.Method
 
 
 fun Activity.navToGalleryActivity(
+    outline: MangaOutline,
+    providerId: String?
+) {
+    navToGalleryActivity(
+        outline.id,
+        (outline.metadata.title ?: outline.id),
+        outline.thumb,
+        providerId
+    )
+}
+
+fun Activity.navToGalleryActivity(
     id: String,
     title: String,
-    thumb: String,
+    thumb: String?,
     providerId: String?
 ) {
     val bundle = bundleOf(
@@ -59,8 +73,8 @@ fun Activity.navToReaderActivity(
     startActivity(intent)
 }
 
-fun Activity.navToProviderActivity(providerId: String) {
-    val bundle = bundleOf("providerId" to providerId)
+fun Activity.navToProviderActivity(provider: ProviderInfo) {
+    val bundle = bundleOf("providerId" to provider.id)
     val intent = Intent(this, ProviderActivity::class.java)
     intent.putExtras(bundle)
     startActivity(intent)

@@ -7,16 +7,14 @@ import androidx.fragment.app.viewModels
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.SubscriptionFragmentBinding
-import com.fishhawk.driftinglibraryandroid.extension.bindToListViewModel
+import com.fishhawk.driftinglibraryandroid.ui.extension.bindToListViewModel
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 
 class SubscriptionFragment : Fragment() {
-    private val viewModel: SubscriptionViewModel by viewModels {
-        MainViewModelFactory(
-            requireActivity().application as MainApplication
-        )
-    }
     private lateinit var binding: SubscriptionFragmentBinding
+    private val viewModel: SubscriptionViewModel by viewModels {
+        MainViewModelFactory(requireActivity().application as MainApplication)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,10 +33,10 @@ class SubscriptionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = SubscriptionListAdapter(requireActivity())
-        adapter.onEnable = { id -> viewModel.enableSubscription(id) }
-        adapter.onDisable = { id -> viewModel.disableSubscription(id) }
-        adapter.onDelete = { id -> viewModel.deleteSubscription(id) }
+        val adapter = SubscriptionListAdapter(requireContext())
+        adapter.onEnabled = { id -> viewModel.enableSubscription(id) }
+        adapter.onDisabled = { id -> viewModel.disableSubscription(id) }
+        adapter.onDeleted = { id -> viewModel.deleteSubscription(id) }
         binding.list.adapter = adapter
 
         bindToListViewModel(binding.multipleStatusView, binding.refreshLayout, viewModel, adapter)

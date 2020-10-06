@@ -81,7 +81,7 @@ class ReaderView @JvmOverloads constructor(
     }
 
     fun setContent(content: List<String>) {
-        adapter.changeList(content.toMutableList())
+        adapter.setList(content)
     }
 
     private fun canScrollForward(): Boolean {

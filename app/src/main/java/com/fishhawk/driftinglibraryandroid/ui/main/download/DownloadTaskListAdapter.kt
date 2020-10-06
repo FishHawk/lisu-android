@@ -1,35 +1,31 @@
 package com.fishhawk.driftinglibraryandroid.ui.main.download
 
-import android.app.Activity
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.fishhawk.driftinglibraryandroid.databinding.DownloadTaskCardBinding
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadTask
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadTaskStatus
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadDesc
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadStatus
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 class DownloadTaskListAdapter(
-    private val activity: Activity
-) : BaseRecyclerViewAdapter<DownloadTask, DownloadTaskListAdapter.ViewHolder>(mutableListOf()) {
-    var onDelete: (String) -> Unit = {}
-    var onStart: (String) -> Unit = {}
-    var onPause: (String) -> Unit = {}
+    private val context: Context
+) : BaseRecyclerViewAdapter<DownloadDesc, DownloadTaskListAdapter.ViewHolder>() {
+    var onDeleted: ((String) -> Unit)? = null
+    var onStarted: ((String) -> Unit)? = null
+    var onPaused: ((String) -> Unit)? = null
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             DownloadTaskCardBinding.inflate(
-                LayoutInflater.from(activity),
-                parent, false
+                LayoutInflater.from(context), parent, false
             )
         )
     }
 
     inner class ViewHolder(private val binding: DownloadTaskCardBinding) :
-        BaseRecyclerViewAdapter.ViewHolder<DownloadTask>(binding) {
+        BaseRecyclerViewAdapter.ViewHolder<DownloadDesc>(binding) {
 
         private fun hideActions() {
             binding.actionPanel.visibility = View.INVISIBLE
@@ -41,32 +37,32 @@ class DownloadTaskListAdapter(
             binding.actionPanel.visibility = View.VISIBLE
         }
 
-        override fun bind(item: DownloadTask, position: Int) {
+        override fun bind(item: DownloadDesc, position: Int) {
             binding.downloadTask = item
             showActions()
 
             binding.status.text = item.status.value
             when (item.status) {
-                DownloadTaskStatus.PAUSED, DownloadTaskStatus.ERROR -> {
+                DownloadStatus.PAUSED, DownloadStatus.ERROR -> {
                     binding.pauseButton.visibility = View.GONE
                     binding.startButton.visibility = View.VISIBLE
                 }
-                DownloadTaskStatus.WAITING, DownloadTaskStatus.DOWNLOADING -> {
+                DownloadStatus.WAITING, DownloadStatus.DOWNLOADING -> {
                     binding.startButton.visibility = View.GONE
                     binding.pauseButton.visibility = View.VISIBLE
                 }
             }
 
             binding.startButton.setOnClickListener {
-                onStart(item.id)
+                onStarted?.invoke(item.id)
                 hideActions()
             }
             binding.pauseButton.setOnClickListener {
-                onPause(item.id)
+                onPaused?.invoke(item.id)
                 hideActions()
             }
             binding.deleteButton.setOnClickListener {
-                onDelete(item.id)
+                onDeleted?.invoke(item.id)
                 hideActions()
             }
         }

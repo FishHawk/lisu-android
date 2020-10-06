@@ -7,16 +7,14 @@ import androidx.fragment.app.viewModels
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.DownloadFragmentBinding
-import com.fishhawk.driftinglibraryandroid.extension.bindToListViewModel
+import com.fishhawk.driftinglibraryandroid.ui.extension.bindToListViewModel
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 
 class DownloadFragment : Fragment() {
-    private val viewModel: DownloadViewModel by viewModels {
-        MainViewModelFactory(
-            requireActivity().application as MainApplication
-        )
-    }
     private lateinit var binding: DownloadFragmentBinding
+    private val viewModel: DownloadViewModel by viewModels {
+        MainViewModelFactory(requireActivity().application as MainApplication)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,13 +33,10 @@ class DownloadFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter =
-            DownloadTaskListAdapter(
-                requireActivity()
-            )
-        adapter.onStart = { id -> viewModel.startDownloadTask(id) }
-        adapter.onPause = { id -> viewModel.pauseDownloadTask(id) }
-        adapter.onDelete = { id -> viewModel.deleteDownloadTask(id) }
+        val adapter = DownloadTaskListAdapter(requireContext())
+        adapter.onStarted = { id -> viewModel.startDownloadTask(id) }
+        adapter.onPaused = { id -> viewModel.pauseDownloadTask(id) }
+        adapter.onDeleted = { id -> viewModel.deleteDownloadTask(id) }
         binding.list.adapter = adapter
 
         bindToListViewModel(binding.multipleStatusView, binding.refreshLayout, viewModel, adapter)

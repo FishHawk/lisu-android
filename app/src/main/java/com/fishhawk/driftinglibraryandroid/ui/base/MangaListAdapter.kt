@@ -4,14 +4,13 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import java.text.SimpleDateFormat
 import java.util.*
 import com.fishhawk.driftinglibraryandroid.databinding.MangaGridThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.databinding.MangaLinearThumbnailBinding
-import com.fishhawk.driftinglibraryandroid.extension.navToGalleryActivity
+import com.fishhawk.driftinglibraryandroid.ui.extension.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 
 class MangaListAdapter(
@@ -60,9 +59,7 @@ class MangaListAdapter(
                 .into(binding.thumb)
 
             binding.root.setOnClickListener {
-                (activity as AppCompatActivity).navToGalleryActivity(
-                    item.id, item.title, item.thumb ?: "", providerId
-                )
+                activity.navToGalleryActivity(item, providerId)
             }
             binding.root.setOnLongClickListener {
                 onCardLongClicked(item)
@@ -90,9 +87,7 @@ class MangaListAdapter(
                 .into(binding.thumb)
 
             binding.root.setOnClickListener {
-                (activity as AppCompatActivity).navToGalleryActivity(
-                    item.id, item.title, item.thumb ?: "", providerId
-                )
+                activity.navToGalleryActivity(item, providerId)
             }
             binding.root.setOnLongClickListener {
                 onCardLongClicked(item)

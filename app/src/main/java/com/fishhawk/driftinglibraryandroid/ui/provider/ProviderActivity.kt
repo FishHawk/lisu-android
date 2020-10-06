@@ -6,11 +6,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderActivityBinding
-import com.fishhawk.driftinglibraryandroid.extension.setupTheme
-import com.fishhawk.driftinglibraryandroid.extension.setupWithNavControllerT
+import com.fishhawk.driftinglibraryandroid.ui.extension.setupTheme
+import com.fishhawk.driftinglibraryandroid.ui.extension.setupWithNavControllerT
 
 class ProviderActivity : AppCompatActivity() {
-    private val viewModel: ProviderViewModel by viewModels {
+    val viewModel: ProviderViewModel by viewModels {
         val providerId = intent.extras!!.getString("providerId")!!
         ProviderViewModelFactory(providerId, application as MainApplication)
     }

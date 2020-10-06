@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="searchResultGroup"
-            type="com.fishhawk.driftinglibraryandroid.ui.main.globalsearch.SearchResultGroup" />
+            name="searchGroup"
+            type="com.fishhawk.driftinglibraryandroid.ui.main.globalsearch.SearchGroup" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -25,21 +25,18 @@
             <TextView
                 android:id="@+id/provider"
                 style="@style/Theme.TextAppearance.Title"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
-                android:text="@{searchResultGroup.providerId}"
+                android:text="@{searchGroup.provider.lang + ` - ` + searchGroup.provider.name}"
                 tools:text="Provider" />
 
-            <FrameLayout
+            <com.classic.common.MultipleStatusView
+                android:id="@+id/multiple_status_view"
                 android:layout_width="match_parent"
-                android:layout_height="140dp">
-
-                <ProgressBar
-                    android:id="@+id/progress_bar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center" />
+                android:layout_height="140dp"
+                app:errorView="@layout/status_error"
+                app:loadingView="@layout/status_loading">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/list"
@@ -48,7 +45,26 @@
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:listitem="@layout/global_search_thumbnail" />
-            </FrameLayout>
+            </com.classic.common.MultipleStatusView>
+
+            <!--            <FrameLayout-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="140dp">-->
+
+            <!--                <ProgressBar-->
+            <!--                    android:id="@+id/progress_bar"-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:layout_gravity="center" />-->
+
+            <!--                <androidx.recyclerview.widget.RecyclerView-->
+            <!--                    android:id="@+id/list"-->
+            <!--                    android:layout_width="match_parent"-->
+            <!--                    android:layout_height="match_parent"-->
+            <!--                    android:orientation="horizontal"-->
+            <!--                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"-->
+            <!--                    tools:listitem="@layout/global_search_thumbnail" />-->
+            <!--            </FrameLayout>-->
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </layout>

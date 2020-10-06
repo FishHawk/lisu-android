@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.extension
+package com.fishhawk.driftinglibraryandroid.ui.extension
 
 import android.content.Intent
 import android.util.SparseArray

@@ -99,6 +99,6 @@ class ContentView @JvmOverloads constructor(
             }
             items.addAll(itemsInCollection)
         }
-        adapter!!.changeList(items)
+        adapter!!.setList(items)
     }
 }

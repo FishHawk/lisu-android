@@ -14,5 +14,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/explore_source_card" />
+        tools:listitem="@layout/explore_provider_card" />
 </com.classic.common.MultipleStatusView>

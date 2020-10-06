@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.fishhawk.driftinglibraryandroid.databinding.*
-import com.fishhawk.driftinglibraryandroid.extension.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.extension.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 data class MarkedPosition(

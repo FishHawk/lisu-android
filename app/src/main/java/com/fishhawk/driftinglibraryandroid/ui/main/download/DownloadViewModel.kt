@@ -4,12 +4,12 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadTask
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadDesc
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModel
 
 class DownloadViewModel(
     private val repository: RemoteDownloadRepository
-) : RefreshableListViewModel<DownloadTask>() {
+) : RefreshableListViewModel<DownloadDesc>() {
     override suspend fun loadResult() = repository.getAllDownloadTasks()
 
     fun startDownloadTask(id: String) = viewModelScope.launch {
@@ -38,7 +38,7 @@ class DownloadViewModel(
     }
 
 
-    private fun deleteItem(id: String, result: Result<DownloadTask>) {
+    private fun deleteItem(id: String, result: Result<DownloadDesc>) {
         resultWarp(result) { _ ->
             (_list.value as? Result.Success)?.data?.let { taskList ->
                 val index = taskList.indexOfFirst { it.id == id }
@@ -48,7 +48,7 @@ class DownloadViewModel(
         _list.value = _list.value
     }
 
-    private fun updateItem(id: String, result: Result<DownloadTask>) {
+    private fun updateItem(id: String, result: Result<DownloadDesc>) {
         resultWarp(result) { task ->
             (_list.value as? Result.Success)?.data?.let { taskList ->
                 val index = taskList.indexOfFirst { it.id == id }
@@ -58,7 +58,7 @@ class DownloadViewModel(
         _list.value = _list.value
     }
 
-    private fun updateList(result: Result<List<DownloadTask>>) {
+    private fun updateList(result: Result<List<DownloadDesc>>) {
         when (result) {
             is Result.Success -> _list.value = Result.Success(result.data.toMutableList())
             is Result.Error -> _list.value = result

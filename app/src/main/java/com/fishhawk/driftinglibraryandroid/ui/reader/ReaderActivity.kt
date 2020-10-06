@@ -13,9 +13,9 @@ import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderActivityBinding
-import com.fishhawk.driftinglibraryandroid.extension.makeToast
-import com.fishhawk.driftinglibraryandroid.extension.setupFullScreen
-import com.fishhawk.driftinglibraryandroid.extension.setupThemeWithTranslucentStatus
+import com.fishhawk.driftinglibraryandroid.ui.extension.makeToast
+import com.fishhawk.driftinglibraryandroid.ui.extension.setupFullScreen
+import com.fishhawk.driftinglibraryandroid.ui.extension.setupThemeWithTranslucentStatus
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.util.FileUtil

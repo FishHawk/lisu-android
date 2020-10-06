@@ -1,7 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.main.history
 
 import android.annotation.SuppressLint
-import android.app.Activity
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
@@ -14,20 +14,23 @@ import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 class HistoryListAdapter(
-    private val activity: Activity
-) : BaseRecyclerViewAdapter<ReadingHistory, HistoryListAdapter.ViewHolder>(mutableListOf()) {
-    var onThumbClicked: (ReadingHistory) -> Unit = {}
-    var onCardClicked: (ReadingHistory) -> Unit = {}
+    private val context: Context
+) : BaseRecyclerViewAdapter<ReadingHistory, HistoryListAdapter.ViewHolder>() {
+    var onThumbClicked: ((ReadingHistory) -> Unit)? = null
+    var onCardClicked: ((ReadingHistory) -> Unit)? = null
+
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            HistoryThumbnailBinding.inflate(LayoutInflater.from(activity), parent, false)
+            HistoryThumbnailBinding.inflate(
+                LayoutInflater.from(context), parent, false
+            )
         )
     }
 
     inner class ViewHolder(private val binding: HistoryThumbnailBinding) :
         BaseRecyclerViewAdapter.ViewHolder<ReadingHistory>(binding) {
-        private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
         @SuppressLint("SetTextI18n")
         override fun bind(item: ReadingHistory, position: Int) {
@@ -40,13 +43,13 @@ class HistoryListAdapter(
             binding.seen.text = seenHint
             binding.date.text = dateFormat.format(Date(item.date))
 
-            Glide.with(activity).load(item.thumb)
+            Glide.with(context).load(item.thumb)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .override(300, 400)
                 .apply(RequestOptions().dontTransform())
                 .into(binding.thumb)
-            binding.thumb.setOnClickListener { onThumbClicked(item) }
-            binding.root.setOnClickListener { onCardClicked(item) }
+            binding.thumb.setOnClickListener { onThumbClicked?.invoke(item) }
+            binding.root.setOnClickListener { onCardClicked?.invoke(item) }
         }
     }
 }

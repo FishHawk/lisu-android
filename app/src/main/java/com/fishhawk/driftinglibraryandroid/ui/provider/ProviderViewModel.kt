@@ -10,7 +10,7 @@ class ProviderViewModel(
     private val providerId: String,
     private val remoteProviderRepository: RemoteProviderRepository
 ) : NotificationViewModel() {
-    val detail: LiveData<Result<ProviderDetail>> = liveData<Result<ProviderDetail>> {
+    val detail: LiveData<Result<ProviderDetail>> = liveData {
         emit(Result.Loading)
         emit(remoteProviderRepository.getProvidersDetail(providerId))
     }
