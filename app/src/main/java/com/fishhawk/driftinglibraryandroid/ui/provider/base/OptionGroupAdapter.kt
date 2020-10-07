@@ -10,7 +10,7 @@ import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 class OptionGroupAdapter(
     private val activity: Activity
-) : BaseRecyclerViewAdapter<String, OptionGroupAdapter.ViewHolder>(mutableListOf()) {
+) : BaseRecyclerViewAdapter<String, OptionGroupAdapter.ViewHolder>() {
     var onOptionSelected: (Int) -> Unit = {}
     var selectedOptionIndex: Int = 0
 

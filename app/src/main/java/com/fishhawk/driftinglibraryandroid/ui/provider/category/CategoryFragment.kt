@@ -18,6 +18,7 @@ import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderViewModel
 import com.fishhawk.driftinglibraryandroid.ui.provider.base.OptionGroupListAdapter
+import com.fishhawk.driftinglibraryandroid.ui.provider.base.ProviderOptionSheet
 import com.fishhawk.driftinglibraryandroid.ui.provider.createMangaOutlineActionDialog
 
 class CategoryFragment : Fragment() {
@@ -30,6 +31,7 @@ class CategoryFragment : Fragment() {
         ProviderViewModelFactory(providerId, requireActivity().application as MainApplication)
     }
     private lateinit var binding: ProviderCategoryFragmentBinding
+    private lateinit var optionSheet: ProviderOptionSheet
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +44,7 @@ class CategoryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = ProviderCategoryFragmentBinding.inflate(inflater, container, false)
+        optionSheet = ProviderOptionSheet(requireContext())
         return binding.root
     }
 
@@ -58,8 +61,9 @@ class CategoryFragment : Fragment() {
         val optionGroupListAdapter = OptionGroupListAdapter(requireActivity())
         optionGroupListAdapter.onOptionSelected = { name, index ->
             viewModel.selectOption(name, index)
+            viewModel.load()
         }
-        binding.options.adapter = optionGroupListAdapter
+        optionSheet.setAdapter(optionGroupListAdapter)
 
         SettingsHelper.displayMode.observe(viewLifecycleOwner, Observer {
             binding.mangaList.list.changeMangaListDisplayMode(adapter)
@@ -74,16 +78,11 @@ class CategoryFragment : Fragment() {
         providerViewModel.detail.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Result.Success -> {
-                    optionGroupListAdapter.setList(
-                        it.data.optionModels.category.toList().toMutableList()
-                    )
-                    it.data.optionModels.category.forEach { (key, _value) ->
+                    optionGroupListAdapter.setList(it.data.optionModels.category.toList())
+                    it.data.optionModels.category.forEach { (key, _) ->
                         viewModel.selectOption(key, 0)
                     }
-                    viewModel.load()
-                }
-                else -> {
-                    // TODO: set error page
+                    if (viewModel.list.value == null) viewModel.load()
                 }
             }
         })
@@ -102,6 +101,10 @@ class CategoryFragment : Fragment() {
             R.id.action_display_mode -> {
                 SettingsHelper.displayMode.setNextValue()
                 item.setIcon(getDisplayModeIcon())
+                true
+            }
+            R.id.action_option -> {
+                optionSheet.show()
                 true
             }
             else -> super.onOptionsItemSelected(item)

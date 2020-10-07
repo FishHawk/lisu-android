@@ -54,7 +54,7 @@ class ServerFragment : Fragment() {
 
         viewModel.serverInfoList.observe(viewLifecycleOwner, Observer { data ->
             if (data.size == 1) SettingsHelper.selectedServer.setValue(data.first().id)
-            adapter.setList(data.toMutableList())
+            adapter.setList(data)
             if (data.isEmpty()) binding.multipleStatusView.showEmpty()
             else binding.multipleStatusView.showContent()
         })

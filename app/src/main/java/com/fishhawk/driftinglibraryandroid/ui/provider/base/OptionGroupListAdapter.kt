@@ -8,9 +8,7 @@ import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 class OptionGroupListAdapter(
     private val activity: Activity
-) : BaseRecyclerViewAdapter<Pair<String, List<String>>, OptionGroupListAdapter.ViewHolder>(
-    mutableListOf()
-) {
+) : BaseRecyclerViewAdapter<Pair<String, List<String>>, OptionGroupListAdapter.ViewHolder>() {
     var onOptionSelected: (String, Int) -> Unit = { _, _ -> }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -26,7 +24,7 @@ class OptionGroupListAdapter(
 
         override fun bind(item: Pair<String, List<String>>, position: Int) {
             val adapter = OptionGroupAdapter(activity)
-            adapter.setList(item.second.toMutableList())
+            adapter.setList(item.second)
             adapter.onOptionSelected = { onOptionSelected(item.first, it) }
             adapter.selectOption(0)
             binding.options.adapter = adapter

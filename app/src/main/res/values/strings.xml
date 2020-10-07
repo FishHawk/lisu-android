@@ -121,6 +121,7 @@
     <string name="menu_search_global">Search global</string>
     <string name="menu_search_global_hint">Search global…</string>
     <string name="menu_display_mode">Display mode</string>
+    <string name="menu_option">Option</string>
     <string name="menu_filter">Filter</string>
     <string name="menu_history_clear">Clear history</string>
     <string name="menu_enable_all">Enable all</string>

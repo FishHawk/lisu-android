@@ -18,6 +18,7 @@ import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderViewModel
 import com.fishhawk.driftinglibraryandroid.ui.provider.base.OptionGroupListAdapter
+import com.fishhawk.driftinglibraryandroid.ui.provider.base.ProviderOptionSheet
 import com.fishhawk.driftinglibraryandroid.ui.provider.createMangaOutlineActionDialog
 
 class PopularFragment : Fragment() {
@@ -30,6 +31,7 @@ class PopularFragment : Fragment() {
         ProviderViewModelFactory(providerId, requireActivity().application as MainApplication)
     }
     private lateinit var binding: ProviderPopularFragmentBinding
+    private lateinit var optionSheet: ProviderOptionSheet
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +44,7 @@ class PopularFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = ProviderPopularFragmentBinding.inflate(inflater, container, false)
+        optionSheet = ProviderOptionSheet(requireContext())
         return binding.root
     }
 
@@ -58,8 +61,9 @@ class PopularFragment : Fragment() {
         val optionGroupListAdapter = OptionGroupListAdapter(requireActivity())
         optionGroupListAdapter.onOptionSelected = { name, index ->
             viewModel.selectOption(name, index)
+            viewModel.load()
         }
-        binding.options.adapter = optionGroupListAdapter
+        optionSheet.setAdapter(optionGroupListAdapter)
 
         SettingsHelper.displayMode.observe(viewLifecycleOwner, Observer {
             binding.mangaList.list.changeMangaListDisplayMode(mangaListAdapter)
@@ -74,16 +78,11 @@ class PopularFragment : Fragment() {
         providerViewModel.detail.observe(viewLifecycleOwner, Observer {
             when (it) {
                 is Result.Success -> {
-                    optionGroupListAdapter.setList(
-                        it.data.optionModels.popular.toList().toMutableList()
-                    )
-                    it.data.optionModels.popular.forEach { (key, _value) ->
+                    optionGroupListAdapter.setList(it.data.optionModels.popular.toList())
+                    it.data.optionModels.popular.forEach { (key, _) ->
                         viewModel.selectOption(key, 0)
                     }
-                    viewModel.load()
-                }
-                else -> {
-                    // TODO: set error page
+                    if (viewModel.list.value == null) viewModel.load()
                 }
             }
         })
@@ -102,6 +101,10 @@ class PopularFragment : Fragment() {
             R.id.action_display_mode -> {
                 SettingsHelper.displayMode.setNextValue()
                 item.setIcon(getDisplayModeIcon())
+                true
+            }
+            R.id.action_option -> {
+                optionSheet.show()
                 true
             }
             else -> super.onOptionsItemSelected(item)

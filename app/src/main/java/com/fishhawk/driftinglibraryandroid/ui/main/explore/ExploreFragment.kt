@@ -45,7 +45,7 @@ class ExploreFragment : Fragment() {
         viewModel.providerList.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is Result.Success -> {
-                    adapter.setList(result.data.toMutableList())
+                    adapter.setList(result.data)
                     if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
                     else binding.multipleStatusView.showContent()
                 }

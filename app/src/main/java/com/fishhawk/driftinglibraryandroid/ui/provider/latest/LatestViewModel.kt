@@ -19,7 +19,6 @@ class LatestViewModel(
 
     fun selectOption(optionType: String, optionIndex: Int) {
         option[optionType] = optionIndex
-        load()
     }
 
     override suspend fun loadResult() =
