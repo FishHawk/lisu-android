@@ -26,7 +26,6 @@ class OptionGroupListAdapter(
             val adapter = OptionGroupAdapter(activity)
             adapter.setList(item.second)
             adapter.onOptionSelected = { onOptionSelected(item.first, it) }
-            adapter.selectOption(0)
             binding.options.adapter = adapter
         }
     }
