@@ -44,9 +44,9 @@
     <string name="more_server">Manage server</string>
     <string name="more_download">Manage download</string>
     <string name="more_subscribe">Manage subscribe</string>
-    <string name="more_setting_general">General</string>
-    <string name="more_setting_reader">Reader</string>
-    <string name="more_setting_advanced">Advanced</string>
+    <string name="more_setting_general">Setting general</string>
+    <string name="more_setting_reader">Setting reader</string>
+    <string name="more_setting_advanced">Setting advanced</string>
     <string name="more_about">About</string>
 
 
