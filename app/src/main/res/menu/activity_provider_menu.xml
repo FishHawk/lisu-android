@@ -4,21 +4,20 @@
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
+
         <item
             android:id="@+id/popular"
             android:icon="@drawable/ic_baseline_whatshot_24"
             android:title="@string/label_popular" />
+
         <item
             android:id="@+id/latest"
             android:icon="@drawable/ic_baseline_new_releases_24"
             android:title="@string/label_latest" />
+
         <item
             android:id="@+id/category"
             android:icon="@drawable/ic_baseline_local_offer_24"
             android:title="@string/label_category" />
-        <item
-            android:id="@+id/search"
-            android:icon="@drawable/ic_baseline_search_24"
-            android:title="@string/label_search" />
     </group>
 </menu>

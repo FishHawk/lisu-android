@@ -9,5 +9,16 @@
         android:id="@+id/nav_popular"
         android:name="com.fishhawk.driftinglibraryandroid.ui.provider.popular.PopularFragment"
         android:label="@string/label_popular"
-        tools:layout="@layout/provider_popular_fragment" />
+        tools:layout="@layout/provider_popular_fragment">
+
+    <action
+        android:id="@+id/action_popular_to_search"
+        app:destination="@id/nav_search" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_search"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.provider.search.SearchFragment"
+        android:label="@string/label_search"
+        tools:layout="@layout/provider_search_fragment" />
 </navigation>

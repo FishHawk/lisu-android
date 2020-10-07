@@ -9,5 +9,16 @@
         android:id="@+id/nav_latest"
         android:name="com.fishhawk.driftinglibraryandroid.ui.provider.latest.LatestFragment"
         android:label="@string/label_latest"
-        tools:layout="@layout/provider_latest_fragment" />
+        tools:layout="@layout/provider_latest_fragment">
+
+        <action
+            android:id="@+id/action_latest_to_search"
+            app:destination="@id/nav_search" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_search"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.provider.search.SearchFragment"
+        android:label="@string/label_search"
+        tools:layout="@layout/provider_search_fragment" />
 </navigation>

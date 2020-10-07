@@ -77,6 +77,8 @@ class SearchFragment : Fragment() {
 
             override fun onQueryTextChange(query: String?): Boolean = true
         })
+        val keywords = arguments?.getString("keywords")!!
+        searchView.setQuery(keywords, true)
 
         val item = menu.findItem(R.id.action_display_mode)
         item.setIcon(getDisplayModeIcon())

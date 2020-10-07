@@ -35,8 +35,7 @@ class ProviderActivity : AppCompatActivity() {
         val navGraphIds = listOf(
             R.navigation.popular,
             R.navigation.latest,
-            R.navigation.category,
-            R.navigation.search
+            R.navigation.category
         )
 
         bottomNavigationView.setupWithNavControllerT(
