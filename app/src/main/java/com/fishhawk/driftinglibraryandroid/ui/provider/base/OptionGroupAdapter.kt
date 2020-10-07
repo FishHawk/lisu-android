@@ -4,6 +4,8 @@ import android.app.Activity
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderOptionItemBinding
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
@@ -29,6 +31,11 @@ class OptionGroupAdapter(
                 LayoutInflater.from(activity), parent, false
             )
         )
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
     }
 
     inner class ViewHolder(private val binding: ProviderOptionItemBinding) :
