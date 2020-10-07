@@ -21,13 +21,13 @@ import com.fishhawk.driftinglibraryandroid.ui.provider.base.OptionGroupListAdapt
 import com.fishhawk.driftinglibraryandroid.ui.provider.createMangaOutlineActionDialog
 
 class PopularFragment : Fragment() {
-    private val providerViewModel: ProviderViewModel by activityViewModels()
+    private val providerViewModel: ProviderViewModel by activityViewModels {
+        val providerId = requireActivity().intent.extras!!.getString("providerId")!!
+        ProviderViewModelFactory(providerId, requireActivity().application as MainApplication)
+    }
     private val viewModel: PopularViewModel by viewModels {
         val providerId = requireActivity().intent.extras!!.getString("providerId")!!
-        ProviderViewModelFactory(
-            providerId,
-            requireActivity().application as MainApplication
-        )
+        ProviderViewModelFactory(providerId, requireActivity().application as MainApplication)
     }
     private lateinit var binding: ProviderPopularFragmentBinding
 
