@@ -97,7 +97,7 @@ abstract class ProviderBaseFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_provider_normal, menu)
+        inflater.inflate(R.menu.menu_provider, menu)
 
         val searchView = menu.findItem(R.id.action_search).actionView as SearchView
         searchView.queryHint = getString(R.string.menu_search_hint)

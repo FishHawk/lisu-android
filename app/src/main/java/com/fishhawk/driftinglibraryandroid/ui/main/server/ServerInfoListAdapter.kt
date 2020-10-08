@@ -18,10 +18,8 @@ class ServerInfoListAdapter(
 
     var selectedId: Int = 0
         set(value) {
-            val oldValue = field
             field = value
-            notifyItemChanged(field)
-            notifyItemChanged(oldValue)
+            notifyDataSetChanged()
         }
 
     override fun onCreateViewHolder(

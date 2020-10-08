@@ -1,16 +1,16 @@
 package com.fishhawk.driftinglibraryandroid.ui.main.server
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
+import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ServerFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.ui.extension.getDisplayModeIcon
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 
 class ServerFragment : Fragment() {
@@ -58,11 +58,22 @@ class ServerFragment : Fragment() {
             if (data.isEmpty()) binding.multipleStatusView.showEmpty()
             else binding.multipleStatusView.showContent()
         })
+    }
 
-        binding.addButton.setOnClickListener {
-            createServerInfoDialog { name, address ->
-                viewModel.addServer(ServerInfo(name, address))
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_server, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_add -> {
+                createServerInfoDialog { name, address ->
+                    viewModel.addServer(ServerInfo(name, address))
+                }
+                true
             }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

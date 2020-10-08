@@ -148,4 +148,5 @@
     <string name="error_hint_empty_refresh_result">List is empty.</string>
     <string name="error_hint_empty_fetch_more_result">No more result.</string>
     <string name="dialog_filter_history">Filter reading history</string>
+    <string name="menu_add">Add</string>
 </resources>
