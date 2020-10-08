@@ -26,6 +26,7 @@ abstract class ProviderBaseFragment : Fragment() {
     abstract val viewModel: ProviderBaseViewModel
     private lateinit var binding: ProviderBaseFragmentBinding
     private lateinit var optionSheet: ProviderOptionSheet
+    private var isOptionSheetEnabled = false
 
     abstract fun getOptionModel(optionModels: OptionModels): Map<String, List<String>>
 
@@ -81,8 +82,13 @@ abstract class ProviderBaseFragment : Fragment() {
             when (result) {
                 is Result.Success -> {
                     val model = getOptionModel(result.data.optionModels)
+                    if (model.toList().isNotEmpty()) {
+                        isOptionSheetEnabled = true
+                        requireActivity().invalidateOptionsMenu()
+                    }
                     optionGroupListAdapter.setList(model.toList())
                     model.keys.forEach { key -> viewModel.selectOption(key, 0) }
+
                     if (viewModel.list.value == null) viewModel.load()
                 }
             }
@@ -109,8 +115,8 @@ abstract class ProviderBaseFragment : Fragment() {
             override fun onQueryTextChange(query: String): Boolean = true
         })
 
-        val item = menu.findItem(R.id.action_display_mode)
-        item.setIcon(getDisplayModeIcon())
+        menu.findItem(R.id.action_option).isVisible = isOptionSheetEnabled
+        menu.findItem(R.id.action_display_mode).setIcon(getDisplayModeIcon())
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
