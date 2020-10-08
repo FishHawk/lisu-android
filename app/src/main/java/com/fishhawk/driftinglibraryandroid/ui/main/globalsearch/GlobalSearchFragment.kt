@@ -68,6 +68,7 @@ class GlobalSearchFragment : Fragment() {
 
         val searchView = menu.findItem(R.id.action_search_global).actionView as SearchView
         searchView.queryHint = getString(R.string.menu_search_global_hint)
+        searchView.maxWidth = Int.MAX_VALUE
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 viewModel.keywords.value = query

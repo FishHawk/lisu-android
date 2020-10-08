@@ -10,13 +10,17 @@ import com.fishhawk.driftinglibraryandroid.ui.base.DownloadCreatedNotification
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModelWithFetchMore
 import com.fishhawk.driftinglibraryandroid.ui.base.SubscriptionCreatedNotification
 
-abstract class MangaListViewModel(
+abstract class ProviderBaseViewModel(
     private val providerId: String,
     private val remoteDownloadRepository: RemoteDownloadRepository,
     private val remoteSubscriptionRepository: RemoteSubscriptionRepository
-) :
-    RefreshableListViewModelWithFetchMore<MangaOutline>() {
+) : RefreshableListViewModelWithFetchMore<MangaOutline>() {
     protected var page = 1
+    protected val option: MutableMap<String, Int> = mutableMapOf()
+
+    fun selectOption(optionType: String, optionIndex: Int) {
+        option[optionType] = optionIndex
+    }
 
     override fun onRefreshSuccess(data: List<MangaOutline>) {
         page = 1

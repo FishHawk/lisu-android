@@ -1,9 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider
 
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderActivityBinding
 import com.fishhawk.driftinglibraryandroid.ui.extension.setupTheme

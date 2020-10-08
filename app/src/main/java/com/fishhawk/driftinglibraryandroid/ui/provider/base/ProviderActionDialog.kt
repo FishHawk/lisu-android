@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.provider
+package com.fishhawk.driftinglibraryandroid.ui.provider.base
 
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
@@ -7,12 +7,12 @@ import androidx.fragment.app.Fragment
 import com.fishhawk.driftinglibraryandroid.databinding.DialogMangaOutlineBinding
 import com.fishhawk.driftinglibraryandroid.ui.extension.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.ui.provider.base.MangaListViewModel
+import com.fishhawk.driftinglibraryandroid.ui.provider.base.ProviderBaseViewModel
 
 fun Fragment.createMangaOutlineActionDialog(
     providerId: String,
     outline: MangaOutline,
-    viewModel: MangaListViewModel
+    viewModel: ProviderBaseViewModel
 ) {
     val dialogBinding =
         DialogMangaOutlineBinding
@@ -24,7 +24,7 @@ fun Fragment.createMangaOutlineActionDialog(
         .create()
 
     dialogBinding.readButton.setOnClickListener {
-        (requireActivity() as AppCompatActivity).navToReaderActivity(
+        requireActivity().navToReaderActivity(
             outline.id, providerId, 0, 0, 0
         )
         dialog.dismiss()

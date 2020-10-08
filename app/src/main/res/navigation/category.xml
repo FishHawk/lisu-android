@@ -12,7 +12,7 @@
         tools:layout="@layout/provider_category_fragment">
 
         <action
-            android:id="@+id/action_category_to_search"
+            android:id="@+id/action_to_search"
             app:destination="@id/nav_search" />
     </fragment>
 

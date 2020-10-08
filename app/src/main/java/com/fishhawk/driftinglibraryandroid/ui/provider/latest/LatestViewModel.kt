@@ -3,24 +3,18 @@ package com.fishhawk.driftinglibraryandroid.ui.provider.latest
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
-import com.fishhawk.driftinglibraryandroid.ui.provider.base.MangaListViewModel
+import com.fishhawk.driftinglibraryandroid.ui.provider.base.ProviderBaseViewModel
 
 class LatestViewModel(
     private val providerId: String,
     private val remoteProviderRepository: RemoteProviderRepository,
     remoteDownloadRepository: RemoteDownloadRepository,
     remoteSubscriptionRepository: RemoteSubscriptionRepository
-) : MangaListViewModel(
+) : ProviderBaseViewModel(
     providerId,
     remoteDownloadRepository,
     remoteSubscriptionRepository
 ) {
-    private val option: MutableMap<String, Int> = mutableMapOf()
-
-    fun selectOption(optionType: String, optionIndex: Int) {
-        option[optionType] = optionIndex
-    }
-
     override suspend fun loadResult() =
         remoteProviderRepository.getLatestMangaList(providerId, 1, option)
 

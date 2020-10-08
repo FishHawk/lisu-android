@@ -71,6 +71,7 @@ class LibraryFragment : Fragment() {
 
         val searchView: SearchView = menu.findItem(R.id.action_search).actionView as SearchView
         searchView.queryHint = getString(R.string.menu_search_hint)
+        searchView.maxWidth = Int.MAX_VALUE
         if (viewModel.filter != "") searchView.setQuery(viewModel.filter, false)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
