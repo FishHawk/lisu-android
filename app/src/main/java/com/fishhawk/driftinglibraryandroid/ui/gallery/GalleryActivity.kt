@@ -2,22 +2,17 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery
 
 import android.os.Bundle
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
-import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryActivityBinding
 import com.fishhawk.driftinglibraryandroid.ui.extension.*
 import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.TagGroup
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.google.android.flexbox.FlexboxLayout
 import kotlinx.android.synthetic.main.gallery_activity.view.*
 
 class GalleryActivity : AppCompatActivity() {
@@ -48,8 +43,16 @@ class GalleryActivity : AppCompatActivity() {
         setupThumb(thumb)
         setupActionButton()
 
-        val adapter = ContentAdapter(this, id, providerId)
-        binding.chapters.adapter = adapter
+        val contentAdapter = ContentAdapter(this, id, providerId)
+        binding.chapters.adapter = contentAdapter
+
+        val tagAdapter = TagGroupListAdapter(this)
+        tagAdapter.onTagClicked = { key, value ->
+            val keywords = if (key.isBlank()) value else "${key}:$value"
+            navToMainActivity(keywords)
+        }
+        binding.tags.adapter = tagAdapter
+
         binding.displayModeButton.setOnClickListener {
             SettingsHelper.chapterDisplayMode.setNextValue()
         }
@@ -89,10 +92,8 @@ class GalleryActivity : AppCompatActivity() {
                         binding.description.maxLines =
                             if (binding.description.maxLines < Int.MAX_VALUE) Int.MAX_VALUE else 3
                     }
-                    if (!detail.metadata.tags.isNullOrEmpty()) bindTags(
-                        detail.metadata.tags,
-                        binding.tags
-                    )
+                    if (!detail.metadata.tags.isNullOrEmpty())
+                        tagAdapter.setList(detail.metadata.tags)
                     if (detail.collections.isNotEmpty())
                         binding.chapters.collections = detail.collections
                 }
@@ -140,33 +141,5 @@ class GalleryActivity : AppCompatActivity() {
         }
         binding.subscribeButton.setOnClickListener { viewModel.subscribe() }
         binding.downloadButton.setOnClickListener { viewModel.download() }
-    }
-
-    private fun bindTags(
-        tags: List<TagGroup>,
-        tagsLayout: LinearLayout
-    ) {
-        tagsLayout.removeViews(0, tagsLayout.childCount)
-        for (tagGroup in tags) {
-            val tagGroupLayout = layoutInflater.inflate(
-                R.layout.gallery_tag_group, tagsLayout, false
-            ) as LinearLayout
-            tagsLayout.addView(tagGroupLayout)
-
-            // bind tag group key
-            val tagGroupKeyView = tagGroupLayout.findViewById<TextView>(R.id.key)
-            tagGroupKeyView.text = tagGroup.key
-
-            // bind tag group value
-            val tagGroupValueLayout: FlexboxLayout = tagGroupLayout.findViewById(R.id.value)
-            for (value in tagGroup.value) {
-                val tagGroupValueView = layoutInflater.inflate(
-                    R.layout.gallery_tag, tagGroupValueLayout, false
-                ) as TextView
-                tagGroupValueLayout.addView(tagGroupValueView)
-                tagGroupValueView.text = value
-                tagGroupValueView.setOnClickListener { navToMainActivity("${tagGroup.key}:$value") }
-            }
-        }
     }
 }

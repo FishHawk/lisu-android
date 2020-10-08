@@ -1,6 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider.base
 
-import android.app.Activity
+import android.content.Context
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,13 +11,13 @@ import com.fishhawk.driftinglibraryandroid.databinding.ProviderOptionItemBinding
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
 
 class OptionGroupAdapter(
-    private val activity: Activity
+    private val context: Context
 ) : BaseRecyclerViewAdapter<String, OptionGroupAdapter.ViewHolder>() {
-    var onOptionSelected: (Int) -> Unit = {}
+    var onOptionSelected: ((Int) -> Unit)? = null
     var selectedOptionIndex: Int = 0
 
     fun selectOption(index: Int) {
-        onOptionSelected(index)
+        onOptionSelected?.invoke(index)
         val oldSelectedOptionIndex = selectedOptionIndex
         selectedOptionIndex = index
 
@@ -28,7 +28,7 @@ class OptionGroupAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             ProviderOptionItemBinding.inflate(
-                LayoutInflater.from(activity), parent, false
+                LayoutInflater.from(context), parent, false
             )
         )
     }
@@ -44,7 +44,7 @@ class OptionGroupAdapter(
         override fun bind(item: String, position: Int) {
             binding.optionName = item
             val typedValue = TypedValue()
-            activity.theme.resolveAttribute(
+            context.theme.resolveAttribute(
                 if (position == selectedOptionIndex) R.attr.colorAccent
                 else R.attr.colorOnPrimary
                 , typedValue, true
