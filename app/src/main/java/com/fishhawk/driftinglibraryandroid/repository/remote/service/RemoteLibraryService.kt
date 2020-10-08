@@ -1,11 +1,10 @@
 package com.fishhawk.driftinglibraryandroid.repository.remote.service
 
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MetadataDetail
+import okhttp3.MultipartBody
+import retrofit2.http.*
 
 interface RemoteLibraryService {
     @GET("library/search")
@@ -20,6 +19,19 @@ interface RemoteLibraryService {
 
     @DELETE("library/manga/{mangaId}")
     suspend fun deleteManga(@Path("mangaId") mangaId: String): String
+
+    @PATCH("library/manga/{mangaId}/metadata")
+    suspend fun patchMangaMetadata(
+        @Path("mangaId") mangaId: String,
+        @Body metadata: MetadataDetail
+    ): MangaDetail
+
+    @Multipart
+    @PATCH("library/manga/{mangaId}/thumb")
+    suspend fun patchMangaThumb(
+        @Path("mangaId") mangaId: String,
+        @Part file: MultipartBody.Part
+    ): MangaDetail
 
     @GET("library/chapter/{mangaId}")
     suspend fun getChapterContent(

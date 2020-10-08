@@ -4,7 +4,11 @@ import retrofit2.Retrofit
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MetadataDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.service.RemoteLibraryService
+import okhttp3.MultipartBody
+import java.io.File
+import okhttp3.RequestBody.Companion.asRequestBody
 
 class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
     fun connect(url: String?, builder: Retrofit?) {
@@ -32,6 +36,18 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
 
     suspend fun deleteManga(mangaId: String): Result<String> =
         resultWrap { it.deleteManga(mangaId) }
+
+    suspend fun updateMangaMetadata(
+        mangaId: String,
+        metadata: MetadataDetail
+    ): Result<MangaDetail> =
+        resultWrap { it.patchMangaMetadata(mangaId, metadata) }
+
+    suspend fun updateMangaThumb(
+        mangaId: String,
+        file: File
+    ): Result<MangaDetail> =
+        resultWrap { it.patchMangaThumb(mangaId, MultipartBody.Part.create(file.asRequestBody())) }
 
     suspend fun getChapterContent(
         mangaId: String,
