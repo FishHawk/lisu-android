@@ -10,6 +10,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderActivityBinding
@@ -19,6 +20,7 @@ import com.fishhawk.driftinglibraryandroid.ui.extension.setupThemeWithTranslucen
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.util.FileUtil
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class ReaderActivity : AppCompatActivity() {
@@ -170,11 +172,20 @@ class ReaderActivity : AppCompatActivity() {
         if (prefix == null) {
             binding.root.makeToast("Chapter not open")
         } else {
-            try {
-                FileUtil.saveImage(this, url, "$prefix-$page")
-                binding.root.makeToast("Image saved")
-            } catch (e: Throwable) {
-                binding.root.makeToast(e.message ?: "Unknown error")
+            val filename = "$prefix-$page"
+            val uri = FileUtil.createImageInGallery(this, filename)
+            if (uri == null) {
+                binding.root.makeToast("Image already exist")
+            } else {
+                val activity = this
+                lifecycleScope.launch {
+                    try {
+                        FileUtil.saveImage(activity, url, uri)
+                        binding.root.makeToast("Image saved")
+                    } catch (e: Throwable) {
+                        binding.root.makeToast(e.message ?: "Unknown error")
+                    }
+                }
             }
         }
     }

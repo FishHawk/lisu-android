@@ -1,14 +1,17 @@
 package com.fishhawk.driftinglibraryandroid.util
 
+import android.content.ContentResolver
+import android.content.ContentValues
 import android.content.Context
-import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileInputStream
 
 object FileUtil {
     suspend fun downloadImage(context: Context, url: String): File =
@@ -20,56 +23,37 @@ object FileUtil {
                 .get()
         }
 
-    suspend fun saveImage(context: Context, url: String, filename: String) =
+    fun createImageInGallery(context: Context, filename: String): Uri? {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(
+                    MediaStore.MediaColumns.RELATIVE_PATH,
+                    "${Environment.DIRECTORY_PICTURES}/DriftingLibrary/"
+                )
+            } else {
+                put(
+                    MediaStore.MediaColumns.DATA,
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                        .toString() + "/DriftingLibrary/${filename}.png"
+                )
+            }
+        }
+
+        val resolver: ContentResolver = context.contentResolver
+        return resolver.insert(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues
+        )
+    }
+
+    suspend fun saveImage(context: Context, url: String, uri: Uri) =
         withContext(Dispatchers.IO) {
-            val srcFile = downloadImage(context, url)
-            val type = ImageUtil.findImageType(FileInputStream(srcFile))
-                ?: throw Exception("Not an image")
-
-            val destDir = File(
-                Environment.getExternalStorageDirectory().absolutePath +
-                        File.separator + Environment.DIRECTORY_PICTURES +
-                        File.separator + "DriftingLibrary"
-            )
-            destDir.mkdirs()
-
-            val validFilename = buildValidFilename(filename)
-            val destFile = File(destDir, "$validFilename.${type.extension}")
-
-            srcFile.copyTo(destFile, overwrite = true)
-            scanMedia(context, destFile)
+            val resolver: ContentResolver = context.contentResolver
+            val outputStream = resolver.openOutputStream(uri)!!
+            val bitmap = Glide.with(context).asBitmap().load(url).submit().get()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            outputStream.flush()
+            outputStream.close()
         }
-
-    private fun scanMedia(context: Context, file: File) {
-        scanMedia(context, Uri.fromFile(file))
-    }
-
-    private fun scanMedia(context: Context, uri: Uri) {
-        val action = Intent.ACTION_MEDIA_SCANNER_SCAN_FILE
-        val mediaScanIntent = Intent(action)
-        mediaScanIntent.data = uri
-        context.sendBroadcast(mediaScanIntent)
-    }
-
-    private fun buildValidFilename(origName: String): String {
-        val name = origName.trim('.', ' ')
-        if (name.isEmpty()) throw Exception("Empty filename")
-
-        val builder = StringBuilder(name.length)
-        name.forEach { c -> builder.append(if (isValidFatFilenameChar(c)) c else '_') }
-
-        // Even though vfat allows 255 UCS-2 chars, we might eventually write to
-        // ext4 through a FUSE layer, so use that limit minus 15 reserved characters.
-        return builder.toString().take(240)
-    }
-
-    private fun isValidFatFilenameChar(c: Char): Boolean {
-        if (0x00.toChar() <= c && c <= 0x1f.toChar()) {
-            return false
-        }
-        return when (c) {
-            '"', '*', '/', ':', '<', '>', '?', '\\', '|', 0x7f.toChar() -> false
-            else -> true
-        }
-    }
 }

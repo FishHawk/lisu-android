@@ -2,9 +2,7 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -20,11 +18,8 @@ import com.fishhawk.driftinglibraryandroid.ui.extension.*
 import com.fishhawk.driftinglibraryandroid.util.FileUtil
 import kotlinx.android.synthetic.main.gallery_activity.view.*
 import kotlinx.coroutines.launch
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.File
 
 
 class GalleryActivity : AppCompatActivity() {
@@ -168,13 +163,18 @@ class GalleryActivity : AppCompatActivity() {
                 binding.root.makeToast("No cover")
             } else {
                 val filename = "${detail.id}-thumb"
-                val activity = this
-                lifecycleScope.launch {
-                    try {
-                        FileUtil.saveImage(activity, url, filename)
-                        binding.root.makeToast("Image saved")
-                    } catch (e: Throwable) {
-                        binding.root.makeToast(e.message ?: "Unknown error")
+                val uri = FileUtil.createImageInGallery(this, filename)
+                if (uri == null) {
+                    binding.root.makeToast("Image already exist")
+                } else {
+                    val activity = this
+                    lifecycleScope.launch {
+                        try {
+                            FileUtil.saveImage(activity, url, uri)
+                            binding.root.makeToast("Image saved")
+                        } catch (e: Throwable) {
+                            binding.root.makeToast(e.message ?: "Unknown error")
+                        }
                     }
                 }
             }
