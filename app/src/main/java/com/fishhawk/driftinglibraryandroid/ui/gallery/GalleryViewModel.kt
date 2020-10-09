@@ -12,11 +12,13 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepos
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MetadataDetail
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.DownloadCreatedNotification
 import com.fishhawk.driftinglibraryandroid.ui.base.NotificationViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.SubscriptionCreatedNotification
 import kotlinx.coroutines.launch
+import okhttp3.RequestBody
 
 class GalleryViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository,
@@ -42,6 +44,23 @@ class GalleryViewModel(
 
     fun openMangaFromProvider(providerId: String, id: String) = viewModelScope.launch {
         _detail.value = remoteProviderRepository.getManga(providerId, id)
+    }
+
+    fun updateThumb(requestBody: RequestBody) = viewModelScope.launch {
+        (detail.value as? Result.Success)?.let {
+            val id = it.data.id
+            val result = remoteLibraryRepository.updateMangaThumb(id, requestBody)
+            println(result)
+            resultWarp(result) { _detail.value = result }
+        }
+    }
+
+    fun updateMetadata(metadata: MetadataDetail) = viewModelScope.launch {
+        (detail.value as? Result.Success)?.let {
+            val id = it.data.id
+            val result = remoteLibraryRepository.updateMangaMetadata(id, metadata)
+            resultWarp(result) { _detail.value = result }
+        }
     }
 
     fun download() {

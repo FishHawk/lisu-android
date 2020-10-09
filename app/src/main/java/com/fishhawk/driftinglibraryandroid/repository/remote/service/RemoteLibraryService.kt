@@ -4,6 +4,7 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MetadataDetail
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface RemoteLibraryService {
@@ -30,7 +31,7 @@ interface RemoteLibraryService {
     @PATCH("library/manga/{mangaId}/thumb")
     suspend fun patchMangaThumb(
         @Path("mangaId") mangaId: String,
-        @Part file: MultipartBody.Part
+        @Part thumb: MultipartBody.Part
     ): MangaDetail
 
     @GET("library/chapter/{mangaId}")

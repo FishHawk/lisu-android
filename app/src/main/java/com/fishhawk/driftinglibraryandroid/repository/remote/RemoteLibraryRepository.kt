@@ -7,8 +7,7 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MetadataDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.service.RemoteLibraryService
 import okhttp3.MultipartBody
-import java.io.File
-import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody
 
 class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
     fun connect(url: String?, builder: Retrofit?) {
@@ -45,9 +44,14 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
 
     suspend fun updateMangaThumb(
         mangaId: String,
-        file: File
+        requestBody: RequestBody
     ): Result<MangaDetail> =
-        resultWrap { it.patchMangaThumb(mangaId, MultipartBody.Part.create(file.asRequestBody())) }
+        resultWrap {
+            it.patchMangaThumb(
+                mangaId,
+                MultipartBody.Part.createFormData("thumb", "thumb", requestBody)
+            ).apply { }
+        }
 
     suspend fun getChapterContent(
         mangaId: String,

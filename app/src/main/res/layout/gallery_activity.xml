@@ -196,24 +196,12 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </FrameLayout>
 
-            <FrameLayout
+            <com.classic.common.MultipleStatusView
+                android:id="@+id/multiple_status_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <ProgressBar
-                    android:id="@+id/loading_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="16dp"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:id="@+id/error_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:visibility="gone" />
+                android:layout_height="wrap_content"
+                app:errorView="@layout/status_error"
+                app:loadingView="@layout/status_loading">
 
                 <LinearLayout
                     android:id="@+id/content_view"
@@ -222,7 +210,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="16dp"
                     android:orientation="vertical"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     tools:visibility="visible">
 
                     <LinearLayout
@@ -343,7 +331,7 @@
                             android:visibility="@{!info.hasContent ? View.VISIBLE : View.GONE}" />
                     </LinearLayout>
                 </LinearLayout>
-            </FrameLayout>
+            </com.classic.common.MultipleStatusView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </layout>

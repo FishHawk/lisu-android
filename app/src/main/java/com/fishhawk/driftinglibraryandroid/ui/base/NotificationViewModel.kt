@@ -11,15 +11,11 @@ open class NotificationViewModel : ViewModel() {
     val notification: LiveData<Event<Notification>> = _notification
 
     protected fun notify(notification: Notification) {
-        _notification.value =
-            Event(notification)
+        _notification.value = Event(notification)
     }
 
     protected fun notifyNetworkError(throwable: Throwable) {
-        _notification.value =
-            Event(
-                NetworkErrorNotification(throwable)
-            )
+        _notification.value = Event(NetworkErrorNotification(throwable))
     }
 
     protected fun <T> resultWarp(result: Result<T>, runIfSuccess: (T) -> Unit) {
