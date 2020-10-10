@@ -1,25 +1,18 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader.reader
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.SeekBar
-import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
-import com.fishhawk.driftinglibraryandroid.ui.extension.saveImageToGallery
-import com.fishhawk.driftinglibraryandroid.ui.extension.startImageShareActivity
 import com.fishhawk.driftinglibraryandroid.ui.reader.*
-import com.fishhawk.driftinglibraryandroid.util.FileUtil
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 class ReaderFragment : Fragment() {
@@ -96,12 +89,7 @@ class ReaderFragment : Fragment() {
         binding.reader.onScrolled = { viewModel.chapterPosition.value = it }
         binding.reader.onPageLongClicked = { position, url ->
             if (SettingsHelper.longTapDialog.getValueDirectly())
-                ReaderPageSheet(
-                    requireContext(), position,
-                    onRefreshed = { refreshImage(position) },
-                    onSaved = { saveImage(position, url) },
-                    onShared = { lifecycleScope.launch { shareImage(url) } }
-                ).show()
+                ReaderPageSheet(this, position, url).show()
         }
     }
 
@@ -140,21 +128,5 @@ class ReaderFragment : Fragment() {
     private fun openNextChapter() {
         if (viewModel.isLoading) return
         if (!viewModel.openNextChapter()) makeToast(R.string.toast_no_next_chapter)
-    }
-
-    fun refreshImage(page: Int) {
-        binding.reader.refreshPage(page)
-    }
-
-    suspend fun shareImage(url: String) {
-        val file = FileUtil.downloadImage(requireContext(), url)
-        startImageShareActivity(file)
-    }
-
-    fun saveImage(page: Int, url: String) {
-        val prefix = viewModel.makeImageFilenamePrefix()
-            ?: return makeToast(R.string.toast_chapter_not_loaded)
-        val filename = "$prefix-$page"
-        saveImageToGallery(url, filename)
     }
 }

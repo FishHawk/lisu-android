@@ -1,33 +1,46 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader.reader
 
-import android.content.Context
 import android.view.LayoutInflater
+import androidx.lifecycle.lifecycleScope
+import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderPageSheetBinding
+import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
+import com.fishhawk.driftinglibraryandroid.ui.extension.saveImageToGallery
+import com.fishhawk.driftinglibraryandroid.ui.extension.startImageShareActivity
+import com.fishhawk.driftinglibraryandroid.util.FileUtil
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.coroutines.launch
 
 class ReaderPageSheet(
-    context: Context,
+    fragment: ReaderFragment,
     page: Int,
-    private val onRefreshed: () -> Unit,
-    private val onShared: () -> Unit,
-    private val onSaved: () -> Unit
-) : BottomSheetDialog(context) {
-    private val binding = ReaderPageSheetBinding.inflate(LayoutInflater.from(context), null, false)
+    url: String
+) : BottomSheetDialog(fragment.requireContext()) {
+    private val binding = ReaderPageSheetBinding.inflate(
+        LayoutInflater.from(context), null, false
+    )
 
     init {
         setContentView(binding.root)
 
         binding.page.text = (page + 1).toString()
         binding.refreshButton.setOnClickListener {
-            onRefreshed()
+            fragment.binding.reader.refreshPage(page)
             dismiss()
         }
         binding.shareButton.setOnClickListener {
-            onShared()
+            fragment.lifecycleScope.launch {
+                val file = FileUtil.downloadImage(context, url)
+                fragment.startImageShareActivity(file)
+            }
             dismiss()
         }
         binding.saveButton.setOnClickListener {
-            onSaved()
+            with(fragment) {
+                val prefix = viewModel.makeImageFilenamePrefix()
+                    ?: return@with makeToast(R.string.toast_chapter_not_loaded)
+                saveImageToGallery(url, "$prefix-$page")
+            }
             dismiss()
         }
     }

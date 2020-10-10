@@ -9,30 +9,25 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
-import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import com.fishhawk.driftinglibraryandroid.ui.base.setupFeedbackModule
 import com.fishhawk.driftinglibraryandroid.ui.extension.*
 import com.fishhawk.driftinglibraryandroid.ui.gallery.*
-import com.fishhawk.driftinglibraryandroid.util.FileUtil
 import kotlinx.android.synthetic.main.gallery_fragment.view.*
-import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class GalleryFragment : Fragment() {
-    private val viewModel: GalleryViewModel by viewModels {
+    internal val viewModel: GalleryViewModel by viewModels {
         val application = requireActivity().application as MainApplication
         GalleryViewModelFactory(application)
     }
-    private lateinit var binding: GalleryFragmentBinding
+    internal lateinit var binding: GalleryFragmentBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,11 +60,7 @@ class GalleryFragment : Fragment() {
         setupActionButton()
 
         binding.thumbCard.setOnLongClickListener {
-            GalleryThumbSheet(
-                requireContext(),
-                onSaved = { saveThumb() },
-                onEdited = { startImagePickActivity() }
-            ).show()
+            GalleryThumbSheet(this).show()
             true
         }
 
@@ -166,14 +157,6 @@ class GalleryFragment : Fragment() {
             .load(thumb)
             .diskCacheStrategy(DiskCacheStrategy.DATA)
             .into(binding.backdrop)
-    }
-
-    private fun saveThumb() {
-        val detail = (viewModel.detail.value as? Result.Success)?.data
-            ?: return makeToast(R.string.toast_manga_not_loaded)
-        val url = detail.thumb
-            ?: return makeToast(R.string.toast_manga_no_thumb)
-        saveImageToGallery(url, "${detail.id}-thumb")
     }
 
     private fun setupActionButton() {
