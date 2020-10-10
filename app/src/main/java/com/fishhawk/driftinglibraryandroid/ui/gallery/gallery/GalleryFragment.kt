@@ -16,8 +16,10 @@ import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.setupFeedbackModule
-import com.fishhawk.driftinglibraryandroid.ui.extension.*
-import com.fishhawk.driftinglibraryandroid.ui.gallery.*
+import com.fishhawk.driftinglibraryandroid.ui.extension.getChapterDisplayModeIcon
+import com.fishhawk.driftinglibraryandroid.ui.extension.navToMainActivity
+import com.fishhawk.driftinglibraryandroid.ui.extension.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModelFactory
 import kotlinx.android.synthetic.main.gallery_fragment.view.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -51,11 +53,7 @@ class GalleryFragment : Fragment() {
         if (providerId == null) viewModel.openMangaFromLibrary(id)
         else viewModel.openMangaFromProvider(providerId, id)
 
-        binding.info =
-            GalleryInfo(
-                providerId,
-                title
-            )
+        binding.info = GalleryInfo(providerId, title)
         setupThumb(thumb)
         setupActionButton()
 
@@ -64,10 +62,7 @@ class GalleryFragment : Fragment() {
             true
         }
 
-        val tagAdapter =
-            TagGroupListAdapter(
-                requireContext()
-            )
+        val tagAdapter = TagGroupListAdapter(requireContext())
         tagAdapter.onTagClicked = { key, value ->
             val keywords = if (key.isBlank()) value else "${key}:$value"
             navToMainActivity(keywords)
@@ -105,10 +100,7 @@ class GalleryFragment : Fragment() {
                     binding.multipleStatusView.showContent()
 
                     val detail = result.data
-                    binding.info =
-                        GalleryInfo(
-                            detail
-                        )
+                    binding.info = GalleryInfo(detail)
                     binding.description.setOnClickListener {
                         binding.description.maxLines =
                             if (binding.description.maxLines < Int.MAX_VALUE) Int.MAX_VALUE else 3
@@ -125,11 +117,7 @@ class GalleryFragment : Fragment() {
 
         viewModel.history.observe(viewLifecycleOwner, Observer { history ->
             binding.contentView.chapters.markedPosition = history?.let {
-                MarkedPosition(
-                    it.collectionIndex,
-                    it.chapterIndex,
-                    it.pageIndex
-                )
+                MarkedPosition(it.collectionIndex, it.chapterIndex, it.pageIndex)
             }
         })
     }

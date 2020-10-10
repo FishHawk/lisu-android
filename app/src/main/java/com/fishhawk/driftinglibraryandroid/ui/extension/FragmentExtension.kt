@@ -1,7 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.extension
 
 import android.content.Intent
-import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -47,10 +46,9 @@ fun <T> Fragment.bindToListViewModel(
         }
     })
 
-    viewModel.refreshFinish.observe(viewLifecycleOwner,
-        EventObserver {
-            refreshLayout.isHeaderRefreshing = false
-        })
+    viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver {
+        refreshLayout.isHeaderRefreshing = false
+    })
 
     if (viewModel is RefreshableListViewModelWithFetchMore) {
         viewModel.fetchMoreFinish.observe(viewLifecycleOwner, EventObserver {
@@ -58,7 +56,39 @@ fun <T> Fragment.bindToListViewModel(
         })
     }
 
-    refreshLayout.bindingToViewModel(viewModel)
+    with(refreshLayout) {
+        setHeaderColorSchemeResources(
+            R.color.loading_indicator_red,
+            R.color.loading_indicator_purple,
+            R.color.loading_indicator_blue,
+            R.color.loading_indicator_cyan,
+            R.color.loading_indicator_green,
+            R.color.loading_indicator_yellow
+        )
+        setFooterColorSchemeResources(
+            R.color.loading_indicator_red,
+            R.color.loading_indicator_blue,
+            R.color.loading_indicator_green,
+            R.color.loading_indicator_orange
+        )
+        val listener = when (viewModel) {
+            is RefreshableListViewModelWithFetchMore<*> -> {
+                object : RefreshLayout.OnRefreshListener {
+                    override fun onHeaderRefresh() = viewModel.refresh()
+                    override fun onFooterRefresh() = viewModel.fetchMore()
+                }
+            }
+            else -> {
+                object : RefreshLayout.OnRefreshListener {
+                    override fun onHeaderRefresh() = viewModel.refresh()
+                    override fun onFooterRefresh() {
+                        isFooterRefreshing = false
+                    }
+                }
+            }
+        }
+        setOnRefreshListener(listener)
+    }
 }
 
 fun RecyclerView.changeMangaListDisplayMode(adapter: MangaListAdapter) {
@@ -150,9 +180,7 @@ fun Fragment.navToProviderActivity(provider: ProviderInfo) {
     startActivity(intent)
 }
 
-fun Fragment.navToMainActivity(
-    filter: String
-) {
+fun Fragment.navToMainActivity(filter: String) {
     val bundle = bundleOf("filter" to filter)
     val intent = Intent(requireActivity(), MainActivity::class.java)
     intent.putExtras(bundle)

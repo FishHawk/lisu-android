@@ -5,9 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
-import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
 
 class GlobalSearchViewModel(
     private val remoteLibraryRepository: RemoteProviderRepository

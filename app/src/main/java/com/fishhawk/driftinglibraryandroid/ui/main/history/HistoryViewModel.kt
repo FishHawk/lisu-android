@@ -1,10 +1,10 @@
 package com.fishhawk.driftinglibraryandroid.ui.main.history
 
 import androidx.lifecycle.*
-import kotlinx.coroutines.launch
 import com.fishhawk.driftinglibraryandroid.repository.local.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import kotlinx.coroutines.launch
 
 class HistoryViewModel(
     private val readingHistoryRepository: ReadingHistoryRepository

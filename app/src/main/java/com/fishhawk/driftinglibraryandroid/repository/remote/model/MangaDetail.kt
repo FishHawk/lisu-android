@@ -42,6 +42,4 @@ data class MangaDetail(
 ) : Parcelable {
     val title
         get() = metadata.title ?: id
-    val authors
-        get() = metadata.authors?.joinToString(";")
 }

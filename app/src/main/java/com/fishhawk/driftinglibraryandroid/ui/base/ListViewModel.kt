@@ -4,10 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.R
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import com.fishhawk.driftinglibraryandroid.repository.Event
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 abstract class RefreshableListViewModelWithFetchMore<T> : RefreshableListViewModel<T>() {
     private val _fetchMoreFinish: MutableLiveData<Event<Unit>> = MutableLiveData()

@@ -10,8 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchFragmentBinding
-import com.fishhawk.driftinglibraryandroid.ui.extension.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.ui.extension.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 import kotlinx.coroutines.launch
 

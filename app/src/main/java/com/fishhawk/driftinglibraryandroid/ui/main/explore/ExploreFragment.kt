@@ -11,8 +11,8 @@ import androidx.navigation.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ExploreFragmentBinding
-import com.fishhawk.driftinglibraryandroid.ui.extension.navToProviderActivity
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.ui.extension.navToProviderActivity
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 
 class ExploreFragment : Fragment() {

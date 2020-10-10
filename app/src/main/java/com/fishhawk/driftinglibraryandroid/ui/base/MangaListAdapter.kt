@@ -6,12 +6,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import java.text.SimpleDateFormat
-import java.util.*
 import com.fishhawk.driftinglibraryandroid.databinding.MangaGridThumbnailBinding
 import com.fishhawk.driftinglibraryandroid.databinding.MangaLinearThumbnailBinding
-import com.fishhawk.driftinglibraryandroid.ui.extension.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.ui.extension.navToGalleryActivity
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MangaListAdapter(
     private val fragment: Fragment,

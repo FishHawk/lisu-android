@@ -2,7 +2,6 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery.gallery
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.fishhawk.driftinglibraryandroid.databinding.*
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter

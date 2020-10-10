@@ -3,9 +3,9 @@ package com.fishhawk.driftinglibraryandroid.ui.provider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.MainApplication
-import com.fishhawk.driftinglibraryandroid.ui.provider.popular.PopularViewModel
-import com.fishhawk.driftinglibraryandroid.ui.provider.latest.LatestViewModel
 import com.fishhawk.driftinglibraryandroid.ui.provider.category.CategoryViewModel
+import com.fishhawk.driftinglibraryandroid.ui.provider.latest.LatestViewModel
+import com.fishhawk.driftinglibraryandroid.ui.provider.popular.PopularViewModel
 import com.fishhawk.driftinglibraryandroid.ui.provider.search.SearchViewModel
 
 @Suppress("UNCHECKED_CAST")

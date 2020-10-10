@@ -2,12 +2,12 @@ package com.fishhawk.driftinglibraryandroid.ui.provider.base
 
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.R
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModelWithFetchMore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 abstract class ProviderBaseViewModel(
     private val providerId: String,

@@ -1,11 +1,11 @@
 package com.fishhawk.driftinglibraryandroid.ui.main.download
 
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadDesc
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModel
+import kotlinx.coroutines.launch
 
 class DownloadViewModel(
     private val repository: RemoteDownloadRepository

@@ -6,9 +6,9 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderActivityBinding
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.extension.setupFullScreen
 import com.fishhawk.driftinglibraryandroid.ui.extension.setupThemeWithTranslucentStatus
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 
 class ReaderActivity : AppCompatActivity() {
     lateinit var binding: ReaderActivityBinding

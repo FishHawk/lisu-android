@@ -2,11 +2,11 @@ package com.fishhawk.driftinglibraryandroid.ui.reader.reader
 
 import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.repository.local.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail
+import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.setting.PreferenceEnumLiveData
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import kotlinx.coroutines.launch

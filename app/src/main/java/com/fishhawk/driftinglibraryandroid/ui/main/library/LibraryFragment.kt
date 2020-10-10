@@ -10,12 +10,12 @@ import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.ui.extension.bindToListViewModel
 import com.fishhawk.driftinglibraryandroid.ui.extension.changeMangaListDisplayMode
 import com.fishhawk.driftinglibraryandroid.ui.extension.getDisplayModeIcon
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
-import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
 
 class LibraryFragment : Fragment() {
     private lateinit var binding: LibraryFragmentBinding

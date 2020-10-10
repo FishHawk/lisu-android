@@ -10,7 +10,6 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ServerFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.ui.extension.getDisplayModeIcon
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 
 class ServerFragment : Fragment() {

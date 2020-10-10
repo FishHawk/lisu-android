@@ -1,6 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider.search
 
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import com.fishhawk.driftinglibraryandroid.R

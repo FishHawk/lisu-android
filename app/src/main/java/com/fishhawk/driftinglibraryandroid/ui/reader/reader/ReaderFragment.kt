@@ -1,7 +1,9 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader.reader
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -12,7 +14,7 @@ import com.fishhawk.driftinglibraryandroid.databinding.ReaderFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
-import com.fishhawk.driftinglibraryandroid.ui.reader.*
+import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderViewModelFactory
 import kotlinx.coroutines.runBlocking
 
 class ReaderFragment : Fragment() {

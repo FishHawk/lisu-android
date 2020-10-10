@@ -1,6 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery.gallery
 
-import android.content.Context
 import android.view.LayoutInflater
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryThumbSheetBinding

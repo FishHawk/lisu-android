@@ -1,6 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.liveData
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderDetail
