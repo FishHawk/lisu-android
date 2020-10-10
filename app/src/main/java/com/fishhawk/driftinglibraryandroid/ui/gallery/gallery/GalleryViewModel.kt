@@ -1,9 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery.gallery
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.switchMap
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.repository.local.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail
@@ -14,11 +12,12 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepos
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MetadataDetail
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.ui.base.DownloadCreatedNotification
-import com.fishhawk.driftinglibraryandroid.ui.base.NotificationViewModel
-import com.fishhawk.driftinglibraryandroid.ui.base.SubscriptionCreatedNotification
+import com.fishhawk.driftinglibraryandroid.ui.base.OperationViewModel
+import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
+import com.fishhawk.driftinglibraryandroid.util.FileUtil
 import kotlinx.coroutines.launch
 import okhttp3.RequestBody
+import okhttp3.internal.notify
 
 class GalleryViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository,
@@ -26,7 +25,7 @@ class GalleryViewModel(
     private val remoteDownloadRepository: RemoteDownloadRepository,
     private val remoteSubscriptionRepository: RemoteSubscriptionRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
-) : NotificationViewModel() {
+) : OperationViewModel() {
     private val _detail: MutableLiveData<Result<MangaDetail>> = MutableLiveData(Result.Loading)
     val detail: LiveData<Result<MangaDetail>> = _detail
 
@@ -70,7 +69,7 @@ class GalleryViewModel(
             val providerId = it.data.providerId ?: return
             viewModelScope.launch {
                 val result = remoteDownloadRepository.postDownloadTask(providerId, id, title)
-                resultWarp(result) { notify(DownloadCreatedNotification()) }
+                resultWarp(result) { feed(R.string.download_task_created) }
             }
         }
     }
@@ -82,8 +81,13 @@ class GalleryViewModel(
             val providerId = it.data.providerId ?: return
             viewModelScope.launch {
                 val result = remoteSubscriptionRepository.postSubscription(providerId, id, title)
-                resultWarp(result) { notify(SubscriptionCreatedNotification()) }
+                resultWarp(result) { feed(R.string.subscription_created) }
             }
         }
+    }
+
+
+    fun saveThumb() {
+
     }
 }

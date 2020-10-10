@@ -37,12 +37,12 @@ class HistoryFragment : Fragment() {
 
         val adapter = HistoryListAdapter(requireActivity())
         adapter.onThumbClicked = {
-            requireActivity().navToGalleryActivity(
+            navToGalleryActivity(
                 it.mangaId, it.title, it.thumb, it.providerId
             )
         }
         adapter.onCardClicked = {
-            requireActivity().navToReaderActivity(
+            navToReaderActivity(
                 it.mangaId, it.providerId, it.collectionIndex, it.chapterIndex, it.pageIndex
             )
         }

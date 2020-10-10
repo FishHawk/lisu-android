@@ -24,9 +24,7 @@ fun Fragment.createMangaOutlineActionDialog(
         .create()
 
     dialogBinding.readButton.setOnClickListener {
-        requireActivity().navToReaderActivity(
-            outline.id, providerId, 0, 0, 0
-        )
+        navToReaderActivity(outline.id, providerId, 0, 0, 0)
         dialog.dismiss()
     }
     dialogBinding.downloadButton.setOnClickListener {

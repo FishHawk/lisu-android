@@ -1,14 +1,13 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider.base
 
 import androidx.lifecycle.viewModelScope
+import com.fishhawk.driftinglibraryandroid.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
-import com.fishhawk.driftinglibraryandroid.ui.base.DownloadCreatedNotification
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModelWithFetchMore
-import com.fishhawk.driftinglibraryandroid.ui.base.SubscriptionCreatedNotification
 
 abstract class ProviderBaseViewModel(
     private val providerId: String,
@@ -33,12 +32,12 @@ abstract class ProviderBaseViewModel(
     fun download(id: String, title: String) =
         viewModelScope.launch(Dispatchers.Main) {
             val result = remoteDownloadRepository.postDownloadTask(providerId, id, title)
-            resultWarp(result) { notify(DownloadCreatedNotification()) }
+            resultWarp(result) { feed(R.string.download_task_created) }
         }
 
     fun subscribe(id: String, title: String) =
         viewModelScope.launch(Dispatchers.Main) {
             val result = remoteSubscriptionRepository.postSubscription(providerId, id, title)
-            resultWarp(result) { notify(SubscriptionCreatedNotification()) }
+            resultWarp(result) { feed(R.string.subscription_created) }
         }
 }

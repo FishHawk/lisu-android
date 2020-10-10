@@ -1,9 +1,9 @@
 package com.fishhawk.driftinglibraryandroid.ui.base
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import java.text.SimpleDateFormat
@@ -14,7 +14,7 @@ import com.fishhawk.driftinglibraryandroid.ui.extension.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 
 class MangaListAdapter(
-    private val activity: Activity,
+    private val fragment: Fragment,
     private val providerId: String?
 ) : BaseRecyclerViewAdapter<MangaOutline, BaseRecyclerViewAdapter.ViewHolder<MangaOutline>>(
     mutableListOf()
@@ -33,14 +33,14 @@ class MangaListAdapter(
             ViewMode.GRID ->
                 GridViewHolder(
                     MangaGridThumbnailBinding.inflate(
-                        LayoutInflater.from(activity),
+                        LayoutInflater.from(fragment.requireContext()),
                         parent, false
                     )
                 )
             ViewMode.LINEAR ->
                 LinearViewHolder(
                     MangaLinearThumbnailBinding.inflate(
-                        LayoutInflater.from(activity),
+                        LayoutInflater.from(fragment.requireContext()),
                         parent, false
                     )
                 )
@@ -53,13 +53,13 @@ class MangaListAdapter(
         override fun bind(item: MangaOutline, position: Int) {
             binding.outline = item
 
-            Glide.with(activity)
+            Glide.with(fragment)
                 .load(item.thumb)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(binding.thumb)
 
             binding.root.setOnClickListener {
-                activity.navToGalleryActivity(item, providerId)
+                fragment.navToGalleryActivity(item, providerId)
             }
             binding.root.setOnLongClickListener {
                 onCardLongClicked(item)
@@ -81,13 +81,13 @@ class MangaListAdapter(
                 format.format(date)
             }
 
-            Glide.with(activity)
+            Glide.with(fragment)
                 .load(item.thumb)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(binding.thumb)
 
             binding.root.setOnClickListener {
-                activity.navToGalleryActivity(item, providerId)
+                fragment.navToGalleryActivity(item, providerId)
             }
             binding.root.setOnLongClickListener {
                 onCardLongClicked(item)

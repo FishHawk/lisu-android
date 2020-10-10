@@ -39,7 +39,7 @@ class ExploreFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val adapter = ProviderInfoListAdapter(requireContext())
-        adapter.onItemClicked = { requireActivity().navToProviderActivity(it) }
+        adapter.onItemClicked = { navToProviderActivity(it) }
         binding.list.adapter = adapter
 
         viewModel.providerList.observe(viewLifecycleOwner, Observer { result ->

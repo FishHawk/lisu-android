@@ -105,9 +105,6 @@
 
 
     <!-- reader fragment -->
-    <string name="reader_no_prev_chapter_hint">Already at the beginning.</string>
-    <string name="reader_no_next_chapter_hint">Already at the end.</string>
-
     <string name="hint_reading_direction_left_to_right">L to R</string>
     <string name="hint_reading_direction_right_to_Left">R to L</string>
     <string name="hint_reading_direction_vertical">Vertical</string>
@@ -115,7 +112,7 @@
     <string name="image_unknown_error_hint">Unknown error</string>
 
 
-    <!-- menu-->
+    <!-- menu -->
     <string name="menu_search">Search</string>
     <string name="menu_search_hint">Search…</string>
     <string name="menu_search_global">Search global</string>
@@ -128,9 +125,10 @@
     <string name="menu_disable_all">Disable all</string>
     <string name="menu_pause_all">Pause all</string>
     <string name="menu_start_all">Start all</string>
+    <string name="menu_add">Add</string>
 
 
-    <!-- dialog-->
+    <!-- dialog -->
     <string name="dialog_clear_history">Clear all history?</string>
     <string name="dialog_clear_history_positive">Clear all</string>
 
@@ -143,10 +141,26 @@
     <string name="thumb_action_subscribe">Subscribe</string>
 
 
-    <!-- misc-->
-    <string name="error_hint_unknown">Unknown error.</string>
+    <!-- toast -->
     <string name="error_hint_empty_refresh_result">List is empty.</string>
     <string name="error_hint_empty_fetch_more_result">No more result.</string>
+    <string name="download_task_created">Download task created.</string>
+    <string name="subscription_created">Subscription created.</string>
+
+    <string name="toast_unknown_error">Unknown error.</string>
+
+    <string name="toast_cache_cleared">Cache cleared.</string>
+
+    <string name="toast_manga_not_loaded">Manga not loaded.</string>
+    <string name="toast_manga_no_thumb">Manga has no thumb.</string>
+
+    <string name="toast_chapter_not_loaded">Chapter not loaded.</string>
+    <string name="toast_no_prev_chapter">Already at the beginning.</string>
+    <string name="toast_no_next_chapter">Already at the end.</string>
+
+
+    <string name="toast_image_already_exist">Image already exist.</string>
+    <string name="toast_image_saved">Image saved.</string>
+
     <string name="dialog_filter_history">Filter reading history</string>
-    <string name="menu_add">Add</string>
 </resources>

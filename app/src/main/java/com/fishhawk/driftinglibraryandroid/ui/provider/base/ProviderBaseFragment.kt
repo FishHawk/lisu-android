@@ -55,7 +55,7 @@ abstract class ProviderBaseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val providerId = requireActivity().intent.extras!!.getString("providerId")!!
-        val adapter = MangaListAdapter(requireActivity(), providerId)
+        val adapter = MangaListAdapter(this, providerId)
         adapter.onCardLongClicked = { outline ->
             createMangaOutlineActionDialog(providerId, outline, viewModel)
         }

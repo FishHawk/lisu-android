@@ -3,6 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.base
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.fishhawk.driftinglibraryandroid.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.fishhawk.driftinglibraryandroid.repository.Event
@@ -23,11 +24,11 @@ abstract class RefreshableListViewModelWithFetchMore<T> : RefreshableListViewMod
                 is Result.Success -> {
                     (_list.value as? Result.Success)?.data?.addAll(result.data)
                     _list.value = _list.value
-                    if (result.data.isEmpty()) notify(ListReachEndNotification())
+                    if (result.data.isEmpty()) feed(R.string.error_hint_empty_fetch_more_result)
                     onFetchMoreSuccess(result.data)
                 }
                 is Result.Error -> {
-                    notifyNetworkError(result.exception)
+                    feed(result.exception)
                     onFetchMoreError(result.exception)
                 }
             }
@@ -50,11 +51,11 @@ abstract class RefreshableListViewModel<T> : ListViewModel<T>() {
             when (val result = loadResult()) {
                 is Result.Success -> {
                     _list.value = Result.Success(result.data.toMutableList())
-                    if (result.data.isEmpty()) notify(ListEmptyNotification())
+                    if (result.data.isEmpty()) feed(R.string.error_hint_empty_refresh_result)
                     onRefreshSuccess(result.data)
                 }
                 is Result.Error -> {
-                    notifyNetworkError(result.exception)
+                    feed(result.exception)
                     onRefreshError(result.exception)
                 }
             }
@@ -64,7 +65,7 @@ abstract class RefreshableListViewModel<T> : ListViewModel<T>() {
     }
 }
 
-abstract class ListViewModel<T> : NotificationViewModel() {
+abstract class ListViewModel<T> : OperationViewModel() {
     protected val _list: MutableLiveData<Result<MutableList<T>>> = MutableLiveData()
     val list: LiveData<Result<MutableList<T>>> = _list
 

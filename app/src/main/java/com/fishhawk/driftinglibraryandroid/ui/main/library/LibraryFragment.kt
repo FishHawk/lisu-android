@@ -40,7 +40,7 @@ class LibraryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = MangaListAdapter(requireActivity(), null)
+        val adapter = MangaListAdapter(this, null)
         adapter.onCardLongClicked = { outline ->
             AlertDialog.Builder(requireActivity())
                 .setTitle("Confirm to delete manga?")

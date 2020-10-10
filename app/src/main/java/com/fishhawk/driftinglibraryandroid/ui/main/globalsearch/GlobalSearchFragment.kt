@@ -40,7 +40,7 @@ class GlobalSearchFragment : Fragment() {
 
         val adapter = GlobalSearchGroupListAdapter(requireContext())
         adapter.onItemClicked = { provider, outline ->
-            requireActivity().navToGalleryActivity(outline, provider.id)
+            navToGalleryActivity(outline, provider.id)
         }
         binding.list.adapter = adapter
 

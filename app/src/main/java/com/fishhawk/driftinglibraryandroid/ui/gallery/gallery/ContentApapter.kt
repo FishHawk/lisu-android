@@ -1,12 +1,12 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery.gallery
 
-import android.app.Activity
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import com.fishhawk.driftinglibraryandroid.databinding.*
-import com.fishhawk.driftinglibraryandroid.ui.extension.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
+import com.fishhawk.driftinglibraryandroid.ui.extension.navToReaderActivity
 
 data class MarkedPosition(
     val collectionIndex: Int,
@@ -54,7 +54,7 @@ sealed class ContentItem {
 }
 
 class ContentAdapter(
-    private val activity: Activity,
+    private val fragment: Fragment,
     private val id: String,
     private val providerId: String?
 ) : BaseRecyclerViewAdapter<ContentItem, BaseRecyclerViewAdapter.ViewHolder<ContentItem>>(
@@ -104,13 +104,13 @@ class ContentAdapter(
                     ViewMode.GRID ->
                         ChapterViewHolder(
                             GalleryChapterGridBinding.inflate(
-                                LayoutInflater.from(activity), parent, false
+                                LayoutInflater.from(fragment.requireContext()), parent, false
                             )
                         )
                     ViewMode.LINEAR ->
                         ChapterLinearViewHolder(
                             GalleryChapterLinearBinding.inflate(
-                                LayoutInflater.from(activity), parent, false
+                                LayoutInflater.from(fragment.requireContext()), parent, false
                             )
                         )
                 }
@@ -120,21 +120,29 @@ class ContentAdapter(
                     ViewMode.GRID ->
                         ChapterMarkedViewHolder(
                             GalleryChapterGridMarkedBinding.inflate(
-                                LayoutInflater.from(activity), parent, false
+                                LayoutInflater.from(fragment.requireContext()), parent, false
                             )
                         )
                     ViewMode.LINEAR ->
                         ChapterLinearMarkedViewHolder(
                             GalleryChapterLinearMarkedBinding.inflate(
-                                LayoutInflater.from(activity), parent, false
+                                LayoutInflater.from(fragment.requireContext()), parent, false
                             )
                         )
                 }
             ViewType.COLLECTION_HEADER.value -> CollectionHeaderViewHolder(
-                GalleryCollectionTitleBinding.inflate(LayoutInflater.from(activity), parent, false)
+                GalleryCollectionTitleBinding.inflate(
+                    LayoutInflater.from(fragment.requireContext()),
+                    parent,
+                    false
+                )
             )
             ViewType.NO_CHAPTER_HINT.value -> NoChapterHintViewHolder(
-                GalleryNoChapterHintBinding.inflate(LayoutInflater.from(activity), parent, false)
+                GalleryNoChapterHintBinding.inflate(
+                    LayoutInflater.from(fragment.requireContext()),
+                    parent,
+                    false
+                )
             )
             else -> throw IllegalAccessError()
         }
@@ -159,7 +167,7 @@ class ContentAdapter(
             val newItem = item as ContentItem.Chapter
             binding.button.text = newItem.name
             binding.button.setOnClickListener {
-                (activity as AppCompatActivity).navToReaderActivity(
+                fragment.navToReaderActivity(
                     id,
                     providerId,
                     newItem.collectionIndex,
@@ -177,7 +185,7 @@ class ContentAdapter(
             val newItem = item as ContentItem.ChapterMarked
             binding.button.text = newItem.name
             binding.button.setOnClickListener {
-                (activity as AppCompatActivity).navToReaderActivity(
+                fragment.navToReaderActivity(
                     id,
                     providerId,
                     newItem.collectionIndex,
@@ -196,7 +204,7 @@ class ContentAdapter(
             binding.name.text = newItem.name
             binding.title.text = newItem.title
             binding.root.setOnClickListener {
-                (activity as AppCompatActivity).navToReaderActivity(
+                fragment.navToReaderActivity(
                     id,
                     providerId,
                     newItem.collectionIndex,
@@ -215,7 +223,7 @@ class ContentAdapter(
             binding.name.text = newItem.name
             binding.title.text = newItem.title
             binding.root.setOnClickListener {
-                (activity as AppCompatActivity).navToReaderActivity(
+                fragment.navToReaderActivity(
                     id,
                     providerId,
                     newItem.collectionIndex,

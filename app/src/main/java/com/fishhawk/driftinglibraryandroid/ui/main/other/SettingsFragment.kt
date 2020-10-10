@@ -6,7 +6,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.bumptech.glide.Glide
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.ui.extension.makeToast
+import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -34,7 +34,7 @@ class SettingAdvancedFragment : PreferenceFragmentCompat() {
                         Glide.get(context).clearDiskCache()
                     }
                     Glide.get(context).clearMemory()
-                    requireView().makeToast("Cache cleared.")
+                    makeToast(R.string.toast_cache_cleared)
                 }
                 true
             }

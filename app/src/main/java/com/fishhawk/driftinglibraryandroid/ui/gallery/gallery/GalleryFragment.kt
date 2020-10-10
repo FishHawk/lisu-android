@@ -13,10 +13,12 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
+import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
-import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
+import com.fishhawk.driftinglibraryandroid.ui.base.setupFeedbackModule
 import com.fishhawk.driftinglibraryandroid.ui.extension.*
 import com.fishhawk.driftinglibraryandroid.ui.gallery.*
 import com.fishhawk.driftinglibraryandroid.util.FileUtil
@@ -43,6 +45,7 @@ class GalleryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupFeedbackModule(viewModel)
 
         val arguments = requireActivity().intent.extras!!
         val id: String = arguments.getString("id")!!
@@ -64,12 +67,8 @@ class GalleryFragment : Fragment() {
         binding.thumbCard.setOnLongClickListener {
             GalleryThumbSheet(
                 requireContext(),
-                { saveThumb() },
-                {
-                    val intent = Intent(Intent.ACTION_PICK)
-                    intent.type = "image/*"
-                    startActivityForResult(intent, 1000)
-                }
+                onSaved = { saveThumb() },
+                onEdited = { startImagePickActivity() }
             ).show()
             true
         }
@@ -80,16 +79,11 @@ class GalleryFragment : Fragment() {
             )
         tagAdapter.onTagClicked = { key, value ->
             val keywords = if (key.isBlank()) value else "${key}:$value"
-            requireActivity().navToMainActivity(keywords)
+            navToMainActivity(keywords)
         }
         binding.tags.adapter = tagAdapter
 
-        val contentAdapter =
-            ContentAdapter(
-                requireActivity(),
-                id,
-                providerId
-            )
+        val contentAdapter = ContentAdapter(this, id, providerId)
         binding.chapters.adapter = contentAdapter
 
         binding.displayModeButton.setOnClickListener {
@@ -112,10 +106,6 @@ class GalleryFragment : Fragment() {
                 SettingsHelper.ChapterDisplayOrder.ASCEND -> ContentView.ViewOrder.ASCEND
                 SettingsHelper.ChapterDisplayOrder.DESCEND -> ContentView.ViewOrder.DESCEND
             }
-        })
-
-        viewModel.notification.observe(viewLifecycleOwner, EventObserver {
-            showErrorMessage(it)
         })
 
         viewModel.detail.observe(viewLifecycleOwner, Observer { result ->
@@ -180,30 +170,10 @@ class GalleryFragment : Fragment() {
 
     private fun saveThumb() {
         val detail = (viewModel.detail.value as? Result.Success)?.data
-        if (detail == null) {
-            binding.root.makeToast("Manga not loaded")
-        } else {
-            val url = detail.thumb
-            if (url == null) {
-                binding.root.makeToast("No cover")
-            } else {
-                val filename = "${detail.id}-thumb"
-                val uri = FileUtil.createImageInGallery(requireContext(), filename)
-                if (uri == null) {
-                    binding.root.makeToast("Image already exist")
-                } else {
-                    val activity = requireContext()
-                    lifecycleScope.launch {
-                        try {
-                            FileUtil.saveImage(activity, url, uri)
-                            binding.root.makeToast("Image saved")
-                        } catch (e: Throwable) {
-                            binding.root.makeToast(e.message ?: "Unknown error")
-                        }
-                    }
-                }
-            }
-        }
+            ?: return makeToast(R.string.toast_manga_not_loaded)
+        val url = detail.thumb
+            ?: return makeToast(R.string.toast_manga_no_thumb)
+        saveImageToGallery(url, "${detail.id}-thumb")
     }
 
     private fun setupActionButton() {
@@ -211,14 +181,14 @@ class GalleryFragment : Fragment() {
             (viewModel.detail.value as? Result.Success)?.let { result ->
                 val detail = result.data
                 viewModel.history.value?.let { history ->
-                    requireActivity().navToReaderActivity(
+                    navToReaderActivity(
                         detail.id,
                         detail.providerId,
                         history.collectionIndex,
                         history.chapterIndex,
                         history.pageIndex
                     )
-                } ?: requireActivity().navToReaderActivity(detail.id, detail.providerId)
+                } ?: navToReaderActivity(detail.id, detail.providerId)
             }
         }
         binding.subscribeButton.setOnClickListener { viewModel.subscribe() }

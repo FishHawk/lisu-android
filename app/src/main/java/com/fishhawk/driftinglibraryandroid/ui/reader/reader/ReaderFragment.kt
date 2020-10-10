@@ -14,7 +14,9 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.ui.extension.makeToast
+import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
+import com.fishhawk.driftinglibraryandroid.ui.extension.saveImageToGallery
+import com.fishhawk.driftinglibraryandroid.ui.extension.startImageShareActivity
 import com.fishhawk.driftinglibraryandroid.ui.reader.*
 import com.fishhawk.driftinglibraryandroid.util.FileUtil
 import kotlinx.coroutines.launch
@@ -97,7 +99,7 @@ class ReaderFragment : Fragment() {
                 ReaderPageSheet(
                     requireContext(), position,
                     onRefreshed = { refreshImage(position) },
-                    onSaved = { lifecycleScope.launch { saveImage(position, url) } },
+                    onSaved = { saveImage(position, url) },
                     onShared = { lifecycleScope.launch { shareImage(url) } }
                 ).show()
         }
@@ -106,9 +108,11 @@ class ReaderFragment : Fragment() {
     private fun setupMenuLayout() {
         binding.menuLayout.setOnClickListener { viewModel.isMenuVisible.value = false }
 
-        binding.settingButton.setOnClickListener { ReaderSettingsSheet(
-            requireContext()
-        ).show() }
+        binding.settingButton.setOnClickListener {
+            ReaderSettingsSheet(
+                requireContext()
+            ).show()
+        }
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}
@@ -130,14 +134,13 @@ class ReaderFragment : Fragment() {
 
     private fun openPrevChapter() {
         if (viewModel.isLoading) return
-        if (!viewModel.openPrevChapter()) binding.root.makeToast(getString(R.string.reader_no_prev_chapter_hint))
+        if (!viewModel.openPrevChapter()) makeToast(R.string.toast_no_prev_chapter)
     }
 
     private fun openNextChapter() {
         if (viewModel.isLoading) return
-        if (!viewModel.openNextChapter()) binding.root.makeToast(getString(R.string.reader_no_next_chapter_hint))
+        if (!viewModel.openNextChapter()) makeToast(R.string.toast_no_next_chapter)
     }
-
 
     fun refreshImage(page: Int) {
         binding.reader.refreshPage(page)
@@ -145,38 +148,13 @@ class ReaderFragment : Fragment() {
 
     suspend fun shareImage(url: String) {
         val file = FileUtil.downloadImage(requireContext(), url)
-
-        val uri = FileProvider.getUriForFile(
-            requireContext(), "${requireActivity().packageName}.fileprovider", file
-        )
-        val shareIntent = Intent().apply {
-            action = Intent.ACTION_SEND
-            type = "image/*"
-            putExtra(Intent.EXTRA_STREAM, uri)
-        }
-        startActivity(Intent.createChooser(shareIntent, "Share image"))
+        startImageShareActivity(file)
     }
 
-    suspend fun saveImage(page: Int, url: String) {
+    fun saveImage(page: Int, url: String) {
         val prefix = viewModel.makeImageFilenamePrefix()
-        if (prefix == null) {
-            binding.root.makeToast("Chapter not open")
-        } else {
-            val filename = "$prefix-$page"
-            val uri = FileUtil.createImageInGallery(requireContext(), filename)
-            if (uri == null) {
-                binding.root.makeToast("Image already exist")
-            } else {
-                val context = requireContext()
-                lifecycleScope.launch {
-                    try {
-                        FileUtil.saveImage(context, url, uri)
-                        binding.root.makeToast("Image saved")
-                    } catch (e: Throwable) {
-                        binding.root.makeToast(e.message ?: "Unknown error")
-                    }
-                }
-            }
-        }
+            ?: return makeToast(R.string.toast_chapter_not_loaded)
+        val filename = "$prefix-$page"
+        saveImageToGallery(url, filename)
     }
 }

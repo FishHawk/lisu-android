@@ -1,7 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.ui.extension
 
-import android.view.View
-import android.widget.Toast
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModelWithFetchMore
@@ -44,8 +42,4 @@ fun RefreshLayout.setupDefaultColorSchemeResources() {
         R.color.loading_indicator_green,
         R.color.loading_indicator_orange
     )
-}
-
-fun View.makeToast(content: String) {
-    Toast.makeText(context, content, Toast.LENGTH_SHORT).show()
 }
