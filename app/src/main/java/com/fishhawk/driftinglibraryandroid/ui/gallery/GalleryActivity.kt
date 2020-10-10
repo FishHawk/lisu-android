@@ -130,12 +130,9 @@ class GalleryActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == 1000) {
-            binding.thumb.setImageURI(data?.data)
             val uri = data?.data
             val content = uri?.let { contentResolver.openInputStream(it)?.readBytes() }
             val type = uri?.let { contentResolver.getType(uri)?.toMediaTypeOrNull() }
-            print(content?.size)
-            println(type)
             if (content != null && type != null)
                 viewModel.updateThumb(content.toRequestBody(type))
         }

@@ -6,7 +6,6 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MetadataDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.service.RemoteLibraryService
-import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
 class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
@@ -46,12 +45,7 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
         mangaId: String,
         requestBody: RequestBody
     ): Result<MangaDetail> =
-        resultWrap {
-            it.patchMangaThumb(
-                mangaId,
-                MultipartBody.Part.createFormData("thumb", "thumb", requestBody)
-            ).apply { }
-        }
+        resultWrap { it.patchMangaThumb(mangaId, requestBody) }
 
     suspend fun getChapterContent(
         mangaId: String,
