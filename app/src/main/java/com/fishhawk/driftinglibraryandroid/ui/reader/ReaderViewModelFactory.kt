@@ -3,6 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.reader
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.MainApplication
+import com.fishhawk.driftinglibraryandroid.ui.reader.reader.ReaderViewModel
 
 @Suppress("UNCHECKED_CAST")
 class ReaderViewModelFactory(

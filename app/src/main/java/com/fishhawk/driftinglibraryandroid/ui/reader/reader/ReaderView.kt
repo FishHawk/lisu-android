@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.reader
+package com.fishhawk.driftinglibraryandroid.ui.reader.reader
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -23,7 +23,10 @@ class ReaderView @JvmOverloads constructor(
     private val recyclerView = binding.content
     private val pagerSnapHelper = PagerSnapHelper()
     private val layoutManager = LinearLayoutManager(context)
-    val adapter = ImageListAdapter(context)
+    val adapter =
+        ImageListAdapter(
+            context
+        )
 
     private var isSnapAttached = false
         set(value) {
@@ -40,7 +43,8 @@ class ReaderView @JvmOverloads constructor(
 
     enum class Mode { LTR, RTL, VERTICAL }
 
-    var mode = Mode.LTR
+    var mode =
+        Mode.LTR
         set(value) {
             isSnapAttached = (value != Mode.VERTICAL)
             layoutManager.reverseLayout = (value == Mode.RTL)

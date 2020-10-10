@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.reader
+package com.fishhawk.driftinglibraryandroid.ui.reader.reader
 
 import android.content.Context
 import android.graphics.Bitmap

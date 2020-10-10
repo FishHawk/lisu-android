@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.reader
+package com.fishhawk.driftinglibraryandroid.ui.reader.reader
 
 import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.repository.Result

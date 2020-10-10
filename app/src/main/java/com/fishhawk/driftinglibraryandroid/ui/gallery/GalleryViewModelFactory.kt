@@ -3,6 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.MainApplication
+import com.fishhawk.driftinglibraryandroid.ui.gallery.gallery.GalleryViewModel
 
 @Suppress("UNCHECKED_CAST")
 class GalleryViewModelFactory constructor(

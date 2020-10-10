@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.gallery
+package com.fishhawk.driftinglibraryandroid.ui.gallery.gallery
 
 import android.annotation.SuppressLint
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail

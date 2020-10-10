@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.gallery
+package com.fishhawk.driftinglibraryandroid.ui.gallery.gallery
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -26,7 +26,10 @@ class TagGroupListAdapter(
         override fun bind(item: TagGroup, position: Int) {
             binding.tagKey = if (itemCount == 1 && item.key.isBlank()) null else item.key
 
-            val adapter = TagGroupAdapter(context)
+            val adapter =
+                TagGroupAdapter(
+                    context
+                )
             adapter.setList(item.value)
             adapter.onTagClicked = { onTagClicked?.invoke(item.key, it) }
             binding.value.adapter = adapter

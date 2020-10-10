@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.gallery
+package com.fishhawk.driftinglibraryandroid.ui.gallery.gallery
 
 import android.app.Activity
 import android.view.LayoutInflater
@@ -22,7 +22,13 @@ sealed class ContentItem {
         val chapterIndex: Int
     ) : ContentItem() {
         fun marked(pageIndex: Int): ChapterMarked {
-            return ChapterMarked(name, title, collectionIndex, chapterIndex, pageIndex)
+            return ChapterMarked(
+                name,
+                title,
+                collectionIndex,
+                chapterIndex,
+                pageIndex
+            )
         }
     }
 
@@ -34,7 +40,12 @@ sealed class ContentItem {
         val pageIndex: Int
     ) : ContentItem() {
         fun unmarked(): Chapter {
-            return Chapter(name, title, collectionIndex, chapterIndex)
+            return Chapter(
+                name,
+                title,
+                collectionIndex,
+                chapterIndex
+            )
         }
     }
 
@@ -54,7 +65,8 @@ class ContentAdapter(
         LINEAR(1)
     }
 
-    var viewMode = ViewMode.GRID
+    var viewMode =
+        ViewMode.GRID
 
     enum class ViewType(val value: Int) {
         CHAPTER(0),

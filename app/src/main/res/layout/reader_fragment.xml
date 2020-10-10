@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="com.fishhawk.driftinglibraryandroid.ui.reader.reader.ReaderViewModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.reader.ReaderActivity">
+
+        <com.fishhawk.driftinglibraryandroid.ui.reader.reader.ReaderView
+            android:id="@+id/reader"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:background="#AA000000"
+            android:gravity="end"
+            android:paddingStart="@dimen/baseline_8dp"
+            android:paddingTop="@dimen/baseline_4dp"
+            android:paddingEnd="@dimen/baseline_8dp"
+            android:paddingBottom="@dimen/baseline_4dp"
+            android:text="@{String.format(`%s %s %s/%s`, viewModel.chapterName, viewModel.chapterTitle, viewModel.chapterPosition+1, viewModel.chapterSize)}"
+            android:textColor="#ffffff"
+            android:visibility="@{!viewModel.isMenuVisible ? View.VISIBLE : View.GONE}" />
+
+        <FrameLayout
+            android:id="@+id/menu_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{viewModel.isMenuVisible ? View.VISIBLE : View.GONE}">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:background="#AA000000"
+                android:orientation="horizontal"
+                android:paddingStart="4dp"
+                android:paddingTop="28dp"
+                android:paddingEnd="4dp"
+                android:paddingBottom="4dp">
+
+                <com.google.android.material.button.MaterialButton
+                    style="@style/Theme.Widget.Button.Icon.Textless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    app:icon="@drawable/ic_baseline_keyboard_arrow_left_24"
+                    app:iconTint="@android:color/white" />
+
+                <TextView
+                    android:id="@+id/title"
+                    style="@style/Theme.TextAppearance.Title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:textColor="@android:color/white"
+                    android:textIsSelectable="false"
+                    tools:text="Title" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/setting_button"
+                    style="@style/Theme.Widget.Button.Icon.Textless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    app:icon="@drawable/ic_settings_black_24dp"
+                    app:iconTint="@android:color/white" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="#AA000000"
+                android:orientation="vertical"
+                android:padding="@dimen/baseline_4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/baseline_4dp"
+                    android:gravity="center_vertical"
+                    android:layoutDirection="@{viewModel.isReaderDirectionEqualRightToLeft ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR}"
+                    android:orientation="horizontal">
+
+                    <SeekBar
+                        android:id="@+id/seek_bar"
+                        android:layout_width="0dp"
+                        android:layout_height="28dp"
+                        android:layout_weight="1"
+                        android:max="@{viewModel.chapterSize - 1}"
+                        android:progress="@{viewModel.chapterPosition}"
+                        android:tint="?attr/colorSecondary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{String.format(`%s/%s`,String.valueOf(viewModel.chapterPosition + 1),String.valueOf(viewModel.chapterSize))}"
+                        android:textColor="#ffffff" />
+                </LinearLayout>
+            </LinearLayout>
+        </FrameLayout>
+    </FrameLayout>
+</layout>
