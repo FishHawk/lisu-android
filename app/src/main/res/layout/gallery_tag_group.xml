@@ -17,17 +17,16 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <TextView
+        <com.google.android.material.chip.Chip
             android:id="@+id/key"
-            style="@style/Theme.TextAppearance.Tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
+            android:layout_margin="2dp"
             android:text="@{tagKey}"
+            android:textSize="12sp"
             android:visibility="@{tagKey != null ? View.VISIBLE : View.GONE}"
+            app:chipMinHeight="24dp"
+            app:chipMinTouchTargetSize="24dp"
             tools:text="key" />
 
         <androidx.recyclerview.widget.RecyclerView
