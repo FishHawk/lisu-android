@@ -63,7 +63,7 @@
                 android:layout_marginStart="@dimen/baseline_8dp"
                 android:layout_marginTop="@dimen/baseline_4dp"
                 android:ellipsize="end"
-                android:singleLine="true"
+                android:maxLines="1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/seen_label"
                 app:layout_constraintTop_toBottomOf="@+id/title" />
@@ -87,7 +87,7 @@
                 android:layout_marginStart="@dimen/baseline_8dp"
                 android:layout_marginTop="@dimen/baseline_4dp"
                 android:ellipsize="end"
-                android:singleLine="true"
+                android:maxLines="1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/date_label"
                 app:layout_constraintTop_toBottomOf="@+id/seen_label" />
@@ -112,7 +112,7 @@
                 android:layout_marginStart="@dimen/baseline_8dp"
                 android:layout_marginTop="@dimen/baseline_4dp"
                 android:ellipsize="end"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:text="@{readingHistory.providerId}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/provider_label"
