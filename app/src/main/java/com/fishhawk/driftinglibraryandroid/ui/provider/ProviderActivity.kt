@@ -10,7 +10,6 @@ import com.fishhawk.driftinglibraryandroid.ui.extension.setupWithNavControllerT
 class ProviderActivity : AppCompatActivity() {
     private lateinit var binding: ProviderActivityBinding
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         setupTheme()
         super.onCreate(savedInstanceState)
@@ -18,7 +17,7 @@ class ProviderActivity : AppCompatActivity() {
         binding = ProviderActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
-        title = intent.extras!!.getString("providerId")!!
+        title = intent.extras!!.getString("providerName")!!
         if (savedInstanceState == null) setupBottomNavigationBar()
     }
 

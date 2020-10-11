@@ -174,7 +174,10 @@ fun Fragment.navToReaderActivity(
 }
 
 fun Fragment.navToProviderActivity(provider: ProviderInfo) {
-    val bundle = bundleOf("providerId" to provider.id)
+    val bundle = bundleOf(
+        "providerId" to provider.id,
+        "providerName" to provider.name
+    )
     val intent = Intent(requireActivity(), ProviderActivity::class.java)
     intent.putExtras(bundle)
     startActivity(intent)
