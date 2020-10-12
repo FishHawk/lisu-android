@@ -61,8 +61,8 @@ class LibraryFragment : Fragment() {
             adapter
         )
 
-        val filter: String? = arguments?.getString("filter")
-        viewModel.reloadIfNeed(filter ?: "")
+        val keywords = requireActivity().intent.extras?.getString("keywords")
+        viewModel.reloadIfNeed(keywords ?: "")
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

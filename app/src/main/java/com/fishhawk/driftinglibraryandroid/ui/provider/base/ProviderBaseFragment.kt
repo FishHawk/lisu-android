@@ -18,6 +18,7 @@ import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.ui.extension.bindToListViewModel
 import com.fishhawk.driftinglibraryandroid.ui.extension.changeMangaListDisplayMode
 import com.fishhawk.driftinglibraryandroid.ui.extension.getDisplayModeIcon
+import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActivity
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderViewModel
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderViewModelFactory
 
@@ -114,6 +115,9 @@ abstract class ProviderBaseFragment : Fragment() {
 
             override fun onQueryTextChange(query: String): Boolean = true
         })
+
+        val keywords = (requireActivity() as ProviderActivity).keywords
+        if (keywords != null) searchView.setQuery(keywords, true)
 
         menu.findItem(R.id.action_option).isVisible = isOptionSheetEnabled
         menu.findItem(R.id.action_display_mode).setIcon(getDisplayModeIcon())

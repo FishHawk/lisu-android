@@ -183,8 +183,19 @@ fun Fragment.navToProviderActivity(provider: ProviderInfo) {
     startActivity(intent)
 }
 
-fun Fragment.navToMainActivity(filter: String) {
-    val bundle = bundleOf("filter" to filter)
+fun Fragment.navToProviderActivity(providerId: String, keywords: String) {
+    val bundle = bundleOf(
+        "providerId" to providerId,
+        "providerName" to providerId,
+        "keywords" to keywords
+    )
+    val intent = Intent(requireActivity(), ProviderActivity::class.java)
+    intent.putExtras(bundle)
+    startActivity(intent)
+}
+
+fun Fragment.navToMainActivity(keywords: String) {
+    val bundle = bundleOf("keywords" to keywords)
     val intent = Intent(requireActivity(), MainActivity::class.java)
     intent.putExtras(bundle)
     startActivity(intent)

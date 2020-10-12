@@ -18,6 +18,7 @@ import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.setupFeedbackModule
 import com.fishhawk.driftinglibraryandroid.ui.extension.getChapterDisplayModeIcon
 import com.fishhawk.driftinglibraryandroid.ui.extension.navToMainActivity
+import com.fishhawk.driftinglibraryandroid.ui.extension.navToProviderActivity
 import com.fishhawk.driftinglibraryandroid.ui.extension.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModelFactory
 import kotlinx.android.synthetic.main.gallery_fragment.view.*
@@ -65,7 +66,8 @@ class GalleryFragment : Fragment() {
         val tagAdapter = TagGroupListAdapter(requireContext())
         tagAdapter.onTagClicked = { key, value ->
             val keywords = if (key.isBlank()) value else "${key}:$value"
-            navToMainActivity(keywords)
+            if (providerId == null) navToMainActivity(keywords)
+            else navToProviderActivity(providerId, keywords)
         }
         binding.tags.adapter = tagAdapter
 
