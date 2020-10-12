@@ -12,6 +12,7 @@ class TagGroupAdapter(
     private val context: Context
 ) : BaseRecyclerViewAdapter<String, TagGroupAdapter.ViewHolder>() {
     var onTagClicked: ((String) -> Unit)? = null
+    var onTagLongClicked: ((String) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
@@ -31,7 +32,13 @@ class TagGroupAdapter(
 
         override fun bind(item: String, position: Int) {
             binding.tagValue = item
-            binding.root.setOnClickListener { onTagClicked?.invoke(item) }
+            binding.value.setOnClickListener {
+                onTagClicked?.invoke(item)
+            }
+            binding.value.setOnLongClickListener {
+                onTagLongClicked?.invoke(item)
+                true
+            }
         }
     }
 }

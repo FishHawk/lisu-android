@@ -12,14 +12,13 @@ import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
+import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import com.fishhawk.driftinglibraryandroid.ui.base.setupFeedbackModule
-import com.fishhawk.driftinglibraryandroid.ui.extension.getChapterDisplayModeIcon
-import com.fishhawk.driftinglibraryandroid.ui.extension.navToMainActivity
-import com.fishhawk.driftinglibraryandroid.ui.extension.navToProviderActivity
-import com.fishhawk.driftinglibraryandroid.ui.extension.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.extension.*
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModelFactory
 import kotlinx.android.synthetic.main.gallery_fragment.view.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -54,6 +53,18 @@ class GalleryFragment : Fragment() {
         if (providerId == null) viewModel.openMangaFromLibrary(id)
         else viewModel.openMangaFromProvider(providerId, id)
 
+        binding.title.setOnLongClickListener {
+            copyToClipboard(binding.title.text as String)
+            makeToast(R.string.toast_manga_title_copied)
+            true
+        }
+
+        binding.author.setOnLongClickListener {
+            copyToClipboard(binding.author.text as String)
+            makeToast(R.string.toast_manga_author_copied)
+            true
+        }
+
         binding.info = GalleryInfo(providerId, title)
         setupThumb(thumb)
         setupActionButton()
@@ -68,6 +79,11 @@ class GalleryFragment : Fragment() {
             val keywords = if (key.isBlank()) value else "${key}:$value"
             if (providerId == null) navToMainActivity(keywords)
             else navToProviderActivity(providerId, keywords)
+        }
+        tagAdapter.onTagLongClicked = { key, value ->
+            val keywords = if (key.isBlank()) value else "${key}:$value"
+            copyToClipboard(keywords)
+            makeToast(R.string.toast_manga_tag_saved)
         }
         binding.tags.adapter = tagAdapter
 
@@ -107,6 +123,12 @@ class GalleryFragment : Fragment() {
                         binding.description.maxLines =
                             if (binding.description.maxLines < Int.MAX_VALUE) Int.MAX_VALUE else 3
                     }
+                    binding.description.setOnLongClickListener {
+                        copyToClipboard(binding.description.text as String)
+                        makeToast(R.string.toast_manga_description_copied)
+                        true
+                    }
+
                     if (!detail.metadata.tags.isNullOrEmpty())
                         tagAdapter.setList(detail.metadata.tags)
                     if (detail.collections.isNotEmpty())

@@ -153,6 +153,10 @@
 
     <string name="toast_manga_not_loaded">Manga not loaded.</string>
     <string name="toast_manga_no_thumb">Manga has no thumb.</string>
+    <string name="toast_manga_title_copied">Copy title to clipboard.</string>
+    <string name="toast_manga_author_copied">Copy author to clipboard.</string>
+    <string name="toast_manga_description_copied">Copy description to clipboard.</string>
+    <string name="toast_manga_tag_saved">Copy tag to clipboard.</string>
 
     <string name="toast_chapter_not_loaded">Chapter not loaded.</string>
     <string name="toast_no_prev_chapter">Already at the beginning.</string>
