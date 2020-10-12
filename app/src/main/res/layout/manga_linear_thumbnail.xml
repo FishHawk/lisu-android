@@ -39,7 +39,7 @@
                 android:layout_marginTop="@dimen/baseline_4dp"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:text="@{outline.metadata.title}"
+                android:text="@{outline.title}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/thumb"
                 app:layout_constraintTop_toTopOf="parent"

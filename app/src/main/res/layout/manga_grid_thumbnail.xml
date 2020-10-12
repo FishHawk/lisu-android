@@ -51,7 +51,7 @@
                     android:ellipsize="end"
                     android:maxLines="2"
                     android:padding="8dp"
-                    android:text="@{outline.metadata.title}"
+                    android:text="@{outline.title}"
                     tools:text="Sample name" />
             </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
