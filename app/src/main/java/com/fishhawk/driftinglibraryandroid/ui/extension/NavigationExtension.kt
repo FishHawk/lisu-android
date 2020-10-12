@@ -24,7 +24,7 @@ fun BottomNavigationView.setupWithNavControllerT(
     fragmentManager: FragmentManager,
     containerId: Int,
     intent: Intent,
-    appBarLayout: AppBarLayout
+    hasHome: Boolean = true
 ): LiveData<NavController> {
 
     // Map of tags
@@ -59,7 +59,6 @@ fun BottomNavigationView.setupWithNavControllerT(
 
         // Hide bottom navigation when destination is not start destination
         navHostFragment.navController.addOnDestinationChangedListener { _, destination, _ ->
-            appBarLayout.setExpanded(true, true)
             if (destination.id == navHostFragment.navController.graph.startDestination)
                 this.visibility = View.VISIBLE
             else
@@ -82,7 +81,6 @@ fun BottomNavigationView.setupWithNavControllerT(
 
     // When a navigation item is selected
     setOnNavigationItemSelectedListener { item ->
-        appBarLayout.setExpanded(true, true)
         // Don't do anything if the state is state has already been saved.
         if (fragmentManager.isStateSaved) {
             false
@@ -91,7 +89,7 @@ fun BottomNavigationView.setupWithNavControllerT(
             if (selectedItemTag != newlySelectedItemTag) {
                 // Pop everything above the first fragment (the "fixed start destination")
                 fragmentManager.popBackStack(
-                    firstFragmentTag,
+                    null,
                     FragmentManager.POP_BACK_STACK_INCLUSIVE
                 )
                 val selectedFragment = fragmentManager.findFragmentByTag(newlySelectedItemTag)
@@ -114,11 +112,14 @@ fun BottomNavigationView.setupWithNavControllerT(
                             // Detach all other Fragments
                             graphIdToTagMap.forEach { _, fragmentTagIter ->
                                 if (fragmentTagIter != newlySelectedItemTag) {
-                                    detach(fragmentManager.findFragmentByTag(firstFragmentTag)!!)
+                                    if (hasHome)
+                                        detach(fragmentManager.findFragmentByTag(firstFragmentTag)!!)
+                                    else
+                                        detach(fragmentManager.findFragmentByTag(fragmentTagIter)!!)
                                 }
                             }
+                            if (hasHome) addToBackStack(firstFragmentTag)
                         }
-                        .addToBackStack(firstFragmentTag)
                         .setReorderingAllowed(true)
                         .commit()
                 }

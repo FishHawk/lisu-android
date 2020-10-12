@@ -40,7 +40,7 @@ class ProviderActivity : AppCompatActivity() {
             fragmentManager = supportFragmentManager,
             containerId = binding.navHostContainer.id,
             intent = intent,
-            appBarLayout = binding.appBarLayout
+            hasHome = false
         )
     }
 }
