@@ -3,18 +3,18 @@ package com.fishhawk.driftinglibraryandroid.ui.provider
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.ProviderActivityBinding
+import com.fishhawk.driftinglibraryandroid.databinding.ActivityProviderBinding
 import com.fishhawk.driftinglibraryandroid.ui.extension.setupTheme
 import com.fishhawk.driftinglibraryandroid.ui.extension.setupWithNavControllerT
 
 class ProviderActivity : AppCompatActivity() {
-    private lateinit var binding: ProviderActivityBinding
+    private lateinit var binding: ActivityProviderBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupTheme()
         super.onCreate(savedInstanceState)
 
-        binding = ProviderActivityBinding.inflate(layoutInflater)
+        binding = ActivityProviderBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         title = intent.extras!!.getString("providerName")!!

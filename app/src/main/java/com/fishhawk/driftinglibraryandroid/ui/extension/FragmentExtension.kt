@@ -129,7 +129,7 @@ fun Fragment.navToGalleryActivity(
 ) {
     navToGalleryActivity(
         outline.id,
-        (outline.metadata.title ?: outline.id),
+        outline.title,
         outline.thumb,
         providerId
     )

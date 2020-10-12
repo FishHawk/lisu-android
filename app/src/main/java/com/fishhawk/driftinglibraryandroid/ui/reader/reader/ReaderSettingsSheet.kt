@@ -15,7 +15,9 @@ class ReaderSettingsSheet(
     context: Context
 ) : BottomSheetDialog(context) {
     private val binding =
-        ReaderSettingsSheetBinding.inflate(LayoutInflater.from(context), null, false)
+        ReaderSettingsSheetBinding.inflate(
+            LayoutInflater.from(context), null, false
+        )
 
     init {
         setContentView(binding.root)

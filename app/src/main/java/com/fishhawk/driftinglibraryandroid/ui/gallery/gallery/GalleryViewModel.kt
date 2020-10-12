@@ -65,7 +65,7 @@ class GalleryViewModel(
     fun download() {
         (detail.value as? Result.Success)?.let {
             val id = it.data.id
-            val title = it.data.metadata.title ?: id
+            val title = it.data.title
             val providerId = it.data.providerId ?: return
             viewModelScope.launch {
                 val result = remoteDownloadRepository.postDownloadTask(providerId, id, title)
@@ -77,7 +77,7 @@ class GalleryViewModel(
     fun subscribe() {
         (detail.value as? Result.Success)?.let {
             val id = it.data.id
-            val title = it.data.metadata.title ?: id
+            val title = it.data.title
             val providerId = it.data.providerId ?: return
             viewModelScope.launch {
                 val result = remoteSubscriptionRepository.postSubscription(providerId, id, title)

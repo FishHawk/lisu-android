@@ -162,6 +162,7 @@ class GalleryFragment : Fragment() {
                 } ?: navToReaderActivity(detail.id, detail.providerId)
             }
         }
+        binding.editButton.setOnClickListener { GalleryEditSheet(this).show() }
         binding.subscribeButton.setOnClickListener { viewModel.subscribe() }
         binding.downloadButton.setOnClickListener { viewModel.download() }
     }

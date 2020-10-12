@@ -29,7 +29,7 @@ class GalleryInfo {
     @SuppressLint("SimpleDateFormat")
     constructor(detail: MangaDetail) {
         providerId = detail.providerId
-        title = detail.metadata.title ?: detail.id
+        title = detail.title
         author = detail.metadata.authors?.let {
             if (it.isEmpty()) null
             else it.joinToString(separator = ";")

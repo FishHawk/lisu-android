@@ -5,20 +5,20 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import com.fishhawk.driftinglibraryandroid.databinding.ReaderActivityBinding
+import com.fishhawk.driftinglibraryandroid.databinding.ActivityReaderBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.extension.setupFullScreen
 import com.fishhawk.driftinglibraryandroid.ui.extension.setupThemeWithTranslucentStatus
 
 class ReaderActivity : AppCompatActivity() {
-    lateinit var binding: ReaderActivityBinding
+    lateinit var binding: ActivityReaderBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setupThemeWithTranslucentStatus()
         super.onCreate(savedInstanceState)
         setupFullScreen()
 
-        binding = ReaderActivityBinding.inflate(layoutInflater)
+        binding = ActivityReaderBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         SettingsHelper.screenOrientation.observe(this, Observer {
