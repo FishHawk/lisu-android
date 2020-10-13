@@ -13,13 +13,15 @@ class ContentView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : RecyclerView(context, attrs, defStyleAttr) {
     private val linearLayoutManager = LinearLayoutManager(context)
-    private val gridLayoutManager = GridLayoutManager(context, 3).apply {
+
+    private val gridSpanCount = 4
+    private val gridLayoutManager = GridLayoutManager(context, gridSpanCount).apply {
         spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return when (adapter?.getItemViewType(position)) {
                     ContentAdapter.ViewType.CHAPTER.value -> 1
                     ContentAdapter.ViewType.CHAPTER_MARKED.value -> 1
-                    else -> 3
+                    else -> gridSpanCount
                 }
             }
         }

@@ -207,137 +207,155 @@
                     android:id="@+id/content_view"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:orientation="vertical"
-                    android:visibility="visible"
-                    tools:visibility="visible">
+                    android:orientation="vertical">
 
-                    <LinearLayout
+                    <androidx.cardview.widget.CardView
+                        style="@style/Theme.Widget.CardView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
-                        android:orientation="vertical">
+                        android:layout_marginEnd="8dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp"
+                            android:layout_marginBottom="8dp"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    style="@style/Theme.TextAppearance.Subtitle1"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="About:" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/download_button"
+                                    style="@style/Theme.Widget.Button.Icon.Textless"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:visibility="@{info.providerId != null ? View.VISIBLE : View.GONE}"
+                                    app:icon="@drawable/ic_baseline_cloud_download_24" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/subscribe_button"
+                                    style="@style/Theme.Widget.Button.Icon.Textless"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:visibility="@{info.providerId != null ? View.VISIBLE : View.GONE}"
+                                    app:icon="@drawable/ic_baseline_rss_feed_24" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/edit_button"
+                                    style="@style/Theme.Widget.Button.Icon.Textless"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:visibility="@{info.providerId == null ? View.VISIBLE : View.GONE}"
+                                    app:icon="@drawable/ic_baseline_edit_24" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/read_button"
+                                    style="@style/Theme.Widget.Button.Icon"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/gallery_read_button_hint"
+                                    app:icon="@drawable/ic_baseline_play_arrow_24" />
+                            </LinearLayout>
 
                             <TextView
-                                style="@style/Theme.TextAppearance.Subtitle1"
-                                android:layout_width="0dp"
+                                android:id="@+id/description"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="About:" />
+                                android:layout_marginTop="4dp"
+                                android:clickable="true"
+                                android:ellipsize="end"
+                                android:focusable="true"
+                                android:maxLines="3"
+                                android:text="@{info.description}"
+                                android:textIsSelectable="false"
+                                android:visibility="@{info.description != null ? View.VISIBLE : View.GONE}"
+                                tools:text="Sample description line 1\nSample description line 2" />
 
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/download_button"
-                                style="@style/Theme.Widget.Button.Icon.Textless"
-                                android:layout_width="wrap_content"
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/tags"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:visibility="@{info.providerId != null ? View.VISIBLE : View.GONE}"
-                                app:icon="@drawable/ic_baseline_cloud_download_24" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/subscribe_button"
-                                style="@style/Theme.Widget.Button.Icon.Textless"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:visibility="@{info.providerId != null ? View.VISIBLE : View.GONE}"
-                                app:icon="@drawable/ic_baseline_rss_feed_24" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/edit_button"
-                                style="@style/Theme.Widget.Button.Icon.Textless"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:visibility="@{info.providerId == null ? View.VISIBLE : View.GONE}"
-                                app:icon="@drawable/ic_baseline_edit_24" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/read_button"
-                                style="@style/Theme.Widget.Button.Icon"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/gallery_read_button_hint"
-                                app:icon="@drawable/ic_baseline_play_arrow_24" />
+                                android:layout_marginTop="4dp"
+                                android:orientation="vertical"
+                                android:visibility="@{info.hasTag ? View.VISIBLE : View.GONE}"
+                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                                tools:itemCount="2"
+                                tools:listitem="@layout/gallery_tag_group" />
                         </LinearLayout>
+                    </androidx.cardview.widget.CardView>
 
-                        <TextView
-                            android:id="@+id/description"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:clickable="true"
-                            android:ellipsize="end"
-                            android:focusable="true"
-                            android:maxLines="3"
-                            android:text="@{info.description}"
-                            android:textIsSelectable="false"
-                            android:visibility="@{info.description != null ? View.VISIBLE : View.GONE}"
-                            tools:text="Sample description line 1\nSample description line 2" />
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/tags"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:orientation="vertical"
-                            android:visibility="@{info.hasTag ? View.VISIBLE : View.GONE}"
-                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                            tools:itemCount="2"
-                            tools:listitem="@layout/gallery_tag_group" />
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <androidx.cardview.widget.CardView
+                        style="@style/Theme.Widget.CardView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
-                        android:orientation="vertical">
+                        android:layout_marginEnd="8dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp"
+                            android:layout_marginBottom="8dp"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    style="@style/Theme.TextAppearance.Subtitle1"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Chapters:" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/display_order_button"
+                                    style="@style/Theme.Widget.Button.Icon.Textless"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    app:icon="@drawable/ic_sort_numeric_variant_24" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/display_mode_button"
+                                    style="@style/Theme.Widget.Button.Icon.Textless"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
+
+                            <com.fishhawk.driftinglibraryandroid.ui.gallery.gallery.ContentView
+                                android:id="@+id/chapters"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:visibility="@{info.hasContent ? View.VISIBLE : View.GONE}" />
 
                             <TextView
-                                style="@style/Theme.TextAppearance.Subtitle1"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Chapters:" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/display_order_button"
-                                style="@style/Theme.Widget.Button.Icon.Textless"
+                                android:id="@+id/no_chapter_hint"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                app:icon="@drawable/ic_sort_numeric_variant_24" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/display_mode_button"
-                                style="@style/Theme.Widget.Button.Icon.Textless"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" />
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/gallery_no_chapters_hint"
+                                android:textColor="?attr/colorSecondary"
+                                android:visibility="@{!info.hasContent ? View.VISIBLE : View.GONE}" />
                         </LinearLayout>
-
-                        <com.fishhawk.driftinglibraryandroid.ui.gallery.gallery.ContentView
-                            android:id="@+id/chapters"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:visibility="@{info.hasContent ? View.VISIBLE : View.GONE}" />
-
-                        <TextView
-                            android:id="@+id/no_chapter_hint"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_horizontal"
-                            android:layout_marginTop="4dp"
-                            android:text="@string/gallery_no_chapters_hint"
-                            android:textColor="?attr/colorSecondary"
-                            android:visibility="@{!info.hasContent ? View.VISIBLE : View.GONE}" />
-                    </LinearLayout>
+                    </androidx.cardview.widget.CardView>
                 </LinearLayout>
             </com.classic.common.MultipleStatusView>
         </LinearLayout>

@@ -33,6 +33,7 @@
         <item name="android:textColorPrimaryInverse">@color/textColorPrimaryDark</item>
         <item name="android:textColorSecondaryInverse">@color/textColorSecondaryDark</item>
         <item name="android:textColorHintInverse">@color/textColorHintDark</item>
+        <item name="android:divider">@color/dividerLight</item>
         <item name="rippleColor">@color/rippleColorLight</item>
 
         <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>
@@ -91,6 +92,7 @@
         <item name="android:textColorPrimaryInverse">@color/textColorPrimaryLight</item>
         <item name="android:textColorSecondaryInverse">@color/textColorSecondaryLight</item>
         <item name="android:textColorHintInverse">@color/textColorHintLight</item>
+        <item name="android:divider">@color/dividerDark</item>
         <item name="rippleColor">@color/rippleColorDark</item>
 
         <item name="actionBarPopupTheme">@style/ThemeOverlay.MaterialComponents</item>

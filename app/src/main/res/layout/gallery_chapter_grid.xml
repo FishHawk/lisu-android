@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.google.android.material.button.MaterialButton
+    <TextView
         android:id="@+id/button"
-        style="@style/Theme.Widget.Button.OutlinedButton"
+        style="@style/Theme.TextAppearance.Body3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
-        android:layout_marginEnd="2dp"
+        android:layout_margin="2dp"
+        android:background="@drawable/chapter_button"
         android:ellipsize="end"
-        android:maxLines="1" />
+        android:gravity="center"
+        android:maxLines="1"
+        android:paddingStart="2dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="2dp"
+        android:paddingBottom="8dp"
+        tools:text="01" />
 </layout>

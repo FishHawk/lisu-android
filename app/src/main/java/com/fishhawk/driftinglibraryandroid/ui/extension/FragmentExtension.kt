@@ -2,10 +2,8 @@ package com.fishhawk.driftinglibraryandroid.ui.extension
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -30,7 +28,6 @@ import com.fishhawk.driftinglibraryandroid.util.FileUtil
 import com.hippo.refreshlayout.RefreshLayout
 import kotlinx.coroutines.launch
 import java.io.File
-
 
 fun <T> Fragment.bindToListViewModel(
     multipleStatusView: MultipleStatusView,
