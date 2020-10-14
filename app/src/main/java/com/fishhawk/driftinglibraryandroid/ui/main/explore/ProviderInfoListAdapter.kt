@@ -16,13 +16,34 @@ class ProviderInfoListAdapter(
     private val listener: Listener
 ) : BaseAdapter<ListItem>() {
 
-    fun setProviderInfoList(infoList: List<ProviderInfo>) {
-        val infoMap = infoList.groupBy { it.lang }
+    var lastUsedProviderId: String? = null
+        set(value) {
+            field = value
+            updateList()
+        }
+
+    var infoList: List<ProviderInfo>? = null
+        set(value) {
+            field = value
+            updateList()
+        }
+
+    private fun updateList() {
+        if (infoList == null) return
+
+        val infoMap = infoList!!.groupBy { it.lang }
         val itemList = infoMap.flatMap { entry ->
             listOf(ListItem.Header(entry.key)) + entry.value.map { ListItem.Item(it) }
+        }.toMutableList()
+
+        infoList!!.find { it.id == lastUsedProviderId }?.let {
+            itemList.add(0, ListItem.Item(it))
+            itemList.add(0, ListItem.Header("Last used"))
         }
+
         setList(itemList)
     }
+
 
     enum class ViewType(val value: Int) {
         HEADER(0),

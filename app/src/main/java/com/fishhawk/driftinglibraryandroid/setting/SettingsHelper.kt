@@ -29,6 +29,10 @@ object SettingsHelper {
         preferenceIntLiveData("selected_library", 1)
     }
 
+    val lastUsedProvider by lazy {
+        preferenceStringLiveData("last_used_provider", "")
+    }
+
 
     // Settings general
     enum class StartScreen { LIBRARY, HISTORY, EXPLORE }

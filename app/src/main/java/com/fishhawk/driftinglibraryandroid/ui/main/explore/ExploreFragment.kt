@@ -13,6 +13,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ExploreFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.extension.navToProviderActivity
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 
@@ -25,10 +26,12 @@ class ExploreFragment : Fragment() {
     private val adapter = ProviderInfoListAdapter(object : ProviderInfoListAdapter.Listener {
         override fun onItemClick(providerInfo: ProviderInfo) {
             navToProviderActivity(providerInfo)
+            SettingsHelper.lastUsedProvider.setValue(providerInfo.id)
         }
 
         override fun onBrowseClick(providerInfo: ProviderInfo) {
             navToProviderActivity(providerInfo)
+            SettingsHelper.lastUsedProvider.setValue(providerInfo.id)
         }
     })
 
@@ -50,10 +53,14 @@ class ExploreFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.list.adapter = adapter
 
+        SettingsHelper.lastUsedProvider.observe(viewLifecycleOwner, Observer {
+            adapter.lastUsedProviderId = it
+        })
+
         viewModel.providerList.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is Result.Success -> {
-                    adapter.setProviderInfoList(result.data)
+                    adapter.infoList = result.data
                     if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
                     else binding.multipleStatusView.showContent()
                 }
