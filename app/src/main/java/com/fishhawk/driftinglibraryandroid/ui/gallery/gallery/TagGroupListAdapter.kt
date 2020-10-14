@@ -24,8 +24,8 @@ class TagGroupListAdapter(
         override fun bind(item: TagGroup, position: Int) {
             binding.key.text = item.key
             binding.key.visibility =
-                if (itemCount == 1 && item.key.isBlank()) View.VISIBLE
-                else View.GONE
+                if (itemCount == 1 && item.key.isBlank()) View.GONE
+                else View.VISIBLE
 
             val adapter = TagGroupAdapter(object : TagGroupAdapter.Listener {
                 override fun onTagClick(value: String) {
