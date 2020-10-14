@@ -10,11 +10,13 @@ import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.ui.extension.bindToListViewModel
 import com.fishhawk.driftinglibraryandroid.ui.extension.changeMangaListDisplayMode
 import com.fishhawk.driftinglibraryandroid.ui.extension.getDisplayModeIcon
+import com.fishhawk.driftinglibraryandroid.ui.extension.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 
 class LibraryFragment : Fragment() {
@@ -22,6 +24,20 @@ class LibraryFragment : Fragment() {
     private val viewModel: LibraryViewModel by viewModels {
         MainViewModelFactory(requireActivity().application as MainApplication)
     }
+
+    val adapter = MangaListAdapter(object : MangaListAdapter.Listener {
+        override fun onCardClick(outline: MangaOutline) {
+            navToGalleryActivity(outline, null)
+        }
+
+        override fun onCardLongClick(outline: MangaOutline) {
+            AlertDialog.Builder(requireActivity())
+                .setTitle("Confirm to delete manga?")
+                .setPositiveButton("OK") { _, _ -> viewModel.deleteManga(outline.id) }
+                .setNegativeButton("cancel") { _, _ -> }
+                .show()
+        }
+    })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,15 +55,6 @@ class LibraryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val adapter = MangaListAdapter(this, null)
-        adapter.onCardLongClicked = { outline ->
-            AlertDialog.Builder(requireActivity())
-                .setTitle("Confirm to delete manga?")
-                .setPositiveButton("OK") { _, _ -> viewModel.deleteManga(outline.id) }
-                .setNegativeButton("cancel") { _, _ -> }
-                .show()
-        }
         binding.mangaList.list.adapter = adapter
 
         SettingsHelper.displayMode.observe(viewLifecycleOwner, Observer {

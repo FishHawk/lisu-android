@@ -1,10 +1,9 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery.gallery
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.fishhawk.driftinglibraryandroid.databinding.*
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 import com.fishhawk.driftinglibraryandroid.ui.extension.navToReaderActivity
 
 data class MarkedPosition(
@@ -21,13 +20,7 @@ sealed class ContentItem {
         val chapterIndex: Int
     ) : ContentItem() {
         fun marked(pageIndex: Int): ChapterMarked {
-            return ChapterMarked(
-                name,
-                title,
-                collectionIndex,
-                chapterIndex,
-                pageIndex
-            )
+            return ChapterMarked(name, title, collectionIndex, chapterIndex, pageIndex)
         }
     }
 
@@ -39,12 +32,7 @@ sealed class ContentItem {
         val pageIndex: Int
     ) : ContentItem() {
         fun unmarked(): Chapter {
-            return Chapter(
-                name,
-                title,
-                collectionIndex,
-                chapterIndex
-            )
+            return Chapter(name, title, collectionIndex, chapterIndex)
         }
     }
 
@@ -56,21 +44,13 @@ class ContentAdapter(
     private val fragment: Fragment,
     private val id: String,
     private val providerId: String?
-) : BaseRecyclerViewAdapter<ContentItem, BaseRecyclerViewAdapter.ViewHolder<ContentItem>>() {
+) : BaseAdapter<ContentItem>() {
     enum class ViewMode(val value: Int) {
         GRID(0),
         LINEAR(1)
     }
 
-    var viewMode =
-        ViewMode.GRID
-
-    enum class ViewType(val value: Int) {
-        CHAPTER(0),
-        CHAPTER_MARKED(1),
-        COLLECTION_HEADER(2),
-        NO_CHAPTER_HINT(3)
-    }
+    var viewMode = ViewMode.GRID
 
     fun unmarkChapter() {
         val index = list.indexOfFirst { it is ContentItem.ChapterMarked }
@@ -94,53 +74,27 @@ class ContentAdapter(
         }
     }
 
+    enum class ViewType(val value: Int) {
+        CHAPTER(0),
+        CHAPTER_MARKED(1),
+        COLLECTION_HEADER(2),
+        NO_CHAPTER_HINT(3)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<ContentItem> {
         return when (viewType) {
             ViewType.CHAPTER.value ->
                 when (viewMode) {
-                    ViewMode.GRID ->
-                        ChapterViewHolder(
-                            GalleryChapterGridBinding.inflate(
-                                LayoutInflater.from(fragment.requireContext()), parent, false
-                            )
-                        )
-                    ViewMode.LINEAR ->
-                        ChapterLinearViewHolder(
-                            GalleryChapterLinearBinding.inflate(
-                                LayoutInflater.from(fragment.requireContext()), parent, false
-                            )
-                        )
+                    ViewMode.GRID -> ChapterViewHolder(parent)
+                    ViewMode.LINEAR -> ChapterLinearViewHolder(parent)
                 }
             ViewType.CHAPTER_MARKED.value ->
-
                 when (viewMode) {
-                    ViewMode.GRID ->
-                        ChapterMarkedViewHolder(
-                            GalleryChapterGridMarkedBinding.inflate(
-                                LayoutInflater.from(fragment.requireContext()), parent, false
-                            )
-                        )
-                    ViewMode.LINEAR ->
-                        ChapterLinearMarkedViewHolder(
-                            GalleryChapterLinearMarkedBinding.inflate(
-                                LayoutInflater.from(fragment.requireContext()), parent, false
-                            )
-                        )
+                    ViewMode.GRID -> ChapterMarkedViewHolder(parent)
+                    ViewMode.LINEAR -> ChapterLinearMarkedViewHolder(parent)
                 }
-            ViewType.COLLECTION_HEADER.value -> CollectionHeaderViewHolder(
-                GalleryCollectionTitleBinding.inflate(
-                    LayoutInflater.from(fragment.requireContext()),
-                    parent,
-                    false
-                )
-            )
-            ViewType.NO_CHAPTER_HINT.value -> NoChapterHintViewHolder(
-                GalleryNoChapterHintBinding.inflate(
-                    LayoutInflater.from(fragment.requireContext()),
-                    parent,
-                    false
-                )
-            )
+            ViewType.COLLECTION_HEADER.value -> CollectionHeaderViewHolder(parent)
+            ViewType.NO_CHAPTER_HINT.value -> NoChapterHintViewHolder(parent)
             else -> throw IllegalAccessError()
         }
     }
@@ -156,9 +110,12 @@ class ContentAdapter(
 
     override fun getItemCount() = list.size
 
-
     inner class ChapterViewHolder(private val binding: GalleryChapterGridBinding) :
-        BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
+        BaseAdapter.ViewHolder<ContentItem>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(GalleryChapterGridBinding::inflate, parent)
+        )
 
         override fun bind(item: ContentItem, position: Int) {
             val newItem = item as ContentItem.Chapter
@@ -176,7 +133,11 @@ class ContentAdapter(
     }
 
     inner class ChapterMarkedViewHolder(private val binding: GalleryChapterGridMarkedBinding) :
-        BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
+        BaseAdapter.ViewHolder<ContentItem>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(GalleryChapterGridMarkedBinding::inflate, parent)
+        )
 
         override fun bind(item: ContentItem, position: Int) {
             val newItem = item as ContentItem.ChapterMarked
@@ -194,7 +155,11 @@ class ContentAdapter(
     }
 
     inner class ChapterLinearViewHolder(private val binding: GalleryChapterLinearBinding) :
-        BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
+        BaseAdapter.ViewHolder<ContentItem>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(GalleryChapterLinearBinding::inflate, parent)
+        )
 
         override fun bind(item: ContentItem, position: Int) {
             val newItem = item as ContentItem.Chapter
@@ -213,7 +178,11 @@ class ContentAdapter(
     }
 
     inner class ChapterLinearMarkedViewHolder(private val binding: GalleryChapterLinearMarkedBinding) :
-        BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
+        BaseAdapter.ViewHolder<ContentItem>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(GalleryChapterLinearMarkedBinding::inflate, parent)
+        )
 
         override fun bind(item: ContentItem, position: Int) {
             val newItem = item as ContentItem.ChapterMarked
@@ -231,8 +200,12 @@ class ContentAdapter(
         }
     }
 
-    inner class CollectionHeaderViewHolder(private val binding: GalleryCollectionTitleBinding) :
-        BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding) {
+    inner class CollectionHeaderViewHolder(private val binding: GalleryContentCollectionHeaderBinding) :
+        BaseAdapter.ViewHolder<ContentItem>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(GalleryContentCollectionHeaderBinding::inflate, parent)
+        )
 
         override fun bind(item: ContentItem, position: Int) {
             val newItem = item as ContentItem.CollectionHeader
@@ -240,6 +213,11 @@ class ContentAdapter(
         }
     }
 
-    inner class NoChapterHintViewHolder(binding: GalleryNoChapterHintBinding) :
-        BaseRecyclerViewAdapter.ViewHolder<ContentItem>(binding)
+    inner class NoChapterHintViewHolder(binding: GalleryContentNoChapterBinding) :
+        BaseAdapter.ViewHolder<ContentItem>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(GalleryContentNoChapterBinding::inflate, parent)
+        )
+    }
 }

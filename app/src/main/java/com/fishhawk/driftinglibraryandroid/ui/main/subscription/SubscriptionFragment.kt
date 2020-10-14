@@ -16,6 +16,20 @@ class SubscriptionFragment : Fragment() {
         MainViewModelFactory(requireActivity().application as MainApplication)
     }
 
+    val adapter = SubscriptionListAdapter(object : SubscriptionListAdapter.Listener {
+        override fun onSubscriptionDelete(id: String) {
+            viewModel.deleteSubscription(id)
+        }
+
+        override fun onSubscriptionEnable(id: String) {
+            viewModel.enableSubscription(id)
+        }
+
+        override fun onSubscriptionDisable(id: String) {
+            viewModel.disableSubscription(id)
+        }
+    })
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -32,11 +46,6 @@ class SubscriptionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val adapter = SubscriptionListAdapter(requireContext())
-        adapter.onEnabled = { id -> viewModel.enableSubscription(id) }
-        adapter.onDisabled = { id -> viewModel.disableSubscription(id) }
-        adapter.onDeleted = { id -> viewModel.deleteSubscription(id) }
         binding.list.adapter = adapter
 
         bindToListViewModel(binding.multipleStatusView, binding.refreshLayout, viewModel, adapter)

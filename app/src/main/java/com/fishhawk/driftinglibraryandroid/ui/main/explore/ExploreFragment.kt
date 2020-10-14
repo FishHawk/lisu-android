@@ -12,6 +12,7 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ExploreFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.extension.navToProviderActivity
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 
@@ -20,6 +21,16 @@ class ExploreFragment : Fragment() {
     private val viewModel: ExploreViewModel by viewModels {
         MainViewModelFactory(requireActivity().application as MainApplication)
     }
+
+    private val adapter = ProviderInfoListAdapter(object : ProviderInfoListAdapter.Listener {
+        override fun onItemClick(providerInfo: ProviderInfo) {
+            navToProviderActivity(providerInfo)
+        }
+
+        override fun onBrowseClick(providerInfo: ProviderInfo) {
+            navToProviderActivity(providerInfo)
+        }
+    })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,10 +48,6 @@ class ExploreFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val adapter = ProviderInfoListAdapter(requireContext())
-        adapter.onItemClicked = { navToProviderActivity(it) }
-        adapter.onBrowseClicked = { navToProviderActivity(it) }
         binding.list.adapter = adapter
 
         viewModel.providerList.observe(viewLifecycleOwner, Observer { result ->

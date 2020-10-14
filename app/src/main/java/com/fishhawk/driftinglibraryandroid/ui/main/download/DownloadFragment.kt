@@ -16,6 +16,20 @@ class DownloadFragment : Fragment() {
         MainViewModelFactory(requireActivity().application as MainApplication)
     }
 
+    val adapter = DownloadTaskListAdapter(object : DownloadTaskListAdapter.Listener {
+        override fun onDownloadTaskDelete(id: String) {
+            viewModel.deleteDownloadTask(id)
+        }
+
+        override fun onDownloadTaskStart(id: String) {
+            viewModel.startDownloadTask(id)
+        }
+
+        override fun onDownloadTaskPause(id: String) {
+            viewModel.pauseDownloadTask(id)
+        }
+    })
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -32,11 +46,6 @@ class DownloadFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val adapter = DownloadTaskListAdapter(requireContext())
-        adapter.onStarted = { id -> viewModel.startDownloadTask(id) }
-        adapter.onPaused = { id -> viewModel.pauseDownloadTask(id) }
-        adapter.onDeleted = { id -> viewModel.deleteDownloadTask(id) }
         binding.list.adapter = adapter
 
         bindToListViewModel(binding.multipleStatusView, binding.refreshLayout, viewModel, adapter)

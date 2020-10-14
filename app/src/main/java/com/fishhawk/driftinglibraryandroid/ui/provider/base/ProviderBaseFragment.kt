@@ -12,12 +12,14 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderBaseFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.OptionModels
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.ui.extension.bindToListViewModel
 import com.fishhawk.driftinglibraryandroid.ui.extension.changeMangaListDisplayMode
 import com.fishhawk.driftinglibraryandroid.ui.extension.getDisplayModeIcon
+import com.fishhawk.driftinglibraryandroid.ui.extension.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActivity
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderViewModel
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderViewModelFactory
@@ -26,8 +28,39 @@ abstract class ProviderBaseFragment : Fragment() {
     private val providerViewModel: ProviderViewModel by activityViewModels { getViewModelFactory() }
     abstract val viewModel: ProviderBaseViewModel
     private lateinit var binding: ProviderBaseFragmentBinding
+
+    val providerId = requireActivity().intent.extras!!.getString("providerId")!!
+
+    private var hasOption = false
     private lateinit var optionSheet: ProviderOptionSheet
-    private var isOptionSheetEnabled = false
+    private val optionAdapter = OptionGroupListAdapter(object : OptionGroupListAdapter.Listener {
+        override fun onOptionSelect(name: String, index: Int) {
+            viewModel.selectOption(name, index)
+            viewModel.load()
+        }
+    })
+
+    private val actionAdapter = object : ProviderActionSheet.Listener {
+        override fun onReadClick(outline: MangaOutline, provider: String) {
+            navToReaderActivity(outline.id, providerId, 0, 0, 0)
+        }
+
+        override fun onDownloadClick(outline: MangaOutline, provider: String) {
+            viewModel.download(outline.id, outline.title)
+        }
+
+        override fun onSubscribeClick(outline: MangaOutline, provider: String) {
+            viewModel.subscribe(outline.id, outline.title)
+        }
+    }
+
+    private val mangaAdapter = MangaListAdapter(object : MangaListAdapter.Listener {
+        override fun onCardClick(outline: MangaOutline) {
+            ProviderActionSheet(requireContext(), outline, providerId, actionAdapter).show()
+        }
+
+        override fun onCardLongClick(outline: MangaOutline) {}
+    })
 
     abstract fun getOptionModel(optionModels: OptionModels): Map<String, List<String>>
 
@@ -55,39 +88,30 @@ abstract class ProviderBaseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val providerId = requireActivity().intent.extras!!.getString("providerId")!!
-        val adapter = MangaListAdapter(this, providerId)
-        adapter.onCardLongClicked = { outline ->
-            ProviderActionSheet(this, providerId, outline).show()
-        }
-        binding.mangaList.list.adapter = adapter
 
-        val optionGroupListAdapter = OptionGroupListAdapter(requireActivity())
-        optionGroupListAdapter.onOptionSelected = { name, index ->
-            viewModel.selectOption(name, index)
-            viewModel.load()
-        }
-        optionSheet.setAdapter(optionGroupListAdapter)
+        binding.mangaList.list.adapter = mangaAdapter
+
+        optionSheet.setAdapter(optionAdapter)
 
         SettingsHelper.displayMode.observe(viewLifecycleOwner, Observer {
-            binding.mangaList.list.changeMangaListDisplayMode(adapter)
+            binding.mangaList.list.changeMangaListDisplayMode(mangaAdapter)
         })
 
         bindToListViewModel(
             binding.mangaList.multipleStatusView,
             binding.mangaList.refreshLayout,
             viewModel,
-            adapter
+            mangaAdapter
         )
         providerViewModel.detail.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is Result.Success -> {
                     val model = getOptionModel(result.data.optionModels)
                     if (model.toList().isNotEmpty()) {
-                        isOptionSheetEnabled = true
+                        hasOption = true
                         requireActivity().invalidateOptionsMenu()
                     }
-                    optionGroupListAdapter.setList(model.toList())
+                    optionAdapter.setList(model.toList())
                     model.keys.forEach { key -> viewModel.selectOption(key, 0) }
 
                     if (viewModel.list.value == null) viewModel.load()
@@ -119,7 +143,7 @@ abstract class ProviderBaseFragment : Fragment() {
         val keywords = (requireActivity() as ProviderActivity).keywords
         if (keywords != null) searchView.setQuery(keywords, true)
 
-        menu.findItem(R.id.action_option).isVisible = isOptionSheetEnabled
+        menu.findItem(R.id.action_option).isVisible = hasOption
         menu.findItem(R.id.action_display_mode).setIcon(getDisplayModeIcon())
     }
 

@@ -31,6 +31,22 @@ class GalleryFragment : Fragment() {
     }
     internal lateinit var binding: GalleryFragmentBinding
 
+    private var providerId: String? = null
+    private val tagAdapter = TagGroupListAdapter(object : TagGroupListAdapter.Listener {
+        override fun onTagClick(key: String, value: String) {
+            val keywords = if (key.isBlank()) value else "${key}:$value"
+            providerId?.let {
+                navToProviderActivity(it, keywords)
+            } ?: navToMainActivity(keywords)
+        }
+
+        override fun onTagLongClick(key: String, value: String) {
+            val keywords = if (key.isBlank()) value else "${key}:$value"
+            copyToClipboard(keywords)
+            makeToast(R.string.toast_manga_tag_saved)
+        }
+    })
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,11 +63,12 @@ class GalleryFragment : Fragment() {
         val arguments = requireActivity().intent.extras!!
         val id: String = arguments.getString("id")!!
         val title: String = arguments.getString("title")!!
-        val providerId: String? = arguments.getString("providerId")
+        providerId = arguments.getString("providerId")
         val thumb: String = arguments.getString("thumb")!!
 
-        if (providerId == null) viewModel.openMangaFromLibrary(id)
-        else viewModel.openMangaFromProvider(providerId, id)
+        providerId?.let {
+            viewModel.openMangaFromProvider(it, id)
+        } ?: viewModel.openMangaFromLibrary(id)
 
         binding.title.setOnLongClickListener {
             copyToClipboard(binding.title.text as String)
@@ -74,17 +91,6 @@ class GalleryFragment : Fragment() {
             true
         }
 
-        val tagAdapter = TagGroupListAdapter(requireContext())
-        tagAdapter.onTagClicked = { key, value ->
-            val keywords = if (key.isBlank()) value else "${key}:$value"
-            if (providerId == null) navToMainActivity(keywords)
-            else navToProviderActivity(providerId, keywords)
-        }
-        tagAdapter.onTagLongClicked = { key, value ->
-            val keywords = if (key.isBlank()) value else "${key}:$value"
-            copyToClipboard(keywords)
-            makeToast(R.string.toast_manga_tag_saved)
-        }
         binding.tags.adapter = tagAdapter
 
         val contentAdapter = ContentAdapter(this, id, providerId)

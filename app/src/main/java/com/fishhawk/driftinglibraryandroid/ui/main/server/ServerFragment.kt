@@ -23,6 +23,24 @@ class ServerFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
+    val adapter = ServerInfoListAdapter(object : ServerInfoListAdapter.Listener {
+        override fun onItemClick(info: ServerInfo) {
+            SettingsHelper.selectedServer.setValue(info.id)
+        }
+
+        override fun onServerDelete(info: ServerInfo) {
+            viewModel.deleteServer(info)
+        }
+
+        override fun onServerEdit(info: ServerInfo) {
+            createServerInfoDialog(info) { name, address ->
+                info.name = name
+                info.address = address
+                viewModel.updateServer(info)
+            }
+        }
+    })
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -34,17 +52,6 @@ class ServerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val adapter = ServerInfoListAdapter(requireActivity())
-        adapter.onEdited = {
-            createServerInfoDialog(it) { name, address ->
-                it.name = name
-                it.address = address
-                viewModel.updateServer(it)
-            }
-        }
-        adapter.onDeleted = { viewModel.deleteServer(it) }
-        adapter.onItemClicked = { SettingsHelper.selectedServer.setValue(it.id) }
         binding.list.adapter = adapter
 
         SettingsHelper.selectedServer.observe(viewLifecycleOwner, Observer { id ->

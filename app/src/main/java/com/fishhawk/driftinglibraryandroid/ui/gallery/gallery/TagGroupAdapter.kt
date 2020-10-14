@@ -1,25 +1,17 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery.gallery
 
-import android.content.Context
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryTagItemBinding
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 class TagGroupAdapter(
-    private val context: Context
-) : BaseRecyclerViewAdapter<String, TagGroupAdapter.ViewHolder>() {
-    var onTagClicked: ((String) -> Unit)? = null
-    var onTagLongClicked: ((String) -> Unit)? = null
+    private val listener: Listener
+) : BaseAdapter<String>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            GalleryTagItemBinding.inflate(
-                LayoutInflater.from(context), parent, false
-            )
-        )
+        return ViewHolder(parent)
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -28,17 +20,24 @@ class TagGroupAdapter(
     }
 
     inner class ViewHolder(private val binding: GalleryTagItemBinding) :
-        BaseRecyclerViewAdapter.ViewHolder<String>(binding) {
+        BaseAdapter.ViewHolder<String>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(GalleryTagItemBinding::inflate, parent)
+        )
 
         override fun bind(item: String, position: Int) {
-            binding.tagValue = item
-            binding.value.setOnClickListener {
-                onTagClicked?.invoke(item)
-            }
+            binding.root.text = item
+            binding.value.setOnClickListener { listener.onTagClick(item) }
             binding.value.setOnLongClickListener {
-                onTagLongClicked?.invoke(item)
+                listener.onTagLongClick(item)
                 true
             }
         }
+    }
+
+    interface Listener {
+        fun onTagClick(value: String)
+        fun onTagLongClick(value: String)
     }
 }

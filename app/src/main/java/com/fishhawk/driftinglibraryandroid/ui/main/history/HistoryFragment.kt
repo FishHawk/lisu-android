@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
+import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.ui.extension.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.ui.extension.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
@@ -17,6 +18,20 @@ class HistoryFragment : Fragment() {
     val viewModel: HistoryViewModel by viewModels {
         MainViewModelFactory(requireActivity().application as MainApplication)
     }
+
+    val adapter = HistoryListAdapter(object : HistoryListAdapter.Listener {
+        override fun onThumbClicked(history: ReadingHistory) {
+            with(history) {
+                navToGalleryActivity(mangaId, title, thumb, providerId)
+            }
+        }
+
+        override fun onCardClicked(history: ReadingHistory) {
+            with(history) {
+                navToReaderActivity(mangaId, providerId, collectionIndex, chapterIndex, pageIndex)
+            }
+        }
+    })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,18 +49,6 @@ class HistoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val adapter = HistoryListAdapter(requireActivity())
-        adapter.onThumbClicked = {
-            navToGalleryActivity(
-                it.mangaId, it.title, it.thumb, it.providerId
-            )
-        }
-        adapter.onCardClicked = {
-            navToReaderActivity(
-                it.mangaId, it.providerId, it.collectionIndex, it.chapterIndex, it.pageIndex
-            )
-        }
         binding.list.adapter = adapter
 
         viewModel.filteredReadingHistoryList.observe(viewLifecycleOwner, Observer {

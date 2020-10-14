@@ -1,122 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Theme.Widget.CardView"
+    android:layout_width="match_parent"
+    android:layout_height="120dp"
+    android:layout_margin="4dp">
 
-    <data>
-
-        <import type="android.view.View" />
-
-        <variable
-            name="readingHistory"
-            type="com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory" />
-    </data>
-
-    <androidx.cardview.widget.CardView
-        style="@style/Theme.Widget.CardView"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_margin="4dp">
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/thumb"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:background="@android:color/transparent">
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="H,4:3"
+            app:layout_constraintStart_toStartOf="parent" />
 
-            <ImageView
-                android:id="@+id/thumb"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:contentDescription="@null"
-                android:scaleType="centerCrop"
-                app:layout_constraintDimensionRatio="H,4:3"
-                app:layout_constraintStart_toStartOf="parent" />
+        <TextView
+            android:id="@+id/title"
+            style="@style/Theme.TextAppearance.LinearThumbnailTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            app:layout_constraintStart_toEndOf="@+id/thumb"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/title"
-                style="@style/Theme.TextAppearance.LinearThumbnailTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/baseline_8dp"
-                android:layout_marginTop="@dimen/baseline_8dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:text="@{readingHistory.title}"
-                app:layout_constraintStart_toEndOf="@+id/thumb"
-                app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/seen_label"
+            style="@style/Theme.TextAppearance.Body1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/history_thumbnail_seen"
+            app:layout_constraintStart_toEndOf="@+id/thumb"
+            app:layout_constraintTop_toBottomOf="@+id/title" />
 
-            <TextView
-                android:id="@+id/seen_label"
-                style="@style/Theme.TextAppearance.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/baseline_8dp"
-                android:layout_marginTop="@dimen/baseline_4dp"
-                android:text="@string/history_thumbnail_seen"
-                app:layout_constraintStart_toEndOf="@+id/thumb"
-                app:layout_constraintTop_toBottomOf="@+id/title" />
+        <TextView
+            android:id="@+id/seen"
+            style="@style/Theme.TextAppearance.Body2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/seen_label"
+            app:layout_constraintTop_toBottomOf="@+id/title" />
 
-            <TextView
-                android:id="@+id/seen"
-                style="@style/Theme.TextAppearance.Body2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/baseline_8dp"
-                android:layout_marginTop="@dimen/baseline_4dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/seen_label"
-                app:layout_constraintTop_toBottomOf="@+id/title" />
+        <TextView
+            android:id="@+id/date_label"
+            style="@style/Theme.TextAppearance.Body1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/history_thumbnail_date"
+            app:layout_constraintStart_toEndOf="@+id/thumb"
+            app:layout_constraintTop_toBottomOf="@+id/seen_label" />
 
-            <TextView
-                android:id="@+id/date_label"
-                style="@style/Theme.TextAppearance.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/baseline_8dp"
-                android:layout_marginTop="@dimen/baseline_4dp"
-                android:text="@string/history_thumbnail_date"
-                app:layout_constraintStart_toEndOf="@+id/thumb"
-                app:layout_constraintTop_toBottomOf="@+id/seen_label" />
+        <TextView
+            android:id="@+id/date"
+            style="@style/Theme.TextAppearance.Body2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/date_label"
+            app:layout_constraintTop_toBottomOf="@+id/seen_label" />
 
-            <TextView
-                android:id="@+id/date"
-                style="@style/Theme.TextAppearance.Body2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/baseline_8dp"
-                android:layout_marginTop="@dimen/baseline_4dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/date_label"
-                app:layout_constraintTop_toBottomOf="@+id/seen_label" />
+        <TextView
+            android:id="@+id/provider_label"
+            style="@style/Theme.TextAppearance.Body1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/history_thumbnail_provider"
+            app:layout_constraintStart_toEndOf="@+id/thumb"
+            app:layout_constraintTop_toBottomOf="@+id/date_label" />
 
-            <TextView
-                android:id="@+id/provider_label"
-                style="@style/Theme.TextAppearance.Body1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/baseline_8dp"
-                android:layout_marginTop="@dimen/baseline_4dp"
-                android:text="@string/history_thumbnail_provider"
-                android:visibility="@{readingHistory.providerId != null ? View.VISIBLE : View.GONE}"
-                app:layout_constraintStart_toEndOf="@+id/thumb"
-                app:layout_constraintTop_toBottomOf="@+id/date_label" />
-
-            <TextView
-                android:id="@+id/provider"
-                style="@style/Theme.TextAppearance.Body2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/baseline_8dp"
-                android:layout_marginTop="@dimen/baseline_4dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="@{readingHistory.providerId}"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/provider_label"
-                app:layout_constraintTop_toBottomOf="@+id/date_label" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
-</layout>
+        <TextView
+            android:id="@+id/provider"
+            style="@style/Theme.TextAppearance.Body2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/provider_label"
+            app:layout_constraintTop_toBottomOf="@+id/date_label" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

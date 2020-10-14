@@ -1,31 +1,26 @@
 package com.fishhawk.driftinglibraryandroid.ui.main.download
 
-import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.fishhawk.driftinglibraryandroid.databinding.DownloadTaskCardBinding
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadDesc
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadStatus
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 class DownloadTaskListAdapter(
-    private val context: Context
-) : BaseRecyclerViewAdapter<DownloadDesc, DownloadTaskListAdapter.ViewHolder>() {
-    var onDeleted: ((String) -> Unit)? = null
-    var onStarted: ((String) -> Unit)? = null
-    var onPaused: ((String) -> Unit)? = null
+    private val listener: Listener
+) : BaseAdapter<DownloadDesc>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            DownloadTaskCardBinding.inflate(
-                LayoutInflater.from(context), parent, false
-            )
-        )
+        return ViewHolder(parent)
     }
 
     inner class ViewHolder(private val binding: DownloadTaskCardBinding) :
-        BaseRecyclerViewAdapter.ViewHolder<DownloadDesc>(binding) {
+        BaseAdapter.ViewHolder<DownloadDesc>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(DownloadTaskCardBinding::inflate, parent)
+        )
 
         private fun hideActions() {
             binding.actionPanel.visibility = View.INVISIBLE
@@ -38,7 +33,10 @@ class DownloadTaskListAdapter(
         }
 
         override fun bind(item: DownloadDesc, position: Int) {
-            binding.downloadTask = item
+            binding.targetManga.text = item.id
+            binding.provider.text = item.providerId
+            binding.sourceManga.text = item.sourceManga
+
             showActions()
 
             binding.status.text = item.status.value
@@ -54,17 +52,23 @@ class DownloadTaskListAdapter(
             }
 
             binding.startButton.setOnClickListener {
-                onStarted?.invoke(item.id)
+                listener.onDownloadTaskStart(item.id)
                 hideActions()
             }
             binding.pauseButton.setOnClickListener {
-                onPaused?.invoke(item.id)
+                listener.onDownloadTaskPause(item.id)
                 hideActions()
             }
             binding.deleteButton.setOnClickListener {
-                onDeleted?.invoke(item.id)
+                listener.onDownloadTaskDelete(item.id)
                 hideActions()
             }
         }
+    }
+
+    interface Listener {
+        fun onDownloadTaskDelete(id: String)
+        fun onDownloadTaskStart(id: String)
+        fun onDownloadTaskPause(id: String)
     }
 }

@@ -1,23 +1,21 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider.base
 
-import android.content.Context
 import android.util.TypedValue
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderOptionItemBinding
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 class OptionGroupAdapter(
-    private val context: Context
-) : BaseRecyclerViewAdapter<String, OptionGroupAdapter.ViewHolder>() {
-    var onOptionSelected: ((Int) -> Unit)? = null
+    private val listener: Listener
+) : BaseAdapter<String>() {
+
     var selectedOptionIndex: Int = 0
 
     fun selectOption(index: Int) {
-        onOptionSelected?.invoke(index)
+        listener.onOptionSelect(index)
         val oldSelectedOptionIndex = selectedOptionIndex
         selectedOptionIndex = index
 
@@ -26,11 +24,7 @@ class OptionGroupAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            ProviderOptionItemBinding.inflate(
-                LayoutInflater.from(context), parent, false
-            )
-        )
+        return ViewHolder(parent)
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -39,18 +33,28 @@ class OptionGroupAdapter(
     }
 
     inner class ViewHolder(private val binding: ProviderOptionItemBinding) :
-        BaseRecyclerViewAdapter.ViewHolder<String>(binding) {
+        BaseAdapter.ViewHolder<String>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(ProviderOptionItemBinding::inflate, parent)
+        )
 
         override fun bind(item: String, position: Int) {
-            binding.optionName = item
+            binding.root.text = item
+
             val typedValue = TypedValue()
-            context.theme.resolveAttribute(
+            itemView.context.theme.resolveAttribute(
                 if (position == selectedOptionIndex) R.attr.colorAccent
                 else R.attr.colorOnPrimary
                 , typedValue, true
             )
-            binding.optionColor = typedValue.data
+            binding.root.setTextColor(typedValue.data)
+
             binding.root.setOnClickListener { selectOption(position) }
         }
+    }
+
+    interface Listener {
+        fun onOptionSelect(index: Int)
     }
 }

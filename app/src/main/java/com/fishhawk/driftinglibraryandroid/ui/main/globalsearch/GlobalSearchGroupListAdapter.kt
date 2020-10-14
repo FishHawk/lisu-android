@@ -1,13 +1,12 @@
 package com.fishhawk.driftinglibraryandroid.ui.main.globalsearch
 
-import android.content.Context
-import android.view.LayoutInflater
+import android.annotation.SuppressLint
 import android.view.ViewGroup
 import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchGroupBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 data class SearchGroup(
     val provider: ProviderInfo,
@@ -15,20 +14,11 @@ data class SearchGroup(
 )
 
 class GlobalSearchGroupListAdapter(
-    private val context: Context
-) : BaseRecyclerViewAdapter<SearchGroup, GlobalSearchGroupListAdapter.ViewHolder>() {
-    var onItemClicked: ((ProviderInfo, MangaOutline) -> Unit)? = null
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            GlobalSearchGroupBinding.inflate(
-                LayoutInflater.from(context), parent, false
-            )
-        )
-    }
+    private val listener: Listener
+) : BaseAdapter<SearchGroup>() {
 
     fun setListWithEmptyItem(providers: List<ProviderInfo>) {
-        this.setList(providers.map { SearchGroup(it, Result.Loading) })
+        setList(providers.map { SearchGroup(it, Result.Loading) })
     }
 
     fun setSearchGroupResult(provider: ProviderInfo, result: Result<List<MangaOutline>>) {
@@ -40,14 +30,26 @@ class GlobalSearchGroupListAdapter(
             }
     }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        return ViewHolder(parent)
+    }
+
     inner class ViewHolder(private val binding: GlobalSearchGroupBinding) :
-        BaseRecyclerViewAdapter.ViewHolder<SearchGroup>(binding) {
+        BaseAdapter.ViewHolder<SearchGroup>(binding) {
 
+        constructor(parent: ViewGroup) : this(
+            viewBinding(GlobalSearchGroupBinding::inflate, parent)
+        )
+
+        @SuppressLint("SetTextI18n")
         override fun bind(item: SearchGroup, position: Int) {
-            binding.searchGroup = item
+            binding.provider.text = "${item.provider.lang} - ${item.provider.name}"
 
-            val adapter = GlobalSearchGroupAdapter(context)
-            adapter.onItemClicked = { onItemClicked?.invoke(item.provider, it) }
+            val adapter = GlobalSearchGroupAdapter(object : GlobalSearchGroupAdapter.Listener {
+                override fun onItemClicked(outline: MangaOutline) {
+                    listener.onItemClicked(item.provider, outline)
+                }
+            })
             binding.list.adapter = adapter
 
             when (val result = item.result) {
@@ -60,5 +62,9 @@ class GlobalSearchGroupListAdapter(
                 is Result.Loading -> binding.multipleStatusView.showLoading()
             }
         }
+    }
+
+    interface Listener {
+        fun onItemClicked(info: ProviderInfo, outline: MangaOutline)
     }
 }

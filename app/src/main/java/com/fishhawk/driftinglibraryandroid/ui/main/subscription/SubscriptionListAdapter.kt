@@ -1,32 +1,27 @@
 package com.fishhawk.driftinglibraryandroid.ui.main.subscription
 
-import android.content.Context
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.SubscriptionCardBinding
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.Subscription
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 class SubscriptionListAdapter(
-    private val context: Context
-) : BaseRecyclerViewAdapter<Subscription, SubscriptionListAdapter.ViewHolder>() {
-    var onDeleted: ((String) -> Unit)? = null
-    var onEnabled: ((String) -> Unit)? = null
-    var onDisabled: ((String) -> Unit)? = null
+    private val listener: Listener
+) : BaseAdapter<Subscription>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            SubscriptionCardBinding.inflate(
-                LayoutInflater.from(context), parent, false
-            )
-        )
+        return ViewHolder(parent)
     }
 
     inner class ViewHolder(private val binding: SubscriptionCardBinding) :
-        BaseRecyclerViewAdapter.ViewHolder<Subscription>(binding) {
+        BaseAdapter.ViewHolder<Subscription>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(SubscriptionCardBinding::inflate, parent)
+        )
 
         private fun hideActions() {
             binding.actionPanel.visibility = View.INVISIBLE
@@ -39,29 +34,40 @@ class SubscriptionListAdapter(
         }
 
         override fun bind(item: Subscription, position: Int) {
-            binding.subscription = item
             showActions()
 
-            if (item.isEnabled) {
-                val color = ContextCompat.getColor(context, R.color.loading_indicator_green)
-                binding.coloredHead.setBackgroundColor(color)
-            } else {
-                val color = ContextCompat.getColor(context, R.color.loading_indicator_red)
-                binding.coloredHead.setBackgroundColor(color)
+            binding.targetManga.text = item.id
+            binding.provider.text = item.providerId
+            binding.sourceManga.text = item.sourceManga
+
+            val colorId =
+                if (item.isEnabled) R.color.loading_indicator_green
+                else R.color.loading_indicator_red
+            val color = ContextCompat.getColor(itemView.context, colorId)
+            binding.coloredHead.setBackgroundColor(color)
+
+            binding.deleteButton.setOnClickListener {
+                listener.onSubscriptionDelete(item.id)
+                hideActions()
             }
 
+            binding.enableButton.visibility = if (!item.isEnabled) View.VISIBLE else View.GONE
             binding.enableButton.setOnClickListener {
-                onEnabled?.invoke(item.id)
+                listener.onSubscriptionEnable(item.id)
                 hideActions()
             }
+
+            binding.disableButton.visibility = if (item.isEnabled) View.VISIBLE else View.GONE
             binding.disableButton.setOnClickListener {
-                onDisabled?.invoke(item.id)
-                hideActions()
-            }
-            binding.deleteButton.setOnClickListener {
-                onDeleted?.invoke(item.id)
+                listener.onSubscriptionDisable(item.id)
                 hideActions()
             }
         }
+    }
+
+    interface Listener {
+        fun onSubscriptionDelete(id: String)
+        fun onSubscriptionEnable(id: String)
+        fun onSubscriptionDisable(id: String)
     }
 }

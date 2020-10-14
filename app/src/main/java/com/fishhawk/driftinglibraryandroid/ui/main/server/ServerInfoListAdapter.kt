@@ -1,20 +1,15 @@
 package com.fishhawk.driftinglibraryandroid.ui.main.server
 
-import android.content.Context
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ServerInfoCardBinding
 import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 class ServerInfoListAdapter(
-    private val context: Context
-) : BaseRecyclerViewAdapter<ServerInfo, ServerInfoListAdapter.ViewHolder>() {
-    var onItemClicked: ((ServerInfo) -> Unit)? = null
-    var onDeleted: ((ServerInfo) -> Unit)? = null
-    var onEdited: ((ServerInfo) -> Unit)? = null
+    private val listener: Listener
+) : BaseAdapter<ServerInfo>() {
 
     var selectedId: Int = 0
         set(value) {
@@ -22,32 +17,36 @@ class ServerInfoListAdapter(
             notifyDataSetChanged()
         }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): ViewHolder {
-        return ViewHolder(
-            ServerInfoCardBinding.inflate(
-                LayoutInflater.from(context), parent, false
-            )
-        )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        return ViewHolder(parent)
     }
 
     inner class ViewHolder(private val binding: ServerInfoCardBinding) :
-        BaseRecyclerViewAdapter.ViewHolder<ServerInfo>(binding) {
+        BaseAdapter.ViewHolder<ServerInfo>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(ServerInfoCardBinding::inflate, parent)
+        )
 
         override fun bind(item: ServerInfo, position: Int) {
-            binding.serverInfo = item
-            if (item.id == selectedId) {
-                val color = ContextCompat.getColor(context, R.color.loading_indicator_green)
-                binding.coloredHead.setBackgroundColor(color)
-            } else {
-                val color = ContextCompat.getColor(context, R.color.loading_indicator_red)
-                binding.coloredHead.setBackgroundColor(color)
-            }
-            binding.root.setOnClickListener { onItemClicked?.invoke(item) }
-            binding.deleteButton.setOnClickListener { onDeleted?.invoke(item) }
-            binding.editButton.setOnClickListener { onEdited?.invoke(item) }
+            binding.name.text = item.name
+            binding.address.text = item.address
+
+            val colorId =
+                if (item.id == selectedId) R.color.loading_indicator_green
+                else R.color.loading_indicator_red
+            val color = ContextCompat.getColor(itemView.context, colorId)
+            binding.coloredHead.setBackgroundColor(color)
+
+            binding.root.setOnClickListener { listener.onItemClick(item) }
+            binding.deleteButton.setOnClickListener { listener.onServerDelete(item) }
+            binding.editButton.setOnClickListener { listener.onServerEdit(item) }
         }
+    }
+
+    interface Listener {
+        fun onItemClick(info: ServerInfo)
+        fun onServerDelete(info: ServerInfo)
+        fun onServerEdit(info: ServerInfo)
     }
 }

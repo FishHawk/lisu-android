@@ -10,8 +10,9 @@ fun ServerFragment.createServerInfoDialog(
     onAccept: (name: String, address: String) -> Unit
 ) {
     val dialogBinding =
-        ServerInfoDialogBinding
-            .inflate(LayoutInflater.from(context), null, false)
+        ServerInfoDialogBinding.inflate(
+            LayoutInflater.from(context), null, false
+        )
 
     val title = if (serverInfo == null) "Add server" else "Edit server"
 

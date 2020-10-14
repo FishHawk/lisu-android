@@ -1,16 +1,17 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider.base
 
+import android.content.Context
 import android.view.LayoutInflater
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderActionSheetBinding
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.ui.extension.navToReaderActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class ProviderActionSheet(
-    fragment: ProviderBaseFragment,
+    context: Context,
+    outline: MangaOutline,
     providerId: String,
-    outline: MangaOutline
-) : BottomSheetDialog(fragment.requireContext()) {
+    private val listener: Listener
+) : BottomSheetDialog(context) {
     private val binding = ProviderActionSheetBinding.inflate(
         LayoutInflater.from(context), null, false
     )
@@ -21,16 +22,22 @@ class ProviderActionSheet(
         binding.title.text = outline.title
 
         binding.readButton.setOnClickListener {
-            fragment.navToReaderActivity(outline.id, providerId, 0, 0, 0)
+            listener.onReadClick(outline, providerId)
             dismiss()
         }
         binding.downloadButton.setOnClickListener {
-            fragment.viewModel.download(outline.id, outline.title)
+            listener.onDownloadClick(outline, providerId)
             dismiss()
         }
         binding.subscribeButton.setOnClickListener {
-            fragment.viewModel.subscribe(outline.id, outline.title)
+            listener.onSubscribeClick(outline, providerId)
             dismiss()
         }
+    }
+
+    interface Listener {
+        fun onReadClick(outline: MangaOutline, provider: String)
+        fun onDownloadClick(outline: MangaOutline, provider: String)
+        fun onSubscribeClick(outline: MangaOutline, provider: String)
     }
 }

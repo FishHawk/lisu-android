@@ -11,6 +11,8 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.extension.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 import kotlinx.coroutines.launch
@@ -20,6 +22,14 @@ class GlobalSearchFragment : Fragment() {
     private val viewModel: GlobalSearchViewModel by viewModels {
         MainViewModelFactory(requireActivity().application as MainApplication)
     }
+
+    private val adapter = GlobalSearchGroupListAdapter(
+        object : GlobalSearchGroupListAdapter.Listener {
+            override fun onItemClicked(info: ProviderInfo, outline: MangaOutline) {
+                navToGalleryActivity(outline, info.id)
+            }
+        }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,11 +47,6 @@ class GlobalSearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val adapter = GlobalSearchGroupListAdapter(requireContext())
-        adapter.onItemClicked = { provider, outline ->
-            navToGalleryActivity(outline, provider.id)
-        }
         binding.list.adapter = adapter
 
         viewModel.providerList.observe(viewLifecycleOwner, Observer { result ->

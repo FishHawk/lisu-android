@@ -17,11 +17,11 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageBinding
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 class ImageListAdapter(
     private val context: Context
-) : BaseRecyclerViewAdapter<String, ImageListAdapter.ViewHolder>() {
+) : BaseAdapter<String>() {
     var onPageLongClicked: ((Int, String) -> Unit)? = null
     var isContinuous = false
 
@@ -36,7 +36,7 @@ class ImageListAdapter(
     }
 
     inner class ViewHolder(private val binding: ReaderChapterImageBinding) :
-        BaseRecyclerViewAdapter.ViewHolder<String>(binding) {
+        BaseAdapter.ViewHolder<String>(binding) {
 
         override fun bind(item: String, position: Int) {
             if (!isContinuous) {

@@ -1,13 +1,11 @@
 package com.fishhawk.driftinglibraryandroid.ui.main.explore
 
-import android.content.Context
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
-import com.fishhawk.driftinglibraryandroid.databinding.ExploreProviderCardItemBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ExploreProviderCardHeaderBinding
+import com.fishhawk.driftinglibraryandroid.databinding.ExploreProviderCardItemBinding
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseRecyclerViewAdapter
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 sealed class ListItem {
     data class Header(val header: String) : ListItem()
@@ -15,38 +13,8 @@ sealed class ListItem {
 }
 
 class ProviderInfoListAdapter(
-    private val context: Context
-) : BaseRecyclerViewAdapter<ListItem, BaseRecyclerViewAdapter.ViewHolder<ListItem>>() {
-    var onItemClicked: ((ProviderInfo) -> Unit)? = null
-    var onBrowseClicked: ((ProviderInfo) -> Unit)? = null
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<ListItem> {
-        return when (viewType) {
-            ViewType.HEADER.value -> HeaderViewHolder(
-                ExploreProviderCardHeaderBinding.inflate(
-                    LayoutInflater.from(context), parent, false
-                )
-            )
-            ViewType.ITEM.value -> ItemViewHolder(
-                ExploreProviderCardItemBinding.inflate(
-                    LayoutInflater.from(context), parent, false
-                )
-            )
-            else -> throw IllegalAccessError()
-        }
-    }
-
-    enum class ViewType(val value: Int) {
-        HEADER(0),
-        ITEM(1)
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return when (list[position]) {
-            is ListItem.Item -> ViewType.ITEM.value
-            is ListItem.Header -> ViewType.HEADER.value
-        }
-    }
+    private val listener: Listener
+) : BaseAdapter<ListItem>() {
 
     fun setProviderInfoList(infoList: List<ProviderInfo>) {
         val infoMap = infoList.groupBy { it.lang }
@@ -56,24 +24,57 @@ class ProviderInfoListAdapter(
         setList(itemList)
     }
 
+    enum class ViewType(val value: Int) {
+        HEADER(0),
+        ITEM(1)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<ListItem> {
+        return when (viewType) {
+            ViewType.HEADER.value -> HeaderViewHolder(parent)
+            ViewType.ITEM.value -> ItemViewHolder(parent)
+            else -> throw IllegalAccessError()
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when (list[position]) {
+            is ListItem.Header -> ViewType.HEADER.value
+            is ListItem.Item -> ViewType.ITEM.value
+        }
+    }
+
     inner class ItemViewHolder(private val binding: ExploreProviderCardItemBinding) :
         ViewHolder<ListItem>(binding) {
 
+        constructor(parent: ViewGroup) : this(
+            viewBinding(ExploreProviderCardItemBinding::inflate, parent)
+        )
+
         override fun bind(item: ListItem, position: Int) {
             val info = (item as ListItem.Item).info
-            binding.providerInfo = info
-            Glide.with(context).load(info.icon).into(binding.icon)
-            binding.root.setOnClickListener { onItemClicked?.invoke(info) }
-            binding.browse.setOnClickListener { onBrowseClicked?.invoke(info) }
+            binding.name.text = info.name
+            Glide.with(itemView.context).load(info.icon).into(binding.icon)
+            binding.root.setOnClickListener { listener.onItemClick(info) }
+            binding.browse.setOnClickListener { listener.onBrowseClick(info) }
         }
     }
 
     inner class HeaderViewHolder(private val binding: ExploreProviderCardHeaderBinding) :
         ViewHolder<ListItem>(binding) {
 
+        constructor(parent: ViewGroup) : this(
+            viewBinding(ExploreProviderCardHeaderBinding::inflate, parent)
+        )
+
         override fun bind(item: ListItem, position: Int) {
             val header = (item as ListItem.Header).header
             binding.title.text = header
         }
+    }
+
+    interface Listener {
+        fun onItemClick(providerInfo: ProviderInfo)
+        fun onBrowseClick(providerInfo: ProviderInfo)
     }
 }

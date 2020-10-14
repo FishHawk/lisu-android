@@ -33,7 +33,7 @@ fun <T> Fragment.bindToListViewModel(
     multipleStatusView: MultipleStatusView,
     refreshLayout: RefreshLayout,
     viewModel: RefreshableListViewModel<T>,
-    adapter: BaseRecyclerViewAdapter<T, *>
+    adapter: BaseAdapter<T>
 ) {
     setupFeedbackModule(viewModel)
 

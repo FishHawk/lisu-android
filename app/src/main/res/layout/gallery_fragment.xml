@@ -343,7 +343,8 @@
                                 android:id="@+id/chapters"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:visibility="@{info.hasContent ? View.VISIBLE : View.GONE}" />
+                                android:visibility="@{info.hasContent ? View.VISIBLE : View.GONE}"
+                                tools:listitem="@layout/gallery_chapter_linear" />
 
                             <TextView
                                 android:id="@+id/no_chapter_hint"
