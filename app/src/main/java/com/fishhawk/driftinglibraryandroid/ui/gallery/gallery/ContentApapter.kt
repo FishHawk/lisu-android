@@ -56,9 +56,7 @@ class ContentAdapter(
     private val fragment: Fragment,
     private val id: String,
     private val providerId: String?
-) : BaseRecyclerViewAdapter<ContentItem, BaseRecyclerViewAdapter.ViewHolder<ContentItem>>(
-    mutableListOf()
-) {
+) : BaseRecyclerViewAdapter<ContentItem, BaseRecyclerViewAdapter.ViewHolder<ContentItem>>() {
     enum class ViewMode(val value: Int) {
         GRID(0),
         LINEAR(1)

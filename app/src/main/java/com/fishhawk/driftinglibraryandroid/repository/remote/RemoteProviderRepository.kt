@@ -16,7 +16,12 @@ class RemoteProviderRepository : BaseRemoteRepository<RemoteProviderService>() {
     }
 
     suspend fun getProvidersInfo(): Result<List<ProviderInfo>> =
-        resultWrap { it.getProviders() }
+        resultWrap {
+            it.getProviders().map { info ->
+                info.icon = "${url}provider/item/${info.id}/icon"
+                info
+            }
+        }
 
     suspend fun getProvidersDetail(providerId: String): Result<ProviderDetail> =
         resultWrap { it.getProviderDetail(providerId) }

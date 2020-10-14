@@ -40,12 +40,13 @@ class ExploreFragment : Fragment() {
 
         val adapter = ProviderInfoListAdapter(requireContext())
         adapter.onItemClicked = { navToProviderActivity(it) }
+        adapter.onBrowseClicked = { navToProviderActivity(it) }
         binding.list.adapter = adapter
 
         viewModel.providerList.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is Result.Success -> {
-                    adapter.setList(result.data)
+                    adapter.setProviderInfoList(result.data)
                     if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
                     else binding.multipleStatusView.showContent()
                 }

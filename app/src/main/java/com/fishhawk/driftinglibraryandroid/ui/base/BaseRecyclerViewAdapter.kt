@@ -1,7 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.base
 
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 
 abstract class BaseRecyclerViewAdapter<ITEM, VH : BaseRecyclerViewAdapter.ViewHolder<ITEM>>(
     protected val list: MutableList<ITEM> = mutableListOf()
@@ -19,7 +19,7 @@ abstract class BaseRecyclerViewAdapter<ITEM, VH : BaseRecyclerViewAdapter.ViewHo
         notifyDataSetChanged()
     }
 
-    abstract class ViewHolder<ITEM>(binding: ViewDataBinding) :
+    abstract class ViewHolder<ITEM>(binding: ViewBinding) :
         RecyclerView.ViewHolder(binding.root) {
         open fun bind(item: ITEM, position: Int) {}
     }

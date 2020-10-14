@@ -36,8 +36,7 @@
 
 
     <!-- explore fragment -->
-    <string name="explore_card_latest">Latest</string>
-    <string name="explore_card_popular">Popular</string>
+    <string name="explore_card_browse">Browse</string>
 
 
     <!-- more fragment -->
