@@ -16,10 +16,7 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.OptionModels
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
-import com.fishhawk.driftinglibraryandroid.ui.extension.bindToListViewModel
-import com.fishhawk.driftinglibraryandroid.ui.extension.changeMangaListDisplayMode
-import com.fishhawk.driftinglibraryandroid.ui.extension.getDisplayModeIcon
-import com.fishhawk.driftinglibraryandroid.ui.extension.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.extension.*
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActivity
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderViewModel
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderViewModelFactory
@@ -29,7 +26,7 @@ abstract class ProviderBaseFragment : Fragment() {
     abstract val viewModel: ProviderBaseViewModel
     private lateinit var binding: ProviderBaseFragmentBinding
 
-    val providerId = requireActivity().intent.extras!!.getString("providerId")!!
+    private lateinit var providerId: String
 
     private var hasOption = false
     private lateinit var optionSheet: ProviderOptionSheet
@@ -56,16 +53,18 @@ abstract class ProviderBaseFragment : Fragment() {
 
     private val mangaAdapter = MangaListAdapter(object : MangaListAdapter.Listener {
         override fun onCardClick(outline: MangaOutline) {
-            ProviderActionSheet(requireContext(), outline, providerId, actionAdapter).show()
+            navToGalleryActivity(outline, providerId)
         }
 
-        override fun onCardLongClick(outline: MangaOutline) {}
+        override fun onCardLongClick(outline: MangaOutline) {
+            ProviderActionSheet(requireContext(), outline, providerId, actionAdapter).show()
+        }
     })
 
     abstract fun getOptionModel(optionModels: OptionModels): Map<String, List<String>>
 
     protected fun getViewModelFactory(): ProviderViewModelFactory {
-        val providerId = requireActivity().intent.extras!!.getString("providerId")!!
+        providerId = requireActivity().intent.extras!!.getString("providerId")!!
         val application = requireActivity().application as MainApplication
         return ProviderViewModelFactory(providerId, application)
     }
@@ -87,8 +86,6 @@ abstract class ProviderBaseFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
         binding.mangaList.list.adapter = mangaAdapter
 
         optionSheet.setAdapter(optionAdapter)
