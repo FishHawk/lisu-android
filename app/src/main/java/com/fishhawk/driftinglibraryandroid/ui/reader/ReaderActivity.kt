@@ -2,6 +2,7 @@ package com.fishhawk.driftinglibraryandroid.ui.reader
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityReaderBinding
@@ -43,5 +44,21 @@ class ReaderActivity : AppCompatActivity() {
             if (it) window.addFlags(flag)
             else window.clearFlags(flag)
         }
+    }
+
+    var listener: OnVolumeKeyEvent? = null
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        val useVolumeKey = SettingsHelper.useVolumeKey.getValueDirectly()
+        return when (event.keyCode) {
+            KeyEvent.KEYCODE_VOLUME_UP -> useVolumeKey.also { if (it) listener?.onVolumeUp() }
+            KeyEvent.KEYCODE_VOLUME_DOWN -> useVolumeKey.also { if (it) listener?.onVolumeDown() }
+            else -> super.dispatchKeyEvent(event)
+        }
+    }
+
+    interface OnVolumeKeyEvent {
+        fun onVolumeUp()
+        fun onVolumeDown()
     }
 }

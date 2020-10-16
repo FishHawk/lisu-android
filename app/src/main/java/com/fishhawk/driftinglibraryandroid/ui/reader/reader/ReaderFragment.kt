@@ -14,6 +14,7 @@ import com.fishhawk.driftinglibraryandroid.databinding.ReaderFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
+import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderViewModelFactory
 import kotlinx.coroutines.runBlocking
 
@@ -75,6 +76,11 @@ class ReaderFragment : Fragment() {
                 }
             }
         })
+
+        (requireActivity() as ReaderActivity).listener = object : ReaderActivity.OnVolumeKeyEvent {
+            override fun onVolumeUp() = binding.reader.gotoPrevPage()
+            override fun onVolumeDown() = binding.reader.gotoNextPage()
+        }
     }
 
     override fun onPause() {
@@ -112,15 +118,6 @@ class ReaderFragment : Fragment() {
             }
         })
     }
-
-//    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-//        val useVolumeKey = SettingsHelper.useVolumeKey.getValueDirectly()
-//        return when (event.keyCode) {
-//            KeyEvent.KEYCODE_VOLUME_UP -> useVolumeKey.also { if (it) binding.reader.gotoPrevPage() }
-//            KeyEvent.KEYCODE_VOLUME_DOWN -> useVolumeKey.also { if (it) binding.reader.gotoNextPage() }
-//            else -> super.dispatchKeyEvent(event)
-//        }
-//    }
 
     private fun openPrevChapter() {
         if (viewModel.isLoading) return
