@@ -96,4 +96,9 @@ object SettingsHelper {
     val longTapDialog by lazy {
         preferenceBooleanLiveData("long_tap_dialog", true)
     }
+
+    // Settings advanced
+    val secureMode by lazy {
+        preferenceBooleanLiveData("secure_mode", false)
+    }
 }

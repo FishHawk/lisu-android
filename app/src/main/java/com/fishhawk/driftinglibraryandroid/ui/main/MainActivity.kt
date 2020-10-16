@@ -1,9 +1,9 @@
 package com.fishhawk.driftinglibraryandroid.ui.main
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import com.fishhawk.driftinglibraryandroid.R
@@ -24,6 +24,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         if (savedInstanceState == null) setupBottomNavigationBar()
+
+        SettingsHelper.secureMode.observe(this) {
+            val flag = WindowManager.LayoutParams.FLAG_SECURE
+            if (it) window.addFlags(flag)
+            else window.clearFlags(flag)
+        }
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -48,9 +54,9 @@ class MainActivity : AppCompatActivity() {
             intent = intent
         )
 
-        controller.observe(this, Observer { navController ->
+        controller.observe(this) { navController ->
             setupActionBarWithNavController(this, navController)
-        })
+        }
         currentNavController = controller
 
         bottomNavigationView.selectedItemId =

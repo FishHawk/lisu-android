@@ -1,9 +1,11 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider
 
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityProviderBinding
+import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.extension.setupTheme
 import com.fishhawk.driftinglibraryandroid.ui.extension.setupWithNavControllerT
 
@@ -28,6 +30,12 @@ class ProviderActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
         title = intent.extras!!.getString("providerName")!!
         if (savedInstanceState == null) setupBottomNavigationBar()
+
+        SettingsHelper.secureMode.observe(this) {
+            val flag = WindowManager.LayoutParams.FLAG_SECURE
+            if (it) window.addFlags(flag)
+            else window.clearFlags(flag)
+        }
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {

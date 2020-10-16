@@ -6,4 +6,11 @@
         app:key="clear_image_cache"
         app:summary="Clear thumb and chapter image cache"
         app:title="Clear image cache" />
+
+    <SwitchPreference
+        app:defaultValue="false"
+        app:iconSpaceReserved="false"
+        app:key="secure_mode"
+        app:summary="Hide app contents when switch apps and block screenshots"
+        app:title="Secure mode" />
 </PreferenceScreen>
