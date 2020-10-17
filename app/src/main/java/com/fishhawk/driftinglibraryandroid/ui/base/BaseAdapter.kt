@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 
 abstract class BaseAdapter<ITEM>(
-    protected val list: MutableList<ITEM> = mutableListOf()
+    val list: MutableList<ITEM> = mutableListOf()
 ) : RecyclerView.Adapter<BaseAdapter.ViewHolder<ITEM>>() {
 
     fun setList(newList: List<ITEM>) {

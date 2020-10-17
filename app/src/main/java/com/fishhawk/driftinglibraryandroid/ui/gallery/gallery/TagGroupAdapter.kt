@@ -7,7 +7,7 @@ import com.fishhawk.driftinglibraryandroid.databinding.GalleryTagItemBinding
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 class TagGroupAdapter(
-    private val listener: Listener
+    private val listener: Listener? = null
 ) : BaseAdapter<String>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -28,9 +28,9 @@ class TagGroupAdapter(
 
         override fun bind(item: String, position: Int) {
             binding.root.text = item
-            binding.value.setOnClickListener { listener.onTagClick(item) }
+            binding.value.setOnClickListener { listener?.onTagClick(item) }
             binding.value.setOnLongClickListener {
-                listener.onTagLongClick(item)
+                listener?.onTagLongClick(item)
                 true
             }
         }
