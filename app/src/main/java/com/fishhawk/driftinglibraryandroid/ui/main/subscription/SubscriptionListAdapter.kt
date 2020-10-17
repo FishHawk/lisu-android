@@ -12,6 +12,8 @@ class SubscriptionListAdapter(
     private val listener: Listener
 ) : BaseAdapter<Subscription>() {
 
+    override val enableDiffUtil: Boolean = true
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(parent)
     }

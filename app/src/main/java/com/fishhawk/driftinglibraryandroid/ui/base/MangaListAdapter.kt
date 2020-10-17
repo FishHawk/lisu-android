@@ -12,6 +12,8 @@ class MangaListAdapter(
     private val listener: Listener
 ) : BaseAdapter<MangaOutline>() {
 
+    override val enableDiffUtil: Boolean = true
+
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     enum class ViewMode(val value: Int) {

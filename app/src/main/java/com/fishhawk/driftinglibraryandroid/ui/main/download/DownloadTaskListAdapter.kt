@@ -11,6 +11,8 @@ class DownloadTaskListAdapter(
     private val listener: Listener
 ) : BaseAdapter<DownloadDesc>() {
 
+    override val enableDiffUtil: Boolean = true
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(parent)
     }
