@@ -103,27 +103,29 @@ class GalleryFragment : Fragment() {
             SettingsHelper.chapterDisplayOrder.setNextValue()
         }
 
-        SettingsHelper.chapterDisplayMode.observe(viewLifecycleOwner, Observer {
+        SettingsHelper.chapterDisplayMode.observe(viewLifecycleOwner) {
             binding.displayModeButton.setIconResource(getChapterDisplayModeIcon())
             binding.chapters.viewMode = when (it) {
                 SettingsHelper.ChapterDisplayMode.GRID -> ContentView.ViewMode.GRID
                 SettingsHelper.ChapterDisplayMode.LINEAR -> ContentView.ViewMode.LINEAR
             }
-        })
+        }
 
-        SettingsHelper.chapterDisplayOrder.observe(viewLifecycleOwner, Observer {
+        SettingsHelper.chapterDisplayOrder.observe(viewLifecycleOwner) {
             binding.chapters.viewOrder = when (it) {
                 SettingsHelper.ChapterDisplayOrder.ASCEND -> ContentView.ViewOrder.ASCEND
                 SettingsHelper.ChapterDisplayOrder.DESCEND -> ContentView.ViewOrder.DESCEND
             }
-        })
+        }
 
-        viewModel.detail.observe(viewLifecycleOwner, Observer { result ->
+        viewModel.detail.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Success -> {
                     binding.multipleStatusView.showContent()
 
                     val detail = result.data
+                    if (thumb != result.data.thumb) result.data.thumb?.let { setupThumb(it) }
+
                     binding.info = GalleryInfo(detail)
                     binding.description.setOnClickListener {
                         binding.description.maxLines =
@@ -143,13 +145,13 @@ class GalleryFragment : Fragment() {
                 is Result.Error -> binding.multipleStatusView.showError(result.exception.message)
                 is Result.Loading -> binding.multipleStatusView.showLoading()
             }
-        })
+        }
 
-        viewModel.history.observe(viewLifecycleOwner, Observer { history ->
+        viewModel.history.observe(viewLifecycleOwner) { history ->
             binding.contentView.chapters.markedPosition = history?.let {
                 MarkedPosition(it.collectionIndex, it.chapterIndex, it.pageIndex)
             }
-        })
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
