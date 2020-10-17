@@ -96,7 +96,7 @@ fun BottomNavigationView.setupWithNavControllerT(
                         as NavHostFragment
 
                 // Exclude the first fragment tag because it's always in the back stack.
-                if (firstFragmentTag != newlySelectedItemTag) {
+                if (!hasHome || (hasHome && firstFragmentTag != newlySelectedItemTag)) {
                     // Commit a transaction that cleans the back stack and adds the first fragment
                     // to it, creating the fixed started destination.
                     fragmentManager.beginTransaction()
@@ -109,16 +109,16 @@ fun BottomNavigationView.setupWithNavControllerT(
                         .attach(selectedFragment)
                         .setPrimaryNavigationFragment(selectedFragment)
                         .apply {
-                            // Detach all other Fragments
-                            graphIdToTagMap.forEach { _, fragmentTagIter ->
-                                if (fragmentTagIter != newlySelectedItemTag) {
-                                    if (hasHome)
-                                        detach(fragmentManager.findFragmentByTag(firstFragmentTag)!!)
-                                    else
+                            if (hasHome) {
+                                detach(fragmentManager.findFragmentByTag(firstFragmentTag)!!)
+                                addToBackStack(firstFragmentTag)
+                            } else {
+                                graphIdToTagMap.forEach { _, fragmentTagIter ->
+                                    if (fragmentTagIter != newlySelectedItemTag) {
                                         detach(fragmentManager.findFragmentByTag(fragmentTagIter)!!)
+                                    }
                                 }
                             }
-                            if (hasHome) addToBackStack(firstFragmentTag)
                         }
                         .setReorderingAllowed(true)
                         .commit()

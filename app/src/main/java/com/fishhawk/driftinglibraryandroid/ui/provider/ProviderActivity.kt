@@ -52,5 +52,4 @@ class ProviderActivity : AppCompatActivity() {
             hasHome = false
         )
     }
-
 }
