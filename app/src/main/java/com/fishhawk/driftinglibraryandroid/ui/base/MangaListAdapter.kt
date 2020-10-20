@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.base
 
+import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -38,21 +39,30 @@ class MangaListAdapter(
         )
 
         override fun bind(item: MangaOutline, position: Int) {
-            binding.outline = item
+            binding.title.text = item.title
+
+            binding.newMark.visibility =
+                if (item.hasNewMark == true) View.VISIBLE
+                else View.GONE
 
             Glide.with(itemView.context)
                 .load(item.thumb)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(binding.thumb)
 
-            binding.root.setOnClickListener { listener.onCardClick(item) }
+            binding.root.setOnClickListener {
+                listener.onCardClick(item)
+                if (item.hasNewMark == true) {
+                    item.hasNewMark = false
+                    notifyItemChanged(position)
+                }
+            }
             binding.root.setOnLongClickListener {
                 listener.onCardLongClick(item)
                 true
             }
         }
     }
-
 
     inner class LinearViewHolder(private val binding: MangaLinearCardBinding) :
         BaseAdapter.ViewHolder<MangaOutline>(binding) {
@@ -62,19 +72,29 @@ class MangaListAdapter(
         )
 
         override fun bind(item: MangaOutline, position: Int) {
-            binding.outline = item
-
+            binding.title.text = item.title
+            binding.author.text = item.metadata.authors?.joinToString(";")
             binding.update.text = item.updateTime?.let {
                 val date = Date(item.updateTime)
                 dateFormat.format(date)
             }
+
+            binding.newMark.visibility =
+                if (item.hasNewMark == true) View.VISIBLE
+                else View.GONE
 
             Glide.with(itemView.context)
                 .load(item.thumb)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(binding.thumb)
 
-            binding.root.setOnClickListener { listener.onCardClick(item) }
+            binding.root.setOnClickListener {
+                listener.onCardClick(item)
+                if (item.hasNewMark == true) {
+                    item.hasNewMark = false
+                    notifyItemChanged(position)
+                }
+            }
             binding.root.setOnLongClickListener {
                 listener.onCardLongClick(item)
                 true

@@ -15,7 +15,8 @@ data class MangaOutline(
     val id: String,
     var thumb: String?,
     val updateTime: Long?,
-    val metadata: MetadataOutline
+    val metadata: MetadataOutline,
+    var hasNewMark: Boolean?
 ) : Parcelable {
     val title
         get() = metadata.title ?: id

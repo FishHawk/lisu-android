@@ -88,6 +88,7 @@ dependencies {
     implementation 'com.google.android:flexbox:2.0.1'
     implementation 'com.github.seven332:refreshlayout:0.1.0'
     implementation 'com.classic.common:multiple-status-view:1.7'
+    implementation 'com.github.shts:TriangleLabelView:1.1.2'
 
     // ImageView
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
