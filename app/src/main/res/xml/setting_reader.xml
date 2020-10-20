@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ListPreference
-        app:defaultValue="1"
+        app:defaultValue="RTL"
         app:entries="@array/reading_direction_entries"
         app:entryValues="@array/reading_direction_entry_values"
         app:iconSpaceReserved="false"
@@ -11,7 +11,7 @@
         app:title="@string/settings_reading_direction" />
 
     <ListPreference
-        app:defaultValue="0"
+        app:defaultValue="DEFAULT"
         app:entries="@array/screen_orientation_entries"
         app:entryValues="@array/screen_orientation_entry_values"
         app:iconSpaceReserved="false"

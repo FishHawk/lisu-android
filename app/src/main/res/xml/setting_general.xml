@@ -10,7 +10,7 @@
         app:title="@string/settings_start_screen" />
 
     <ListPreference
-        app:defaultValue="0"
+        app:defaultValue="LIGHT"
         app:entries="@array/theme_entries"
         app:entryValues="@array/theme_entry_values"
         app:iconSpaceReserved="false"
@@ -19,7 +19,7 @@
         app:title="@string/settings_theme" />
 
     <ListPreference
-        app:defaultValue="0"
+        app:defaultValue="GRID"
         app:entries="@array/display_mode_entries"
         app:entryValues="@array/display_mode_entry_values"
         app:iconSpaceReserved="false"
@@ -28,7 +28,7 @@
         app:title="@string/settings_display_mode" />
 
     <ListPreference
-        app:defaultValue="1"
+        app:defaultValue="FROM_LIBRARY"
         app:entries="@array/settings_history_filter_entries"
         app:entryValues="@array/settings_history_filter_entry_values"
         app:iconSpaceReserved="false"
@@ -37,7 +37,7 @@
         app:title="@string/settings_history_filter" />
 
     <ListPreference
-        app:defaultValue="0"
+        app:defaultValue="GRID"
         app:entries="@array/display_mode_entries"
         app:entryValues="@array/display_mode_entry_values"
         app:iconSpaceReserved="false"
@@ -46,7 +46,7 @@
         app:title="@string/settings_chapter_display_mode" />
 
     <ListPreference
-        app:defaultValue="0"
+        app:defaultValue="DESCEND"
         app:entries="@array/display_order_entries"
         app:entryValues="@array/display_order_entry_values"
         app:iconSpaceReserved="false"
