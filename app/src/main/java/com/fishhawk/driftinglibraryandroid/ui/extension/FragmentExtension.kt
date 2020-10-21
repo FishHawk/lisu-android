@@ -17,12 +17,10 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryActivity
 import com.fishhawk.driftinglibraryandroid.ui.main.MainActivity
-import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActivity
 import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActivity
 import com.fishhawk.driftinglibraryandroid.util.FileUtil
 import com.hippo.refreshlayout.RefreshLayout
@@ -172,27 +170,6 @@ fun Fragment.navToReaderActivity(
     )
 
     val intent = Intent(requireActivity(), ReaderActivity::class.java)
-    intent.putExtras(bundle)
-    startActivity(intent)
-}
-
-fun Fragment.navToProviderActivity(provider: ProviderInfo) {
-    val bundle = bundleOf(
-        "providerId" to provider.id,
-        "providerName" to provider.name
-    )
-    val intent = Intent(requireActivity(), ProviderActivity::class.java)
-    intent.putExtras(bundle)
-    startActivity(intent)
-}
-
-fun Fragment.navToProviderActivity(providerId: String, keywords: String) {
-    val bundle = bundleOf(
-        "providerId" to providerId,
-        "providerName" to providerId,
-        "keywords" to keywords
-    )
-    val intent = Intent(requireActivity(), ProviderActivity::class.java)
     intent.putExtras(bundle)
     startActivity(intent)
 }

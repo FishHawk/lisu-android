@@ -1,11 +1,11 @@
-package com.fishhawk.driftinglibraryandroid.ui.provider.latest
+package com.fishhawk.driftinglibraryandroid.ui.main.provider.search
 
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
-import com.fishhawk.driftinglibraryandroid.ui.provider.base.ProviderBaseViewModel
+import com.fishhawk.driftinglibraryandroid.ui.main.provider.base.ProviderBaseViewModel
 
-class LatestViewModel(
+class SearchViewModel(
     private val providerId: String,
     private val remoteProviderRepository: RemoteProviderRepository,
     remoteDownloadRepository: RemoteDownloadRepository,
@@ -15,9 +15,16 @@ class LatestViewModel(
     remoteDownloadRepository,
     remoteSubscriptionRepository
 ) {
+    private var keywords = ""
+
     override suspend fun loadResult() =
-        remoteProviderRepository.getLatestMangaList(providerId, 1, option)
+        remoteProviderRepository.search(providerId, keywords, 1)
 
     override suspend fun fetchMoreResult() =
-        remoteProviderRepository.getLatestMangaList(providerId, page + 1, option)
+        remoteProviderRepository.search(providerId, keywords, page + 1)
+
+    fun search(keywords: String) {
+        this.keywords = keywords
+        load()
+    }
 }

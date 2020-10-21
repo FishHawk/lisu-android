@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.provider.base
+package com.fishhawk.driftinglibraryandroid.ui.main.provider.base
 
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.R

@@ -1,20 +1,26 @@
-package com.fishhawk.driftinglibraryandroid.ui.provider
+package com.fishhawk.driftinglibraryandroid.ui.main.provider
 
 import android.content.Context
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.ui.provider.category.CategoryFragment
-import com.fishhawk.driftinglibraryandroid.ui.provider.latest.LatestFragment
-import com.fishhawk.driftinglibraryandroid.ui.provider.popular.PopularFragment
+import com.fishhawk.driftinglibraryandroid.ui.main.provider.category.CategoryFragment
+import com.fishhawk.driftinglibraryandroid.ui.main.provider.latest.LatestFragment
+import com.fishhawk.driftinglibraryandroid.ui.main.provider.popular.PopularFragment
 import java.lang.IllegalArgumentException
 
-class ProviderPagerAdapter(private val context: Context, fm: FragmentManager) :
+class ProviderPagerAdapter(
+    private val context: Context,
+    fm: FragmentManager,
+    providerId: String
+) :
     FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-    private val popularFragment by lazy { PopularFragment() }
-    private val latestFragment by lazy { LatestFragment() }
-    private val categoryFragment by lazy { CategoryFragment() }
+    private val arguments = bundleOf("providerId" to providerId)
+    private val popularFragment by lazy { PopularFragment().also { it.arguments = arguments } }
+    private val latestFragment by lazy { LatestFragment().also { it.arguments = arguments } }
+    private val categoryFragment by lazy { CategoryFragment().also { it.arguments = arguments } }
 
     override fun getItem(position: Int): Fragment {
         return when (position) {

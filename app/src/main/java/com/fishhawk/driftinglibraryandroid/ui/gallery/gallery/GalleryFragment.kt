@@ -35,7 +35,8 @@ class GalleryFragment : Fragment() {
         override fun onTagClick(key: String, value: String) {
             val keywords = if (key.isBlank()) value else "${key}:$value"
             providerId?.let {
-                navToProviderActivity(it, keywords)
+                TODO("")
+//                navToProviderActivity(it, keywords)
             } ?: navToMainActivity(keywords)
         }
 

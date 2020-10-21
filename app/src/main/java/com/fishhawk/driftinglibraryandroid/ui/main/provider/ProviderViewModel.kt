@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.provider
+package com.fishhawk.driftinglibraryandroid.ui.main.provider
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData

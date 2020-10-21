@@ -10,9 +10,14 @@
         android:name="com.fishhawk.driftinglibraryandroid.ui.main.explore.ExploreFragment"
         android:label="@string/label_explore"
         tools:layout="@layout/explore_fragment">
+
         <action
             android:id="@+id/action_explore_to_global_search"
             app:destination="@id/nav_global_search" />
+
+        <action
+            android:id="@+id/action_explore_to_provider_pager"
+            app:destination="@id/nav_provider_pager" />
     </fragment>
 
     <fragment
@@ -20,4 +25,21 @@
         android:name="com.fishhawk.driftinglibraryandroid.ui.main.globalsearch.GlobalSearchFragment"
         android:label="@string/label_global_search"
         tools:layout="@layout/global_search_fragment" />
+
+    <fragment
+        android:id="@+id/nav_provider_pager"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.main.provider.ProviderPagerFragment"
+        android:label=""
+        tools:layout="@layout/provider_pager_fragment">
+
+        <action
+            android:id="@+id/action_to_search"
+            app:destination="@id/nav_search" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_search"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.main.provider.search.SearchFragment"
+        android:label="@string/label_search"
+        tools:layout="@layout/provider_base_fragment" />
 </navigation>

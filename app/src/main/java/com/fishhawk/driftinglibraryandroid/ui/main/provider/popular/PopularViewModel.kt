@@ -1,11 +1,11 @@
-package com.fishhawk.driftinglibraryandroid.ui.provider.category
+package com.fishhawk.driftinglibraryandroid.ui.main.provider.popular
 
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
-import com.fishhawk.driftinglibraryandroid.ui.provider.base.ProviderBaseViewModel
+import com.fishhawk.driftinglibraryandroid.ui.main.provider.base.ProviderBaseViewModel
 
-class CategoryViewModel(
+class PopularViewModel(
     private val providerId: String,
     private val remoteProviderRepository: RemoteProviderRepository,
     remoteDownloadRepository: RemoteDownloadRepository,
@@ -16,8 +16,8 @@ class CategoryViewModel(
     remoteSubscriptionRepository
 ) {
     override suspend fun loadResult() =
-        remoteProviderRepository.getCategoryMangaList(providerId, 1, option)
+        remoteProviderRepository.getPopularMangaList(providerId, 1, option)
 
     override suspend fun fetchMoreResult() =
-        remoteProviderRepository.getCategoryMangaList(providerId, page + 1, option)
+        remoteProviderRepository.getPopularMangaList(providerId, page + 1, option)
 }

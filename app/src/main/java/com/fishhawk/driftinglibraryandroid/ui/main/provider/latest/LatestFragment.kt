@@ -1,8 +1,8 @@
-package com.fishhawk.driftinglibraryandroid.ui.provider.latest
+package com.fishhawk.driftinglibraryandroid.ui.main.provider.latest
 
 import androidx.fragment.app.viewModels
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.OptionModels
-import com.fishhawk.driftinglibraryandroid.ui.provider.base.ProviderBaseFragment
+import com.fishhawk.driftinglibraryandroid.ui.main.provider.base.ProviderBaseFragment
 
 class LatestFragment : ProviderBaseFragment() {
     override val viewModel: LatestViewModel by viewModels { getViewModelFactory() }

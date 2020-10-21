@@ -8,13 +8,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ExploreFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.ui.extension.navToProviderActivity
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 
 class ExploreFragment : Fragment() {
@@ -25,12 +25,24 @@ class ExploreFragment : Fragment() {
 
     private val adapter = ProviderInfoListAdapter(object : ProviderInfoListAdapter.Listener {
         override fun onItemClick(providerInfo: ProviderInfo) {
-            navToProviderActivity(providerInfo)
+            findNavController().navigate(
+                R.id.action_explore_to_provider_pager,
+                bundleOf(
+                    "providerId" to providerInfo.id,
+                    "providerName" to providerInfo.name
+                )
+            )
             SettingsHelper.lastUsedProvider.setValue(providerInfo.id)
         }
 
         override fun onBrowseClick(providerInfo: ProviderInfo) {
-            navToProviderActivity(providerInfo)
+            findNavController().navigate(
+                R.id.action_explore_to_provider_pager,
+                bundleOf(
+                    "providerId" to providerInfo.id,
+                    "providerName" to providerInfo.name
+                )
+            )
             SettingsHelper.lastUsedProvider.setValue(providerInfo.id)
         }
     })

@@ -18,11 +18,6 @@ class ServerFragment : Fragment() {
         MainViewModelFactory(requireActivity().application as MainApplication)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     val adapter = ServerInfoListAdapter(object : ServerInfoListAdapter.Listener {
         override fun onItemClick(info: ServerInfo) {
             SettingsHelper.selectedServer.setValue(info.id)
@@ -45,6 +40,11 @@ class ServerFragment : Fragment() {
             // saveServerListOrder()
         }
     })
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
