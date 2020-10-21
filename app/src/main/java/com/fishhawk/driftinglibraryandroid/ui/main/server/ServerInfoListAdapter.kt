@@ -17,12 +17,15 @@ class ServerInfoListAdapter(
         super.onAttachedToRecyclerView(recyclerView)
 
         val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
-//            override fun onSelectedChanged(
-//                viewHolder: RecyclerView.ViewHolder?,
-//                actionState: Int
-//            ) {
-//                super.onSelectedChanged(viewHolder, actionState)
-//            }
+            override fun onSelectedChanged(
+                viewHolder: RecyclerView.ViewHolder?,
+                actionState: Int
+            ) {
+                super.onSelectedChanged(viewHolder, actionState)
+                if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
+                    listener.onDragFinish()
+                }
+            }
 
             override fun getMovementFlags(
                 recyclerView: RecyclerView,
@@ -96,5 +99,6 @@ class ServerInfoListAdapter(
         fun onItemClick(info: ServerInfo)
         fun onServerDelete(info: ServerInfo)
         fun onServerEdit(info: ServerInfo)
+        fun onDragFinish()
     }
 }

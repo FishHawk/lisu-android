@@ -12,6 +12,9 @@ interface ServerInfoDao {
     @Query("SELECT * FROM ServerInfo WHERE id = :id")
     fun observe(id: Int): LiveData<ServerInfo>
 
+    @Query("SELECT * FROM ServerInfo ORDER BY position ASC")
+    fun list(): List<ServerInfo>
+
     @Query("SELECT * FROM ServerInfo WHERE id = :id")
     fun select(id: Int): ServerInfo?
 

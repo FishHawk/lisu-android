@@ -39,6 +39,11 @@ class ServerFragment : Fragment() {
                 viewModel.updateServer(info)
             }
         }
+
+        override fun onDragFinish() {
+            // wait LiveData update
+            // saveServerListOrder()
+        }
     })
 
     override fun onCreateView(
