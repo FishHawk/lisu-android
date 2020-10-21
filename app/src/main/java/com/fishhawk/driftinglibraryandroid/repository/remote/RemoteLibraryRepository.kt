@@ -22,14 +22,20 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
         resultWrap {
             it.search(lastTime, filter, limit).apply {
                 for (outline in this) {
-                    outline.thumb = "${url}library/image/${outline.id}/${outline.thumb}"
+                    outline.thumb =
+                        if (outline.thumb.isNullOrBlank()) null
+                        else "${url}library/image/${outline.id}/${outline.thumb}"
                 }
             }
         }
 
     suspend fun getManga(mangaId: String): Result<MangaDetail> =
         resultWrap {
-            it.getManga(mangaId).apply { thumb = "${url}library/image/${mangaId}/${thumb}" }
+            it.getManga(mangaId).apply {
+                thumb =
+                    if (thumb.isNullOrBlank()) null
+                    else "${url}library/image/${mangaId}/${thumb}"
+            }
         }
 
     suspend fun deleteManga(mangaId: String): Result<String> =

@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
@@ -64,7 +63,7 @@ class GalleryFragment : Fragment() {
         val id: String = arguments.getString("id")!!
         val title: String = arguments.getString("title")!!
         providerId = arguments.getString("providerId")
-        val thumb: String = arguments.getString("thumb")!!
+        val thumb = arguments.getString("thumb")
 
         providerId?.let {
             viewModel.openMangaFromProvider(it, id)
@@ -83,7 +82,7 @@ class GalleryFragment : Fragment() {
         }
 
         binding.info = GalleryInfo(providerId, title)
-        setupThumb(thumb)
+        thumb?.let { setupThumb(it) }
         setupActionButton()
 
         binding.thumbCard.setOnLongClickListener {
@@ -124,7 +123,7 @@ class GalleryFragment : Fragment() {
                     binding.multipleStatusView.showContent()
 
                     val detail = result.data
-                    if (thumb != result.data.thumb) result.data.thumb?.let { setupThumb(it) }
+                    detail.thumb?.let { setupThumb(it) }
 
                     binding.info = GalleryInfo(detail)
                     binding.description.setOnClickListener {
@@ -170,11 +169,13 @@ class GalleryFragment : Fragment() {
     private fun setupThumb(thumb: String) {
         Glide.with(this)
             .load(thumb)
+            .placeholder(binding.thumb.drawable)
             .diskCacheStrategy(DiskCacheStrategy.DATA)
             .into(binding.thumb)
 
         Glide.with(this)
             .load(thumb)
+            .placeholder(binding.backdrop.drawable)
             .diskCacheStrategy(DiskCacheStrategy.DATA)
             .into(binding.backdrop)
     }

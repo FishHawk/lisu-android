@@ -67,7 +67,10 @@ class RemoteProviderRepository : BaseRemoteRepository<RemoteProviderService>() {
         }
 
     suspend fun getManga(providerId: String, id: String): Result<MangaDetail> =
-        resultWrap { it.getManga(providerId, id) }
+        resultWrap { service ->
+            service.getManga(providerId, id)
+                .apply { thumb = thumb?.let { processImageUrl(providerId, it) } }
+        }
 
     suspend fun getChapterContent(
         providerId: String,
