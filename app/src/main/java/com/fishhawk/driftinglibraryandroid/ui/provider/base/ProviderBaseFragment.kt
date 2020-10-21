@@ -28,8 +28,6 @@ abstract class ProviderBaseFragment : Fragment() {
 
     private lateinit var providerId: String
 
-    private var hasOption = false
-    private lateinit var optionSheet: ProviderOptionSheet
     private val optionAdapter = OptionGroupListAdapter(object : OptionGroupListAdapter.Listener {
         override fun onOptionSelect(name: String, index: Int) {
             viewModel.selectOption(name, index)
@@ -80,7 +78,6 @@ abstract class ProviderBaseFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = ProviderBaseFragmentBinding.inflate(inflater, container, false)
-        optionSheet = ProviderOptionSheet(requireContext())
         return binding.root
     }
 
@@ -88,7 +85,7 @@ abstract class ProviderBaseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.mangaList.list.adapter = mangaAdapter
 
-        optionSheet.setAdapter(optionAdapter)
+        binding.options.adapter = optionAdapter
 
         SettingsHelper.displayMode.observe(viewLifecycleOwner, Observer {
             binding.mangaList.list.changeMangaListDisplayMode(mangaAdapter)
@@ -104,10 +101,6 @@ abstract class ProviderBaseFragment : Fragment() {
             when (result) {
                 is Result.Success -> {
                     val model = getOptionModel(result.data.optionModels)
-                    if (model.toList().isNotEmpty()) {
-                        hasOption = true
-                        requireActivity().invalidateOptionsMenu()
-                    }
                     optionAdapter.setList(model.toList())
                     model.keys.forEach { key -> viewModel.selectOption(key, 0) }
 
@@ -140,7 +133,6 @@ abstract class ProviderBaseFragment : Fragment() {
         val keywords = (requireActivity() as ProviderActivity).keywords
         if (keywords != null) searchView.setQuery(keywords, true)
 
-        menu.findItem(R.id.action_option).isVisible = hasOption
         menu.findItem(R.id.action_display_mode).setIcon(getDisplayModeIcon())
     }
 
@@ -149,10 +141,6 @@ abstract class ProviderBaseFragment : Fragment() {
             R.id.action_display_mode -> {
                 SettingsHelper.displayMode.setNextValue()
                 item.setIcon(getDisplayModeIcon())
-                true
-            }
-            R.id.action_option -> {
-                optionSheet.show()
                 true
             }
             else -> super.onOptionsItemSelected(item)
