@@ -3,7 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.main.provider.base
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderBaseFragmentBinding
@@ -17,7 +17,7 @@ import com.fishhawk.driftinglibraryandroid.ui.main.provider.ProviderViewModel
 import com.fishhawk.driftinglibraryandroid.ui.main.provider.ProviderViewModelFactory
 
 abstract class ProviderBaseFragment : Fragment() {
-    private val providerViewModel: ProviderViewModel by activityViewModels { getViewModelFactory() }
+    private val providerViewModel: ProviderViewModel by viewModels { getViewModelFactory() }
     abstract val viewModel: ProviderBaseViewModel
     private lateinit var binding: ProviderBaseFragmentBinding
 

@@ -38,13 +38,14 @@ class ProviderPagerFragment : Fragment() {
 
         val activity = requireActivity() as MainActivity
 
-        val providerId = requireArguments().getString("providerId")!!
+        val providerName = requireArguments().getString("providerName")!!
+        activity.toolbar.title = providerName
 
+        val providerId = requireArguments().getString("providerId")!!
         binding.viewPager.offscreenPageLimit = 3
         binding.viewPager.adapter = ProviderPagerAdapter(
             requireContext(), childFragmentManager, providerId
         )
-        activity.enableTabs(binding.viewPager)
     }
 
     override fun onStart() {
