@@ -2,13 +2,13 @@
 <resources>
     <color name="colorAccent">#1e88e5</color>
 
-    <color name="loading_indicator_red">#ffe53935</color>
-    <color name="loading_indicator_purple">#ffaa00ff</color>
-    <color name="loading_indicator_blue">#ff1d87e4</color>
-    <color name="loading_indicator_cyan">#ff00acc1</color>
-    <color name="loading_indicator_green">#ff7cb342</color>
-    <color name="loading_indicator_yellow">#fff9a825</color>
-    <color name="loading_indicator_orange">#ffff7043</color>
+    <color name="loading_indicator_red">@color/red_600</color>
+    <color name="loading_indicator_purple">@color/purple_700</color>
+    <color name="loading_indicator_blue">@color/blue_600</color>
+    <color name="loading_indicator_cyan">@color/cyan_600</color>
+    <color name="loading_indicator_green">@color/light_green_600</color>
+    <color name="loading_indicator_yellow">@color/yellow_800</color>
+    <color name="loading_indicator_orange">@color/deep_orange_400</color>
 
 
     <!-- Application Colors -->
@@ -18,19 +18,16 @@
     <!-- Dark Application Colors -->
     <color name="colorDarkPrimary">#212121</color>
     <color name="colorDarkPrimaryDark">#1C1C1D</color>
-    <color name="colorAmoledPrimary">@color/md_black_1000</color>
-
-    <color name="splashBackgroundColor">@color/colorPrimary</color>
 
     <!-- Light Theme -->
-    <color name="colorAccentLight">@color/md_blue_A400</color>
+    <color name="colorAccentLight">@color/blue_A400</color>
     <color name="textColorPrimaryLight">@color/md_black_1000_87</color>
     <color name="textColorSecondaryLight">@color/md_black_1000_54</color>
     <color name="textColorHintLight">@color/md_black_1000_38</color>
     <color name="dividerLight">@color/md_black_1000_12</color>
     <color name="rippleColorLight">@color/md_black_1000_12</color>
-    <color name="backgroundLight">@color/md_grey_50</color>
-    <color name="dialogLight">@color/md_white_1000</color>
+    <color name="backgroundLight">@color/grey_50</color>
+    <color name="dialogLight">@color/white</color>
     <color name="selectorColorLight">@color/md_blue_A400_38</color>
 
     <!-- Dark Theme -->
