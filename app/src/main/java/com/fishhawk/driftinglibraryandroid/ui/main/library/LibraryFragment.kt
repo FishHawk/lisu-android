@@ -4,9 +4,10 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
@@ -16,7 +17,6 @@ import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.ui.extension.bindToListViewModel
 import com.fishhawk.driftinglibraryandroid.ui.extension.changeMangaListDisplayMode
 import com.fishhawk.driftinglibraryandroid.ui.extension.getDisplayModeIcon
-import com.fishhawk.driftinglibraryandroid.ui.extension.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 
 class LibraryFragment : Fragment() {
@@ -27,7 +27,14 @@ class LibraryFragment : Fragment() {
 
     val adapter = MangaListAdapter(object : MangaListAdapter.Listener {
         override fun onCardClick(outline: MangaOutline) {
-            navToGalleryActivity(outline, null)
+            findNavController().navigate(
+                R.id.action_to_gallery,
+                bundleOf(
+                    "id" to outline.id,
+                    "title" to outline.title,
+                    "thumb" to outline.thumb
+                )
+            )
         }
 
         override fun onCardLongClick(outline: MangaOutline) {

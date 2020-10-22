@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.gallery.edit
+package com.fishhawk.driftinglibraryandroid.ui.main.gallery.edit
 
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog

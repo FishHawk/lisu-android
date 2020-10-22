@@ -2,14 +2,15 @@ package com.fishhawk.driftinglibraryandroid.ui.main.history
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.ui.extension.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.ui.extension.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 
@@ -22,7 +23,15 @@ class HistoryFragment : Fragment() {
     val adapter = HistoryListAdapter(object : HistoryListAdapter.Listener {
         override fun onThumbClicked(history: ReadingHistory) {
             with(history) {
-                navToGalleryActivity(mangaId, title, thumb, providerId)
+                findNavController().navigate(
+                    R.id.action_to_gallery,
+                    bundleOf(
+                        "id" to mangaId,
+                        "title" to title,
+                        "thumb" to thumb,
+                        "providerId" to providerId
+                    )
+                )
             }
         }
 

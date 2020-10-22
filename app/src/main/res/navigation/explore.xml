@@ -41,4 +41,13 @@
         android:name="com.fishhawk.driftinglibraryandroid.ui.main.provider.search.SearchFragment"
         android:label="@string/label_search"
         tools:layout="@layout/provider_base_fragment" />
+
+    <action
+        android:id="@+id/action_to_gallery"
+        app:destination="@id/nav_gallery" />
+
+    <fragment
+        android:id="@+id/nav_gallery"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.main.gallery.detail.GalleryFragment"
+        tools:layout="@layout/gallery_fragment" />
 </navigation>

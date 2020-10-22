@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.gallery.gallery
+package com.fishhawk.driftinglibraryandroid.ui.main.gallery.detail
 
 import android.view.View
 import android.view.ViewGroup

@@ -3,6 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.main.globalsearch
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -14,7 +15,6 @@ import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchFragmentBindi
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
-import com.fishhawk.driftinglibraryandroid.ui.extension.navToGalleryActivity
 import com.fishhawk.driftinglibraryandroid.ui.main.MainViewModelFactory
 import kotlinx.coroutines.launch
 
@@ -27,7 +27,15 @@ class GlobalSearchFragment : Fragment() {
     private val adapter = GlobalSearchGroupListAdapter(
         object : GlobalSearchGroupListAdapter.Listener {
             override fun onItemClicked(info: ProviderInfo, outline: MangaOutline) {
-                navToGalleryActivity(outline, info.id)
+                findNavController().navigate(
+                    R.id.action_to_gallery,
+                    bundleOf(
+                        "id" to outline.id,
+                        "title" to outline.title,
+                        "thumb" to outline.thumb,
+                        "providerId" to info.id
+                    )
+                )
             }
         }
     )

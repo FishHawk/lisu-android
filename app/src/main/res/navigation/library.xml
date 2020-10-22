@@ -9,4 +9,13 @@
         android:id="@+id/nav_library"
         android:name="com.fishhawk.driftinglibraryandroid.ui.main.library.LibraryFragment"
         tools:layout="@layout/library_fragment" />
+
+    <action
+        android:id="@+id/action_to_gallery"
+        app:destination="@id/nav_gallery" />
+
+    <fragment
+        android:id="@+id/nav_gallery"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.main.gallery.detail.GalleryFragment"
+        tools:layout="@layout/gallery_fragment" />
 </navigation>

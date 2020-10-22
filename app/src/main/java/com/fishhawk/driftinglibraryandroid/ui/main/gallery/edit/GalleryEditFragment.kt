@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.gallery.edit
+package com.fishhawk.driftinglibraryandroid.ui.main.gallery.edit
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,9 +14,9 @@ import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaStatus
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MetadataDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.TagGroup
-import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModelFactory
-import com.fishhawk.driftinglibraryandroid.ui.gallery.gallery.GalleryViewModel
-import com.fishhawk.driftinglibraryandroid.ui.gallery.gallery.TagGroupAdapter
+import com.fishhawk.driftinglibraryandroid.ui.main.gallery.GalleryViewModelFactory
+import com.fishhawk.driftinglibraryandroid.ui.main.gallery.detail.GalleryViewModel
+import com.fishhawk.driftinglibraryandroid.ui.main.gallery.detail.TagGroupAdapter
 
 class GalleryEditFragment : Fragment() {
     internal val viewModel: GalleryViewModel by activityViewModels {

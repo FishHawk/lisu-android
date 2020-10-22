@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.gallery.gallery
+package com.fishhawk.driftinglibraryandroid.ui.main.gallery.detail
 
 import android.app.Activity
 import android.content.Intent
@@ -18,7 +18,7 @@ import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import com.fishhawk.driftinglibraryandroid.ui.base.setupFeedbackModule
 import com.fishhawk.driftinglibraryandroid.ui.extension.*
-import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModelFactory
+import com.fishhawk.driftinglibraryandroid.ui.main.gallery.GalleryViewModelFactory
 import kotlinx.android.synthetic.main.gallery_fragment.view.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -35,8 +35,8 @@ class GalleryFragment : Fragment() {
         override fun onTagClick(key: String, value: String) {
             val keywords = if (key.isBlank()) value else "${key}:$value"
             providerId?.let {
-                TODO("")
-//                navToProviderActivity(it, keywords)
+                // Wait for deep link update
+                navToMainActivity(keywords)
             } ?: navToMainActivity(keywords)
         }
 
@@ -60,11 +60,10 @@ class GalleryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupFeedbackModule(viewModel)
 
-        val arguments = requireActivity().intent.extras!!
-        val id: String = arguments.getString("id")!!
-        val title: String = arguments.getString("title")!!
-        providerId = arguments.getString("providerId")
-        val thumb = arguments.getString("thumb")
+        val id: String = requireArguments().getString("id")!!
+        val title: String = requireArguments().getString("title")!!
+        providerId = requireArguments().getString("providerId")
+        val thumb = requireArguments().getString("thumb")
 
         providerId?.let {
             viewModel.openMangaFromProvider(it, id)

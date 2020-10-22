@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.gallery.gallery
+package com.fishhawk.driftinglibraryandroid.ui.main.gallery.detail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

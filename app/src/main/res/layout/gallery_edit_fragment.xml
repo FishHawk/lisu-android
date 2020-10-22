@@ -14,8 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?android:attr/colorBackground"
-        android:orientation="vertical"
-        tools:context=".ui.gallery.GalleryActivity">
+        android:orientation="vertical">
 
         <FrameLayout
             android:layout_width="match_parent"

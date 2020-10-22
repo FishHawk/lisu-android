@@ -16,10 +16,8 @@ import com.classic.common.MultipleStatusView
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.*
-import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryActivity
 import com.fishhawk.driftinglibraryandroid.ui.main.MainActivity
 import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActivity
 import com.fishhawk.driftinglibraryandroid.util.FileUtil
@@ -121,37 +119,6 @@ fun getChapterDisplayModeIcon(): Int {
         SettingsHelper.ChapterDisplayMode.GRID -> R.drawable.ic_baseline_view_module_24
         SettingsHelper.ChapterDisplayMode.LINEAR -> R.drawable.ic_baseline_view_list_24
     }
-}
-
-
-fun Fragment.navToGalleryActivity(
-    outline: MangaOutline,
-    providerId: String?
-) {
-    navToGalleryActivity(
-        outline.id,
-        outline.title,
-        outline.thumb,
-        providerId
-    )
-}
-
-fun Fragment.navToGalleryActivity(
-    id: String,
-    title: String,
-    thumb: String?,
-    providerId: String?
-) {
-    val bundle = bundleOf(
-        "id" to id,
-        "title" to title,
-        "thumb" to thumb,
-        "providerId" to providerId
-    )
-
-    val intent = Intent(requireActivity(), GalleryActivity::class.java)
-    intent.putExtras(bundle)
-    startActivity(intent)
 }
 
 fun Fragment.navToReaderActivity(
