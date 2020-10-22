@@ -9,15 +9,15 @@
 
         <variable
             name="viewModel"
-            type="com.fishhawk.driftinglibraryandroid.ui.reader.reader.ReaderViewModel" />
+            type="com.fishhawk.driftinglibraryandroid.ui.reader.ReaderViewModel" />
     </data>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.reader.ReaderActivity">
+        tools:context=".ui.activity.ReaderActivity">
 
-        <com.fishhawk.driftinglibraryandroid.ui.reader.reader.ReaderView
+        <com.fishhawk.driftinglibraryandroid.ui.reader.ReaderView
             android:id="@+id/reader"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

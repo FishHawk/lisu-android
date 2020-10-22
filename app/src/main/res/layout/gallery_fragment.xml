@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.main.gallery.detail.GalleryFragment">
+    tools:context=".ui.gallery.detail.GalleryFragment">
 
     <data>
 
@@ -10,7 +10,7 @@
 
         <variable
             name="info"
-            type="com.fishhawk.driftinglibraryandroid.ui.main.gallery.detail.GalleryInfo" />
+            type="com.fishhawk.driftinglibraryandroid.ui.gallery.detail.GalleryInfo" />
     </data>
 
     <androidx.core.widget.NestedScrollView
@@ -321,7 +321,7 @@
                                 android:layout_height="wrap_content" />
                         </LinearLayout>
 
-                        <com.fishhawk.driftinglibraryandroid.ui.main.gallery.detail.ContentView
+                        <com.fishhawk.driftinglibraryandroid.ui.gallery.detail.ContentView
                             android:id="@+id/chapters"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"

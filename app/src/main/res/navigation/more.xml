@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_more"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.main.more.MoreFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.more.MoreFragment"
         android:label="@string/label_more">
         <action
             android:id="@+id/action_more_to_server"
@@ -36,39 +36,39 @@
 
     <fragment
         android:id="@+id/nav_server"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.main.server.ServerFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.server.ServerFragment"
         android:label="@string/label_server"
         tools:layout="@layout/server_fragment" />
 
     <fragment
         android:id="@+id/nav_download"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.main.download.DownloadFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.download.DownloadFragment"
         android:label="@string/label_download"
         tools:layout="@layout/download_fragment" />
 
     <fragment
         android:id="@+id/nav_subscription"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.main.subscription.SubscriptionFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.subscription.SubscriptionFragment"
         android:label="@string/label_subscription"
         tools:layout="@layout/subscription_fragment" />
 
     <fragment
         android:id="@+id/nav_setting_general"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.main.more.SettingGeneralFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.more.SettingGeneralFragment"
         android:label="@string/label_settings_general" />
 
     <fragment
         android:id="@+id/nav_setting_reader"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.main.more.SettingReaderFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.more.SettingReaderFragment"
         android:label="@string/label_settings_reader" />
 
     <fragment
         android:id="@+id/nav_setting_advanced"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.main.more.SettingAdvancedFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.more.SettingAdvancedFragment"
         android:label="@string/label_settings_advanced" />
 
     <fragment
         android:id="@+id/nav_about"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.main.more.AboutFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.more.AboutFragment"
         android:label="@string/label_about" />
 </navigation>
