@@ -43,11 +43,21 @@
         tools:layout="@layout/provider_base_fragment" />
 
     <action
-        android:id="@+id/action_to_gallery"
+        android:id="@+id/action_to_gallery_detail"
         app:destination="@id/nav_gallery" />
 
     <fragment
         android:id="@+id/nav_gallery"
         android:name="com.fishhawk.driftinglibraryandroid.ui.gallery.detail.GalleryFragment"
-        tools:layout="@layout/gallery_fragment" />
+        tools:layout="@layout/gallery_fragment">
+
+        <action
+            android:id="@+id/action_to_gallery_edit"
+            app:destination="@id/nav_gallery_edit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_gallery_edit"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.gallery.edit.GalleryEditFragment"
+        tools:layout="@layout/gallery_edit_fragment" />
 </navigation>

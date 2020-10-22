@@ -38,10 +38,12 @@ class GalleryViewModel(
     }
 
     fun openMangaFromLibrary(id: String) = viewModelScope.launch {
+        _detail.value = Result.Loading
         _detail.value = remoteLibraryRepository.getManga(id)
     }
 
     fun openMangaFromProvider(providerId: String, id: String) = viewModelScope.launch {
+        _detail.value = Result.Loading
         _detail.value = remoteProviderRepository.getManga(providerId, id)
     }
 
@@ -49,7 +51,6 @@ class GalleryViewModel(
         (detail.value as? Result.Success)?.let {
             val id = it.data.id
             val result = remoteLibraryRepository.updateMangaThumb(id, requestBody)
-            println(result)
             resultWarp(result) { _detail.value = result }
         }
     }

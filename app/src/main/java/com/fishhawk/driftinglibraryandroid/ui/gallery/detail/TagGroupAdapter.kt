@@ -7,8 +7,14 @@ import com.fishhawk.driftinglibraryandroid.databinding.GalleryTagItemBinding
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 class TagGroupAdapter(
-    private val listener: Listener? = null
+    private val listener: Listener? = null,
+    private val editable: Boolean = false
 ) : BaseAdapter<String>() {
+
+    fun addTag(value: String) {
+        val newList = list + value
+        setList(newList)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(parent)
@@ -28,6 +34,12 @@ class TagGroupAdapter(
 
         override fun bind(item: String, position: Int) {
             binding.root.text = item
+            binding.value.isCloseIconVisible = editable
+            binding.value.setOnCloseIconClickListener {
+                list.removeAt(position)
+                notifyItemRemoved(position)
+            }
+
             binding.value.setOnClickListener { listener?.onTagClick(item) }
             binding.value.setOnLongClickListener {
                 listener?.onTagLongClick(item)

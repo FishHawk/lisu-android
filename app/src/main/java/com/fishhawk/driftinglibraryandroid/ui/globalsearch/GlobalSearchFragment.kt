@@ -28,7 +28,7 @@ class GlobalSearchFragment : Fragment() {
         object : GlobalSearchGroupListAdapter.Listener {
             override fun onItemClicked(info: ProviderInfo, outline: MangaOutline) {
                 findNavController().navigate(
-                    R.id.action_to_gallery,
+                    R.id.action_to_gallery_detail,
                     bundleOf(
                         "id" to outline.id,
                         "title" to outline.title,

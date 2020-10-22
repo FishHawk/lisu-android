@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.ui.download.DownloadViewModel
 import com.fishhawk.driftinglibraryandroid.ui.explore.ExploreViewModel
+import com.fishhawk.driftinglibraryandroid.ui.gallery.detail.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.globalsearch.GlobalSearchViewModel
 import com.fishhawk.driftinglibraryandroid.ui.history.HistoryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.library.LibraryViewModel
@@ -40,6 +41,15 @@ class MainViewModelFactory constructor(
 
             isAssignableFrom(SubscriptionViewModel::class.java) ->
                 SubscriptionViewModel(application.remoteSubscriptionRepository)
+
+            isAssignableFrom(GalleryViewModel::class.java) ->
+                GalleryViewModel(
+                    application.remoteLibraryRepository,
+                    application.remoteProviderRepository,
+                    application.remoteDownloadRepository,
+                    application.remoteSubscriptionRepository,
+                    application.readingHistoryRepository
+                )
 
             else ->
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

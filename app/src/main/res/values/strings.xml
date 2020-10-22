@@ -166,4 +166,6 @@
     <string name="toast_image_saved">Image saved.</string>
 
     <string name="dialog_filter_history">Filter reading history</string>
+    <string name="menu_publish">Submit</string>
+    <string name="label_gallery_edit">Edit metadata</string>
 </resources>

@@ -24,7 +24,7 @@ class HistoryFragment : Fragment() {
         override fun onThumbClicked(history: ReadingHistory) {
             with(history) {
                 findNavController().navigate(
-                    R.id.action_to_gallery,
+                    R.id.action_to_gallery_detail,
                     bundleOf(
                         "id" to mangaId,
                         "title" to title,

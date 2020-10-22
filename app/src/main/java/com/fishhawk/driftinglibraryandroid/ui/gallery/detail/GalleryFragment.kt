@@ -7,7 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
@@ -16,15 +17,15 @@ import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.*
-import com.fishhawk.driftinglibraryandroid.ui.GalleryViewModelFactory
+import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import kotlinx.android.synthetic.main.gallery_fragment.view.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class GalleryFragment : Fragment() {
-    internal val viewModel: GalleryViewModel by viewModels {
+    internal val viewModel: GalleryViewModel by activityViewModels {
         val application = requireActivity().application as MainApplication
-        GalleryViewModelFactory(application)
+        MainViewModelFactory(application)
     }
     internal lateinit var binding: GalleryFragmentBinding
 
@@ -193,7 +194,9 @@ class GalleryFragment : Fragment() {
                 } ?: navToReaderActivity(detail.id, detail.providerId)
             }
         }
-        binding.editButton.setOnClickListener { GalleryEditSheet(this).show() }
+        binding.editButton.setOnClickListener {
+            findNavController().navigate(R.id.action_to_gallery_edit)
+        }
         binding.subscribeButton.setOnClickListener { viewModel.subscribe() }
         binding.downloadButton.setOnClickListener { viewModel.download() }
     }

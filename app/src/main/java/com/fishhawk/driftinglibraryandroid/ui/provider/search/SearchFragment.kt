@@ -43,7 +43,7 @@ class SearchFragment : Fragment() {
     private val mangaAdapter = MangaListAdapter(object : MangaListAdapter.Listener {
         override fun onCardClick(outline: MangaOutline) {
             findNavController().navigate(
-                R.id.action_to_gallery,
+                R.id.action_to_gallery_detail,
                 bundleOf(
                     "id" to outline.id,
                     "title" to outline.title,
