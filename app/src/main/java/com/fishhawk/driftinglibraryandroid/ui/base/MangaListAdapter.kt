@@ -13,7 +13,8 @@ class MangaListAdapter(
     private val listener: Listener
 ) : BaseAdapter<MangaOutline>() {
 
-    override val enableDiffUtil: Boolean = true
+    // TODO: Don't need it, why?
+//    override val enableDiffUtil: Boolean = true
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
