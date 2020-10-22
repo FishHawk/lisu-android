@@ -1,9 +1,7 @@
-package com.fishhawk.driftinglibraryandroid.ui.main.other
+package com.fishhawk.driftinglibraryandroid.ui.main.more
 
 import android.os.Bundle
-import android.view.View
 import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
 import com.fishhawk.driftinglibraryandroid.BuildConfig
 import com.fishhawk.driftinglibraryandroid.R
 

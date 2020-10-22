@@ -2,24 +2,20 @@ package com.fishhawk.driftinglibraryandroid.ui.main
 
 import android.os.Bundle
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityMainBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.ui.extension.setupFullScreen
-import com.fishhawk.driftinglibraryandroid.ui.extension.setupThemeWithTranslucentStatus
+import com.fishhawk.driftinglibraryandroid.ui.base.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.extension.setupWithNavControllerT
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private var currentNavController: LiveData<NavController>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setupThemeWithTranslucentStatus()
         super.onCreate(savedInstanceState)
-        setupFullScreen()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
