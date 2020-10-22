@@ -47,11 +47,6 @@ class ExploreFragment : Fragment() {
         }
     })
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -62,7 +57,8 @@ class ExploreFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        setupMenu(binding.toolbar.menu)
+
         binding.list.adapter = adapter
 
         SettingsHelper.lastUsedProvider.observe(viewLifecycleOwner, Observer {
@@ -82,24 +78,23 @@ class ExploreFragment : Fragment() {
         })
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_explore, menu)
+    private fun setupMenu(menu: Menu) {
+        with(menu.findItem(R.id.action_search).actionView as SearchView) {
 
-        val searchView: SearchView = menu.findItem(R.id.action_search).actionView as SearchView
-        searchView.queryHint = getString(R.string.menu_search_global_hint)
-        searchView.maxWidth = Int.MAX_VALUE
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                searchView.setQuery("", false)
-                binding.root.findNavController().navigate(
-                    R.id.action_explore_to_global_search,
-                    bundleOf("keywords" to query)
-                )
-                return true
-            }
+            queryHint = getString(R.string.menu_search_global_hint)
+            maxWidth = Int.MAX_VALUE
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    setQuery("", false)
+                    binding.root.findNavController().navigate(
+                        R.id.action_explore_to_global_search,
+                        bundleOf("keywords" to query)
+                    )
+                    return true
+                }
 
-            override fun onQueryTextChange(query: String): Boolean = true
-        })
+                override fun onQueryTextChange(query: String): Boolean = true
+            })
+        }
     }
 }

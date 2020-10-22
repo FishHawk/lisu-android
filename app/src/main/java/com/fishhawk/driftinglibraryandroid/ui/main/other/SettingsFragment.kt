@@ -3,7 +3,6 @@ package com.fishhawk.driftinglibraryandroid.ui.main.other
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
 import com.bumptech.glide.Glide
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
@@ -11,19 +10,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class SettingGeneralFragment : PreferenceFragmentCompat() {
+class SettingGeneralFragment : BaseSettingFragment() {
+    override val titleResId: Int = R.string.label_settings_general
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.setting_general, rootKey)
     }
 }
 
-class SettingReaderFragment : PreferenceFragmentCompat() {
+class SettingReaderFragment : BaseSettingFragment() {
+    override val titleResId: Int = R.string.label_settings_reader
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.setting_reader, rootKey)
     }
 }
 
-class SettingAdvancedFragment : PreferenceFragmentCompat() {
+class SettingAdvancedFragment : BaseSettingFragment() {
+    override val titleResId: Int = R.string.label_settings_advanced
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

@@ -8,6 +8,5 @@
     <fragment
         android:id="@+id/nav_history"
         android:name="com.fishhawk.driftinglibraryandroid.ui.main.history.HistoryFragment"
-        android:label="@string/label_history"
         tools:layout="@layout/history_fragment" />
 </navigation>

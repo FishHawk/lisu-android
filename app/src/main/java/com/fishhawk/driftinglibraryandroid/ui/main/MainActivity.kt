@@ -1,13 +1,11 @@
 package com.fishhawk.driftinglibraryandroid.ui.main
 
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
-import androidx.viewpager.widget.ViewPager
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityMainBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
@@ -24,7 +22,6 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
         if (savedInstanceState == null) setupBottomNavigationBar()
 
         SettingsHelper.secureMode.observe(this) {
@@ -56,9 +53,9 @@ class MainActivity : AppCompatActivity() {
             intent = intent
         )
 
-        controller.observe(this) { navController ->
-            setupActionBarWithNavController(this, navController)
-        }
+//        controller.observe(this) { navController ->
+//            setupActionBarWithNavController(this, navController)
+//        }
         currentNavController = controller
 
         bottomNavigationView.selectedItemId =
@@ -71,14 +68,5 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         return currentNavController?.value?.navigateUp() ?: false
-    }
-
-    fun enableTabs(viewPager: ViewPager) {
-        binding.tabs.visibility = View.VISIBLE
-        binding.tabs.setupWithViewPager(viewPager)
-    }
-
-    fun disableTabs() {
-        binding.tabs.visibility = View.GONE
     }
 }

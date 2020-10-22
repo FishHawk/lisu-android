@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.main.explore.ExploreFragment">
+    android:orientation="vertical"
+    tools:context=".ui.main.download.DownloadFragment">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:menu="@menu/menu_download"
+            app:title="@string/label_download" />
+    </com.google.android.material.appbar.AppBarLayout>
 
     <com.classic.common.MultipleStatusView
         android:id="@+id/multiple_status_view"
@@ -12,7 +26,6 @@
         android:layout_height="match_parent"
         app:errorView="@layout/status_error"
         app:loadingView="@layout/status_loading">
-
 
         <com.hippo.refreshlayout.RefreshLayout
             android:id="@+id/refresh_layout"
@@ -27,4 +40,4 @@
                 tools:listitem="@layout/manga_grid_card" />
         </com.hippo.refreshlayout.RefreshLayout>
     </com.classic.common.MultipleStatusView>
-</FrameLayout>
+</LinearLayout>

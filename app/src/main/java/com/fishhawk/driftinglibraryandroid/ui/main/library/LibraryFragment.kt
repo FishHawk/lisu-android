@@ -39,11 +39,6 @@ class LibraryFragment : Fragment() {
         }
     })
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -54,12 +49,14 @@ class LibraryFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        setupMenu(binding.toolbar.menu)
+        binding.toolbar.setOnMenuItemClickListener(this::onMenuItemSelected)
+
         binding.mangaList.list.adapter = adapter
 
-        SettingsHelper.displayMode.observe(viewLifecycleOwner, Observer {
+        SettingsHelper.displayMode.observe(viewLifecycleOwner) {
             binding.mangaList.list.changeMangaListDisplayMode(adapter)
-        })
+        }
 
         bindToListViewModel(
             binding.mangaList.multipleStatusView,
@@ -72,37 +69,33 @@ class LibraryFragment : Fragment() {
         viewModel.reloadIfNeed(keywords ?: "")
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_library, menu)
+    private fun setupMenu(menu: Menu) {
+        with(menu.findItem(R.id.action_search).actionView as SearchView) {
+            queryHint = getString(R.string.menu_search_hint)
+            maxWidth = Int.MAX_VALUE
+            if (viewModel.filter != "") setQuery(viewModel.filter, false)
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    viewModel.reload(query)
+                    return true
+                }
 
-        val searchView: SearchView = menu.findItem(R.id.action_search).actionView as SearchView
-        searchView.queryHint = getString(R.string.menu_search_hint)
-        searchView.maxWidth = Int.MAX_VALUE
-        if (viewModel.filter != "") searchView.setQuery(viewModel.filter, false)
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                viewModel.reload(query)
-                return true
-            }
-
-            override fun onQueryTextChange(query: String?): Boolean {
-                return true
-            }
-        })
-
-        val item = menu.findItem(R.id.action_display_mode)
-        item.setIcon(getDisplayModeIcon())
+                override fun onQueryTextChange(query: String?): Boolean = false
+            })
+        }
+        with(menu.findItem(R.id.action_display_mode)) {
+            setIcon(getDisplayModeIcon())
+        }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    private fun onMenuItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_display_mode -> {
                 SettingsHelper.displayMode.setNextValue()
                 item.setIcon(getDisplayModeIcon())
                 true
             }
-            else -> super.onOptionsItemSelected(item)
+            else -> false
         }
     }
 }

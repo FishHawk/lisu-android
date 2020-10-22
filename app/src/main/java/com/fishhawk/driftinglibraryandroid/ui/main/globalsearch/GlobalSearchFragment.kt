@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchFragmentBinding
@@ -31,11 +32,6 @@ class GlobalSearchFragment : Fragment() {
         }
     )
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -46,7 +42,10 @@ class GlobalSearchFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        setupMenu(binding.toolbar.menu)
+        binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
+        binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
+
         binding.list.adapter = adapter
 
         viewModel.providerList.observe(viewLifecycleOwner, Observer { result ->
@@ -67,10 +66,7 @@ class GlobalSearchFragment : Fragment() {
         })
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_global_search, menu)
-
+    private fun setupMenu(menu: Menu) {
         val searchView = menu.findItem(R.id.action_search_global).actionView as SearchView
         searchView.queryHint = getString(R.string.menu_search_global_hint)
         searchView.maxWidth = Int.MAX_VALUE

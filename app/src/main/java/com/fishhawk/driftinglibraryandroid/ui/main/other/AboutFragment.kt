@@ -1,12 +1,15 @@
 package com.fishhawk.driftinglibraryandroid.ui.main.other
 
 import android.os.Bundle
+import android.view.View
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.fishhawk.driftinglibraryandroid.BuildConfig
 import com.fishhawk.driftinglibraryandroid.R
 
-class AboutFragment : PreferenceFragmentCompat() {
+class AboutFragment : BaseSettingFragment() {
+    override val titleResId: Int = R.string.label_about
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

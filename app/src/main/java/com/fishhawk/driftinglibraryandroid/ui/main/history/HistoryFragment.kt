@@ -48,7 +48,8 @@ class HistoryFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        binding.toolbar.setOnMenuItemClickListener(this::onMenuItemSelected)
+
         binding.list.adapter = adapter
 
         viewModel.filteredReadingHistoryList.observe(viewLifecycleOwner, Observer {
@@ -58,16 +59,11 @@ class HistoryFragment : Fragment() {
         })
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_history, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    private fun onMenuItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_filter -> createHistoryFilterSwitchDialog()
             R.id.action_clear_history -> createClearHistoryDialog()
-            else -> return super.onOptionsItemSelected(item)
+            else -> return false
         }
         return true
     }

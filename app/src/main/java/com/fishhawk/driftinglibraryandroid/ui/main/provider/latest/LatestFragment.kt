@@ -11,17 +11,6 @@ import com.fishhawk.driftinglibraryandroid.ui.main.provider.base.ProviderBaseFra
 class LatestFragment : ProviderBaseFragment() {
     override val viewModel: LatestViewModel by viewModels { getViewModelFactory() }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)?.apply {
-            setPadding(0, 100, 0, 0)
-        }
-
-    }
-
     override fun getOptionModel(optionModels: OptionModels): Map<String, List<String>> {
         return optionModels.latest
     }

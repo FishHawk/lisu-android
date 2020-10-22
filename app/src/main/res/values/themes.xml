@@ -24,6 +24,7 @@
         <item name="colorOnSurface">@color/textColorPrimaryLight</item>
         <item name="colorOnBackground">@color/textColorPrimaryLight</item>
         <item name="colorAccent">@color/colorAccentLight</item>
+        <item name="colorControlNormal">?attr/colorOnPrimary</item>
 
         <!-- Base background/text colors -->
         <item name="android:colorBackground">@color/backgroundLight</item>
@@ -83,6 +84,7 @@
         <item name="colorOnSurface">@color/textColorPrimaryDark</item>
         <item name="colorOnBackground">@color/textColorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccentDark</item>
+        <item name="colorControlNormal">?attr/colorOnPrimary</item>
 
         <!-- Base background/text colors -->
         <item name="android:colorBackground">@color/backgroundDark</item>

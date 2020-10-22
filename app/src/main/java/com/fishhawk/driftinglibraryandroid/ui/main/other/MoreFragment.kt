@@ -1,12 +1,18 @@
 package com.fishhawk.driftinglibraryandroid.ui.main.other
 
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.databinding.MoreFragmentBinding
 
 class MoreFragment : PreferenceFragmentCompat() {
+    private lateinit var binding: MoreFragmentBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -19,6 +25,17 @@ class MoreFragment : PreferenceFragmentCompat() {
         setPreferenceNavigation("setting_advanced", R.id.action_more_to_setting_advanced)
 
         setPreferenceNavigation("about", R.id.action_more_to_about)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = super.onCreateView(inflater, container, savedInstanceState)
+        binding = MoreFragmentBinding.inflate(inflater, container, false)
+        binding.preference.addView(view)
+        return binding.root
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

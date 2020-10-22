@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ServerFragmentBinding
@@ -41,11 +41,6 @@ class ServerFragment : Fragment() {
         }
     })
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -56,27 +51,25 @@ class ServerFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        binding.toolbar.setOnMenuItemClickListener(this::onMenuItemSelected)
+        binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
+        binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
+
         binding.list.adapter = adapter
 
-        SettingsHelper.selectedServer.observe(viewLifecycleOwner, Observer { id ->
+        SettingsHelper.selectedServer.observe(viewLifecycleOwner) { id ->
             adapter.selectedId = id
-        })
+        }
 
-        viewModel.serverInfoList.observe(viewLifecycleOwner, Observer { data ->
+        viewModel.serverInfoList.observe(viewLifecycleOwner) { data ->
             if (data.size == 1) SettingsHelper.selectedServer.setValue(data.first().id)
             adapter.setList(data)
             if (data.isEmpty()) binding.multipleStatusView.showEmpty()
             else binding.multipleStatusView.showContent()
-        })
+        }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_server, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    private fun onMenuItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_add -> {
                 createServerInfoDialog { name, address ->
@@ -84,7 +77,7 @@ class ServerFragment : Fragment() {
                 }
                 true
             }
-            else -> super.onOptionsItemSelected(item)
+            else -> false
         }
     }
 }
