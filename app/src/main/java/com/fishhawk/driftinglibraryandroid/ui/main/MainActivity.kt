@@ -5,11 +5,11 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
-import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityMainBinding
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
-import com.fishhawk.driftinglibraryandroid.ui.extension.setupTheme
+import com.fishhawk.driftinglibraryandroid.ui.extension.setupFullScreen
+import com.fishhawk.driftinglibraryandroid.ui.extension.setupThemeWithTranslucentStatus
 import com.fishhawk.driftinglibraryandroid.ui.extension.setupWithNavControllerT
 
 class MainActivity : AppCompatActivity() {
@@ -17,8 +17,9 @@ class MainActivity : AppCompatActivity() {
     private var currentNavController: LiveData<NavController>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setupTheme()
+        setupThemeWithTranslucentStatus()
         super.onCreate(savedInstanceState)
+        setupFullScreen()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -46,17 +47,12 @@ class MainActivity : AppCompatActivity() {
             R.navigation.more
         )
 
-        val controller = bottomNavigationView.setupWithNavControllerT(
+        currentNavController = bottomNavigationView.setupWithNavControllerT(
             navGraphIds = navGraphIds,
             fragmentManager = supportFragmentManager,
             containerId = binding.navHostContainer.id,
             intent = intent
         )
-
-//        controller.observe(this) { navController ->
-//            setupActionBarWithNavController(this, navController)
-//        }
-        currentNavController = controller
 
         bottomNavigationView.selectedItemId =
             when (SettingsHelper.startScreen.getValueDirectly()) {

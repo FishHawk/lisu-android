@@ -170,6 +170,16 @@
 
 
     <!--=================-->
+    <!--Widgets.AppBarLayout-->
+    <!--=================-->
+
+    <style name="Theme.Widget.AppBarLayout" parent="Widget.Design.AppBarLayout">
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="statusBarForeground">?attr/colorPrimary</item>
+    </style>
+
+
+    <!--=================-->
     <!--Widgets.TabLayout-->
     <!--=================-->
 

@@ -41,6 +41,7 @@
         <item name="dialogTheme">@style/Theme.AlertDialog</item>
         <item name="alertDialogTheme">@style/Theme.AlertDialog</item>
         <item name="textInputStyle">@style/Theme.TextInputLayout.FilledBox</item>
+        <item name="appBarLayoutStyle">@style/Theme.Widget.AppBarLayout</item>
 
         <!-- Themes -->
         <!--        <item name="windowActionModeOverlay">true</item>-->
@@ -101,6 +102,7 @@
         <item name="dialogTheme">@style/Theme.AlertDialog</item>
         <item name="alertDialogTheme">@style/Theme.AlertDialog</item>
         <item name="textInputStyle">@style/Theme.TextInputLayout.FilledBox</item>
+        <item name="appBarLayoutStyle">@style/Theme.Widget.AppBarLayout</item>
 
         <!-- Themes -->
         <item name="android:navigationBarColor">?attr/colorPrimary</item>

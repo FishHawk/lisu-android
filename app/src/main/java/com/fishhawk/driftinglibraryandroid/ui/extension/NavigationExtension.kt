@@ -3,7 +3,6 @@ package com.fishhawk.driftinglibraryandroid.ui.extension
 import android.content.Intent
 import android.util.SparseArray
 import android.view.View
-import androidx.core.util.forEach
 import androidx.core.util.set
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LiveData
@@ -11,7 +10,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.fishhawk.driftinglibraryandroid.R
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 /**
@@ -23,8 +21,7 @@ fun BottomNavigationView.setupWithNavControllerT(
     navGraphIds: List<Int>,
     fragmentManager: FragmentManager,
     containerId: Int,
-    intent: Intent,
-    hasHome: Boolean = true
+    intent: Intent
 ): LiveData<NavController> {
 
     // Map of tags
@@ -96,7 +93,7 @@ fun BottomNavigationView.setupWithNavControllerT(
                         as NavHostFragment
 
                 // Exclude the first fragment tag because it's always in the back stack.
-                if (!hasHome || (hasHome && firstFragmentTag != newlySelectedItemTag)) {
+                if (firstFragmentTag != newlySelectedItemTag) {
                     // Commit a transaction that cleans the back stack and adds the first fragment
                     // to it, creating the fixed started destination.
                     fragmentManager.beginTransaction()
@@ -109,16 +106,8 @@ fun BottomNavigationView.setupWithNavControllerT(
                         .attach(selectedFragment)
                         .setPrimaryNavigationFragment(selectedFragment)
                         .apply {
-                            if (hasHome) {
-                                detach(fragmentManager.findFragmentByTag(firstFragmentTag)!!)
-                                addToBackStack(firstFragmentTag)
-                            } else {
-                                graphIdToTagMap.forEach { _, fragmentTagIter ->
-                                    if (fragmentTagIter != newlySelectedItemTag) {
-                                        detach(fragmentManager.findFragmentByTag(fragmentTagIter)!!)
-                                    }
-                                }
-                            }
+                            detach(fragmentManager.findFragmentByTag(firstFragmentTag)!!)
+                            addToBackStack(firstFragmentTag)
                         }
                         .setReorderingAllowed(true)
                         .commit()
