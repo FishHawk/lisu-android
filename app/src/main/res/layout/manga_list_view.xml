@@ -18,6 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="4dp"
-            tools:listitem="@layout/manga_grid_card" />
+            tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            tools:listitem="@layout/manga_grid_card"
+            tools:spanCount="3" />
     </com.hippo.refreshlayout.RefreshLayout>
 </com.classic.common.MultipleStatusView>

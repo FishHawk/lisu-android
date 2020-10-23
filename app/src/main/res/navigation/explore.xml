@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/explore"
+    android:id="@+id/nav_graph_explore"
     app:startDestination="@+id/nav_explore">
 
     <fragment
@@ -44,20 +44,7 @@
 
     <action
         android:id="@+id/action_to_gallery_detail"
-        app:destination="@id/nav_gallery" />
+        app:destination="@id/nav_graph_gallery" />
 
-    <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.gallery.detail.GalleryFragment"
-        tools:layout="@layout/gallery_fragment">
-
-        <action
-            android:id="@+id/action_to_gallery_edit"
-            app:destination="@id/nav_gallery_edit" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/nav_gallery_edit"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.gallery.edit.GalleryEditFragment"
-        tools:layout="@layout/gallery_edit_fragment" />
+    <include app:graph="@navigation/gallery" />
 </navigation>

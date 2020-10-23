@@ -6,17 +6,13 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchFragmentBinding
-import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
-import kotlinx.coroutines.launch
 
 class GlobalSearchFragment : Fragment() {
     private lateinit var binding: GlobalSearchFragmentBinding
@@ -50,28 +46,16 @@ class GlobalSearchFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        if (viewModel.keywords.value.isNullOrBlank())
+            viewModel.keywords.value = arguments?.getString("keywords")!!
+
         setupMenu(binding.toolbar.menu)
         binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
 
         binding.list.adapter = adapter
 
-        viewModel.providerList.observe(viewLifecycleOwner, Observer { result ->
-            if (result is Result.Success) {
-                adapter.setListWithEmptyItem(result.data)
-                viewModel.keywords.value = viewModel.keywords.value
-            }
-        })
-        viewModel.keywords.observe(viewLifecycleOwner, Observer { keywords ->
-            (viewModel.providerList.value as? Result.Success)?.data?.forEach {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    adapter.setSearchGroupResult(it, Result.Loading)
-                    val result = viewModel.search(it.id, keywords)
-                    if (viewModel.keywords.value == keywords)
-                        adapter.setSearchGroupResult(it, result)
-                }
-            }
-        })
+        viewModel.searchGroupList.observe(viewLifecycleOwner) { adapter.setList(it) }
     }
 
     private fun setupMenu(menu: Menu) {
@@ -86,6 +70,6 @@ class GlobalSearchFragment : Fragment() {
 
             override fun onQueryTextChange(query: String): Boolean = true
         })
-        searchView.setQuery(arguments?.getString("keywords")!!, true)
+        searchView.setQuery(viewModel.keywords.value, false)
     }
 }

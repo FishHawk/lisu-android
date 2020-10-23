@@ -43,9 +43,9 @@ class MainActivity : BaseActivity() {
 
         bottomNavigationView.selectedItemId =
             when (SettingsHelper.startScreen.getValueDirectly()) {
-                SettingsHelper.StartScreen.LIBRARY -> R.id.library
-                SettingsHelper.StartScreen.HISTORY -> R.id.history
-                SettingsHelper.StartScreen.EXPLORE -> R.id.explore
+                SettingsHelper.StartScreen.LIBRARY -> R.id.nav_graph_library
+                SettingsHelper.StartScreen.HISTORY -> R.id.nav_graph_history
+                SettingsHelper.StartScreen.EXPLORE -> R.id.nav_graph_explore
             }
     }
 

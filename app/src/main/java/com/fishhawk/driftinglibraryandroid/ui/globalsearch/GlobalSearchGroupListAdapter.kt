@@ -17,19 +17,6 @@ class GlobalSearchGroupListAdapter(
     private val listener: Listener
 ) : BaseAdapter<SearchGroup>() {
 
-    fun setListWithEmptyItem(providers: List<ProviderInfo>) {
-        setList(providers.map { SearchGroup(it, Result.Loading) })
-    }
-
-    fun setSearchGroupResult(provider: ProviderInfo, result: Result<List<MangaOutline>>) {
-        list.withIndex()
-            .find { it.value.provider.id == provider.id }
-            ?.let {
-                it.value.result = result
-                notifyItemChanged(it.index)
-            }
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(parent)
     }
