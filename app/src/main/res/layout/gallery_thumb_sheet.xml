@@ -8,18 +8,26 @@
     android:padding="16dp">
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/save_button"
-        style="@style/Theme.Widget.Button.TextButton.NoColor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Save image"
-        app:icon="@drawable/ic_baseline_refresh_24" />
-
-    <com.google.android.material.button.MaterialButton
         android:id="@+id/edit_button"
         style="@style/Theme.Widget.Button.TextButton.NoColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Change thumb"
+        android:text="Edit cover"
+        app:icon="@drawable/ic_baseline_edit_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/save_button"
+        style="@style/Theme.Widget.Button.TextButton.NoColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save cover"
+        app:icon="@drawable/ic_baseline_refresh_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/share_button"
+        style="@style/Theme.Widget.Button.TextButton.NoColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Share cover"
         app:icon="@drawable/ic_baseline_share_24" />
 </LinearLayout>

@@ -2,5 +2,5 @@
 <paths>
     <cache-path
         name="share"
-        path="image_manager_disk_cache" />
+        path="shared_image" />
 </paths>

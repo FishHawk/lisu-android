@@ -1,9 +1,18 @@
 package com.fishhawk.driftinglibraryandroid.ui.base
 
-import android.content.ClipData
-import android.content.ClipboardManager
+import android.app.Activity
+import android.content.*
 import android.content.Context.CLIPBOARD_SERVICE
-import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
+import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions.ACTION_REQUEST_PERMISSIONS
+import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions.EXTRA_PERMISSIONS
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -12,17 +21,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.classic.common.MultipleStatusView
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.activity.MainActivity
 import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
-import com.fishhawk.driftinglibraryandroid.util.FileUtil
 import com.hippo.refreshlayout.RefreshLayout
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.jar.Manifest
 
 fun <T> Fragment.bindToListViewModel(
     multipleStatusView: MultipleStatusView,
@@ -147,14 +160,55 @@ fun Fragment.navToMainActivity(keywords: String) {
     startActivity(intent)
 }
 
+fun Fragment.checkPermission(permission: String): Boolean {
+    return ContextCompat.checkSelfPermission(
+        requireContext(),
+        permission
+    ) == PackageManager.PERMISSION_GRANTED
+}
 
-fun Fragment.saveImageToGallery(url: String, filename: String) {
-    val uri = FileUtil.createImageInGallery(requireContext(), filename)
-        ?: return makeToast(R.string.toast_image_already_exist)
+fun Fragment.ensurePermission(permission: String): Boolean {
+    return checkPermission(permission).also { isGrant ->
+        if (!isGrant) (requireActivity() as BaseActivity).requestPermission(permission)
+    }
+}
 
-    lifecycleScope.launch {
+fun Fragment.saveImage(url: String, filename: String) {
+    if (!ensurePermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) return
+    lifecycleScope.launch(Dispatchers.Main) {
         try {
-            FileUtil.saveImage(requireContext(), url, uri)
+            val resolver: ContentResolver = requireContext().contentResolver
+            val uri = resolver.run {
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        put(
+                            MediaStore.MediaColumns.RELATIVE_PATH,
+                            "${Environment.DIRECTORY_PICTURES}/DriftingLibrary/"
+                        )
+                    } else {
+                        put(
+                            MediaStore.MediaColumns.DATA,
+                            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                                .toString() + "/DriftingLibrary/${filename}.png"
+                        )
+                    }
+                }
+
+                insert(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues
+                )
+            } ?: return@launch makeToast(R.string.toast_image_already_exist)
+
+            withContext(Dispatchers.IO) {
+                val outputStream = resolver.openOutputStream(uri)!!
+                val bitmap = Glide.with(requireContext()).asBitmap().load(url).submit().get()
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                outputStream.flush()
+                outputStream.close()
+            }
+
             makeToast(R.string.toast_image_saved)
         } catch (e: Throwable) {
             makeToast(e)
@@ -162,23 +216,32 @@ fun Fragment.saveImageToGallery(url: String, filename: String) {
     }
 }
 
-fun Fragment.startImagePickActivity() {
-    val intent = Intent(Intent.ACTION_PICK)
-    intent.type = "image/*"
-    startActivityForResult(intent, 1000)
-}
+fun Fragment.shareImage(url: String, filename: String) {
+    lifecycleScope.launch(Dispatchers.IO) {
+        try {
+            val srcFile = Glide.with(requireContext()).asFile().load(url).submit().get()
 
-fun Fragment.startImageShareActivity(file: File) {
-    val uri = FileProvider.getUriForFile(
-        requireContext(), "${requireActivity().packageName}.fileprovider", file
-    )
+            val dir = File(requireContext().cacheDir, "shared_image")
+            dir.mkdirs()
+            val destFile = File(dir, "$filename.${srcFile.extension}")
+            srcFile.copyTo(destFile, overwrite = true)
 
-    val shareIntent = Intent().apply {
-        action = Intent.ACTION_SEND
-        type = "image/*"
-        putExtra(Intent.EXTRA_STREAM, uri)
+            val uri = FileProvider.getUriForFile(
+                requireContext(),
+                "${requireActivity().packageName}.fileprovider",
+                destFile
+            )
+
+            val shareIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                type = "image/*"
+                putExtra(Intent.EXTRA_STREAM, uri)
+            }
+            startActivity(Intent.createChooser(shareIntent, "Share image via"))
+        } catch (e: Throwable) {
+            makeToast(e)
+        }
     }
-    startActivity(Intent.createChooser(shareIntent, "Share image"))
 }
 
 fun Fragment.copyToClipboard(text: String) {

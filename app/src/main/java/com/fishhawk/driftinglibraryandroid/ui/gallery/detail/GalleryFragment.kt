@@ -1,11 +1,10 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery.detail
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -33,10 +32,9 @@ class GalleryFragment : Fragment() {
     private val tagAdapter = TagGroupListAdapter(object : TagGroupListAdapter.Listener {
         override fun onTagClick(key: String, value: String) {
             val keywords = if (key.isBlank()) value else "${key}:$value"
-            providerId?.let {
-                // Wait for deep link update
-                navToMainActivity(keywords)
-            } ?: navToMainActivity(keywords)
+//            providerId?.let {
+//                navToMainActivity(keywords)
+//            } ?: navToMainActivity(keywords)
         }
 
         override fun onTagLongClick(key: String, value: String) {
@@ -45,6 +43,17 @@ class GalleryFragment : Fragment() {
             makeToast(R.string.toast_manga_tag_saved)
         }
     })
+
+    private val pickPictureLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            println(uri)
+            val content =
+                uri?.let { requireContext().contentResolver.openInputStream(it)?.readBytes() }
+            val type =
+                uri?.let { requireContext().contentResolver.getType(uri)?.toMediaTypeOrNull() }
+            if (content != null && type != null)
+                viewModel.updateThumb(content.toRequestBody(type))
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -85,7 +94,28 @@ class GalleryFragment : Fragment() {
         setupActionButton()
 
         binding.thumbCard.setOnLongClickListener {
-            GalleryThumbSheet(this).show()
+            GalleryThumbSheet(requireContext(), object : GalleryThumbSheet.Listener {
+                override fun onEdit() {
+                    pickPictureLauncher.launch("image/*")
+                }
+
+                override fun onSave() {
+                    val detail = (viewModel.detail.value as? Result.Success)?.data
+                        ?: return makeToast(R.string.toast_manga_not_loaded)
+                    val url = detail.thumb
+                        ?: return makeToast(R.string.toast_manga_no_cover)
+                    saveImage(url, "${detail.id}-thumb")
+                }
+
+                override fun onShare() {
+                    val detail = (viewModel.detail.value as? Result.Success)?.data
+                        ?: return makeToast(R.string.toast_manga_not_loaded)
+                    val url = detail.thumb
+                        ?: return makeToast(R.string.toast_manga_no_cover)
+                    shareImage(url, "${detail.id}-thumb")
+                }
+            }).show()
+
             true
         }
 
@@ -152,18 +182,6 @@ class GalleryFragment : Fragment() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK && requestCode == 1000) {
-            val uri = data?.data
-            val content =
-                uri?.let { requireContext().contentResolver.openInputStream(it)?.readBytes() }
-            val type =
-                uri?.let { requireContext().contentResolver.getType(uri)?.toMediaTypeOrNull() }
-            if (content != null && type != null)
-                viewModel.updateThumb(content.toRequestBody(type))
-        }
-    }
 
     private fun setupThumb(thumb: String) {
         Glide.with(this)

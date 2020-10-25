@@ -16,6 +16,8 @@ import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.ReaderViewModelFactory
+import com.fishhawk.driftinglibraryandroid.ui.base.saveImage
+import com.fishhawk.driftinglibraryandroid.ui.base.shareImage
 import kotlinx.coroutines.runBlocking
 
 class ReaderFragment : Fragment() {
@@ -97,7 +99,23 @@ class ReaderFragment : Fragment() {
         binding.reader.onScrolled = { viewModel.chapterPosition.value = it }
         binding.reader.onPageLongClicked = { position, url ->
             if (SettingsHelper.longTapDialog.getValueDirectly())
-                ReaderPageSheet(this, position, url).show()
+                ReaderPageSheet(requireContext(), position, object : ReaderPageSheet.Listener {
+                    override fun onRefresh() {
+                        binding.reader.refreshPage(position)
+                    }
+
+                    override fun onSave() {
+                        val prefix = viewModel.makeImageFilenamePrefix()
+                            ?: return makeToast(R.string.toast_chapter_not_loaded)
+                        saveImage(url, "$prefix-$position")
+                    }
+
+                    override fun onShare() {
+                        val prefix = viewModel.makeImageFilenamePrefix()
+                            ?: return makeToast(R.string.toast_chapter_not_loaded)
+                        shareImage(url, "$prefix-$position")
+                    }
+                }).show()
         }
     }
 

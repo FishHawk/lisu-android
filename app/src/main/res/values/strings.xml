@@ -151,7 +151,9 @@
     <string name="toast_cache_cleared">Cache cleared.</string>
 
     <string name="toast_manga_not_loaded">Manga not loaded.</string>
-    <string name="toast_manga_no_thumb">Manga has no thumb.</string>
+    <string name="toast_manga_no_cover">Manga has no cover.</string>
+    <string name="toast_manga_cover_updated">Manga cover has been updated.</string>
+    <string name="toast_manga_metadata_updated">Manga metadata has been updated.</string>
     <string name="toast_manga_title_copied">Copy title to clipboard.</string>
     <string name="toast_manga_author_copied">Copy author to clipboard.</string>
     <string name="toast_manga_description_copied">Copy description to clipboard.</string>
@@ -160,7 +162,6 @@
     <string name="toast_chapter_not_loaded">Chapter not loaded.</string>
     <string name="toast_no_prev_chapter">Already at the beginning.</string>
     <string name="toast_no_next_chapter">Already at the end.</string>
-
 
     <string name="toast_image_already_exist">Image already exist.</string>
     <string name="toast_image_saved">Image saved.</string>

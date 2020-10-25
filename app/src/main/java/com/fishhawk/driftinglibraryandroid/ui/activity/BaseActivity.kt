@@ -5,12 +5,22 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import java.lang.reflect.Method
 
 open class BaseActivity : AppCompatActivity() {
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) {}
+
+    fun requestPermission(permission: String) {
+        requestPermissionLauncher.launch(permission)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setupTheme()
         super.onCreate(savedInstanceState)

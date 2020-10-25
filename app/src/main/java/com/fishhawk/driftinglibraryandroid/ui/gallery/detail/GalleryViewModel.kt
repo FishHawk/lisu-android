@@ -51,7 +51,10 @@ class GalleryViewModel(
         (detail.value as? Result.Success)?.let {
             val id = it.data.id
             val result = remoteLibraryRepository.updateMangaThumb(id, requestBody)
-            resultWarp(result) { _detail.value = result }
+            resultWarp(result) {
+                _detail.value = result
+                feed(R.string.toast_manga_cover_updated)
+            }
         }
     }
 
@@ -59,7 +62,10 @@ class GalleryViewModel(
         (detail.value as? Result.Success)?.let {
             val id = it.data.id
             val result = remoteLibraryRepository.updateMangaMetadata(id, metadata)
-            resultWarp(result) { _detail.value = result }
+            resultWarp(result) {
+                _detail.value = result
+                feed(R.string.toast_manga_metadata_updated)
+            }
         }
     }
 

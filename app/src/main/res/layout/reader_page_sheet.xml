@@ -32,22 +32,22 @@
         style="@style/Theme.Widget.Button.TextButton.NoColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Refresh"
+        android:text="Refresh image"
         app:icon="@drawable/ic_baseline_refresh_24" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/share_button"
-        style="@style/Theme.Widget.Button.TextButton.NoColor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Share"
-        app:icon="@drawable/ic_baseline_share_24" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/save_button"
         style="@style/Theme.Widget.Button.TextButton.NoColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save"
+        android:text="Save image"
         app:icon="@drawable/ic_baseline_save_alt_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/share_button"
+        style="@style/Theme.Widget.Button.TextButton.NoColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Share image"
+        app:icon="@drawable/ic_baseline_share_24" />
 </LinearLayout>
