@@ -6,6 +6,7 @@ import com.fishhawk.driftinglibraryandroid.ui.provider.base.ProviderBaseFragment
 
 class LatestFragment : ProviderBaseFragment() {
     override val viewModel: LatestViewModel by viewModels { getViewModelFactory() }
+    override val page: Int = 1
 
     override fun getOptionModel(optionModels: OptionModels): Map<String, List<String>> {
         return optionModels.latest

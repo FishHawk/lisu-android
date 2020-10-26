@@ -8,11 +8,13 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderPagerFragmentBinding
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.preference.ProviderBrowseHistory
 import com.fishhawk.driftinglibraryandroid.ui.base.getDisplayModeIcon
 
 class ProviderPagerFragment : Fragment() {
     private lateinit var binding: ProviderPagerFragmentBinding
+    private lateinit var providerBrowseHistory: ProviderBrowseHistory
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -24,6 +26,8 @@ class ProviderPagerFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        providerBrowseHistory = ProviderBrowseHistory(requireContext())
+
         val providerId = requireArguments().getString("providerId")!!
         val providerName = requireArguments().getString("providerName")!!
 
@@ -37,7 +41,15 @@ class ProviderPagerFragment : Fragment() {
         binding.viewPager.adapter = ProviderPagerAdapter(
             requireContext(), childFragmentManager, providerId
         )
+        binding.viewPager.currentItem =
+            providerBrowseHistory.getPageHistory(providerId).coerceIn(0, 2)
         binding.tabs.setupWithViewPager(binding.viewPager)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val providerId = requireArguments().getString("providerId")!!
+        providerBrowseHistory.setPageHistory(providerId, binding.viewPager.currentItem)
     }
 
     private fun setupMenu(menu: Menu) {
@@ -68,7 +80,7 @@ class ProviderPagerFragment : Fragment() {
     private fun onMenuItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_display_mode -> {
-                SettingsHelper.displayMode.setNextValue()
+                GlobalPreference.displayMode.setNextValue()
                 item.setIcon(getDisplayModeIcon())
                 true
             }

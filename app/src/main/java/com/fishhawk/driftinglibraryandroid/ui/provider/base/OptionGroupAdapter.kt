@@ -9,12 +9,12 @@ import com.fishhawk.driftinglibraryandroid.databinding.ProviderOptionItemBinding
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 class OptionGroupAdapter(
-    private val listener: Listener
+    private val listener: Listener,
+    private var selectedOptionIndex: Int = -1
 ) : BaseAdapter<String>() {
 
-    var selectedOptionIndex: Int = 0
 
-    fun selectOption(index: Int) {
+    private fun selectOption(index: Int) {
         listener.onOptionSelect(index)
         val oldSelectedOptionIndex = selectedOptionIndex
         selectedOptionIndex = index
@@ -45,8 +45,7 @@ class OptionGroupAdapter(
             val typedValue = TypedValue()
             itemView.context.theme.resolveAttribute(
                 if (position == selectedOptionIndex) R.attr.colorAccent
-                else R.attr.colorOnPrimary
-                , typedValue, true
+                else R.attr.colorOnPrimary, typedValue, true
             )
             binding.root.setTextColor(typedValue.data)
 

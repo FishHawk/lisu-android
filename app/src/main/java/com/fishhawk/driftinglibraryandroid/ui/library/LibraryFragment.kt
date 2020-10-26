@@ -12,7 +12,7 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
 import com.fishhawk.driftinglibraryandroid.ui.base.bindToListViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.getDisplayModeIcon
@@ -61,7 +61,7 @@ class LibraryFragment : Fragment() {
 
         binding.mangaList.list.adapter = adapter
 
-        SettingsHelper.displayMode.observe(viewLifecycleOwner) {
+        GlobalPreference.displayMode.observe(viewLifecycleOwner) {
             binding.mangaList.list.changeMangaListDisplayMode(adapter)
         }
 
@@ -98,7 +98,7 @@ class LibraryFragment : Fragment() {
     private fun onMenuItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_display_mode -> {
-                SettingsHelper.displayMode.setNextValue()
+                GlobalPreference.displayMode.setNextValue()
                 item.setIcon(getDisplayModeIcon())
                 true
             }

@@ -14,7 +14,7 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepos
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MetadataDetail
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.base.OperationViewModel
 import kotlinx.coroutines.launch
 import okhttp3.RequestBody
@@ -31,7 +31,7 @@ class GalleryViewModel(
 
     val history: LiveData<ReadingHistory> = detail.switchMap {
         if (it is Result.Success) readingHistoryRepository.observeReadingHistory(
-            SettingsHelper.selectedServer.getValueDirectly(),
+            GlobalPreference.selectedServer.getValueDirectly(),
             it.data.id
         )
         else MutableLiveData()

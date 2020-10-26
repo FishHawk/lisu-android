@@ -11,7 +11,7 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderSearchFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.ProviderViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.provider.base.ProviderActionSheet
@@ -75,7 +75,7 @@ class SearchFragment : Fragment() {
 
         binding.mangaList.list.adapter = mangaAdapter
 
-        SettingsHelper.displayMode.observe(viewLifecycleOwner) {
+        GlobalPreference.displayMode.observe(viewLifecycleOwner) {
             binding.mangaList.list.changeMangaListDisplayMode(mangaAdapter)
         }
 
@@ -110,7 +110,7 @@ class SearchFragment : Fragment() {
     private fun onMenuItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_display_mode -> {
-                SettingsHelper.displayMode.setNextValue()
+                GlobalPreference.displayMode.setNextValue()
                 item.setIcon(getDisplayModeIcon())
                 true
             }

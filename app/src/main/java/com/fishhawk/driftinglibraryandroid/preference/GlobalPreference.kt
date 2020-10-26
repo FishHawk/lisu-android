@@ -1,10 +1,10 @@
-package com.fishhawk.driftinglibraryandroid.setting
+package com.fishhawk.driftinglibraryandroid.preference
 
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 
-object SettingsHelper {
+object GlobalPreference {
     private lateinit var sharedPreferences: SharedPreferences
 
     fun initialize(context: Context) {

@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.setting
+package com.fishhawk.driftinglibraryandroid.preference
 
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener

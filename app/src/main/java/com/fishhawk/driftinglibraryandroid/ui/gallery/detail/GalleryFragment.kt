@@ -14,7 +14,7 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import kotlinx.android.synthetic.main.gallery_fragment.view.*
@@ -46,7 +46,6 @@ class GalleryFragment : Fragment() {
 
     private val pickPictureLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            println(uri)
             val content =
                 uri?.let { requireContext().contentResolver.openInputStream(it)?.readBytes() }
             val type =
@@ -125,24 +124,24 @@ class GalleryFragment : Fragment() {
         binding.chapters.adapter = contentAdapter
 
         binding.displayModeButton.setOnClickListener {
-            SettingsHelper.chapterDisplayMode.setNextValue()
+            GlobalPreference.chapterDisplayMode.setNextValue()
         }
         binding.displayOrderButton.setOnClickListener {
-            SettingsHelper.chapterDisplayOrder.setNextValue()
+            GlobalPreference.chapterDisplayOrder.setNextValue()
         }
 
-        SettingsHelper.chapterDisplayMode.observe(viewLifecycleOwner) {
+        GlobalPreference.chapterDisplayMode.observe(viewLifecycleOwner) {
             binding.displayModeButton.setIconResource(getChapterDisplayModeIcon())
             binding.chapters.viewMode = when (it) {
-                SettingsHelper.ChapterDisplayMode.GRID -> ContentView.ViewMode.GRID
-                SettingsHelper.ChapterDisplayMode.LINEAR -> ContentView.ViewMode.LINEAR
+                GlobalPreference.ChapterDisplayMode.GRID -> ContentView.ViewMode.GRID
+                GlobalPreference.ChapterDisplayMode.LINEAR -> ContentView.ViewMode.LINEAR
             }
         }
 
-        SettingsHelper.chapterDisplayOrder.observe(viewLifecycleOwner) {
+        GlobalPreference.chapterDisplayOrder.observe(viewLifecycleOwner) {
             binding.chapters.viewOrder = when (it) {
-                SettingsHelper.ChapterDisplayOrder.ASCEND -> ContentView.ViewOrder.ASCEND
-                SettingsHelper.ChapterDisplayOrder.DESCEND -> ContentView.ViewOrder.DESCEND
+                GlobalPreference.ChapterDisplayOrder.ASCEND -> ContentView.ViewOrder.ASCEND
+                GlobalPreference.ChapterDisplayOrder.DESCEND -> ContentView.ViewOrder.DESCEND
             }
         }
 

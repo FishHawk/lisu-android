@@ -8,7 +8,7 @@ import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import java.lang.reflect.Method
 
 open class BaseActivity : AppCompatActivity() {
@@ -30,7 +30,7 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     private fun setupSecureModule() {
-        SettingsHelper.secureMode.observe(this) {
+        GlobalPreference.secureMode.observe(this) {
             val flag = WindowManager.LayoutParams.FLAG_SECURE
             if (it) window.addFlags(flag)
             else window.clearFlags(flag)
@@ -60,9 +60,9 @@ open class BaseActivity : AppCompatActivity() {
         val lightThemeId = R.style.Theme_App_Light_TranslucentStatus
         val darkThemeId = R.style.Theme_App_Dark_TranslucentStatus
 
-        when (SettingsHelper.theme.getValueDirectly()) {
-            SettingsHelper.Theme.LIGHT -> setTheme(lightThemeId)
-            SettingsHelper.Theme.DARK -> setTheme(darkThemeId)
+        when (GlobalPreference.theme.getValueDirectly()) {
+            GlobalPreference.Theme.LIGHT -> setTheme(lightThemeId)
+            GlobalPreference.Theme.DARK -> setTheme(darkThemeId)
         }
     }
 }

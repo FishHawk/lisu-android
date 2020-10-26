@@ -9,7 +9,7 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ServerFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 
 class ServerFragment : Fragment() {
@@ -20,7 +20,7 @@ class ServerFragment : Fragment() {
 
     val adapter = ServerInfoListAdapter(object : ServerInfoListAdapter.Listener {
         override fun onItemClick(info: ServerInfo) {
-            SettingsHelper.selectedServer.setValue(info.id)
+            GlobalPreference.selectedServer.setValue(info.id)
         }
 
         override fun onServerDelete(info: ServerInfo) {
@@ -57,12 +57,12 @@ class ServerFragment : Fragment() {
 
         binding.list.adapter = adapter
 
-        SettingsHelper.selectedServer.observe(viewLifecycleOwner) { id ->
+        GlobalPreference.selectedServer.observe(viewLifecycleOwner) { id ->
             adapter.selectedId = id
         }
 
         viewModel.serverInfoList.observe(viewLifecycleOwner) { data ->
-            if (data.size == 1) SettingsHelper.selectedServer.setValue(data.first().id)
+            if (data.size == 1) GlobalPreference.selectedServer.setValue(data.first().id)
             adapter.setList(data)
             if (data.isEmpty()) binding.multipleStatusView.showEmpty()
             else binding.multipleStatusView.showContent()

@@ -5,9 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.appcompat.widget.AppCompatSpinner
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderSettingsSheetBinding
-import com.fishhawk.driftinglibraryandroid.setting.PreferenceBooleanLiveData
-import com.fishhawk.driftinglibraryandroid.setting.PreferenceEnumLiveData
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.PreferenceBooleanLiveData
+import com.fishhawk.driftinglibraryandroid.preference.PreferenceEnumLiveData
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.switchmaterial.SwitchMaterial
 
@@ -29,12 +29,12 @@ class ReaderSettingsSheet(
     }
 
     private fun initGeneralPreferences() {
-        bindingEnumPreference(binding.direction, SettingsHelper.readingDirection)
-        bindingEnumPreference(binding.orientation, SettingsHelper.screenOrientation)
+        bindingEnumPreference(binding.direction, GlobalPreference.readingDirection)
+        bindingEnumPreference(binding.orientation, GlobalPreference.screenOrientation)
 
-        bindingBoolPreference(binding.keepScreenOn, SettingsHelper.keepScreenOn)
-        bindingBoolPreference(binding.useVolumeKey, SettingsHelper.useVolumeKey)
-        bindingBoolPreference(binding.longTapDialog, SettingsHelper.longTapDialog)
+        bindingBoolPreference(binding.keepScreenOn, GlobalPreference.keepScreenOn)
+        bindingBoolPreference(binding.useVolumeKey, GlobalPreference.useVolumeKey)
+        bindingBoolPreference(binding.longTapDialog, GlobalPreference.longTapDialog)
     }
 
     private fun <T : Enum<T>> bindingEnumPreference(

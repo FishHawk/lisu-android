@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityMainBinding
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -42,10 +42,10 @@ class MainActivity : BaseActivity() {
         )
 
         bottomNavigationView.selectedItemId =
-            when (SettingsHelper.startScreen.getValueDirectly()) {
-                SettingsHelper.StartScreen.LIBRARY -> R.id.nav_graph_library
-                SettingsHelper.StartScreen.HISTORY -> R.id.nav_graph_history
-                SettingsHelper.StartScreen.EXPLORE -> R.id.nav_graph_explore
+            when (GlobalPreference.startScreen.getValueDirectly()) {
+                GlobalPreference.StartScreen.LIBRARY -> R.id.nav_graph_library
+                GlobalPreference.StartScreen.HISTORY -> R.id.nav_graph_history
+                GlobalPreference.StartScreen.EXPLORE -> R.id.nav_graph_explore
             }
     }
 

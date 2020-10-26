@@ -12,7 +12,7 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.ReaderViewModelFactory
@@ -59,11 +59,11 @@ class ReaderFragment : Fragment() {
         setupReaderView()
         setupMenuLayout()
 
-        SettingsHelper.readingDirection.observe(viewLifecycleOwner, Observer {
+        GlobalPreference.readingDirection.observe(viewLifecycleOwner, Observer {
             binding.reader.mode = when (it) {
-                SettingsHelper.ReadingDirection.LTR -> ReaderView.Mode.LTR
-                SettingsHelper.ReadingDirection.RTL -> ReaderView.Mode.RTL
-                SettingsHelper.ReadingDirection.VERTICAL -> ReaderView.Mode.VERTICAL
+                GlobalPreference.ReadingDirection.LTR -> ReaderView.Mode.LTR
+                GlobalPreference.ReadingDirection.RTL -> ReaderView.Mode.RTL
+                GlobalPreference.ReadingDirection.VERTICAL -> ReaderView.Mode.VERTICAL
                 else -> ReaderView.Mode.LTR
             }
         })
@@ -98,7 +98,7 @@ class ReaderFragment : Fragment() {
         binding.reader.onRequestMenu = { viewModel.isMenuVisible.value = true }
         binding.reader.onScrolled = { viewModel.chapterPosition.value = it }
         binding.reader.onPageLongClicked = { position, url ->
-            if (SettingsHelper.longTapDialog.getValueDirectly())
+            if (GlobalPreference.longTapDialog.getValueDirectly())
                 ReaderPageSheet(requireContext(), position, object : ReaderPageSheet.Listener {
                     override fun onRefresh() {
                         binding.reader.refreshPage(position)

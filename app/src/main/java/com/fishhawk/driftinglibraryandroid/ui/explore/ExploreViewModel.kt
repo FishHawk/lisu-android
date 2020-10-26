@@ -7,13 +7,13 @@ import androidx.lifecycle.switchMap
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 
 class ExploreViewModel(
     private val remoteProviderRepository: RemoteProviderRepository
 ) : ViewModel() {
     val providerList: LiveData<Result<List<ProviderInfo>>> =
-        SettingsHelper.selectedServer.switchMap {
+        GlobalPreference.selectedServer.switchMap {
             liveData {
                 emit(Result.Loading)
                 emit(remoteProviderRepository.getProvidersInfo())

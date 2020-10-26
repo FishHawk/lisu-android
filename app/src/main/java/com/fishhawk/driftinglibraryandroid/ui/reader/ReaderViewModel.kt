@@ -7,8 +7,8 @@ import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail
-import com.fishhawk.driftinglibraryandroid.setting.PreferenceEnumLiveData
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.PreferenceEnumLiveData
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -23,9 +23,9 @@ class ReaderViewModel(
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModel() {
     // reading direction
-    private val readingDirection: PreferenceEnumLiveData<*> = SettingsHelper.readingDirection
+    private val readingDirection: PreferenceEnumLiveData<*> = GlobalPreference.readingDirection
     val isReaderDirectionEqualRightToLeft: LiveData<Boolean> =
-        Transformations.map(readingDirection) { it == SettingsHelper.ReadingDirection.RTL }
+        Transformations.map(readingDirection) { it == GlobalPreference.ReadingDirection.RTL }
 
     // menu
     val isMenuVisible: MutableLiveData<Boolean> = MutableLiveData(false)
@@ -120,7 +120,7 @@ class ReaderViewModel(
             val readingHistory =
                 ReadingHistory(
                     it.id,
-                    SettingsHelper.selectedServer.getValueDirectly(),
+                    GlobalPreference.selectedServer.getValueDirectly(),
 
                     it.title,
                     it.thumb ?: "",

@@ -14,7 +14,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ExploreFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 
 class ExploreFragment : Fragment() {
@@ -32,7 +32,7 @@ class ExploreFragment : Fragment() {
                     "providerName" to providerInfo.name
                 )
             )
-            SettingsHelper.lastUsedProvider.setValue(providerInfo.id)
+            GlobalPreference.lastUsedProvider.setValue(providerInfo.id)
         }
 
         override fun onBrowseClick(providerInfo: ProviderInfo) {
@@ -43,7 +43,7 @@ class ExploreFragment : Fragment() {
                     "providerName" to providerInfo.name
                 )
             )
-            SettingsHelper.lastUsedProvider.setValue(providerInfo.id)
+            GlobalPreference.lastUsedProvider.setValue(providerInfo.id)
         }
     })
 
@@ -61,7 +61,7 @@ class ExploreFragment : Fragment() {
 
         binding.list.adapter = adapter
 
-        SettingsHelper.lastUsedProvider.observe(viewLifecycleOwner, Observer {
+        GlobalPreference.lastUsedProvider.observe(viewLifecycleOwner, Observer {
             adapter.lastUsedProviderId = it
         })
 

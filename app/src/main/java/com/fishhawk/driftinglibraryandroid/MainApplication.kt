@@ -16,7 +16,7 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepos
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 
 class MainApplication : Application() {
     private lateinit var database: ApplicationDatabase
@@ -34,7 +34,7 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        SettingsHelper.initialize(this)
+        GlobalPreference.initialize(this)
 
         database = Room.databaseBuilder(
             applicationContext,
@@ -47,12 +47,12 @@ class MainApplication : Application() {
 
         runBlocking {
             val selectedServerInfoValue = serverInfoRepository.selectServerInfo(
-                SettingsHelper.selectedServer.getValueDirectly()
+                GlobalPreference.selectedServer.getValueDirectly()
             )
             selectServer(selectedServerInfoValue)
         }
 
-        selectedServerInfo = SettingsHelper.selectedServer.switchMap {
+        selectedServerInfo = GlobalPreference.selectedServer.switchMap {
             serverInfoRepository.observeServerInfo(it)
         }
 

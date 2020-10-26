@@ -12,15 +12,12 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryEditFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaStatus
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MetadataDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.TagGroup
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.gallery.detail.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.gallery.detail.TagGroupAdapter
-import kotlinx.android.synthetic.main.manga_list_view.view.*
 
 class GalleryEditFragment : Fragment() {
     internal val viewModel: GalleryViewModel by activityViewModels {

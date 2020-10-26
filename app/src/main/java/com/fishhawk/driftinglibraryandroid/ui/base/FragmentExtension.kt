@@ -1,6 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.ui.base
 
-import android.app.Activity
 import android.content.*
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.pm.PackageManager
@@ -26,7 +25,7 @@ import com.classic.common.MultipleStatusView
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.setting.SettingsHelper
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.activity.MainActivity
 import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
@@ -35,7 +34,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.util.jar.Manifest
 
 fun <T> Fragment.bindToListViewModel(
     multipleStatusView: MultipleStatusView,
@@ -103,14 +101,14 @@ fun <T> Fragment.bindToListViewModel(
 }
 
 fun RecyclerView.changeMangaListDisplayMode(adapter: MangaListAdapter) {
-    val displayMode = SettingsHelper.displayMode.getValueDirectly()
-    if (displayMode == SettingsHelper.DisplayMode.GRID &&
+    val displayMode = GlobalPreference.displayMode.getValueDirectly()
+    if (displayMode == GlobalPreference.DisplayMode.GRID &&
         (adapter.viewMode != MangaListAdapter.ViewMode.GRID || layoutManager == null)
     ) {
         adapter.viewMode = MangaListAdapter.ViewMode.GRID
         layoutManager = GridLayoutManager(context, 3)
         this.adapter = adapter
-    } else if (displayMode == SettingsHelper.DisplayMode.LINEAR &&
+    } else if (displayMode == GlobalPreference.DisplayMode.LINEAR &&
         (adapter.viewMode != MangaListAdapter.ViewMode.LINEAR || layoutManager == null)
     ) {
         adapter.viewMode = MangaListAdapter.ViewMode.LINEAR
@@ -120,16 +118,16 @@ fun RecyclerView.changeMangaListDisplayMode(adapter: MangaListAdapter) {
 }
 
 fun getDisplayModeIcon(): Int {
-    return when (SettingsHelper.displayMode.getValueDirectly()) {
-        SettingsHelper.DisplayMode.GRID -> R.drawable.ic_baseline_view_module_24
-        SettingsHelper.DisplayMode.LINEAR -> R.drawable.ic_baseline_view_list_24
+    return when (GlobalPreference.displayMode.getValueDirectly()) {
+        GlobalPreference.DisplayMode.GRID -> R.drawable.ic_baseline_view_module_24
+        GlobalPreference.DisplayMode.LINEAR -> R.drawable.ic_baseline_view_list_24
     }
 }
 
 fun getChapterDisplayModeIcon(): Int {
-    return when (SettingsHelper.chapterDisplayMode.getValueDirectly()) {
-        SettingsHelper.ChapterDisplayMode.GRID -> R.drawable.ic_baseline_view_module_24
-        SettingsHelper.ChapterDisplayMode.LINEAR -> R.drawable.ic_baseline_view_list_24
+    return when (GlobalPreference.chapterDisplayMode.getValueDirectly()) {
+        GlobalPreference.ChapterDisplayMode.GRID -> R.drawable.ic_baseline_view_module_24
+        GlobalPreference.ChapterDisplayMode.LINEAR -> R.drawable.ic_baseline_view_list_24
     }
 }
 
