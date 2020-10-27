@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.provider.search
+package com.fishhawk.driftinglibraryandroid.ui.search
 
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.R

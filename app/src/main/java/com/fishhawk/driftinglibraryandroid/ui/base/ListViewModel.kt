@@ -65,7 +65,7 @@ abstract class RefreshableListViewModel<T> : ListViewModel<T>() {
     }
 }
 
-abstract class ListViewModel<T> : OperationViewModel() {
+abstract class ListViewModel<T> : FeedbackViewModel() {
     protected val _list: MutableLiveData<Result<MutableList<T>>> = MutableLiveData()
     val list: LiveData<Result<MutableList<T>>> = _list
 

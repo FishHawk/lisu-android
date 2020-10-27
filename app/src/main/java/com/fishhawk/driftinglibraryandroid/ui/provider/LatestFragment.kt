@@ -1,11 +1,9 @@
-package com.fishhawk.driftinglibraryandroid.ui.provider.latest
+package com.fishhawk.driftinglibraryandroid.ui.provider
 
-import androidx.fragment.app.viewModels
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.OptionModels
-import com.fishhawk.driftinglibraryandroid.ui.provider.base.ProviderBaseFragment
 
 class LatestFragment : ProviderBaseFragment() {
-    override val viewModel: LatestViewModel by viewModels { getViewModelFactory() }
+    override val mangaListComponent: ProviderMangaListComponent by lazy { viewModel.latestMangaList }
     override val page: Int = 1
 
     override fun getOptionModel(optionModels: OptionModels): Map<String, List<String>> {

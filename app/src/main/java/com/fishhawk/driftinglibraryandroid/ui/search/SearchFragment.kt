@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.provider.search
+package com.fishhawk.driftinglibraryandroid.ui.search
 
 import android.os.Bundle
 import android.view.*
@@ -14,7 +14,7 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.ProviderViewModelFactory
-import com.fishhawk.driftinglibraryandroid.ui.provider.base.ProviderActionSheet
+import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActionSheet
 
 class SearchFragment : Fragment() {
     val viewModel: SearchViewModel by viewModels {

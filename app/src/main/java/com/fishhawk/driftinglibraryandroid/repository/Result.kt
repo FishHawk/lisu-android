@@ -12,4 +12,22 @@ sealed class Result<out R> {
             Loading -> "Loading"
         }
     }
+
+    fun <T> map(transform: (R) -> T): Result<T> {
+        return when (this) {
+            is Success -> Success(transform(data))
+            is Error -> Error(exception)
+            is Loading -> Loading
+        }
+    }
+
+    fun onSuccess(action: (value: R) -> Unit): Result<R> {
+        if (this is Success) action(data)
+        return this
+    }
+
+    fun onFailure(action: (exception: Throwable) -> Unit): Result<*> {
+        if (this is Error) action(exception)
+        return this
+    }
 }

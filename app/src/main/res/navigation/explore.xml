@@ -38,7 +38,7 @@
 
     <fragment
         android:id="@+id/nav_search"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.provider.search.SearchFragment"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.search.SearchFragment"
         android:label="@string/label_search"
         tools:layout="@layout/provider_base_fragment" />
 

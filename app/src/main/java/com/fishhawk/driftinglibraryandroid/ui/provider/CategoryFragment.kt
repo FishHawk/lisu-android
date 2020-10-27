@@ -1,11 +1,9 @@
-package com.fishhawk.driftinglibraryandroid.ui.provider.category
+package com.fishhawk.driftinglibraryandroid.ui.provider
 
-import androidx.fragment.app.viewModels
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.OptionModels
-import com.fishhawk.driftinglibraryandroid.ui.provider.base.ProviderBaseFragment
 
 class CategoryFragment : ProviderBaseFragment() {
-    override val viewModel: CategoryViewModel by viewModels { getViewModelFactory() }
+    override val mangaListComponent: ProviderMangaListComponent by lazy { viewModel.categoryMangaList }
     override val page: Int = 2
 
     override fun getOptionModel(optionModels: OptionModels): Map<String, List<String>> {

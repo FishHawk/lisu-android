@@ -15,7 +15,7 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionR
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MetadataDetail
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.ui.base.OperationViewModel
+import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import kotlinx.coroutines.launch
 import okhttp3.RequestBody
 
@@ -25,7 +25,7 @@ class GalleryViewModel(
     private val remoteDownloadRepository: RemoteDownloadRepository,
     private val remoteSubscriptionRepository: RemoteSubscriptionRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
-) : OperationViewModel() {
+) : FeedbackViewModel() {
     private val _detail: MutableLiveData<Result<MangaDetail>> = MutableLiveData(Result.Loading)
     val detail: LiveData<Result<MangaDetail>> = _detail
 

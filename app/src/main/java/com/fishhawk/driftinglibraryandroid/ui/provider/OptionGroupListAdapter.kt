@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.provider.base
+package com.fishhawk.driftinglibraryandroid.ui.provider
 
 import android.view.ViewGroup
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderOptionGroupBinding

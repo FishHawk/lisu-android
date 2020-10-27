@@ -17,6 +17,8 @@ import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
+import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
+import com.fishhawk.driftinglibraryandroid.ui.base.bindToFeedbackViewModel
 import kotlinx.android.synthetic.main.gallery_fragment.view.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -65,7 +67,7 @@ class GalleryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupFeedbackModule(viewModel)
+        bindToFeedbackViewModel(viewModel)
 
         val id: String = requireArguments().getString("id")!!
         val title: String = requireArguments().getString("title")!!

@@ -7,10 +7,6 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
-import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions.ACTION_REQUEST_PERMISSIONS
-import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions.EXTRA_PERMISSIONS
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
@@ -41,7 +37,7 @@ fun <T> Fragment.bindToListViewModel(
     viewModel: RefreshableListViewModel<T>,
     adapter: BaseAdapter<T>
 ) {
-    setupFeedbackModule(viewModel)
+    bindToFeedbackViewModel(viewModel)
 
     viewModel.list.observe(viewLifecycleOwner, Observer { result ->
         when (result) {
