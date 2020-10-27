@@ -35,7 +35,6 @@ abstract class ProviderBaseFragment : Fragment() {
         override fun onOptionSelect(name: String, index: Int) {
             providerBrowseHistory.setOptionHistory(viewModel.getProviderId(), page, name, index)
             mangaListComponent.selectOption(name, index)
-            mangaListComponent.load()
         }
     })
 
@@ -109,15 +108,16 @@ abstract class ProviderBaseFragment : Fragment() {
             when (result) {
                 is Result.Success -> {
                     val model = getOptionModel(result.data.optionModels)
+                    val option: Option = mutableMapOf()
                     optionAdapter.setList(model.map { (name, options) ->
                         val selectedIndex =
                             providerBrowseHistory.getOptionHistory(
                                 viewModel.getProviderId(), page, name
                             )
-                        mangaListComponent.selectOption(name, selectedIndex)
+                        option[name] = selectedIndex
                         OptionGroup(name, options, selectedIndex)
                     })
-                    mangaListComponent.load()
+                    mangaListComponent.selectOption(option)
                 }
             }
         }

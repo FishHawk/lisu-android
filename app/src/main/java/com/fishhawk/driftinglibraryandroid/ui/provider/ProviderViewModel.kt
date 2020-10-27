@@ -1,10 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import androidx.lifecycle.Transformations.switchMap
-import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
@@ -27,8 +24,19 @@ class ProviderMangaListComponent(
     private var option: Option = mutableMapOf()
 
     fun selectOption(name: String, index: Int) {
-        option[name] = index
-        load()
+        if (option[name] != index) {
+            option[name] = index
+            load()
+        }
+    }
+
+    fun selectOption(option: Option) {
+        if (option.keys.size != this.option.keys.size ||
+            option.filterKeys { option[it] != this.option[it] }.isNotEmpty()
+        ) {
+            this.option = option
+            load()
+        }
     }
 
     override fun reset() {
@@ -62,13 +70,15 @@ class ProviderViewModel(
     fun getProviderId(): String = providerId.value.orEmpty()
 
     fun setProviderId(id: String) {
-        providerId.value = id
-        popularMangaList.reset()
-        latestMangaList.reset()
-        categoryMangaList.reset()
+        if (id != providerId.value) {
+            providerId.value = id
+            popularMangaList.reset()
+            latestMangaList.reset()
+            categoryMangaList.reset()
+        }
     }
 
-    val detail: LiveData<Result<ProviderDetail>> = switchMap(providerId) {
+    val detail: LiveData<Result<ProviderDetail>> = providerId.switchMap {
         liveData {
             emit(Result.Loading)
             emit(remoteProviderRepository.getProvidersDetail(it))
