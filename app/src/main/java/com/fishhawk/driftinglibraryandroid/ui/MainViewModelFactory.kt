@@ -10,6 +10,7 @@ import com.fishhawk.driftinglibraryandroid.ui.globalsearch.GlobalSearchViewModel
 import com.fishhawk.driftinglibraryandroid.ui.history.HistoryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.library.LibraryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderViewModel
+import com.fishhawk.driftinglibraryandroid.ui.search.SearchViewModel
 import com.fishhawk.driftinglibraryandroid.ui.server.ServerViewModel
 import com.fishhawk.driftinglibraryandroid.ui.subscription.SubscriptionViewModel
 
@@ -33,6 +34,13 @@ class MainViewModelFactory constructor(
 
             isAssignableFrom(ProviderViewModel::class.java) ->
                 ProviderViewModel(
+                    application.remoteProviderRepository,
+                    application.remoteDownloadRepository,
+                    application.remoteSubscriptionRepository
+                )
+
+            isAssignableFrom(SearchViewModel::class.java) ->
+                SearchViewModel(
                     application.remoteProviderRepository,
                     application.remoteDownloadRepository,
                     application.remoteSubscriptionRepository

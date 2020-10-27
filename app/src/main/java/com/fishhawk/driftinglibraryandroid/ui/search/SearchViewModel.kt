@@ -1,54 +1,44 @@
 package com.fishhawk.driftinglibraryandroid.ui.search
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModelWithFetchMore
-import kotlinx.coroutines.Dispatchers
+import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
+import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderMangaListComponent
 import kotlinx.coroutines.launch
 
-
 class SearchViewModel(
-    private val providerId: String,
     private val remoteProviderRepository: RemoteProviderRepository,
     private val remoteDownloadRepository: RemoteDownloadRepository,
     private val remoteSubscriptionRepository: RemoteSubscriptionRepository
-) : RefreshableListViewModelWithFetchMore<MangaOutline>() {
-    private var page = 1
+) : FeedbackViewModel() {
+    private val providerId: MutableLiveData<String> = MutableLiveData()
+    var keywords = ""
 
-    private var keywords = ""
+    val mangaList = ProviderMangaListComponent(viewModelScope) { page, _ ->
+        remoteProviderRepository.search(providerId.value!!, keywords, page)
+    }
 
-    override suspend fun loadResult() =
-        remoteProviderRepository.search(providerId, keywords, 1)
-
-    override suspend fun fetchMoreResult() =
-        remoteProviderRepository.search(providerId, keywords, page + 1)
+    fun setProviderId(id: String) {
+        providerId.value = id
+        mangaList.reset()
+    }
 
     fun search(keywords: String) {
         this.keywords = keywords
-        load()
+        mangaList.load()
     }
 
-    override fun onRefreshSuccess(data: List<MangaOutline>) {
-        page = 1
+    fun download(id: String, title: String) = viewModelScope.launch {
+        val result = remoteDownloadRepository.postDownloadTask(providerId.value!!, id, title)
+        resultWarp(result) { feed(R.string.download_task_created) }
     }
 
-    override fun onFetchMoreSuccess(data: List<MangaOutline>) {
-        if (data.isNotEmpty()) page += 1
+    fun subscribe(id: String, title: String) = viewModelScope.launch {
+        val result = remoteSubscriptionRepository.postSubscription(providerId.value!!, id, title)
+        resultWarp(result) { feed(R.string.subscription_created) }
     }
-
-    fun download(id: String, title: String) =
-        viewModelScope.launch(Dispatchers.Main) {
-            val result = remoteDownloadRepository.postDownloadTask(providerId, id, title)
-            resultWarp(result) { feed(R.string.download_task_created) }
-        }
-
-    fun subscribe(id: String, title: String) =
-        viewModelScope.launch(Dispatchers.Main) {
-            val result = remoteSubscriptionRepository.postSubscription(providerId, id, title)
-            resultWarp(result) { feed(R.string.subscription_created) }
-        }
 }

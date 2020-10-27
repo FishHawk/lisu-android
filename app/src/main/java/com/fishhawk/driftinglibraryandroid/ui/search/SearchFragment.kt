@@ -12,15 +12,14 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderSearchFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.*
-import com.fishhawk.driftinglibraryandroid.ui.ProviderViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActionSheet
 
 class SearchFragment : Fragment() {
     val viewModel: SearchViewModel by viewModels {
-        providerId = requireArguments().getString("providerId")!!
         val application = requireActivity().application as MainApplication
-        ProviderViewModelFactory(providerId, application)
+        MainViewModelFactory(application)
     }
     private lateinit var binding: ProviderSearchFragmentBinding
 
@@ -68,6 +67,10 @@ class SearchFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        viewModel.keywords = requireArguments().getString("keywords")!!
+        providerId = requireArguments().getString("providerId")!!
+        viewModel.setProviderId(providerId)
+
         setupMenu(binding.toolbar.menu)
         binding.toolbar.setOnMenuItemClickListener(this::onMenuItemSelected)
         binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
@@ -79,10 +82,10 @@ class SearchFragment : Fragment() {
             binding.mangaList.list.changeMangaListDisplayMode(mangaAdapter)
         }
 
-        bindToListViewModel(
+        bindToListComponent(
             binding.mangaList.multipleStatusView,
             binding.mangaList.refreshLayout,
-            viewModel,
+            viewModel.mangaList,
             mangaAdapter
         )
     }
@@ -99,8 +102,7 @@ class SearchFragment : Fragment() {
 
                 override fun onQueryTextChange(query: String?): Boolean = true
             })
-            val keywords = requireArguments().getString("keywords")!!
-            setQuery(keywords, true)
+            setQuery(viewModel.keywords, true)
         }
         with(menu.findItem(R.id.action_display_mode)) {
             setIcon(getDisplayModeIcon())
