@@ -1,7 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider
 
 import androidx.lifecycle.*
-import androidx.lifecycle.Transformations.switchMap
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
