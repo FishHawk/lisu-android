@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.ui.download.DownloadViewModel
 import com.fishhawk.driftinglibraryandroid.ui.explore.ExploreViewModel
-import com.fishhawk.driftinglibraryandroid.ui.gallery.detail.GalleryViewModel
+import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.globalsearch.GlobalSearchViewModel
 import com.fishhawk.driftinglibraryandroid.ui.history.HistoryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.library.LibraryViewModel
@@ -67,7 +67,9 @@ class MainViewModelFactory constructor(
                     application.remoteProviderRepository,
                     application.remoteDownloadRepository,
                     application.remoteSubscriptionRepository,
-                    application.readingHistoryRepository
+                    application.readingHistoryRepository,
+                    bundle.getString("id")!!,
+                    bundle.getString("providerId")
                 )
 
             else ->

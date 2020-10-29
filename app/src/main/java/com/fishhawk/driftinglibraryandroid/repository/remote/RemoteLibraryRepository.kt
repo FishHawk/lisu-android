@@ -45,13 +45,21 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
         mangaId: String,
         metadata: MetadataDetail
     ): Result<MangaDetail> =
-        resultWrap { it.patchMangaMetadata(mangaId, metadata) }
+        resultWrap { it.patchMangaMetadata(mangaId, metadata).apply {
+            thumb =
+                if (thumb.isNullOrBlank()) null
+                else "${url}library/image/${mangaId}/${thumb}"
+        } }
 
     suspend fun updateMangaThumb(
         mangaId: String,
         requestBody: RequestBody
     ): Result<MangaDetail> =
-        resultWrap { it.patchMangaThumb(mangaId, requestBody) }
+        resultWrap { it.patchMangaThumb(mangaId, requestBody).apply {
+            thumb =
+                if (thumb.isNullOrBlank()) null
+                else "${url}library/image/${mangaId}/${thumb}"
+        } }
 
     suspend fun getChapterContent(
         mangaId: String,

@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.navigation.navGraphViewModels
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryEditFragmentBinding
@@ -16,11 +16,12 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaStatus
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MetadataDetail
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.TagGroup
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
-import com.fishhawk.driftinglibraryandroid.ui.gallery.detail.GalleryViewModel
+import com.fishhawk.driftinglibraryandroid.ui.base.bindToFeedbackViewModel
+import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.gallery.detail.TagGroupAdapter
 
 class GalleryEditFragment : Fragment() {
-    internal val viewModel: GalleryViewModel by activityViewModels {
+    internal val viewModel: GalleryViewModel by  navGraphViewModels(R.id.nav_graph_gallery)  {
         val application = requireActivity().application as MainApplication
         MainViewModelFactory(application)
     }
@@ -40,6 +41,8 @@ class GalleryEditFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.toolbar.setOnMenuItemClickListener(this::onMenuItemSelected)
+
+        bindToFeedbackViewModel(viewModel)
 
         val detail = (viewModel.detail.value as Result.Success).data
 

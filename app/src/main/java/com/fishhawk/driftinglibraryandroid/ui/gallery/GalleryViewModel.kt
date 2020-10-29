@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.gallery.detail
+package com.fishhawk.driftinglibraryandroid.ui.gallery
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -24,8 +24,11 @@ class GalleryViewModel(
     private val remoteProviderRepository: RemoteProviderRepository,
     private val remoteDownloadRepository: RemoteDownloadRepository,
     private val remoteSubscriptionRepository: RemoteSubscriptionRepository,
-    private val readingHistoryRepository: ReadingHistoryRepository
+    private val readingHistoryRepository: ReadingHistoryRepository,
+    private val mangaId: String,
+    private val providerId: String?
 ) : FeedbackViewModel() {
+
     private val _detail: MutableLiveData<Result<MangaDetail>?> = MutableLiveData(null)
     val detail: LiveData<Result<MangaDetail>?> = _detail
 
@@ -37,14 +40,17 @@ class GalleryViewModel(
         else MutableLiveData()
     }
 
-    fun openMangaFromLibrary(id: String) = viewModelScope.launch {
+    private fun loadManga() {
         _detail.value = null
-        _detail.value = remoteLibraryRepository.getManga(id)
+        viewModelScope.launch {
+            _detail.value = providerId?.let {
+                remoteProviderRepository.getManga(it, mangaId)
+            } ?: remoteLibraryRepository.getManga(mangaId)
+        }
     }
 
-    fun openMangaFromProvider(providerId: String, id: String) = viewModelScope.launch {
-        _detail.value = null
-        _detail.value = remoteProviderRepository.getManga(providerId, id)
+    init {
+        loadManga()
     }
 
     fun updateThumb(requestBody: RequestBody) = viewModelScope.launch {

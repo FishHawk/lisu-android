@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
@@ -19,14 +19,15 @@ import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import com.fishhawk.driftinglibraryandroid.ui.base.bindToFeedbackViewModel
+import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
 import kotlinx.android.synthetic.main.gallery_fragment.view.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class GalleryFragment : Fragment() {
-    internal val viewModel: GalleryViewModel by activityViewModels {
+    internal val viewModel: GalleryViewModel by navGraphViewModels(R.id.nav_graph_gallery) {
         val application = requireActivity().application as MainApplication
-        MainViewModelFactory(application)
+        MainViewModelFactory(application, requireArguments())
     }
     internal lateinit var binding: GalleryFragmentBinding
 
@@ -66,17 +67,12 @@ class GalleryFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         bindToFeedbackViewModel(viewModel)
 
         val id: String = requireArguments().getString("id")!!
         val title: String = requireArguments().getString("title")!!
         providerId = requireArguments().getString("providerId")
         val thumb = requireArguments().getString("thumb")
-
-        providerId?.let {
-            viewModel.openMangaFromProvider(it, id)
-        } ?: viewModel.openMangaFromLibrary(id)
 
         binding.title.setOnLongClickListener {
             copyToClipboard(binding.title.text as String)
