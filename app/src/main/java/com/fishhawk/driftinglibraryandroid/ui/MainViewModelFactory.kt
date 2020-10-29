@@ -39,14 +39,17 @@ class MainViewModelFactory constructor(
                 ProviderViewModel(
                     application.remoteProviderRepository,
                     application.remoteDownloadRepository,
-                    application.remoteSubscriptionRepository
+                    application.remoteSubscriptionRepository,
+                    bundle.getString("providerId")!!,
                 )
 
             isAssignableFrom(SearchViewModel::class.java) ->
                 SearchViewModel(
                     application.remoteProviderRepository,
                     application.remoteDownloadRepository,
-                    application.remoteSubscriptionRepository
+                    application.remoteSubscriptionRepository,
+                    bundle.getString("providerId")!!,
+                    bundle.getString("keywords")!!
                 )
 
             isAssignableFrom(ServerViewModel::class.java) ->

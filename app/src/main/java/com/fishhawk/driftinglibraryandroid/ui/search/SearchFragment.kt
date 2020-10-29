@@ -19,7 +19,7 @@ import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActionSheet
 class SearchFragment : Fragment() {
     val viewModel: SearchViewModel by viewModels {
         val application = requireActivity().application as MainApplication
-        MainViewModelFactory(application)
+        MainViewModelFactory(application, requireArguments())
     }
     private lateinit var binding: ProviderSearchFragmentBinding
 
@@ -67,9 +67,7 @@ class SearchFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.keywords = requireArguments().getString("keywords")!!
         providerId = requireArguments().getString("providerId")!!
-        viewModel.setProviderId(providerId)
 
         setupMenu(binding.toolbar.menu)
         binding.toolbar.setOnMenuItemClickListener(this::onMenuItemSelected)
@@ -82,7 +80,7 @@ class SearchFragment : Fragment() {
             binding.mangaList.list.changeMangaListDisplayMode(mangaAdapter)
         }
 
-        bindToListComponent(
+        bindToPagingList(
             binding.mangaList.multipleStatusView,
             binding.mangaList.refreshLayout,
             viewModel.mangaList,
@@ -94,15 +92,15 @@ class SearchFragment : Fragment() {
         with(menu.findItem(R.id.action_search).actionView as SearchView) {
             queryHint = getString(R.string.menu_search_hint)
             maxWidth = Int.MAX_VALUE
+            setQuery(viewModel.keywords.value, false)
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String): Boolean {
-                    viewModel.search(query)
+                    viewModel.keywords.value = query
                     return true
                 }
 
                 override fun onQueryTextChange(query: String?): Boolean = true
             })
-            setQuery(viewModel.keywords, true)
         }
         with(menu.findItem(R.id.action_display_mode)) {
             setIcon(getDisplayModeIcon())

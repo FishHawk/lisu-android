@@ -1,6 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider
 
 import android.content.Context
+import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -9,11 +10,12 @@ import java.lang.IllegalArgumentException
 
 class ProviderPagerAdapter(
     private val context: Context,
-    fm: FragmentManager
+    fm: FragmentManager,
+    arguments: Bundle
 ) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-    private val popularFragment by lazy { PopularFragment() }
-    private val latestFragment by lazy { LatestFragment() }
-    private val categoryFragment by lazy { CategoryFragment() }
+    private val popularFragment by lazy { PopularFragment().also { it.arguments = arguments } }
+    private val latestFragment by lazy { LatestFragment().also { it.arguments = arguments } }
+    private val categoryFragment by lazy { CategoryFragment().also { it.arguments = arguments } }
 
     override fun getItem(position: Int): Fragment {
         return when (position) {

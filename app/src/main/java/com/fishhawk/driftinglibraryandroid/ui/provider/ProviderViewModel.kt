@@ -9,7 +9,8 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionR
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderDetail
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
-import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListComponentWithFetchMore
+import com.fishhawk.driftinglibraryandroid.ui.base.Page
+import com.fishhawk.driftinglibraryandroid.ui.base.PagingList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -18,8 +19,7 @@ typealias Option = MutableMap<String, Int>
 class ProviderMangaListComponent(
     scope: CoroutineScope,
     private val loadPage: suspend (page: Int, option: Option) -> Result<List<MangaOutline>>
-) : RefreshableListComponentWithFetchMore<MangaOutline>(scope) {
-    private var page = 1
+) : PagingList<Int, MangaOutline>(scope) {
     private var option: Option = mutableMapOf()
 
     fun selectOption(name: String, index: Int) {
@@ -38,44 +38,21 @@ class ProviderMangaListComponent(
         }
     }
 
-    override fun reset() {
-        super.reset()
-        page = 1
-        option.clear()
-    }
-
-    override suspend fun loadInternal(): Result<List<MangaOutline>> =
-        loadPage(1, option)
-
-    override suspend fun fetchMoreInternal(): Result<List<MangaOutline>> =
-        loadPage(page + 1, option)
-
-    override fun onRefreshFinish(result: Result<List<MangaOutline>>) {
-        result.onSuccess { page = 1 }
-    }
-
-    override fun onFetchMoreFinish(result: Result<List<MangaOutline>>) {
-        result.onSuccess { if (it.isNotEmpty()) page += 1 }
+    override suspend fun loadPage(key: Int?): Result<Page<Int, MangaOutline>> {
+        val page = key ?: 1
+        return loadPage(key ?: 1, option)
+            .map { Page(data = it, nextPage = page + 1) }
     }
 }
 
 class ProviderViewModel(
     private val remoteProviderRepository: RemoteProviderRepository,
     private val remoteDownloadRepository: RemoteDownloadRepository,
-    private val remoteSubscriptionRepository: RemoteSubscriptionRepository
+    private val remoteSubscriptionRepository: RemoteSubscriptionRepository,
+    argProviderId: String
 ) : FeedbackViewModel() {
-    private val providerId: MutableLiveData<String> = MutableLiveData()
 
-    fun getProviderId(): String = providerId.value.orEmpty()
-
-    fun setProviderId(id: String) {
-        if (id != providerId.value) {
-            providerId.value = id
-            popularMangaList.reset()
-            latestMangaList.reset()
-            categoryMangaList.reset()
-        }
-    }
+    val providerId: MutableLiveData<String> = MutableLiveData(argProviderId)
 
     val detail: LiveData<Result<ProviderDetail>?> = providerId.switchMap {
         liveData {

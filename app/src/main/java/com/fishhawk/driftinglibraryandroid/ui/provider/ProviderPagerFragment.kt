@@ -5,21 +5,14 @@ import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderPagerFragmentBinding
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.preference.ProviderBrowseHistory
-import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.getDisplayModeIcon
 
 class ProviderPagerFragment : Fragment() {
-    private val viewModel: ProviderViewModel by activityViewModels {
-        val application = requireActivity().application as MainApplication
-        MainViewModelFactory(application)
-    }
     private lateinit var binding: ProviderPagerFragmentBinding
     private lateinit var providerBrowseHistory: ProviderBrowseHistory
 
@@ -38,8 +31,6 @@ class ProviderPagerFragment : Fragment() {
         val providerId = requireArguments().getString("providerId")!!
         val providerName = requireArguments().getString("providerName")!!
 
-        viewModel.setProviderId(providerId)
-
         setupMenu(binding.toolbar.menu)
         binding.toolbar.setOnMenuItemClickListener(this::onMenuItemSelected)
         binding.toolbar.title = providerName
@@ -47,7 +38,11 @@ class ProviderPagerFragment : Fragment() {
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
 
         binding.viewPager.offscreenPageLimit = 3
-        binding.viewPager.adapter = ProviderPagerAdapter(requireContext(), childFragmentManager)
+        binding.viewPager.adapter = ProviderPagerAdapter(
+            requireContext(),
+            childFragmentManager,
+            requireArguments()
+        )
         binding.viewPager.currentItem =
             providerBrowseHistory.getPageHistory(providerId).coerceIn(0, 2)
         binding.tabs.setupWithViewPager(binding.viewPager)
