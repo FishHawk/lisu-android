@@ -1,40 +1,39 @@
 package com.fishhawk.driftinglibraryandroid.ui.library
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModelWithFetchMore
+import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
+import com.fishhawk.driftinglibraryandroid.ui.base.Page
+import com.fishhawk.driftinglibraryandroid.ui.base.PagingList
 import kotlinx.coroutines.launch
 
 class LibraryViewModel(
     private val repository: RemoteLibraryRepository
-) : RefreshableListViewModelWithFetchMore<MangaOutline>() {
-    private var address = repository.url
-    var filter: String = ""
+) : FeedbackViewModel() {
 
-    override suspend fun loadResult() = repository.search(Long.MAX_VALUE, filter)
-    override suspend fun fetchMoreResult(): Result<List<MangaOutline>> {
-        val lastTime = when (val result = _list.value) {
-            is Result.Success -> result.data.lastOrNull()?.updateTime
-            else -> null
+    val keywords = MutableLiveData("")
+
+    val mangaList = object : PagingList<Long, MangaOutline>(viewModelScope) {
+        override suspend fun loadPage(key: Long?): Result<Page<Long, MangaOutline>> {
+            return repository.search(
+                lastTime = key ?: Long.MAX_VALUE,
+                keywords = keywords.value ?: "",
+                limit = 20
+            ).map { Page(data = it, nextPage = it.lastOrNull()?.updateTime) }
         }
-        return repository.search(lastTime ?: Long.MAX_VALUE, filter)
     }
 
-    fun reload(filter: String) {
-        this.filter = filter
-        load()
-    }
-
-    fun reloadIfNeed(filter: String) {
-        if (address != repository.url || _list.value !is Result.Success)
-            reload(filter)
-        address = repository.url
+    init {
+        mangaList.list.addSource(keywords) { mangaList.load() }
+        mangaList.list.addSource(GlobalPreference.selectedServer) { mangaList.load() }
     }
 
     fun deleteManga(id: String) = viewModelScope.launch {
         val result = repository.deleteManga(id)
-        resultWarp(result) { load() }
+        resultWarp(result) { mangaList.load() }
     }
 }

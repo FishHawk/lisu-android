@@ -16,11 +16,11 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
 
     suspend fun search(
         lastTime: Long,
-        filter: String,
+        keywords: String,
         limit: Int = 20
     ): Result<List<MangaOutline>> =
         resultWrap {
-            it.search(lastTime, filter, limit).apply {
+            it.search(lastTime, keywords, limit).apply {
                 for (outline in this) {
                     outline.thumb =
                         if (outline.thumb.isNullOrBlank()) null

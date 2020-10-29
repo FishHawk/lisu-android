@@ -13,11 +13,8 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.ui.base.MangaListAdapter
-import com.fishhawk.driftinglibraryandroid.ui.base.bindToListViewModel
-import com.fishhawk.driftinglibraryandroid.ui.base.getDisplayModeIcon
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
-import com.fishhawk.driftinglibraryandroid.ui.base.changeMangaListDisplayMode
+import com.fishhawk.driftinglibraryandroid.ui.base.*
 
 class LibraryFragment : Fragment() {
     private lateinit var binding: LibraryFragmentBinding
@@ -65,25 +62,22 @@ class LibraryFragment : Fragment() {
             binding.mangaList.list.changeMangaListDisplayMode(adapter)
         }
 
-        bindToListViewModel(
+        bindToPagingList(
             binding.mangaList.multipleStatusView,
             binding.mangaList.refreshLayout,
-            viewModel,
+            viewModel.mangaList,
             adapter
         )
-
-        val keywords = requireActivity().intent.extras?.getString("keywords")
-        viewModel.reloadIfNeed(keywords ?: "")
     }
 
     private fun setupMenu(menu: Menu) {
         with(menu.findItem(R.id.action_search).actionView as SearchView) {
             queryHint = getString(R.string.menu_search_hint)
             maxWidth = Int.MAX_VALUE
-            if (viewModel.filter != "") setQuery(viewModel.filter, false)
+            setQuery(viewModel.keywords.value, false)
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String): Boolean {
-                    viewModel.reload(query)
+                    viewModel.keywords.value = query
                     return true
                 }
 

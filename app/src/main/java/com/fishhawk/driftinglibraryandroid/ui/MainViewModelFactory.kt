@@ -1,5 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui
 
+import android.os.Bundle
+import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.MainApplication
@@ -16,7 +18,8 @@ import com.fishhawk.driftinglibraryandroid.ui.subscription.SubscriptionViewModel
 
 @Suppress("UNCHECKED_CAST")
 class MainViewModelFactory constructor(
-    private val application: MainApplication
+    private val application: MainApplication,
+    private val bundle: Bundle = bundleOf()
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
         when {

@@ -2,6 +2,7 @@ package com.fishhawk.driftinglibraryandroid.ui.base
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.classic.common.MultipleStatusView
 import com.fishhawk.driftinglibraryandroid.R
@@ -19,8 +20,7 @@ data class Page<KEY, ITEM>(
 
 // TODO : fix consistency
 abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
-    private val _list: MutableLiveData<Result<MutableList<ITEM>>?> = MutableLiveData()
-    val list: LiveData<Result<MutableList<ITEM>>?> = _list
+    val list: MediatorLiveData<Result<MutableList<ITEM>>?> = MediatorLiveData()
 
     private val _refreshFinish: MutableLiveData<Event<Feedback>> = MutableLiveData()
     val refreshFinish: LiveData<Event<Feedback>> = _refreshFinish
@@ -33,30 +33,27 @@ abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
 
     protected abstract suspend fun loadPage(key: KEY?): Result<Page<KEY, ITEM>>
 
-    private fun appendPage(page: Page<KEY, ITEM>) {
+    private fun onNewPage(page: Page<KEY, ITEM>) {
         nextPage = page.nextPage
-
         if (page.data.isEmpty()) canFetchMore = false
-
-        val items = (_list.value as? Result.Success)?.data ?: mutableListOf()
-        items.addAll(page.data)
-        Result.Success(items)
     }
 
     fun load() {
         nextPage = null
-        _list.value = null
+        list.value = null
         scope.launch {
-            loadPage(null)
-                .onSuccess { appendPage(it) }
-                .onFailure { _list.value = Result.Error(it) }
+            list.value = loadPage(null)
+                .onSuccess { onNewPage(it) }
+                .map { it.data.toMutableList() }
         }
     }
 
     fun refresh() {
         scope.launch {
             loadPage(null).onSuccess {
-                appendPage(it)
+                onNewPage(it)
+
+                list.value = Result.Success(it.data.toMutableList())
 
                 _refreshFinish.value = Event(
                     if (it.data.isEmpty()) Feedback.Hint(R.string.error_hint_empty_refresh_result)
@@ -75,7 +72,11 @@ abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
             )
         else scope.launch {
             loadPage(nextPage).onSuccess {
-                appendPage(it)
+                onNewPage(it)
+
+                val items = (list.value as? Result.Success)?.data ?: mutableListOf()
+                items.addAll(it.data)
+                list.value = Result.Success(items)
 
                 _fetchMoreFinish.value = Event(
                     if (it.data.isEmpty()) Feedback.Hint(R.string.error_hint_empty_fetch_more_result)
