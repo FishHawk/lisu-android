@@ -10,7 +10,7 @@ import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 data class SearchGroup(
     val provider: ProviderInfo,
-    var result: Result<List<MangaOutline>>
+    var result: Result<List<MangaOutline>>?
 )
 
 class GlobalSearchGroupListAdapter(
@@ -46,7 +46,7 @@ class GlobalSearchGroupListAdapter(
                     else binding.multipleStatusView.showContent()
                 }
                 is Result.Error -> binding.multipleStatusView.showError(result.exception.message)
-                is Result.Loading -> binding.multipleStatusView.showLoading()
+                null -> binding.multipleStatusView.showLoading()
             }
         }
     }

@@ -66,8 +66,8 @@ abstract class RefreshableListViewModel<T> : ListViewModel<T>() {
 }
 
 abstract class ListViewModel<T> : FeedbackViewModel() {
-    protected val _list: MutableLiveData<Result<MutableList<T>>> = MutableLiveData()
-    val list: LiveData<Result<MutableList<T>>> = _list
+    protected val _list: MutableLiveData<Result<MutableList<T>>?> = MutableLiveData()
+    val list: LiveData<Result<MutableList<T>>?> = _list
 
     abstract suspend fun loadResult(): Result<List<T>>
 
@@ -75,7 +75,7 @@ abstract class ListViewModel<T> : FeedbackViewModel() {
     open fun onLoadError(throwable: Throwable) {}
 
     fun load() {
-        _list.value = Result.Loading
+        _list.value = null
         viewModelScope.launch(Dispatchers.Main) {
             when (val result = loadResult()) {
                 is Result.Success -> {

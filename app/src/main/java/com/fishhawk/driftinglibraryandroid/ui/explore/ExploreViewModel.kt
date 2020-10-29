@@ -12,10 +12,10 @@ import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 class ExploreViewModel(
     private val remoteProviderRepository: RemoteProviderRepository
 ) : ViewModel() {
-    val providerList: LiveData<Result<List<ProviderInfo>>> =
+    val providerList: LiveData<Result<List<ProviderInfo>>?> =
         GlobalPreference.selectedServer.switchMap {
             liveData {
-                emit(Result.Loading)
+                emit(null)
                 emit(remoteProviderRepository.getProvidersInfo())
             }
         }

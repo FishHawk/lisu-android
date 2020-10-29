@@ -78,9 +78,9 @@ class ProviderViewModel(
         }
     }
 
-    val detail: LiveData<Result<ProviderDetail>> = providerId.switchMap {
+    val detail: LiveData<Result<ProviderDetail>?> = providerId.switchMap {
         liveData {
-            emit(Result.Loading)
+            emit(null)
             emit(remoteProviderRepository.getProvidersDetail(it))
         }
     }

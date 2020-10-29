@@ -68,7 +68,7 @@ class ReaderFragment : Fragment() {
             }
         })
 
-        viewModel.readerContent.observe(viewLifecycleOwner, Observer { result ->
+        viewModel.readerContent.observe(viewLifecycleOwner) { result ->
             binding.title.text = viewModel.mangaTitle
             when (result) {
                 is Result.Success -> {
@@ -77,7 +77,7 @@ class ReaderFragment : Fragment() {
                     viewModel.chapterPosition.value?.let { binding.reader.setPage(it) }
                 }
             }
-        })
+        }
 
         (requireActivity() as ReaderActivity).listener = object : ReaderActivity.OnVolumeKeyEvent {
             override fun onVolumeUp() = binding.reader.gotoPrevPage()

@@ -32,7 +32,7 @@ class ReaderViewModel(
 
     // reader content
     private val mangaDetail: MutableLiveData<Result<MangaDetail>> = MutableLiveData()
-    val readerContent: MutableLiveData<Result<List<String>>> = MutableLiveData(Result.Loading)
+    val readerContent: MutableLiveData<Result<List<String>>?> = MutableLiveData(null)
 
     val mangaTitle: String?
         get() = (mangaDetail.value as? Result.Success)?.data?.title

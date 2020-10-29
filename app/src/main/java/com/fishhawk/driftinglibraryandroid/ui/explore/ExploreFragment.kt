@@ -65,7 +65,7 @@ class ExploreFragment : Fragment() {
             adapter.lastUsedProviderId = it
         })
 
-        viewModel.providerList.observe(viewLifecycleOwner, Observer { result ->
+        viewModel.providerList.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Success -> {
                     adapter.infoList = result.data
@@ -73,9 +73,9 @@ class ExploreFragment : Fragment() {
                     else binding.multipleStatusView.showContent()
                 }
                 is Result.Error -> binding.multipleStatusView.showError(result.exception.message)
-                is Result.Loading -> binding.multipleStatusView.showLoading()
+                null -> binding.multipleStatusView.showLoading()
             }
-        })
+        }
     }
 
     private fun setupMenu(menu: Menu) {

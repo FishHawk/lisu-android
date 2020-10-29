@@ -26,8 +26,8 @@ class GalleryViewModel(
     private val remoteSubscriptionRepository: RemoteSubscriptionRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : FeedbackViewModel() {
-    private val _detail: MutableLiveData<Result<MangaDetail>> = MutableLiveData(Result.Loading)
-    val detail: LiveData<Result<MangaDetail>> = _detail
+    private val _detail: MutableLiveData<Result<MangaDetail>?> = MutableLiveData(null)
+    val detail: LiveData<Result<MangaDetail>?> = _detail
 
     val history: LiveData<ReadingHistory> = detail.switchMap {
         if (it is Result.Success) readingHistoryRepository.observeReadingHistory(
@@ -38,12 +38,12 @@ class GalleryViewModel(
     }
 
     fun openMangaFromLibrary(id: String) = viewModelScope.launch {
-        _detail.value = Result.Loading
+        _detail.value = null
         _detail.value = remoteLibraryRepository.getManga(id)
     }
 
     fun openMangaFromProvider(providerId: String, id: String) = viewModelScope.launch {
-        _detail.value = Result.Loading
+        _detail.value = null
         _detail.value = remoteProviderRepository.getManga(providerId, id)
     }
 

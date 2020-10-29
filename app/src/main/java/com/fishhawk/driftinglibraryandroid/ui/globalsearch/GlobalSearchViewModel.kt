@@ -11,8 +11,8 @@ class GlobalSearchViewModel(
 ) : ViewModel() {
     val keywords: MutableLiveData<String> = MutableLiveData("")
 
-    private val providerList: LiveData<Result<List<ProviderInfo>>> = liveData {
-        emit(Result.Loading)
+    private val providerList: LiveData<Result<List<ProviderInfo>>?> = liveData {
+        emit(null)
         emit(remoteLibraryRepository.getProvidersInfo())
     }
 
@@ -29,7 +29,7 @@ class GlobalSearchViewModel(
             val providerList = (providerList.value as? Result.Success)?.data ?: return@launch
 
             searchGroupList.value = providerList.map { info ->
-                SearchGroup(info, Result.Loading)
+                SearchGroup(info, null)
             }
 
             searchGroupList.value = providerList.map { info ->

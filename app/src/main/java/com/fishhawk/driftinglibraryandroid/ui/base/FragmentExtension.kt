@@ -47,7 +47,7 @@ fun <T> Fragment.bindToListViewModel(
                 else multipleStatusView.showContent()
             }
             is Result.Error -> multipleStatusView.showError(result.exception.message)
-            is Result.Loading -> multipleStatusView.showLoading()
+            null -> multipleStatusView.showLoading()
         }
     })
 

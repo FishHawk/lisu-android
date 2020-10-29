@@ -172,7 +172,7 @@ class GalleryFragment : Fragment() {
                         binding.chapters.collections = detail.collections
                 }
                 is Result.Error -> binding.multipleStatusView.showError(result.exception.message)
-                is Result.Loading -> binding.multipleStatusView.showLoading()
+                null -> binding.multipleStatusView.showLoading()
             }
         }
 

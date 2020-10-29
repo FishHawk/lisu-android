@@ -23,9 +23,7 @@ abstract class RefreshableListComponentWithFetchMore<T>(
 
     fun fetchMore() {
         scope.launch {
-            println("??")
             val result = fetchMoreInternal()
-            println(result)
 
             result.onSuccess {
                 (_list.value as? Result.Success)?.data?.addAll(it)
@@ -71,19 +69,19 @@ abstract class RefreshableListComponent<T>(
 abstract class ListComponent<T>(
     protected val scope: CoroutineScope
 ) {
-    protected val _list: MutableLiveData<Result<MutableList<T>>> = MutableLiveData()
-    val list: LiveData<Result<MutableList<T>>> = _list
+    protected val _list: MutableLiveData<Result<MutableList<T>>?> = MutableLiveData()
+    val list: LiveData<Result<MutableList<T>>?> = _list
 
     protected abstract suspend fun loadInternal(): Result<List<T>>
     fun load() {
         scope.launch {
-            _list.value = Result.Loading
+            _list.value = null
             _list.value = loadInternal().map { it.toMutableList() }
         }
     }
 
     open fun reset() {
-        _list.value = Result.Loading
+        _list.value = null
     }
 }
 
@@ -102,7 +100,7 @@ fun <T> Fragment.bindToListComponent(
                 else multipleStatusView.showContent()
             }
             is Result.Error -> multipleStatusView.showError(result.exception.message)
-            is Result.Loading -> multipleStatusView.showLoading()
+            null -> multipleStatusView.showLoading()
         }
     }
 
