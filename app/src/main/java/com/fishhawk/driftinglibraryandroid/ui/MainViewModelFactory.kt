@@ -24,7 +24,10 @@ class MainViewModelFactory constructor(
     override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
         when {
             isAssignableFrom(LibraryViewModel::class.java) ->
-                LibraryViewModel(application.remoteLibraryRepository)
+                LibraryViewModel(
+                    application.remoteLibraryRepository,
+                    bundle.getString("keywords")
+                )
 
             isAssignableFrom(HistoryViewModel::class.java) ->
                 HistoryViewModel(application.readingHistoryRepository)

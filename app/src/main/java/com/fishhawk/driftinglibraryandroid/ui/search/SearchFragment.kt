@@ -17,11 +17,10 @@ import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActionSheet
 
 class SearchFragment : Fragment() {
-    val viewModel: SearchViewModel by viewModels {
-        val application = requireActivity().application as MainApplication
-        MainViewModelFactory(application, requireArguments())
-    }
     private lateinit var binding: ProviderSearchFragmentBinding
+    private val viewModel: SearchViewModel by viewModels {
+        MainViewModelFactory(requireActivity().application as MainApplication, requireArguments())
+    }
 
     private lateinit var providerId: String
 

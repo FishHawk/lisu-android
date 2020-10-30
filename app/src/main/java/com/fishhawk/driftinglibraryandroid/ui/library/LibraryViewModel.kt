@@ -12,10 +12,11 @@ import com.fishhawk.driftinglibraryandroid.ui.base.PagingList
 import kotlinx.coroutines.launch
 
 class LibraryViewModel(
-    private val repository: RemoteLibraryRepository
+    private val repository: RemoteLibraryRepository,
+    argKeywords: String?
 ) : FeedbackViewModel() {
 
-    val keywords = MutableLiveData("")
+    val keywords = MutableLiveData(argKeywords ?: "")
 
     val mangaList = object : PagingList<Long, MangaOutline>(viewModelScope) {
         override suspend fun loadPage(key: Long?): Result<Page<Long, MangaOutline>> {

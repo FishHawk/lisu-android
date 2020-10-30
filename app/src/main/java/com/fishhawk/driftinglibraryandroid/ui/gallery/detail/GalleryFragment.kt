@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
@@ -25,19 +26,27 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class GalleryFragment : Fragment() {
-    internal val viewModel: GalleryViewModel by navGraphViewModels(R.id.nav_graph_gallery) {
-        val application = requireActivity().application as MainApplication
-        MainViewModelFactory(application, requireArguments())
+    private lateinit var binding: GalleryFragmentBinding
+    private val viewModel: GalleryViewModel by navGraphViewModels(R.id.nav_graph_gallery_internal) {
+        MainViewModelFactory(requireActivity().application as MainApplication, requireArguments())
     }
-    internal lateinit var binding: GalleryFragmentBinding
 
     private var providerId: String? = null
     private val tagAdapter = TagGroupListAdapter(object : TagGroupListAdapter.Listener {
         override fun onTagClick(key: String, value: String) {
             val keywords = if (key.isBlank()) value else "${key}:$value"
-//            providerId?.let {
-//                navToMainActivity(keywords)
-//            } ?: navToMainActivity(keywords)
+            providerId?.let {
+                findNavController().navigate(
+                    R.id.action_to_provider_search,
+                    bundleOf(
+                        "keywords" to keywords,
+                        "providerId" to it
+                    )
+                )
+            } ?: findNavController().navigate(
+                R.id.action_to_library,
+                bundleOf("keywords" to keywords)
+            )
         }
 
         override fun onTagLongClick(key: String, value: String) {

@@ -19,7 +19,10 @@ import com.fishhawk.driftinglibraryandroid.ui.base.*
 class LibraryFragment : Fragment() {
     private lateinit var binding: LibraryFragmentBinding
     private val viewModel: LibraryViewModel by viewModels {
-        MainViewModelFactory(requireActivity().application as MainApplication)
+        MainViewModelFactory(
+            requireActivity().application as MainApplication,
+            arguments ?: bundleOf()
+        )
     }
 
     val adapter = MangaListAdapter(object : MangaListAdapter.Listener {

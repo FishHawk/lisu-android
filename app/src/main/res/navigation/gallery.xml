@@ -3,20 +3,55 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_gallery"
-    app:startDestination="@id/nav_gallery_detail">
+    app:startDestination="@id/nav_graph_gallery_internal">
+
+    <navigation
+        android:id="@+id/nav_graph_gallery_internal"
+        app:startDestination="@id/nav_gallery_detail">
+
+        <fragment
+            android:id="@+id/nav_gallery_detail"
+            android:name="com.fishhawk.driftinglibraryandroid.ui.gallery.detail.GalleryFragment"
+            tools:layout="@layout/gallery_fragment">
+
+            <action
+                android:id="@+id/action_to_gallery_edit"
+                app:destination="@id/nav_gallery_edit" />
+
+            <action
+                android:id="@+id/action_to_library"
+                app:destination="@id/nav_library" />
+
+            <action
+                android:id="@+id/action_to_provider_search"
+                app:destination="@id/nav_search" />
+        </fragment>
+
+        <fragment
+            android:id="@+id/nav_gallery_edit"
+            android:name="com.fishhawk.driftinglibraryandroid.ui.gallery.edit.GalleryEditFragment"
+            tools:layout="@layout/gallery_edit_fragment" />
+    </navigation>
 
     <fragment
-        android:id="@+id/nav_gallery_detail"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.gallery.detail.GalleryFragment"
-        tools:layout="@layout/gallery_fragment">
+        android:id="@+id/nav_library"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.library.LibraryFragment"
+        tools:layout="@layout/library_fragment">
 
         <action
-            android:id="@+id/action_to_gallery_edit"
-            app:destination="@id/nav_gallery_edit" />
+            android:id="@+id/action_to_gallery"
+            app:destination="@id/nav_graph_gallery_internal" />
     </fragment>
 
+
     <fragment
-        android:id="@+id/nav_gallery_edit"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.gallery.edit.GalleryEditFragment"
-        tools:layout="@layout/gallery_edit_fragment" />
+        android:id="@+id/nav_search"
+        android:name="com.fishhawk.driftinglibraryandroid.ui.search.SearchFragment"
+        android:label="@string/label_search"
+        tools:layout="@layout/provider_base_fragment">
+
+        <action
+            android:id="@+id/action_to_gallery_detail"
+            app:destination="@id/nav_graph_gallery_internal" />
+    </fragment>
 </navigation>

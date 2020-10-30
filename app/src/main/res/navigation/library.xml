@@ -12,8 +12,7 @@
 
         <action
             android:id="@+id/action_to_gallery"
-            app:destination="@id/nav_graph_gallery"
-            app:enterAnim="@android:anim/fade_in" />
+            app:destination="@id/nav_graph_gallery" />
     </fragment>
 
     <include app:graph="@navigation/gallery" />

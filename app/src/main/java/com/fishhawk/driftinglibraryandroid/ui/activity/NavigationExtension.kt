@@ -55,11 +55,9 @@ fun BottomNavigationView.setupWithNavController(
 
 
         // Hide bottom navigation when destination is not start destination
-        navHostFragment.navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == navHostFragment.navController.graph.startDestination)
-                this.visibility = View.VISIBLE
-            else
-                this.visibility = View.GONE
+        navHostFragment.navController.addOnDestinationChangedListener { controller, _, _ ->
+            val isTopDestination = controller.previousBackStackEntry == null
+            this.visibility = if (isTopDestination) View.VISIBLE else View.GONE
         }
 
         // Attach or detach nav host fragment depending on whether it's the selected item.
