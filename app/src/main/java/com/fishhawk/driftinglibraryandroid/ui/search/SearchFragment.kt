@@ -95,6 +95,7 @@ class SearchFragment : Fragment() {
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String): Boolean {
                     viewModel.keywords.value = query
+                    closeInputMethod()
                     return true
                 }
 

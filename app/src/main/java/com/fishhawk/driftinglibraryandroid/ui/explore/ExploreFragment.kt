@@ -16,6 +16,7 @@ import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
+import com.fishhawk.driftinglibraryandroid.ui.base.closeInputMethod
 
 class ExploreFragment : Fragment() {
     private lateinit var binding: ExploreFragmentBinding
@@ -80,7 +81,6 @@ class ExploreFragment : Fragment() {
 
     private fun setupMenu(menu: Menu) {
         with(menu.findItem(R.id.action_search).actionView as SearchView) {
-
             queryHint = getString(R.string.menu_search_global_hint)
             maxWidth = Int.MAX_VALUE
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {

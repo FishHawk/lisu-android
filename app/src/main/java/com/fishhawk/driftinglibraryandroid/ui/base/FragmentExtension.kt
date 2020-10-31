@@ -2,11 +2,13 @@ package com.fishhawk.driftinglibraryandroid.ui.base
 
 import android.content.*
 import android.content.Context.CLIPBOARD_SERVICE
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
@@ -19,9 +21,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.classic.common.MultipleStatusView
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.activity.MainActivity
 import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
@@ -238,9 +240,20 @@ fun Fragment.shareImage(url: String, filename: String) {
     }
 }
 
+val Fragment.clipboardManager
+    get() = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+
+val Fragment.inputMethodManager
+    get() = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+
 fun Fragment.copyToClipboard(text: String) {
     val clipboard = requireActivity().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
     val clip = ClipData.newPlainText("simple text", text)
-    clipboard.setPrimaryClip(clip)
+    clipboardManager.setPrimaryClip(clip)
+}
+
+fun Fragment.closeInputMethod() {
+    inputMethodManager.hideSoftInputFromWindow(requireView().windowToken, 0)
 }
 

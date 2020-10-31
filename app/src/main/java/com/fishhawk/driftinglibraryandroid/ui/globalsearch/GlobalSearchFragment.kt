@@ -13,6 +13,7 @@ import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchFragmentBindi
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
+import com.fishhawk.driftinglibraryandroid.ui.base.closeInputMethod
 
 class GlobalSearchFragment : Fragment() {
     private lateinit var binding: GlobalSearchFragmentBinding
@@ -65,6 +66,7 @@ class GlobalSearchFragment : Fragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 viewModel.keywords.value = query
+                closeInputMethod()
                 return true
             }
 
