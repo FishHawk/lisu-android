@@ -2,6 +2,7 @@ package com.fishhawk.driftinglibraryandroid.ui.library
 
 import android.os.Bundle
 import android.view.*
+import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
@@ -87,6 +88,12 @@ class LibraryFragment : Fragment() {
 
                 override fun onQueryTextChange(query: String?): Boolean = false
             })
+            val closeButton: ImageView = findViewById(R.id.search_close_btn)
+            closeButton.setOnClickListener {
+                setQuery(null, false)
+                isIconified = true
+                viewModel.keywords.value = ""
+            }
         }
         with(menu.findItem(R.id.action_display_mode)) {
             setIcon(getDisplayModeIcon())

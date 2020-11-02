@@ -11,6 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- workaround. see https://stackoverflow.com/questions/21624282 -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:focusableInTouchMode="true" />
+
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
