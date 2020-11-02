@@ -85,7 +85,8 @@ class ExploreFragment : Fragment() {
             maxWidth = Int.MAX_VALUE
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String): Boolean {
-                    setQuery("", false)
+                    isIconified = true
+                    isIconified = true
                     binding.root.findNavController().navigate(
                         R.id.action_explore_to_global_search,
                         bundleOf("keywords" to query)
@@ -95,6 +96,12 @@ class ExploreFragment : Fragment() {
 
                 override fun onQueryTextChange(query: String): Boolean = true
             })
+            setOnQueryTextFocusChangeListener { _, b ->
+                if (!b && query.isNullOrBlank()) {
+                    isIconified = true
+                    isIconified = true
+                }
+            }
         }
     }
 }

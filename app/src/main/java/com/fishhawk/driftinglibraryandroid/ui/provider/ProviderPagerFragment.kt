@@ -61,7 +61,8 @@ class ProviderPagerFragment : Fragment() {
             maxWidth = Int.MAX_VALUE
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String): Boolean {
-                    setQuery("", false)
+                    isIconified = true
+                    isIconified = true
                     findNavController().navigate(
                         R.id.action_to_search,
                         bundleOf(
@@ -74,6 +75,12 @@ class ProviderPagerFragment : Fragment() {
 
                 override fun onQueryTextChange(query: String): Boolean = true
             })
+            setOnQueryTextFocusChangeListener { _, b ->
+                if (!b && query.isNullOrBlank()) {
+                    isIconified = true
+                    isIconified = true
+                }
+            }
         }
 
         menu.findItem(R.id.action_display_mode).setIcon(getDisplayModeIcon())
