@@ -1,11 +1,16 @@
 # DriftingLibraryAndroid
 
-这是漂流图书馆的安卓客户端，用来远程连接服务端。服务端的搭建参考[DriftingLibraryServer](https://github.com/FishHawk/DriftingLibraryServer)。
+DriftingLibrary是一个免费的漫画库管理系统，该存储库是DriftingLibrary的Android客户端。
 
-启动后，在`Setting`里设置library address为服务端ip地址，如`192.168.0.101：8080`。
+- Server：https://github.com/FishHawk/DriftingLibraryServer
+- Android：https://github.com/FishHawk/DriftingLibraryAndroid
 
-## 截图
 
-| LibraryPageLight                                             | LibraryPageDark                                              | GalleryPage                                                  | ReaderPage                                                   |
-| ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| ![Screenshot_20200512-125543](https://raw.githubusercontent.com/wiki/FishHawk/DriftingLibraryAndroid/Home.assets/Screenshot_20200512-125543.jpg) | ![Screenshot_20200512-125634](https://raw.githubusercontent.com/wiki/FishHawk/DriftingLibraryAndroid/Home.assets/Screenshot_20200512-125634.jpg) | ![Screenshot_20200512-125555](https://raw.githubusercontent.com/wiki/FishHawk/DriftingLibraryAndroid/Home.assets/Screenshot_20200512-125555.jpg) | ![Screenshot_20200512-125620](https://raw.githubusercontent.com/wiki/FishHawk/DriftingLibraryAndroid/Home.assets/Screenshot_20200512-125620.jpg) |
+
+![Screenshot_20201110-105619_c](.github/readme_image/Screenshot_20201110-105619.png)
+
+## 特点
+
+- 利用[ComicImageView](https://github.com/FishHawk/ComicImageView)减轻了漫画网点缩放后产生的摩尔纹。
+- 支持在多个服务器之间切换。
+- 支持深色主题。
