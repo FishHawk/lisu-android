@@ -135,6 +135,9 @@ class ReaderFragment : Fragment() {
                 binding.reader.setPage(seek.progress)
             }
         })
+
+        binding.buttonPrevChapter.setOnClickListener { openPrevChapter() }
+        binding.buttonNextChapter.setOnClickListener { openNextChapter() }
     }
 
     private fun openPrevChapter() {

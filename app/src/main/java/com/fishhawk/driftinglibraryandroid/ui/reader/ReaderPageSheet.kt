@@ -33,7 +33,6 @@ class ReaderPageSheet(
             listener.onShare()
             dismiss()
         }
-
     }
 
     interface Listener {
