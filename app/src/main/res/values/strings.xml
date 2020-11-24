@@ -86,6 +86,13 @@
     <string name="settings_screen_orientation_portrait">Portrait</string>
     <string name="settings_screen_orientation_landscape">Landscape</string>
 
+    <string name="settings_filter_mode_default">Default</string>
+    <string name="settings_filter_mode_multiply">Multiply</string>
+    <string name="settings_filter_mode_screen">Screen</string>
+    <string name="settings_filter_mode_overlay">Overlay</string>
+    <string name="settings_filter_mode_lighten">Lighten</string>
+    <string name="settings_filter_mode_darken">Darken</string>
+
 
     <!-- about fragment -->
     <string name="about_version">Version</string>

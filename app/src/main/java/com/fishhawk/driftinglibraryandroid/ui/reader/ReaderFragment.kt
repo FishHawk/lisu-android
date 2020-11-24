@@ -122,11 +122,8 @@ class ReaderFragment : Fragment() {
     private fun setupMenuLayout() {
         binding.menuLayout.setOnClickListener { viewModel.isMenuVisible.value = false }
 
-        binding.settingButton.setOnClickListener {
-            ReaderSettingsSheet(
-                requireContext()
-            ).show()
-        }
+        binding.settingButton.setOnClickListener { ReaderSettingsSheet(requireContext()).show() }
+        binding.overlayButton.setOnClickListener { ReaderOverlaySheet(requireContext()).show() }
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}

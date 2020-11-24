@@ -97,6 +97,21 @@ object GlobalPreference {
         preferenceBooleanLiveData("long_tap_dialog", true)
     }
 
+    val colorFilterEnabled by lazy {
+        preferenceBooleanLiveData("color_filter_enabled", false)
+    }
+
+    val colorFilterValue by lazy {
+        preferenceIntLiveData("color_filter_value", 0)
+    }
+
+    enum class ColorFilterMode { DEFAULT, MULTIPLY, SCREEN, OVERLAY, LIGHTEN, DARKEN }
+
+    val colorFilterMode by lazy {
+        preferenceEnumLiveData("color_filter_mode", ColorFilterMode.DEFAULT)
+    }
+
+
     // Settings advanced
     val secureMode by lazy {
         preferenceBooleanLiveData("secure_mode", false)

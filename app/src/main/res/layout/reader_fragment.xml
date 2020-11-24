@@ -36,6 +36,12 @@
             android:textColor="#ffffff"
             android:visibility="@{!viewModel.isMenuVisible ? View.VISIBLE : View.GONE}" />
 
+        <com.fishhawk.driftinglibraryandroid.ui.reader.ReaderColorFilterView
+            android:id="@+id/color_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
         <FrameLayout
             android:id="@+id/menu_layout"
             android:layout_width="match_parent"
@@ -74,6 +80,15 @@
                     android:textColor="@android:color/white"
                     android:textIsSelectable="false"
                     tools:text="Title" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/overlay_button"
+                    style="@style/Theme.Widget.Button.Icon.Textless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    app:icon="@drawable/ic_baseline_brightness_medium_24"
+                    app:iconTint="@color/white" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/setting_button"

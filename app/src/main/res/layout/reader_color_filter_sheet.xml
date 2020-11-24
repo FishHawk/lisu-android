@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/verticalcenter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/color_filter_switch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Custom color filter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/hue_symbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/color_filter_switch"
+        app:srcCompat="@drawable/ic_baseline_color_lens_24"
+        app:tint="?attr/colorOnBackground" />
+
+    <SeekBar
+        android:id="@+id/hue_seek_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:max="359"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/hue_symbol"
+        app:layout_constraintTop_toBottomOf="@id/color_filter_switch" />
+
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/opacity_symbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hue_symbol"
+        app:srcCompat="@drawable/ic_baseline_opacity_24"
+        app:tint="?attr/colorOnBackground" />
+
+    <SeekBar
+        android:id="@+id/opacity_seek_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:max="100"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/opacity_symbol"
+        app:layout_constraintTop_toBottomOf="@id/hue_symbol" />
+
+    <!-- Filter mode -->
+
+    <TextView
+        android:id="@+id/color_filter_mode_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Custom filter mode"
+        app:layout_constraintBaseline_toBaselineOf="@id/color_filter_mode"
+        app:layout_constraintEnd_toStartOf="@id/color_filter_mode"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatSpinner
+        android:id="@+id/color_filter_mode"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:entries="@array/color_filter_mode_entries"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/verticalcenter"
+        app:layout_constraintTop_toBottomOf="@id/opacity_seek_bar" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/custom_brightness"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Custom brightness"
+        app:layout_constraintTop_toBottomOf="@id/color_filter_mode_text" />
+
+    <SeekBar
+        android:id="@+id/brightness_seekbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/brightness_symbol"
+        app:layout_constraintTop_toBottomOf="@id/custom_brightness" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/brightness_symbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/brightness_seekbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/brightness_seekbar"
+        app:srcCompat="@drawable/ic_baseline_brightness_high_24"
+        app:tint="?attr/colorOnBackground" />
+</androidx.constraintlayout.widget.ConstraintLayout>

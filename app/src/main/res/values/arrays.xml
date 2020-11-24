@@ -75,4 +75,21 @@
         <item>PORTRAIT</item>
         <item>LANDSCAPE</item>
     </string-array>
+
+    <string-array name="color_filter_mode_entries">
+        <item>@string/settings_filter_mode_default</item>
+        <item>@string/settings_filter_mode_multiply</item>
+        <item>@string/settings_filter_mode_screen</item>
+        <item>@string/settings_filter_mode_overlay</item>
+        <item>@string/settings_filter_mode_lighten</item>
+        <item>@string/settings_filter_mode_darken</item>
+    </string-array>
+    <string-array name="color_filter_mode_entry_values" translatable="false">
+        <item>DEFAULT</item>
+        <item>MULTIPLY</item>
+        <item>SCREEN</item>
+        <item>OVERLAY</item>
+        <item>LIGHTEN</item>
+        <item>DARKEN</item>
+    </string-array>
 </resources>
