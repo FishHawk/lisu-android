@@ -8,12 +8,13 @@ import com.fishhawk.driftinglibraryandroid.databinding.ReaderSettingsSheetBindin
 import com.fishhawk.driftinglibraryandroid.preference.PreferenceBooleanLiveData
 import com.fishhawk.driftinglibraryandroid.preference.PreferenceEnumLiveData
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.widget.IgnoreFirstSpinnerListener
+import com.fishhawk.driftinglibraryandroid.widget.PreferenceBottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.switchmaterial.SwitchMaterial
 
-class ReaderSettingsSheet(
-    context: Context
-) : BottomSheetDialog(context) {
+class ReaderSettingsSheet(context: Context) : PreferenceBottomSheetDialog(context) {
+
     private val binding =
         ReaderSettingsSheetBinding.inflate(
             LayoutInflater.from(context), null, false
@@ -35,26 +36,5 @@ class ReaderSettingsSheet(
         bindingBoolPreference(binding.keepScreenOn, GlobalPreference.keepScreenOn)
         bindingBoolPreference(binding.useVolumeKey, GlobalPreference.useVolumeKey)
         bindingBoolPreference(binding.longTapDialog, GlobalPreference.longTapDialog)
-    }
-
-    private fun <T : Enum<T>> bindingEnumPreference(
-        spinner: AppCompatSpinner,
-        preference: PreferenceEnumLiveData<T>
-    ) {
-        spinner.onItemSelectedListener =
-            IgnoreFirstSpinnerListener {
-                preference.setValue(it)
-            }
-        spinner.setSelection(preference.getOrdinal(), false)
-    }
-
-    private fun bindingBoolPreference(
-        switch: SwitchMaterial,
-        preference: PreferenceBooleanLiveData
-    ) {
-        switch.isChecked = preference.getValueDirectly()
-        switch.setOnCheckedChangeListener { _, isChecked ->
-            preference.setValue(isChecked)
-        }
     }
 }
