@@ -71,8 +71,6 @@
         app:layout_constraintStart_toEndOf="@id/opacity_symbol"
         app:layout_constraintTop_toBottomOf="@id/hue_symbol" />
 
-    <!-- Filter mode -->
-
     <TextView
         android:id="@+id/color_filter_mode_text"
         android:layout_width="0dp"

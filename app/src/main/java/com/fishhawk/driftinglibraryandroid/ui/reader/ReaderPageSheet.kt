@@ -10,6 +10,7 @@ class ReaderPageSheet(
     page: Int,
     private val listener: Listener
 ) : BottomSheetDialog(context) {
+
     private val binding = ReaderPageSheetBinding.inflate(
         LayoutInflater.from(context), null, false
     )

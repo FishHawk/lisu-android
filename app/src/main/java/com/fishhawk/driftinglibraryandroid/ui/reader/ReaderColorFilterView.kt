@@ -9,7 +9,6 @@ import android.view.View
 import androidx.core.graphics.toXfermode
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 
-
 class ReaderColorFilterView(
     context: Context,
     attrs: AttributeSet? = null

@@ -8,7 +8,6 @@ import com.fishhawk.driftinglibraryandroid.widget.PreferenceBottomSheetDialog
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-
 class ReaderOverlaySheet(fragment: ReaderFragment) :
     PreferenceBottomSheetDialog(fragment.requireContext()) {
 
@@ -17,8 +16,12 @@ class ReaderOverlaySheet(fragment: ReaderFragment) :
     )
 
     init {
-        bindPreference(GlobalPreference.colorFilterIsEnabled, binding.colorFilterSwitch)
-        GlobalPreference.colorFilterIsEnabled.asFlow()
+        bindPreference(GlobalPreference.colorFilter, binding.colorFilterSwitch)
+        bindPreference(GlobalPreference.colorFilterHue, binding.hueSeekBar)
+        bindPreference(GlobalPreference.colorFilterOpacity, binding.opacitySeekBar)
+        bindPreference(GlobalPreference.colorFilterMode, binding.colorFilterMode)
+
+        GlobalPreference.colorFilter.asFlow()
             .onEach {
                 binding.hueSeekBar.isEnabled = it
                 binding.opacitySeekBar.isEnabled = it
@@ -26,9 +29,14 @@ class ReaderOverlaySheet(fragment: ReaderFragment) :
             }
             .launchIn(fragment.viewLifecycleOwner.lifecycleScope)
 
-        bindPreference(GlobalPreference.colorFilterHue, binding.hueSeekBar)
-        bindPreference(GlobalPreference.colorFilterOpacity, binding.opacitySeekBar)
-        bindPreference(GlobalPreference.colorFilterMode, binding.colorFilterMode)
+
+        bindPreference(GlobalPreference.customBrightness, binding.customBrightness)
+        bindPreference(GlobalPreference.customBrightnessValue, binding.brightnessSeekbar)
+
+        GlobalPreference.customBrightness.asFlow()
+            .onEach { binding.brightnessSeekbar.isEnabled = it }
+            .launchIn(fragment.viewLifecycleOwner.lifecycleScope)
+
 
         setContentView(binding.root)
     }

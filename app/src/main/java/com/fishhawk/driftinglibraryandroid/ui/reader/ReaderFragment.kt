@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.SeekBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -24,7 +25,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
-
 
 class ReaderFragment : Fragment() {
     val viewModel: ReaderViewModel by viewModels {
@@ -155,7 +155,7 @@ class ReaderFragment : Fragment() {
         binding.buttonNextChapter.setOnClickListener { openNextChapter() }
 
         combine(
-            GlobalPreference.colorFilterIsEnabled.asFlow(),
+            GlobalPreference.colorFilter.asFlow(),
             GlobalPreference.colorFilterMode.asFlow(),
             GlobalPreference.colorFilterHue.asFlow(),
             GlobalPreference.colorFilterOpacity.asFlow()

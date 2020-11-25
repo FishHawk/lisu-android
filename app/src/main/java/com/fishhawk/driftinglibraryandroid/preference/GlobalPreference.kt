@@ -72,10 +72,13 @@ object GlobalPreference {
 
     enum class ColorFilterMode { DEFAULT, MULTIPLY, SCREEN, OVERLAY, LIGHTEN, DARKEN }
 
-    val colorFilterIsEnabled by get("color_filter_is_enabled", false)
+    val colorFilter by get("color_filter", false)
     val colorFilterHue by get("color_filter_hue", 0)
     val colorFilterOpacity by get("color_filter_opacity", 0)
     val colorFilterMode by get("color_filter_mode", ColorFilterMode.DEFAULT)
+
+    val customBrightness by get("custom_brightness", false)
+    val customBrightnessValue by get("custom_brightness_value", 10)
 
 
     // Settings advanced
