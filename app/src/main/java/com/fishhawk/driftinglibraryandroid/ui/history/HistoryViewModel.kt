@@ -10,7 +10,7 @@ class HistoryViewModel(
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModel() {
     private val readingHistoryList: LiveData<List<ReadingHistory>> =
-        GlobalPreference.selectedServer.switchMap {
+        GlobalPreference.selectedServer.asFlow().asLiveData().switchMap {
             readingHistoryRepository.observeAllReadingHistoryOfServer(it)
         }
 
@@ -18,10 +18,12 @@ class HistoryViewModel(
 
     init {
         filteredReadingHistoryList.addSource(readingHistoryList) { list ->
-            val filter = GlobalPreference.historyFilter.getValueDirectly()
+            val filter = GlobalPreference.historyFilter.get()
             filteredReadingHistoryList.value = filterList(list, filter)
         }
-        filteredReadingHistoryList.addSource(GlobalPreference.historyFilter) { filter ->
+        filteredReadingHistoryList.addSource(
+            GlobalPreference.historyFilter.asFlow().asLiveData()
+        ) { filter ->
             val list = readingHistoryList.value
             if (list != null) filteredReadingHistoryList.value = filterList(list, filter)
         }
@@ -29,7 +31,7 @@ class HistoryViewModel(
 
     fun clearReadingHistory() = viewModelScope.launch {
         readingHistoryRepository.clearReadingHistoryOfServer(
-            GlobalPreference.selectedServer.getValueDirectly()
+            GlobalPreference.selectedServer.get()
         )
     }
 

@@ -7,6 +7,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
@@ -17,6 +18,8 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.closeInputMethod
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class ExploreFragment : Fragment() {
     private lateinit var binding: ExploreFragmentBinding
@@ -33,7 +36,7 @@ class ExploreFragment : Fragment() {
                     "providerName" to providerInfo.name
                 )
             )
-            GlobalPreference.lastUsedProvider.setValue(providerInfo.id)
+            GlobalPreference.lastUsedProvider.set(providerInfo.id)
         }
 
         override fun onBrowseClick(providerInfo: ProviderInfo) {
@@ -44,7 +47,7 @@ class ExploreFragment : Fragment() {
                     "providerName" to providerInfo.name
                 )
             )
-            GlobalPreference.lastUsedProvider.setValue(providerInfo.id)
+            GlobalPreference.lastUsedProvider.set(providerInfo.id)
         }
     })
 
@@ -62,9 +65,9 @@ class ExploreFragment : Fragment() {
 
         binding.list.adapter = adapter
 
-        GlobalPreference.lastUsedProvider.observe(viewLifecycleOwner, Observer {
-            adapter.lastUsedProviderId = it
-        })
+        GlobalPreference.lastUsedProvider.asFlow()
+            .onEach { adapter.lastUsedProviderId = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.providerList.observe(viewLifecycleOwner) { result ->
             when (result) {

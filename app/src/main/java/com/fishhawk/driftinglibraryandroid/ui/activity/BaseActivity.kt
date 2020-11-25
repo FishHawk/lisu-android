@@ -7,8 +7,11 @@ import android.view.View
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.lang.reflect.Method
 
 open class BaseActivity : AppCompatActivity() {
@@ -30,11 +33,9 @@ open class BaseActivity : AppCompatActivity() {
     }
 
     private fun setupSecureModule() {
-        GlobalPreference.secureMode.observe(this) {
-            val flag = WindowManager.LayoutParams.FLAG_SECURE
-            if (it) window.addFlags(flag)
-            else window.clearFlags(flag)
-        }
+        GlobalPreference.secureMode.asFlow()
+            .onEach { setFlag(WindowManager.LayoutParams.FLAG_SECURE, it) }
+            .launchIn(lifecycleScope)
     }
 
     private fun getThemeResId(): Int {
@@ -60,9 +61,14 @@ open class BaseActivity : AppCompatActivity() {
         val lightThemeId = R.style.Theme_App_Light_TranslucentStatus
         val darkThemeId = R.style.Theme_App_Dark_TranslucentStatus
 
-        when (GlobalPreference.theme.getValueDirectly()) {
+        when (GlobalPreference.theme.get()) {
             GlobalPreference.Theme.LIGHT -> setTheme(lightThemeId)
             GlobalPreference.Theme.DARK -> setTheme(darkThemeId)
         }
+    }
+
+    protected fun setFlag(flag: Int, isEnabled: Boolean) {
+        if (isEnabled) window.addFlags(flag)
+        else window.clearFlags(flag)
     }
 }

@@ -5,7 +5,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 
 fun HistoryFragment.createHistoryFilterSwitchDialog() {
-    val checkedItem = when (GlobalPreference.historyFilter.getValueDirectly()) {
+    val checkedItem = when (GlobalPreference.historyFilter.get()) {
         GlobalPreference.HistoryFilter.ALL -> 0
         GlobalPreference.HistoryFilter.FROM_LIBRARY -> 1
         GlobalPreference.HistoryFilter.FROM_SOURCES -> 2
@@ -16,7 +16,7 @@ fun HistoryFragment.createHistoryFilterSwitchDialog() {
             R.array.settings_history_filter_entries,
             checkedItem
         ) { _, which ->
-            GlobalPreference.historyFilter.setValue(
+            GlobalPreference.historyFilter.set(
                 when (which) {
                     0 -> GlobalPreference.HistoryFilter.ALL
                     1 -> GlobalPreference.HistoryFilter.FROM_LIBRARY

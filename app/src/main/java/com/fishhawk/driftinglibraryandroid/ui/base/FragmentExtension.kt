@@ -99,7 +99,7 @@ fun <T> Fragment.bindToListViewModel(
 }
 
 fun RecyclerView.changeMangaListDisplayMode(adapter: MangaListAdapter) {
-    val displayMode = GlobalPreference.displayMode.getValueDirectly()
+    val displayMode = GlobalPreference.displayMode.get()
     if (displayMode == GlobalPreference.DisplayMode.GRID &&
         (adapter.viewMode != MangaListAdapter.ViewMode.GRID || layoutManager == null)
     ) {
@@ -116,14 +116,14 @@ fun RecyclerView.changeMangaListDisplayMode(adapter: MangaListAdapter) {
 }
 
 fun getDisplayModeIcon(): Int {
-    return when (GlobalPreference.displayMode.getValueDirectly()) {
+    return when (GlobalPreference.displayMode.get()) {
         GlobalPreference.DisplayMode.GRID -> R.drawable.ic_baseline_view_module_24
         GlobalPreference.DisplayMode.LINEAR -> R.drawable.ic_baseline_view_list_24
     }
 }
 
 fun getChapterDisplayModeIcon(): Int {
-    return when (GlobalPreference.chapterDisplayMode.getValueDirectly()) {
+    return when (GlobalPreference.chapterDisplayMode.get()) {
         GlobalPreference.ChapterDisplayMode.GRID -> R.drawable.ic_baseline_view_module_24
         GlobalPreference.ChapterDisplayMode.LINEAR -> R.drawable.ic_baseline_view_list_24
     }

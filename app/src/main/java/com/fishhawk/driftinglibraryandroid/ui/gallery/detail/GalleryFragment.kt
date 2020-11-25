@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.bumptech.glide.Glide
@@ -21,7 +22,11 @@ import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import com.fishhawk.driftinglibraryandroid.ui.base.bindToFeedbackViewModel
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
+import com.fishhawk.driftinglibraryandroid.util.next
+import com.fishhawk.driftinglibraryandroid.util.setNext
 import kotlinx.android.synthetic.main.gallery_fragment.view.*
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 
@@ -131,26 +136,30 @@ class GalleryFragment : Fragment() {
         binding.chapters.adapter = contentAdapter
 
         binding.displayModeButton.setOnClickListener {
-            GlobalPreference.chapterDisplayMode.setNextValue()
+            GlobalPreference.chapterDisplayMode.setNext()
         }
         binding.displayOrderButton.setOnClickListener {
-            GlobalPreference.chapterDisplayOrder.setNextValue()
+            GlobalPreference.chapterDisplayOrder.setNext()
         }
 
-        GlobalPreference.chapterDisplayMode.observe(viewLifecycleOwner) {
-            binding.displayModeButton.setIconResource(getChapterDisplayModeIcon())
-            binding.chapters.viewMode = when (it) {
-                GlobalPreference.ChapterDisplayMode.GRID -> ContentView.ViewMode.GRID
-                GlobalPreference.ChapterDisplayMode.LINEAR -> ContentView.ViewMode.LINEAR
+        GlobalPreference.chapterDisplayMode.asFlow()
+            .onEach {
+                binding.displayModeButton.setIconResource(getChapterDisplayModeIcon())
+                binding.chapters.viewMode = when (it) {
+                    GlobalPreference.ChapterDisplayMode.GRID -> ContentView.ViewMode.GRID
+                    GlobalPreference.ChapterDisplayMode.LINEAR -> ContentView.ViewMode.LINEAR
+                }
             }
-        }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        GlobalPreference.chapterDisplayOrder.observe(viewLifecycleOwner) {
-            binding.chapters.viewOrder = when (it) {
-                GlobalPreference.ChapterDisplayOrder.ASCEND -> ContentView.ViewOrder.ASCEND
-                GlobalPreference.ChapterDisplayOrder.DESCEND -> ContentView.ViewOrder.DESCEND
+        GlobalPreference.chapterDisplayOrder.asFlow()
+            .onEach {
+                binding.chapters.viewOrder = when (it) {
+                    GlobalPreference.ChapterDisplayOrder.ASCEND -> ContentView.ViewOrder.ASCEND
+                    GlobalPreference.ChapterDisplayOrder.DESCEND -> ContentView.ViewOrder.DESCEND
+                }
             }
-        }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.detail.observe(viewLifecycleOwner) { result ->
             when (result) {

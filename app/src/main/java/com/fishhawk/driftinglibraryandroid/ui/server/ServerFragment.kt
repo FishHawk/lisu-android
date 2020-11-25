@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
@@ -11,6 +12,8 @@ import com.fishhawk.driftinglibraryandroid.databinding.ServerFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class ServerFragment : Fragment() {
     private lateinit var binding: ServerFragmentBinding
@@ -20,7 +23,7 @@ class ServerFragment : Fragment() {
 
     val adapter = ServerInfoListAdapter(object : ServerInfoListAdapter.Listener {
         override fun onItemClick(info: ServerInfo) {
-            GlobalPreference.selectedServer.setValue(info.id)
+            GlobalPreference.selectedServer.set(info.id)
         }
 
         override fun onServerDelete(info: ServerInfo) {
@@ -57,12 +60,12 @@ class ServerFragment : Fragment() {
 
         binding.list.adapter = adapter
 
-        GlobalPreference.selectedServer.observe(viewLifecycleOwner) { id ->
-            adapter.selectedId = id
-        }
+        GlobalPreference.selectedServer.asFlow()
+            .onEach { adapter.selectedId = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.serverInfoList.observe(viewLifecycleOwner) { data ->
-            if (data.size == 1) GlobalPreference.selectedServer.setValue(data.first().id)
+            if (data.size == 1) GlobalPreference.selectedServer.set(data.first().id)
             adapter.setList(data)
             if (data.isEmpty()) binding.multipleStatusView.showEmpty()
             else binding.multipleStatusView.showContent()

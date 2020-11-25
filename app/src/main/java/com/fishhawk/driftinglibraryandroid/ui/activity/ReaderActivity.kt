@@ -4,8 +4,11 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.WindowManager
+import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityReaderBinding
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class ReaderActivity : BaseActivity() {
     lateinit var binding: ActivityReaderBinding
@@ -16,29 +19,27 @@ class ReaderActivity : BaseActivity() {
         binding = ActivityReaderBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        GlobalPreference.screenOrientation.observe(this) {
-            val newOrientation = when (it) {
-                GlobalPreference.ScreenOrientation.DEFAULT -> ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                GlobalPreference.ScreenOrientation.LOCK -> ActivityInfo.SCREEN_ORIENTATION_LOCKED
-                GlobalPreference.ScreenOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                GlobalPreference.ScreenOrientation.LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        GlobalPreference.screenOrientation.asFlow()
+            .onEach {
+                val newOrientation = when (it) {
+                    GlobalPreference.ScreenOrientation.DEFAULT -> ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                    GlobalPreference.ScreenOrientation.LOCK -> ActivityInfo.SCREEN_ORIENTATION_LOCKED
+                    GlobalPreference.ScreenOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    GlobalPreference.ScreenOrientation.LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                }
+                if (newOrientation != requestedOrientation) requestedOrientation = newOrientation
             }
-            if (newOrientation != requestedOrientation) {
-                requestedOrientation = newOrientation
-            }
-        }
+            .launchIn(lifecycleScope)
 
-        GlobalPreference.keepScreenOn.observe(this) {
-            val flag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-            if (it) window.addFlags(flag)
-            else window.clearFlags(flag)
-        }
+        GlobalPreference.keepScreenOn.asFlow()
+            .onEach { setFlag(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, it) }
+            .launchIn(lifecycleScope)
     }
 
     var listener: OnVolumeKeyEvent? = null
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        val useVolumeKey = GlobalPreference.useVolumeKey.getValueDirectly()
+        val useVolumeKey = GlobalPreference.useVolumeKey.get()
         return when (event.keyCode) {
             KeyEvent.KEYCODE_VOLUME_UP -> useVolumeKey.also { if (it) listener?.onVolumeUp() }
             KeyEvent.KEYCODE_VOLUME_DOWN -> useVolumeKey.also { if (it) listener?.onVolumeDown() }

@@ -1,17 +1,10 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
 import android.content.Context
-import android.os.Bundle
 import android.view.LayoutInflater
-import androidx.appcompat.widget.AppCompatSpinner
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderSettingsSheetBinding
-import com.fishhawk.driftinglibraryandroid.preference.PreferenceBooleanLiveData
-import com.fishhawk.driftinglibraryandroid.preference.PreferenceEnumLiveData
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.widget.IgnoreFirstSpinnerListener
 import com.fishhawk.driftinglibraryandroid.widget.PreferenceBottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.switchmaterial.SwitchMaterial
 
 class ReaderSettingsSheet(context: Context) : PreferenceBottomSheetDialog(context) {
 
@@ -21,20 +14,13 @@ class ReaderSettingsSheet(context: Context) : PreferenceBottomSheetDialog(contex
         )
 
     init {
+        bindPreference(GlobalPreference.readingDirection, binding.direction)
+        bindPreference(GlobalPreference.screenOrientation, binding.orientation)
+
+        bindPreference(GlobalPreference.keepScreenOn, binding.keepScreenOn)
+        bindPreference(GlobalPreference.useVolumeKey, binding.useVolumeKey)
+        bindPreference(GlobalPreference.longTapDialog, binding.longTapDialog)
+
         setContentView(binding.root)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        initGeneralPreferences()
-    }
-
-    private fun initGeneralPreferences() {
-        bindingEnumPreference(binding.direction, GlobalPreference.readingDirection)
-        bindingEnumPreference(binding.orientation, GlobalPreference.screenOrientation)
-
-        bindingBoolPreference(binding.keepScreenOn, GlobalPreference.keepScreenOn)
-        bindingBoolPreference(binding.useVolumeKey, GlobalPreference.useVolumeKey)
-        bindingBoolPreference(binding.longTapDialog, GlobalPreference.longTapDialog)
     }
 }

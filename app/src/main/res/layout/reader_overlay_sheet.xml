@@ -3,7 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
     android:padding="16dp">
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/Theme.TextAppearance.Subtitle1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Overlay"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/verticalcenter"
@@ -19,7 +28,7 @@
         android:text="Custom color filter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/title" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/hue_symbol"

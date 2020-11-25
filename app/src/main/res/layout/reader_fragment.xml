@@ -101,64 +101,57 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/menu_bottom_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:background="#AA000000"
-                android:orientation="vertical"
-                android:padding="@dimen/baseline_4dp">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_prev_chapter"
+                    style="@style/Theme.Widget.Button.Icon.Textless"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/baseline_4dp"
-                    android:gravity="center_vertical"
-                    android:layoutDirection="@{viewModel.isReaderDirectionEqualRightToLeft ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR}"
-                    android:orientation="horizontal">
+                    app:icon="@drawable/ic_baseline_skip_previous_24"
+                    app:iconTint="@color/white" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_prev_chapter"
-                        style="@style/Theme.Widget.Button.Icon.Textless"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:icon="@drawable/ic_baseline_skip_previous_24"
-                        app:iconTint="@color/white" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:minEms="2"
+                    android:text="@{String.valueOf(viewModel.chapterPosition + 1)}"
+                    android:textColor="@color/white"
+                    tools:text="54" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:minEms="2"
-                        android:text="@{String.valueOf(viewModel.chapterPosition + 1)}"
-                        android:textColor="@color/white"
-                        tools:text="54" />
+                <SeekBar
+                    android:id="@+id/seek_bar"
+                    android:layout_width="0dp"
+                    android:layout_height="28dp"
+                    android:layout_weight="1"
+                    android:max="@{viewModel.chapterSize - 1}"
+                    android:progress="@{viewModel.chapterPosition}"
+                    android:tint="?attr/colorSecondary" />
 
-                    <SeekBar
-                        android:id="@+id/seek_bar"
-                        android:layout_width="0dp"
-                        android:layout_height="28dp"
-                        android:layout_weight="1"
-                        android:max="@{viewModel.chapterSize - 1}"
-                        android:progress="@{viewModel.chapterPosition}"
-                        android:tint="?attr/colorSecondary" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:minEms="2"
+                    android:text="@{String.valueOf(viewModel.chapterSize)}"
+                    android:textColor="@color/white"
+                    tools:text="124" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:minEms="2"
-                        android:text="@{String.valueOf(viewModel.chapterSize)}"
-                        android:textColor="@color/white"
-                        tools:text="124" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_next_chapter"
-                        style="@style/Theme.Widget.Button.Icon.Textless"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:icon="@drawable/ic_baseline_skip_next_24"
-                        app:iconTint="@color/white" />
-                </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_next_chapter"
+                    style="@style/Theme.Widget.Button.Icon.Textless"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/ic_baseline_skip_next_24"
+                    app:iconTint="@color/white" />
             </LinearLayout>
         </FrameLayout>
     </FrameLayout>

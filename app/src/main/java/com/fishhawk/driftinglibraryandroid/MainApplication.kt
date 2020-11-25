@@ -3,6 +3,7 @@ package com.fishhawk.driftinglibraryandroid
 import android.app.Application
 import android.webkit.URLUtil
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
 import androidx.room.Room
 import kotlinx.coroutines.runBlocking
@@ -47,12 +48,12 @@ class MainApplication : Application() {
 
         runBlocking {
             val selectedServerInfoValue = serverInfoRepository.selectServerInfo(
-                GlobalPreference.selectedServer.getValueDirectly()
+                GlobalPreference.selectedServer.get()
             )
             selectServer(selectedServerInfoValue)
         }
 
-        selectedServerInfo = GlobalPreference.selectedServer.switchMap {
+        selectedServerInfo = GlobalPreference.selectedServer.asFlow().asLiveData().switchMap {
             serverInfoRepository.observeServerInfo(it)
         }
 

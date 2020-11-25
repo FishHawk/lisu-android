@@ -3,14 +3,12 @@ package com.fishhawk.driftinglibraryandroid.widget
 import android.view.View
 import android.widget.AdapterView
 
-class IgnoreFirstSpinnerListener(
-    private val onSelected: (Int) -> Unit
+class SimpleSpinnerListener(
+    private val onEach: (Int) -> Unit
 ) : AdapterView.OnItemSelectedListener {
-    private var hasSelected = false
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        if (hasSelected) onSelected(position)
-        else hasSelected = true
+        onEach(position)
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {}

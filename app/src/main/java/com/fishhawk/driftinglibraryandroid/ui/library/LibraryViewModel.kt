@@ -1,6 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.library
 
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.repository.Result
@@ -30,7 +31,9 @@ class LibraryViewModel(
 
     init {
         mangaList.list.addSource(keywords) { mangaList.load() }
-        mangaList.list.addSource(GlobalPreference.selectedServer) { mangaList.load() }
+        mangaList.list.addSource(
+            GlobalPreference.selectedServer.asFlow().asLiveData()
+        ) { mangaList.load() }
     }
 
     fun deleteManga(id: String) = viewModelScope.launch {

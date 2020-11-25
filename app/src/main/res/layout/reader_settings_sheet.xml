@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:attr/colorBackground"
-    android:orientation="vertical"
     android:padding="16dp">
 
     <TextView
@@ -12,7 +11,7 @@
         style="@style/Theme.TextAppearance.Subtitle1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Menu"
+        android:text="Setting"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline

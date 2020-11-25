@@ -4,33 +4,35 @@ import android.content.Context
 import android.widget.SeekBar
 import androidx.appcompat.widget.AppCompatSpinner
 import com.fishhawk.driftinglibraryandroid.preference.PreferenceBooleanLiveData
-import com.fishhawk.driftinglibraryandroid.preference.PreferenceEnumLiveData
-import com.fishhawk.driftinglibraryandroid.preference.PreferenceIntLiveData
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.switchmaterial.SwitchMaterial
+import com.tfcporciuncula.flow.Preference
 
 open class PreferenceBottomSheetDialog(context: Context) : BottomSheetDialog(context) {
 
-    protected fun <T : Enum<T>> bindingEnumPreference(
-        spinner: AppCompatSpinner,
-        preference: PreferenceEnumLiveData<T>
+    protected fun bindPreference(
+        preference: Preference<Int>,
+        seekBar: SeekBar
     ) {
-        spinner.setSelection(preference.getOrdinal(), false)
-        spinner.onItemSelectedListener = IgnoreFirstSpinnerListener {
-            preference.setValue(it)
-        }
+        seekBar.progress = preference.get()
+        seekBar.setOnSeekBarChangeListener(SimpleSeekBarListener { preference.set(it) })
     }
 
-    protected fun bindingIntPreference(
-        seekBar: SeekBar,
-        preference: PreferenceIntLiveData
+    protected fun bindPreference(
+        preference: Preference<Boolean>,
+        switch: SwitchMaterial
     ) {
-        seekBar.progress = preference.getValueDirectly()
-        seekBar.setOnSeekBarChangeListener(object : SimpleSeekBarListener() {
-            override fun onProgressChanged(seekBar: SeekBar, value: Int, fromUser: Boolean) {
-                if (fromUser) preference.setValue(value)
-            }
-        })
+        switch.isChecked = preference.get()
+        switch.setOnCheckedChangeListener { _, isChecked -> preference.set(isChecked) }
+    }
+
+    protected inline fun <reified T : Enum<T>> bindPreference(
+        preference: Preference<T>,
+        spinner: AppCompatSpinner
+    ) {
+        spinner.setSelection(preference.get().ordinal, false)
+        spinner.onItemSelectedListener =
+            SimpleSpinnerListener { preference.set(enumValues<T>()[it]) }
     }
 
     protected fun bindingBoolPreference(

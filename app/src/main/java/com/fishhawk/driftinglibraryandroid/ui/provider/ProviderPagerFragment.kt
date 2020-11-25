@@ -11,6 +11,7 @@ import com.fishhawk.driftinglibraryandroid.databinding.ProviderPagerFragmentBind
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.preference.ProviderBrowseHistory
 import com.fishhawk.driftinglibraryandroid.ui.base.getDisplayModeIcon
+import com.fishhawk.driftinglibraryandroid.util.setNext
 
 class ProviderPagerFragment : Fragment() {
     private lateinit var binding: ProviderPagerFragmentBinding
@@ -89,7 +90,7 @@ class ProviderPagerFragment : Fragment() {
     private fun onMenuItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_display_mode -> {
-                GlobalPreference.displayMode.setNextValue()
+                GlobalPreference.displayMode.setNext()
                 item.setIcon(getDisplayModeIcon())
                 true
             }

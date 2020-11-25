@@ -34,7 +34,7 @@ class GalleryViewModel(
 
     val history: LiveData<ReadingHistory> = detail.switchMap {
         if (it is Result.Success) readingHistoryRepository.observeReadingHistory(
-            GlobalPreference.selectedServer.getValueDirectly(),
+            GlobalPreference.selectedServer.get(),
             it.data.id
         )
         else MutableLiveData()

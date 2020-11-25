@@ -9,18 +9,22 @@ import android.widget.SeekBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderFragmentBinding
-import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
-import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
+import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.ui.ReaderViewModelFactory
+import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import com.fishhawk.driftinglibraryandroid.ui.base.saveImage
 import com.fishhawk.driftinglibraryandroid.ui.base.shareImage
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
+
 
 class ReaderFragment : Fragment() {
     val viewModel: ReaderViewModel by viewModels {
@@ -61,14 +65,18 @@ class ReaderFragment : Fragment() {
         setupReaderView()
         setupMenuLayout()
 
-        GlobalPreference.readingDirection.observe(viewLifecycleOwner, Observer {
-            binding.reader.mode = when (it) {
-                GlobalPreference.ReadingDirection.LTR -> ReaderView.Mode.LTR
-                GlobalPreference.ReadingDirection.RTL -> ReaderView.Mode.RTL
-                GlobalPreference.ReadingDirection.VERTICAL -> ReaderView.Mode.VERTICAL
-                else -> ReaderView.Mode.LTR
+        GlobalPreference.readingDirection.asFlow()
+            .onEach {
+                binding.reader.mode = when (it) {
+                    GlobalPreference.ReadingDirection.LTR -> ReaderView.Mode.LTR
+                    GlobalPreference.ReadingDirection.RTL -> ReaderView.Mode.RTL
+                    GlobalPreference.ReadingDirection.VERTICAL -> ReaderView.Mode.VERTICAL
+                }
+                binding.menuBottomLayout.layoutDirection =
+                    if (it == GlobalPreference.ReadingDirection.RTL) View.LAYOUT_DIRECTION_RTL
+                    else View.LAYOUT_DIRECTION_LTR
             }
-        })
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.readerContent.observe(viewLifecycleOwner) { result ->
             binding.title.text = viewModel.mangaTitle
@@ -100,7 +108,7 @@ class ReaderFragment : Fragment() {
         binding.reader.onRequestMenu = { viewModel.isMenuVisible.value = true }
         binding.reader.onScrolled = { viewModel.chapterPosition.value = it }
         binding.reader.onPageLongClicked = { position, url ->
-            if (GlobalPreference.longTapDialog.getValueDirectly())
+            if (GlobalPreference.longTapDialog.get())
                 ReaderPageSheet(requireContext(), position, object : ReaderPageSheet.Listener {
                     override fun onRefresh() {
                         binding.reader.refreshPage(position)
@@ -126,7 +134,7 @@ class ReaderFragment : Fragment() {
 
         binding.settingButton.setOnClickListener { ReaderSettingsSheet(requireContext()).show() }
         binding.overlayButton.setOnClickListener {
-            ReaderOverlaySheet(requireContext())
+            ReaderOverlaySheet(this)
                 .apply {
                     setOnDismissListener { viewModel.isMenuVisible.value = true }
                     viewModel.isMenuVisible.value = false
@@ -146,23 +154,23 @@ class ReaderFragment : Fragment() {
         binding.buttonPrevChapter.setOnClickListener { openPrevChapter() }
         binding.buttonNextChapter.setOnClickListener { openNextChapter() }
 
-        GlobalPreference.colorFilterEnabled.observe(viewLifecycleOwner) { updateColorFilterView() }
-        GlobalPreference.colorFilterHue.observe(viewLifecycleOwner) { updateColorFilterView() }
-        GlobalPreference.colorFilterOpacity.observe(viewLifecycleOwner) { updateColorFilterView() }
-    }
-
-    private fun updateColorFilterView() {
-        val isEnabled = GlobalPreference.colorFilterEnabled.getValueDirectly()
-        if (isEnabled) {
-            val hue = GlobalPreference.colorFilterHue.getValueDirectly().coerceIn(0, 360).toFloat()
-            val opacity = GlobalPreference.colorFilterOpacity.getValueDirectly().coerceIn(0, 255)
-            val color = Color.HSVToColor(opacity, floatArrayOf(hue, 0.5f, 0.5f))
-            val mode = GlobalPreference.colorFilterMode.getValueDirectly()
-            binding.colorOverlay.isVisible = true
-            binding.colorOverlay.setFilterColor(color, mode)
-        } else {
-            binding.colorOverlay.isVisible = false
-        }
+        combine(
+            GlobalPreference.colorFilterIsEnabled.asFlow(),
+            GlobalPreference.colorFilterMode.asFlow(),
+            GlobalPreference.colorFilterHue.asFlow(),
+            GlobalPreference.colorFilterOpacity.asFlow()
+        ) { isEnabled, mode, hue, opacity ->
+            if (isEnabled) {
+                val color = Color.HSVToColor(
+                    opacity.coerceIn(0, 255),
+                    floatArrayOf(hue.coerceIn(0, 360).toFloat(), 0.5f, 0.5f)
+                )
+                binding.colorOverlay.setFilterColor(color, mode)
+                binding.colorOverlay.isVisible = true
+            } else {
+                binding.colorOverlay.isVisible = false
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun openPrevChapter() {

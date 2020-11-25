@@ -5,6 +5,7 @@ import android.view.*
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
@@ -16,6 +17,8 @@ import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.preference.ProviderBrowseHistory
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.*
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 abstract class ProviderBaseFragment : Fragment() {
     protected val viewModel: ProviderViewModel by viewModels(
@@ -94,9 +97,9 @@ abstract class ProviderBaseFragment : Fragment() {
 
         binding.options.adapter = optionAdapter
 
-        GlobalPreference.displayMode.observe(viewLifecycleOwner) {
-            binding.mangaList.list.changeMangaListDisplayMode(mangaAdapter)
-        }
+        GlobalPreference.displayMode.asFlow()
+            .onEach { binding.mangaList.list.changeMangaListDisplayMode(mangaAdapter) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         bindToPagingList(
             binding.mangaList.multipleStatusView,

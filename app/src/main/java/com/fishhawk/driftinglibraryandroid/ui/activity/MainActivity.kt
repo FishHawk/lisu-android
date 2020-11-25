@@ -42,7 +42,7 @@ class MainActivity : BaseActivity() {
         )
 
         bottomNavigationView.selectedItemId =
-            when (GlobalPreference.startScreen.getValueDirectly()) {
+            when (GlobalPreference.startScreen.get()) {
                 GlobalPreference.StartScreen.LIBRARY -> R.id.nav_graph_library
                 GlobalPreference.StartScreen.HISTORY -> R.id.nav_graph_history
                 GlobalPreference.StartScreen.EXPLORE -> R.id.nav_graph_explore
