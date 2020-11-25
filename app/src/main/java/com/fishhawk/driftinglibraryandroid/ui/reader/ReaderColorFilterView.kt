@@ -7,6 +7,7 @@ import android.graphics.PorterDuff
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.graphics.toXfermode
+import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 
 class ReaderColorFilterView(
     context: Context,
@@ -15,15 +16,15 @@ class ReaderColorFilterView(
 
     private val colorFilterPaint: Paint = Paint()
 
-    fun setFilterColor(color: Int, filterMode: Int) {
+    fun setFilterColor(color: Int, filterMode: GlobalPreference.ColorFilterMode) {
         colorFilterPaint.color = color
         colorFilterPaint.xfermode = when (filterMode) {
-            1 -> PorterDuff.Mode.MULTIPLY
-            2 -> PorterDuff.Mode.SCREEN
-            3 -> PorterDuff.Mode.OVERLAY
-            4 -> PorterDuff.Mode.LIGHTEN
-            5 -> PorterDuff.Mode.DARKEN
-            else -> PorterDuff.Mode.SRC_OVER
+            GlobalPreference.ColorFilterMode.DEFAULT -> PorterDuff.Mode.SRC_OVER
+            GlobalPreference.ColorFilterMode.MULTIPLY -> PorterDuff.Mode.MULTIPLY
+            GlobalPreference.ColorFilterMode.SCREEN -> PorterDuff.Mode.SCREEN
+            GlobalPreference.ColorFilterMode.OVERLAY -> PorterDuff.Mode.OVERLAY
+            GlobalPreference.ColorFilterMode.LIGHTEN -> PorterDuff.Mode.LIGHTEN
+            GlobalPreference.ColorFilterMode.DARKEN -> PorterDuff.Mode.DARKEN
         }.toXfermode()
 
         invalidate()

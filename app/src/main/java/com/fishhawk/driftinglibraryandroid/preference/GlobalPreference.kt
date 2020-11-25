@@ -101,8 +101,12 @@ object GlobalPreference {
         preferenceBooleanLiveData("color_filter_enabled", false)
     }
 
-    val colorFilterValue by lazy {
-        preferenceIntLiveData("color_filter_value", 0)
+    val colorFilterHue by lazy {
+        preferenceIntLiveData("color_filter_hue", 0)
+    }
+
+    val colorFilterOpacity by lazy {
+        preferenceIntLiveData("color_filter_opacity", 0)
     }
 
     enum class ColorFilterMode { DEFAULT, MULTIPLY, SCREEN, OVERLAY, LIGHTEN, DARKEN }

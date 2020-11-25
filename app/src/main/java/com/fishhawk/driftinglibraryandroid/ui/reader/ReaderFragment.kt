@@ -1,10 +1,12 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -123,7 +125,15 @@ class ReaderFragment : Fragment() {
         binding.menuLayout.setOnClickListener { viewModel.isMenuVisible.value = false }
 
         binding.settingButton.setOnClickListener { ReaderSettingsSheet(requireContext()).show() }
-        binding.overlayButton.setOnClickListener { ReaderOverlaySheet(requireContext()).show() }
+        binding.overlayButton.setOnClickListener {
+            ReaderOverlaySheet(requireContext())
+                .apply {
+                    setOnDismissListener { viewModel.isMenuVisible.value = true }
+                    viewModel.isMenuVisible.value = false
+                    window?.setDimAmount(0f)
+                }
+                .show()
+        }
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}
@@ -135,6 +145,24 @@ class ReaderFragment : Fragment() {
 
         binding.buttonPrevChapter.setOnClickListener { openPrevChapter() }
         binding.buttonNextChapter.setOnClickListener { openNextChapter() }
+
+        GlobalPreference.colorFilterEnabled.observe(viewLifecycleOwner) { updateColorFilterView() }
+        GlobalPreference.colorFilterHue.observe(viewLifecycleOwner) { updateColorFilterView() }
+        GlobalPreference.colorFilterOpacity.observe(viewLifecycleOwner) { updateColorFilterView() }
+    }
+
+    private fun updateColorFilterView() {
+        val isEnabled = GlobalPreference.colorFilterEnabled.getValueDirectly()
+        if (isEnabled) {
+            val hue = GlobalPreference.colorFilterHue.getValueDirectly().coerceIn(0, 360).toFloat()
+            val opacity = GlobalPreference.colorFilterOpacity.getValueDirectly().coerceIn(0, 255)
+            val color = Color.HSVToColor(opacity, floatArrayOf(hue, 0.5f, 0.5f))
+            val mode = GlobalPreference.colorFilterMode.getValueDirectly()
+            binding.colorOverlay.isVisible = true
+            binding.colorOverlay.setFilterColor(color, mode)
+        } else {
+            binding.colorOverlay.isVisible = false
+        }
     }
 
     private fun openPrevChapter() {

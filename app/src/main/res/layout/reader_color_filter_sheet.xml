@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:max="359"
+        android:max="360"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/hue_symbol"
         app:layout_constraintTop_toBottomOf="@id/color_filter_switch" />
@@ -57,7 +57,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:max="100"
+        android:max="255"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/opacity_symbol"
         app:layout_constraintTop_toBottomOf="@id/hue_symbol" />
