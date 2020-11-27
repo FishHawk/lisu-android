@@ -15,67 +15,125 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/verticalcenter"
+        android:id="@+id/vertical_center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
 
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/color_filter_label_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="end"
+        app:constraint_referenced_ids="color_filter_H_label,color_filter_S_label,color_filter_L_label,color_filter_A_label" />
+
+
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/color_filter_switch"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:text="Custom color filter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/hue_symbol"
+    <TextView
+        android:id="@+id/color_filter_H_label"
+        style="@style/Theme.TextAppearance.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="H"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/color_filter_switch"
-        app:srcCompat="@drawable/ic_baseline_color_lens_24"
-        app:tint="?attr/colorOnBackground" />
+        app:layout_constraintTop_toBottomOf="@id/color_filter_switch" />
 
     <SeekBar
-        android:id="@+id/hue_seek_bar"
+        android:id="@+id/color_filter_H"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:max="360"
+        app:layout_constraintBottom_toBottomOf="@id/color_filter_H_label"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/hue_symbol"
-        app:layout_constraintTop_toBottomOf="@id/color_filter_switch" />
+        app:layout_constraintStart_toEndOf="@id/color_filter_label_barrier" />
 
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/opacity_symbol"
+    <TextView
+        android:id="@+id/color_filter_S_label"
+        style="@style/Theme.TextAppearance.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="S"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/hue_symbol"
-        app:srcCompat="@drawable/ic_baseline_opacity_24"
-        app:tint="?attr/colorOnBackground" />
+        app:layout_constraintTop_toBottomOf="@id/color_filter_H_label" />
 
     <SeekBar
-        android:id="@+id/opacity_seek_bar"
+        android:id="@+id/color_filter_S"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:max="100"
+        app:layout_constraintBottom_toBottomOf="@id/color_filter_S_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/color_filter_label_barrier" />
+
+    <TextView
+        android:id="@+id/color_filter_L_label"
+        style="@style/Theme.TextAppearance.Body1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="L"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/color_filter_S_label" />
+
+    <SeekBar
+        android:id="@+id/color_filter_L"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:max="100"
+        app:layout_constraintBottom_toBottomOf="@id/color_filter_L_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/color_filter_label_barrier" />
+
+    <TextView
+        android:id="@+id/color_filter_A_label"
+        style="@style/Theme.TextAppearance.Body1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="A"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/color_filter_L_label" />
+
+    <SeekBar
+        android:id="@+id/color_filter_A"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:max="255"
+        app:layout_constraintBottom_toBottomOf="@id/color_filter_A_label"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/opacity_symbol"
-        app:layout_constraintTop_toBottomOf="@id/hue_symbol" />
+        app:layout_constraintStart_toEndOf="@id/color_filter_A_label" />
 
     <TextView
-        android:id="@+id/color_filter_mode_text"
+        android:id="@+id/color_filter_mode_label"
+        style="@style/Theme.TextAppearance.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Custom filter mode"
+        android:layout_marginStart="8dp"
+        android:text="Blend mode"
         app:layout_constraintBaseline_toBaselineOf="@id/color_filter_mode"
         app:layout_constraintEnd_toStartOf="@id/color_filter_mode"
         app:layout_constraintStart_toStartOf="parent" />
@@ -87,34 +145,37 @@
         android:layout_marginTop="16dp"
         android:entries="@array/color_filter_mode_entries"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/verticalcenter"
-        app:layout_constraintTop_toBottomOf="@id/opacity_seek_bar" />
+        app:layout_constraintStart_toEndOf="@id/vertical_center"
+        app:layout_constraintTop_toBottomOf="@id/color_filter_A" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/custom_brightness"
+        android:id="@+id/custom_brightness_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:text="Custom brightness"
-        app:layout_constraintTop_toBottomOf="@id/color_filter_mode_text" />
+        app:layout_constraintTop_toBottomOf="@id/color_filter_mode_label" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/custom_brightness_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/custom_brightness_switch"
+        app:srcCompat="@drawable/ic_baseline_brightness_high_24"
+        app:tint="?attr/colorOnBackground" />
 
     <SeekBar
-        android:id="@+id/brightness_seekbar"
+        android:id="@+id/custom_brightness_value"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/brightness_symbol"
-        app:layout_constraintTop_toBottomOf="@id/custom_brightness" />
+        app:layout_constraintBottom_toBottomOf="@id/custom_brightness_label"
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/brightness_symbol"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@id/brightness_seekbar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/brightness_seekbar"
-        app:srcCompat="@drawable/ic_baseline_brightness_high_24"
-        app:tint="?attr/colorOnBackground" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/custom_brightness_label"
+        app:layout_constraintTop_toTopOf="@id/custom_brightness_label" />
 </androidx.constraintlayout.widget.ConstraintLayout>

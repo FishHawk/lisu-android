@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/verticalcenter"
+        android:id="@+id/vertical_center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -29,7 +29,7 @@
         android:layout_marginStart="8dp"
         android:text="Direction"
         app:layout_constraintBaseline_toBaselineOf="@id/direction"
-        app:layout_constraintEnd_toStartOf="@id/verticalcenter"
+        app:layout_constraintEnd_toStartOf="@id/vertical_center"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -40,7 +40,7 @@
         android:layout_marginTop="20dp"
         android:entries="@array/reading_direction_entries"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/verticalcenter"
+        app:layout_constraintStart_toEndOf="@id/vertical_center"
         app:layout_constraintTop_toBottomOf="@id/title" />
 
     <TextView
@@ -51,7 +51,7 @@
         android:layout_marginStart="8dp"
         android:text="Orientation"
         app:layout_constraintBaseline_toBaselineOf="@id/orientation"
-        app:layout_constraintEnd_toStartOf="@id/verticalcenter"
+        app:layout_constraintEnd_toStartOf="@id/vertical_center"
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatSpinner
@@ -61,7 +61,7 @@
         android:layout_marginTop="20dp"
         android:entries="@array/screen_orientation_entries"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/verticalcenter"
+        app:layout_constraintStart_toEndOf="@id/vertical_center"
         app:layout_constraintTop_toBottomOf="@id/direction" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial

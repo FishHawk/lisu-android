@@ -1,9 +1,11 @@
 package com.fishhawk.driftinglibraryandroid.preference
 
 import android.content.Context
+import android.graphics.Color
 import androidx.preference.PreferenceManager
 import com.tfcporciuncula.flow.FlowSharedPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -73,8 +75,10 @@ object GlobalPreference {
     enum class ColorFilterMode { DEFAULT, MULTIPLY, SCREEN, OVERLAY, LIGHTEN, DARKEN }
 
     val colorFilter by get("color_filter", false)
-    val colorFilterHue by get("color_filter_hue", 0)
-    val colorFilterOpacity by get("color_filter_opacity", 0)
+    val colorFilterH by get("color_filter_h", 0)
+    val colorFilterS by get("color_filter_s", 50)
+    val colorFilterL by get("color_filter_l", 50)
+    val colorFilterA by get("color_filter_a", 127)
     val colorFilterMode by get("color_filter_mode", ColorFilterMode.DEFAULT)
 
     val customBrightness by get("custom_brightness", false)

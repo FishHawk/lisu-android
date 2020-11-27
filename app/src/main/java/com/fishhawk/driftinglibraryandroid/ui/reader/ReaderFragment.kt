@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.SeekBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -134,7 +133,7 @@ class ReaderFragment : Fragment() {
 
         binding.settingButton.setOnClickListener { ReaderSettingsSheet(requireContext()).show() }
         binding.overlayButton.setOnClickListener {
-            ReaderOverlaySheet(this)
+            ReaderOverlaySheet(requireContext(), viewLifecycleOwner.lifecycleScope)
                 .apply {
                     setOnDismissListener { viewModel.isMenuVisible.value = true }
                     viewModel.isMenuVisible.value = false
@@ -154,17 +153,28 @@ class ReaderFragment : Fragment() {
         binding.buttonPrevChapter.setOnClickListener { openPrevChapter() }
         binding.buttonNextChapter.setOnClickListener { openNextChapter() }
 
+        val colorFilterValue = combine(
+            GlobalPreference.colorFilterH.asFlow(),
+            GlobalPreference.colorFilterS.asFlow(),
+            GlobalPreference.colorFilterL.asFlow(),
+            GlobalPreference.colorFilterA.asFlow()
+        ) { h, s, l, a ->
+            Color.HSVToColor(
+                a.coerceIn(0, 255),
+                floatArrayOf(
+                    h.coerceIn(0, 360).toFloat(),
+                    s.coerceIn(0, 100).toFloat() / 100f,
+                    l.coerceIn(0, 100).toFloat() / 100f
+                )
+            )
+        }
+
         combine(
             GlobalPreference.colorFilter.asFlow(),
             GlobalPreference.colorFilterMode.asFlow(),
-            GlobalPreference.colorFilterHue.asFlow(),
-            GlobalPreference.colorFilterOpacity.asFlow()
-        ) { isEnabled, mode, hue, opacity ->
+            colorFilterValue
+        ) { isEnabled, mode, color ->
             if (isEnabled) {
-                val color = Color.HSVToColor(
-                    opacity.coerceIn(0, 255),
-                    floatArrayOf(hue.coerceIn(0, 360).toFloat(), 0.5f, 0.5f)
-                )
                 binding.colorOverlay.setFilterColor(color, mode)
                 binding.colorOverlay.isVisible = true
             } else {
