@@ -6,14 +6,6 @@
     android:background="?android:attr/colorBackground"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/title"
-        style="@style/Theme.TextAppearance.Subtitle1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Overlay"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/vertical_center"
         android:layout_width="wrap_content"
@@ -33,19 +25,16 @@
         android:id="@+id/color_filter_switch"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:text="Custom color filter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/color_filter_H_label"
         style="@style/Theme.TextAppearance.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:text="H"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/color_filter_switch" />
@@ -66,7 +55,6 @@
         style="@style/Theme.TextAppearance.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="S"
         app:layout_constraintStart_toStartOf="parent"
@@ -88,7 +76,6 @@
         style="@style/Theme.TextAppearance.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="L"
         app:layout_constraintStart_toStartOf="parent"
@@ -110,7 +97,6 @@
         style="@style/Theme.TextAppearance.Body1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="A"
         app:layout_constraintStart_toStartOf="parent"
@@ -132,7 +118,6 @@
         style="@style/Theme.TextAppearance.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:text="Blend mode"
         app:layout_constraintBaseline_toBaselineOf="@id/color_filter_mode"
         app:layout_constraintEnd_toStartOf="@id/color_filter_mode"
@@ -152,7 +137,6 @@
         android:id="@+id/custom_brightness_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:text="Custom brightness"
         app:layout_constraintTop_toBottomOf="@id/color_filter_mode_label" />
@@ -161,7 +145,6 @@
         android:id="@+id/custom_brightness_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/custom_brightness_switch"
         app:srcCompat="@drawable/ic_baseline_brightness_high_24"

@@ -108,7 +108,7 @@ class ReaderFragment : Fragment() {
         binding.reader.onScrolled = { viewModel.chapterPosition.value = it }
         binding.reader.onPageLongClicked = { position, url ->
             if (GlobalPreference.longTapDialog.get())
-                ReaderPageSheet(requireContext(), position, object : ReaderPageSheet.Listener {
+                ReaderPageSheet(requireContext(), object : ReaderPageSheet.Listener {
                     override fun onRefresh() {
                         binding.reader.refreshPage(position)
                     }

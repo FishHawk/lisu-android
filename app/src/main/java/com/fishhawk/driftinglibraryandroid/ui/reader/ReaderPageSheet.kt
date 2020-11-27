@@ -7,7 +7,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class ReaderPageSheet(
     context: Context,
-    page: Int,
     private val listener: Listener
 ) : BottomSheetDialog(context) {
 
@@ -17,8 +16,6 @@ class ReaderPageSheet(
 
     init {
         setContentView(binding.root)
-
-        binding.page.text = (page + 1).toString()
 
         binding.refreshButton.setOnClickListener {
             listener.onRefresh()
