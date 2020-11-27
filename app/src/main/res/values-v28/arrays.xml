@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string-array name="color_filter_mode_entries" tools:ignore="InconsistentArrays">
+        <item>@string/settings_filter_mode_default</item>
+        <item>@string/settings_filter_mode_multiply</item>
+        <item>@string/settings_filter_mode_screen</item>
+        <item>@string/settings_filter_mode_overlay</item>
+        <item>@string/settings_filter_mode_lighten</item>
+        <item>@string/settings_filter_mode_darken</item>
+    </string-array>
+</resources>
