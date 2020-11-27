@@ -21,13 +21,12 @@ import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 
 class MainApplication : Application() {
     private lateinit var database: ApplicationDatabase
-    lateinit var selectedServerInfo: LiveData<ServerInfo>
+    private lateinit var selectedServerInfo: LiveData<ServerInfo>
     private var selectedUrl: String? = null
 
     lateinit var readingHistoryRepository: ReadingHistoryRepository
     lateinit var serverInfoRepository: ServerInfoRepository
 
-    var url: String? = null
     val remoteLibraryRepository = RemoteLibraryRepository()
     val remoteProviderRepository = RemoteProviderRepository()
     val remoteDownloadRepository = RemoteDownloadRepository()

@@ -1,18 +1,20 @@
 package com.fishhawk.driftinglibraryandroid.ui.history
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
+import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
 
 class HistoryFragment : Fragment() {
     private lateinit var binding: HistoryFragmentBinding
@@ -51,7 +53,7 @@ class HistoryFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = HistoryFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -61,11 +63,11 @@ class HistoryFragment : Fragment() {
 
         binding.list.adapter = adapter
 
-        viewModel.filteredReadingHistoryList.observe(viewLifecycleOwner, Observer {
+        viewModel.filteredReadingHistoryList.observe(viewLifecycleOwner) {
             adapter.setList(it)
             if (it.isEmpty()) binding.multipleStatusView.showEmpty()
             else binding.multipleStatusView.showContent()
-        })
+        }
     }
 
     private fun onMenuItemSelected(item: MenuItem): Boolean {

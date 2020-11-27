@@ -35,7 +35,7 @@ class SubscriptionFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = SubscriptionFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }

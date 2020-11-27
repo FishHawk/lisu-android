@@ -81,12 +81,4 @@
         <item>@string/settings_filter_mode_multiply</item>
         <item>@string/settings_filter_mode_screen</item>
     </string-array>
-    <string-array name="color_filter_mode_entry_values" translatable="false">
-        <item>DEFAULT</item>
-        <item>MULTIPLY</item>
-        <item>SCREEN</item>
-        <item>OVERLAY</item>
-        <item>LIGHTEN</item>
-        <item>DARKEN</item>
-    </string-array>
 </resources>

@@ -12,7 +12,7 @@
         style="@style/Theme.Widget.Button.TextButton.NoColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Refresh image"
+        android:text="@string/page_action_refresh"
         app:icon="@drawable/ic_baseline_refresh_24" />
 
     <com.google.android.material.button.MaterialButton
@@ -20,7 +20,7 @@
         style="@style/Theme.Widget.Button.TextButton.NoColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save image"
+        android:text="@string/page_action_save"
         app:icon="@drawable/ic_baseline_save_alt_24" />
 
     <com.google.android.material.button.MaterialButton
@@ -28,6 +28,6 @@
         style="@style/Theme.Widget.Button.TextButton.NoColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Share image"
+        android:text="@string/page_action_share"
         app:icon="@drawable/ic_baseline_share_24" />
 </LinearLayout>

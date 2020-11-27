@@ -50,7 +50,7 @@ class ReaderFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = ReaderFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }

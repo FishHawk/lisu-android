@@ -31,7 +31,7 @@ class MoreFragment : PreferenceFragmentCompat() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val view = super.onCreateView(inflater, container, savedInstanceState)
         binding = MoreFragmentBinding.inflate(inflater, container, false)
         binding.preference.addView(view)

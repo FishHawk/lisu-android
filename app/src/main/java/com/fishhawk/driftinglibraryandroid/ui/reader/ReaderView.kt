@@ -91,8 +91,8 @@ class ReaderView @JvmOverloads constructor(
     private fun canScrollForward(): Boolean {
         val direction = if (layoutManager.reverseLayout) -1 else 1
         return when (layoutManager.orientation) {
-            LinearLayoutManager.HORIZONTAL -> recyclerView.canScrollHorizontally(direction)
-            LinearLayoutManager.VERTICAL -> recyclerView.canScrollVertically(direction)
+            RecyclerView.HORIZONTAL -> recyclerView.canScrollHorizontally(direction)
+            RecyclerView.VERTICAL -> recyclerView.canScrollVertically(direction)
             else -> false
         }
     }
@@ -100,8 +100,8 @@ class ReaderView @JvmOverloads constructor(
     private fun canScrollBackward(): Boolean {
         val direction = if (layoutManager.reverseLayout) 1 else -1
         return when (layoutManager.orientation) {
-            LinearLayoutManager.HORIZONTAL -> recyclerView.canScrollHorizontally(direction)
-            LinearLayoutManager.VERTICAL -> recyclerView.canScrollVertically(direction)
+            RecyclerView.HORIZONTAL -> recyclerView.canScrollHorizontally(direction)
+            RecyclerView.VERTICAL -> recyclerView.canScrollVertically(direction)
             else -> false
         }
     }

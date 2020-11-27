@@ -33,7 +33,7 @@ class GalleryEditFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = GalleryEditFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }

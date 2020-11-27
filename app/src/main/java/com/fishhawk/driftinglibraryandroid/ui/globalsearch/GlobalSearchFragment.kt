@@ -41,7 +41,7 @@ class GlobalSearchFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = GlobalSearchFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }

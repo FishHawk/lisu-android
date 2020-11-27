@@ -3,7 +3,6 @@ package com.fishhawk.driftinglibraryandroid.widget
 import android.content.Context
 import android.widget.SeekBar
 import androidx.appcompat.widget.AppCompatSpinner
-import com.fishhawk.driftinglibraryandroid.preference.PreferenceBooleanLiveData
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.tfcporciuncula.flow.Preference
@@ -33,19 +32,5 @@ open class PreferenceBottomSheetDialog(context: Context) : BottomSheetDialog(con
         spinner.setSelection(preference.get().ordinal, false)
         spinner.onItemSelectedListener =
             SimpleSpinnerListener { preference.set(enumValues<T>()[it]) }
-    }
-
-    protected fun bindingBoolPreference(
-        switch: SwitchMaterial,
-        preference: PreferenceBooleanLiveData,
-        callback: ((Boolean) -> Unit)? = null
-    ) {
-        switch.isChecked = preference.getValueDirectly()
-        callback?.invoke(switch.isChecked)
-
-        switch.setOnCheckedChangeListener { _, isChecked ->
-            preference.setValue(isChecked)
-            callback?.invoke(isChecked)
-        }
     }
 }

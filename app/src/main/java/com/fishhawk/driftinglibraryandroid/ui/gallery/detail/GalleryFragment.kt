@@ -15,14 +15,11 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
-import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.ui.base.*
+import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
-import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
-import com.fishhawk.driftinglibraryandroid.ui.base.bindToFeedbackViewModel
+import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
-import com.fishhawk.driftinglibraryandroid.util.next
 import com.fishhawk.driftinglibraryandroid.util.setNext
 import kotlinx.android.synthetic.main.gallery_fragment.view.*
 import kotlinx.coroutines.flow.launchIn
@@ -75,7 +72,7 @@ class GalleryFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = GalleryFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }

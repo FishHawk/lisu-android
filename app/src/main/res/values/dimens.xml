@@ -2,13 +2,6 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="baseline_4dp">4dp</dimen>
     <dimen name="baseline_8dp">8dp</dimen>
-    <dimen name="keyline_margin">16dp</dimen>
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="nav_header_vertical_spacing">8dp</dimen>
-    <dimen name="nav_header_height">176dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="text_margin">16dp</dimen>
 
     <dimen name="card_radius">4dp</dimen>
 

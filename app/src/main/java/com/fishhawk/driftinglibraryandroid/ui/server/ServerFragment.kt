@@ -48,7 +48,7 @@ class ServerFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = ServerFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }

@@ -1,12 +1,9 @@
 package com.fishhawk.driftinglibraryandroid.preference
 
 import android.content.Context
-import android.graphics.Color
 import androidx.preference.PreferenceManager
 import com.tfcporciuncula.flow.FlowSharedPreferences
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.combine
-
 
 @OptIn(ExperimentalCoroutinesApi::class)
 object GlobalPreference {

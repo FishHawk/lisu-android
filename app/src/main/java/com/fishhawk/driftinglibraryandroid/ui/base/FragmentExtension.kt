@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,7 +24,6 @@ import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
-import com.fishhawk.driftinglibraryandroid.ui.activity.MainActivity
 import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
 import com.hippo.refreshlayout.RefreshLayout
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +39,7 @@ fun <T> Fragment.bindToListViewModel(
 ) {
     bindToFeedbackViewModel(viewModel)
 
-    viewModel.list.observe(viewLifecycleOwner, Observer { result ->
+    viewModel.list.observe(viewLifecycleOwner) { result ->
         when (result) {
             is Result.Success -> {
                 adapter.setList(result.data)
@@ -51,7 +49,7 @@ fun <T> Fragment.bindToListViewModel(
             is Result.Error -> multipleStatusView.showError(result.exception.message)
             null -> multipleStatusView.showLoading()
         }
-    })
+    }
 
     viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver {
         refreshLayout.isHeaderRefreshing = false
@@ -149,13 +147,6 @@ fun Fragment.navToReaderActivity(
     startActivity(intent)
 }
 
-fun Fragment.navToMainActivity(keywords: String) {
-    val bundle = bundleOf("keywords" to keywords)
-    val intent = Intent(requireActivity(), MainActivity::class.java)
-    intent.putExtras(bundle)
-    startActivity(intent)
-}
-
 fun Fragment.checkPermission(permission: String): Boolean {
     return ContextCompat.checkSelfPermission(
         requireContext(),
@@ -241,10 +232,10 @@ fun Fragment.shareImage(url: String, filename: String) {
 }
 
 val Fragment.clipboardManager
-    get() = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    get() = requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
 
 val Fragment.inputMethodManager
-    get() = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    get() = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
 
 
 fun Fragment.copyToClipboard(text: String) {

@@ -64,7 +64,7 @@ class SearchFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = ProviderSearchFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }

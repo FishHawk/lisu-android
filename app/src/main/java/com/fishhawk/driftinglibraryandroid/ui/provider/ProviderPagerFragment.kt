@@ -21,7 +21,7 @@ class ProviderPagerFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = ProviderPagerFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
