@@ -8,7 +8,6 @@
     <string name="label_explore">Explore</string>
     <string name="label_global_search">Global search</string>
     <string name="label_more">More</string>
-    <string name="label_settings">Setting</string>
     <string name="label_about">About</string>
     <string name="label_download">Download</string>
     <string name="label_subscription">Subscription</string>
@@ -21,12 +20,6 @@
     <string name="label_latest">Latest</string>
     <string name="label_category">Category</string>
     <string name="label_search">Search</string>
-
-
-    <!-- library fragment -->
-    <string name="library_reach_end_hint">No more mangas.</string>
-    <string name="library_empty_hint">Library is empty.</string>
-    <string name="library_unknown_error_hint">Unknown error.</string>
 
 
     <!-- history fragment -->
