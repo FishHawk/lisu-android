@@ -62,6 +62,7 @@ class ImageListAdapter(
 
             Glide.with(context)
                 .asBitmap()
+                .timeout(20000)
                 .load(item)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
