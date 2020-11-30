@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.SeekBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -21,6 +23,7 @@ import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import com.fishhawk.driftinglibraryandroid.ui.base.saveImage
 import com.fishhawk.driftinglibraryandroid.ui.base.shareImage
+import com.fishhawk.driftinglibraryandroid.widget.SimpleAnimationListener
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -203,9 +206,33 @@ class ReaderFragment : Fragment() {
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    private fun setMenuLayoutVisibility(isVisible: Boolean, animate: Boolean = true) {
-        binding.menuLayout.isVisible = isVisible
-        binding.readerIndicator.isVisible = !isVisible
+    private fun setMenuLayoutVisibility(isVisible: Boolean) {
+        if (isVisible) {
+            binding.menuLayout.isVisible = true
+            binding.readerIndicator.isVisible = false
+
+            val topAnim =
+                AnimationUtils.loadAnimation(requireContext(), R.anim.enter_from_top)
+            val bottomAnim =
+                AnimationUtils.loadAnimation(requireContext(), R.anim.enter_from_bottom)
+            binding.menuTopLayout.startAnimation(topAnim)
+            binding.menuBottomLayout.startAnimation(bottomAnim)
+        } else {
+            val topAnim =
+                AnimationUtils.loadAnimation(requireContext(), R.anim.exit_to_top)
+            val bottomAnim =
+                AnimationUtils.loadAnimation(requireContext(), R.anim.exit_to_bottom)
+            topAnim.setAnimationListener(
+                object : SimpleAnimationListener() {
+                    override fun onAnimationEnd(animation: Animation) {
+                        binding.menuLayout.isVisible = false
+                        binding.readerIndicator.isVisible = true
+                    }
+                }
+            )
+            binding.menuTopLayout.startAnimation(topAnim)
+            binding.menuBottomLayout.startAnimation(bottomAnim)
+        }
     }
 
     private fun openPrevChapter() {
