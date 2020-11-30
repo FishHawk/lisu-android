@@ -1,11 +1,13 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery.detail
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -21,11 +23,12 @@ import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.util.setNext
-import kotlinx.android.synthetic.main.gallery_fragment.view.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.text.SimpleDateFormat
+import java.util.*
 
 class GalleryFragment : Fragment() {
     private lateinit var binding: GalleryFragmentBinding
@@ -77,6 +80,7 @@ class GalleryFragment : Fragment() {
         return binding.root
     }
 
+    @SuppressLint("SimpleDateFormat")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         bindToFeedbackViewModel(viewModel)
 
@@ -97,7 +101,6 @@ class GalleryFragment : Fragment() {
             true
         }
 
-        binding.info = GalleryInfo(providerId, title)
         thumb?.let { setupThumb(it) }
         setupActionButton()
 
@@ -158,6 +161,12 @@ class GalleryFragment : Fragment() {
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
+        binding.title.text = title
+        providerId.let {
+            binding.providerLabel.isVisible = (it != null)
+            binding.provider.isVisible = (it != null)
+            binding.provider.text = it
+        }
         viewModel.detail.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Success -> {
@@ -166,21 +175,78 @@ class GalleryFragment : Fragment() {
                     val detail = result.data
                     detail.thumb?.let { setupThumb(it) }
 
-                    binding.info = GalleryInfo(detail)
-                    binding.description.setOnClickListener {
-                        binding.description.maxLines =
-                            if (binding.description.maxLines < Int.MAX_VALUE) Int.MAX_VALUE else 3
-                    }
-                    binding.description.setOnLongClickListener {
-                        copyToClipboard(binding.description.text as String)
-                        makeToast(R.string.toast_manga_description_copied)
-                        true
+                    binding.title.text = detail.title
+
+                    detail.metadata.authors?.let {
+                        if (it.isEmpty()) null
+                        else it.joinToString(separator = ";")
+                    }.let {
+                        binding.authorLabel.isVisible = (it != null)
+                        binding.author.isVisible = (it != null)
+                        binding.author.text = it
                     }
 
-                    if (!detail.metadata.tags.isNullOrEmpty())
+                    detail.metadata.status.let {
+                        binding.statusLabel.isVisible = (it != null)
+                        binding.status.isVisible = (it != null)
+                        binding.status.text = it.toString()
+                    }
+
+                    detail.updateTime?.let {
+                        val date = Date(it)
+                        val format = SimpleDateFormat("yyyy-MM-dd")
+                        format.format(date)
+                    }.let {
+                        binding.updateLabel.isVisible = (it != null)
+                        binding.update.isVisible = (it != null)
+                        binding.update.text = it
+                    }
+
+                    detail.providerId.let {
+                        binding.providerLabel.isVisible = (it != null)
+                        binding.provider.isVisible = (it != null)
+                        binding.provider.text = it
+                    }
+
+                    val isFromProvider = (detail.providerId != null)
+                    binding.downloadButton.isVisible = isFromProvider
+                    binding.subscribeButton.isVisible = isFromProvider
+                    binding.editButton.isVisible = !isFromProvider
+
+                    detail.metadata.description?.let {
+                        if (it.isBlank()) null
+                        else it
+                    }.let {
+                        binding.description.isVisible = (it != null)
+                        binding.description.text = it
+
+                        binding.description.setOnClickListener {
+                            binding.description.maxLines =
+                                if (binding.description.maxLines < Int.MAX_VALUE) Int.MAX_VALUE else 3
+                        }
+
+                        binding.description.setOnLongClickListener {
+                            copyToClipboard(binding.description.text as String)
+                            makeToast(R.string.toast_manga_description_copied)
+                            true
+                        }
+                    }
+
+                    if (!detail.metadata.tags.isNullOrEmpty()) {
+                        binding.tags.isVisible = true
                         tagAdapter.setList(detail.metadata.tags)
-                    if (detail.collections.isNotEmpty())
+                    } else {
+                        binding.tags.isVisible = false
+                    }
+
+                    if (detail.collections.isNotEmpty()) {
+                        binding.chapters.isVisible = true
+                        binding.noChapterHint.isVisible = false
                         binding.chapters.collections = detail.collections
+                    } else {
+                        binding.chapters.isVisible = false
+                        binding.noChapterHint.isVisible = true
+                    }
                 }
                 is Result.Error -> binding.multipleStatusView.showError(result.exception.message)
                 null -> binding.multipleStatusView.showLoading()
@@ -188,7 +254,7 @@ class GalleryFragment : Fragment() {
         }
 
         viewModel.history.observe(viewLifecycleOwner) { history ->
-            binding.contentView.chapters.markedPosition = history?.let {
+            binding.chapters.markedPosition = history?.let {
                 MarkedPosition(it.collectionIndex, it.chapterIndex, it.pageIndex)
             }
         }

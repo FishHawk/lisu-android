@@ -239,7 +239,6 @@ val Fragment.inputMethodManager
 
 
 fun Fragment.copyToClipboard(text: String) {
-    val clipboard = requireActivity().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
     val clip = ClipData.newPlainText("simple text", text)
     clipboardManager.setPrimaryClip(clip)
 }
