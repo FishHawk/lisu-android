@@ -9,6 +9,7 @@ import android.widget.SeekBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
@@ -58,35 +59,9 @@ class ReaderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = this
-
-        setupReaderView()
-        setupMenuLayout()
-
-        GlobalPreference.readingDirection.asFlow()
-            .onEach {
-                binding.reader.mode = when (it) {
-                    GlobalPreference.ReadingDirection.LTR -> ReaderView.Mode.LTR
-                    GlobalPreference.ReadingDirection.RTL -> ReaderView.Mode.RTL
-                    GlobalPreference.ReadingDirection.VERTICAL -> ReaderView.Mode.VERTICAL
-                }
-                binding.menuBottomLayout.layoutDirection =
-                    if (it == GlobalPreference.ReadingDirection.RTL) View.LAYOUT_DIRECTION_RTL
-                    else View.LAYOUT_DIRECTION_LTR
-            }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
-
-        viewModel.readerContent.observe(viewLifecycleOwner) { result ->
-            binding.title.text = viewModel.mangaTitle
-            when (result) {
-                is Result.Success -> {
-                    val content = result.data
-                    binding.reader.setContent(content)
-                    viewModel.chapterPosition.value?.let { binding.reader.setPage(it) }
-                }
-            }
-        }
+        initializeReader()
+        initializeOverlay()
+        initializeMenu()
 
         (requireActivity() as ReaderActivity).listener = object : ReaderActivity.OnVolumeKeyEvent {
             override fun onVolumeUp() = binding.reader.gotoPrevPage()
@@ -101,7 +76,7 @@ class ReaderFragment : Fragment() {
         }
     }
 
-    private fun setupReaderView() {
+    private fun initializeReader() {
         binding.reader.onRequestPrevChapter = { openPrevChapter() }
         binding.reader.onRequestNextChapter = { openNextChapter() }
         binding.reader.onRequestMenu = { setMenuLayoutVisibility(it) }
@@ -126,32 +101,30 @@ class ReaderFragment : Fragment() {
                     }
                 }).show()
         }
-    }
 
-    private fun setupMenuLayout() {
-
-        binding.settingButton.setOnClickListener { ReaderSettingsSheet(requireContext()).show() }
-        binding.overlayButton.setOnClickListener {
-            ReaderOverlaySheet(requireContext(), viewLifecycleOwner.lifecycleScope)
-                .apply {
-                    setOnDismissListener { setMenuLayoutVisibility(true) }
-                    setMenuLayoutVisibility(false)
-                    window?.setDimAmount(0f)
+        viewModel.readerContent.observe(viewLifecycleOwner) { result ->
+            binding.title.text = viewModel.mangaTitle
+            when (result) {
+                is Result.Success -> {
+                    val content = result.data
+                    binding.reader.setContent(content)
+                    viewModel.chapterPosition.value?.let { binding.reader.setPage(it) }
                 }
-                .show()
+            }
         }
 
-        binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}
-            override fun onStartTrackingTouch(seek: SeekBar) {}
-            override fun onStopTrackingTouch(seek: SeekBar) {
-                binding.reader.setPage(seek.progress)
+        GlobalPreference.readingDirection.asFlow()
+            .onEach {
+                binding.reader.mode = when (it) {
+                    GlobalPreference.ReadingDirection.LTR -> ReaderView.Mode.LTR
+                    GlobalPreference.ReadingDirection.RTL -> ReaderView.Mode.RTL
+                    GlobalPreference.ReadingDirection.VERTICAL -> ReaderView.Mode.VERTICAL
+                }
             }
-        })
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
 
-        binding.buttonPrevChapter.setOnClickListener { openPrevChapter() }
-        binding.buttonNextChapter.setOnClickListener { openNextChapter() }
-
+    private fun initializeOverlay() {
         val colorFilterValue = combine(
             GlobalPreference.colorFilterH.asFlow(),
             GlobalPreference.colorFilterS.asFlow(),
@@ -180,6 +153,54 @@ class ReaderFragment : Fragment() {
                 binding.colorOverlay.isVisible = false
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun initializeMenu() {
+        combine(
+            viewModel.chapterName.asFlow(),
+            viewModel.chapterTitle.asFlow(),
+            viewModel.chapterPosition.asFlow(),
+            viewModel.chapterSize.asFlow()
+        ) { name, title, position, size ->
+            val indicator = "$name $title ${position + 1}/$size"
+            binding.readerIndicator.text = indicator
+            binding.chapterPositionLabel.text = (position + 1).toString()
+            binding.chapterSizeLabel.text = size.toString()
+            binding.chapterProgress.max = size - 1
+            binding.chapterProgress.progress = position
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        binding.settingButton.setOnClickListener { ReaderSettingsSheet(requireContext()).show() }
+        binding.overlayButton.setOnClickListener {
+            ReaderOverlaySheet(requireContext(), viewLifecycleOwner.lifecycleScope)
+                .apply {
+                    setOnDismissListener { setMenuLayoutVisibility(true) }
+                    setMenuLayoutVisibility(false)
+                    window?.setDimAmount(0f)
+                }
+                .show()
+        }
+
+        binding.chapterProgress.setOnSeekBarChangeListener(object :
+            SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}
+            override fun onStartTrackingTouch(seek: SeekBar) {}
+            override fun onStopTrackingTouch(seek: SeekBar) {
+                binding.reader.setPage(seek.progress)
+            }
+        })
+
+        binding.buttonPrevChapter.setOnClickListener { openPrevChapter() }
+        binding.buttonNextChapter.setOnClickListener { openNextChapter() }
+
+
+        GlobalPreference.readingDirection.asFlow()
+            .onEach {
+                binding.menuBottomLayout.layoutDirection =
+                    if (it == GlobalPreference.ReadingDirection.RTL) View.LAYOUT_DIRECTION_RTL
+                    else View.LAYOUT_DIRECTION_LTR
+            }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
     private fun setMenuLayoutVisibility(isVisible: Boolean, animate: Boolean = true) {
