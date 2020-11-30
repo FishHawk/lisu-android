@@ -23,6 +23,7 @@
             android:layout_height="match_parent" />
 
         <TextView
+            android:id="@+id/reader_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
@@ -33,8 +34,7 @@
             android:paddingEnd="@dimen/baseline_8dp"
             android:paddingBottom="@dimen/baseline_4dp"
             android:text="@{String.format(`%s %s %s/%s`, viewModel.chapterName, viewModel.chapterTitle, viewModel.chapterPosition+1, viewModel.chapterSize)}"
-            android:textColor="#ffffff"
-            android:visibility="@{!viewModel.isMenuVisible ? View.VISIBLE : View.GONE}" />
+            android:textColor="#ffffff" />
 
         <com.fishhawk.driftinglibraryandroid.ui.reader.ReaderColorFilterView
             android:id="@+id/color_overlay"
@@ -46,7 +46,7 @@
             android:id="@+id/menu_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="@{viewModel.isMenuVisible ? View.VISIBLE : View.GONE}">
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"

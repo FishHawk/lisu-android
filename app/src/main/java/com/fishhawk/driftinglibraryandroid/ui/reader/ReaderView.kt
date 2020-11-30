@@ -23,10 +23,7 @@ class ReaderView @JvmOverloads constructor(
     private val recyclerView = binding.content
     private val pagerSnapHelper = PagerSnapHelper()
     private val layoutManager = LinearLayoutManager(context)
-    val adapter =
-        ImageListAdapter(
-            context
-        )
+    val adapter = ImageListAdapter(context)
 
     private var isSnapAttached = false
         set(value) {
@@ -64,9 +61,10 @@ class ReaderView @JvmOverloads constructor(
             field = value
         }
 
+    var isMenuVisible = false
     var onRequestPrevChapter: (() -> Unit)? = null
     var onRequestNextChapter: (() -> Unit)? = null
-    var onRequestMenu: (() -> Unit)? = null
+    var onRequestMenu: ((isEnabled: Boolean) -> Unit)? = null
     var onScrolled: ((Int) -> Unit)? = null
     var onPageLongClicked: ((Int, String) -> Unit)?
         set(value) {
@@ -193,23 +191,31 @@ class ReaderView @JvmOverloads constructor(
     private val detector = GestureDetectorCompat(context, object :
         GestureDetector.SimpleOnGestureListener() {
         override fun onSingleTapConfirmed(ev: MotionEvent?): Boolean {
-            val onLeftAreaClicked = {
-                if (mode == Mode.RTL) gotoNextPage()
-                else gotoPrevPage()
-            }
-            val onRightAreaClicked = {
-                if (mode == Mode.RTL) gotoPrevPage()
-                else gotoNextPage()
-            }
+            if (isMenuVisible) {
+                isMenuVisible = false
+                onRequestMenu?.invoke(isMenuVisible)
+            } else {
+                val onLeftAreaClicked = {
+                    if (mode == Mode.RTL) gotoNextPage()
+                    else gotoPrevPage()
+                }
+                val onRightAreaClicked = {
+                    if (mode == Mode.RTL) gotoPrevPage()
+                    else gotoNextPage()
+                }
 
-            val percentageX = ev?.x?.div(width)
-            val threshold = 0.3
+                val percentageX = ev?.x?.div(width)
+                val threshold = 0.3
 
-            if (percentageX != null) {
-                when {
-                    percentageX < threshold -> onLeftAreaClicked()
-                    percentageX > 1 - threshold -> onRightAreaClicked()
-                    else -> onRequestMenu?.invoke()
+                if (percentageX != null) {
+                    when {
+                        percentageX < threshold -> onLeftAreaClicked()
+                        percentageX > 1 - threshold -> onRightAreaClicked()
+                        else -> {
+                            isMenuVisible = true
+                            onRequestMenu?.invoke(isMenuVisible)
+                        }
+                    }
                 }
             }
             return true

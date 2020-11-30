@@ -104,7 +104,7 @@ class ReaderFragment : Fragment() {
     private fun setupReaderView() {
         binding.reader.onRequestPrevChapter = { openPrevChapter() }
         binding.reader.onRequestNextChapter = { openNextChapter() }
-        binding.reader.onRequestMenu = { viewModel.isMenuVisible.value = true }
+        binding.reader.onRequestMenu = { setMenuLayoutVisibility(it) }
         binding.reader.onScrolled = { viewModel.chapterPosition.value = it }
         binding.reader.onPageLongClicked = { position, url ->
             if (GlobalPreference.longTapDialog.get())
@@ -129,14 +129,13 @@ class ReaderFragment : Fragment() {
     }
 
     private fun setupMenuLayout() {
-        binding.menuLayout.setOnClickListener { viewModel.isMenuVisible.value = false }
 
         binding.settingButton.setOnClickListener { ReaderSettingsSheet(requireContext()).show() }
         binding.overlayButton.setOnClickListener {
             ReaderOverlaySheet(requireContext(), viewLifecycleOwner.lifecycleScope)
                 .apply {
-                    setOnDismissListener { viewModel.isMenuVisible.value = true }
-                    viewModel.isMenuVisible.value = false
+                    setOnDismissListener { setMenuLayoutVisibility(true) }
+                    setMenuLayoutVisibility(false)
                     window?.setDimAmount(0f)
                 }
                 .show()
@@ -181,6 +180,11 @@ class ReaderFragment : Fragment() {
                 binding.colorOverlay.isVisible = false
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun setMenuLayoutVisibility(isVisible: Boolean, animate: Boolean = true) {
+        binding.menuLayout.isVisible = isVisible
+        binding.readerIndicator.isVisible = !isVisible
     }
 
     private fun openPrevChapter() {

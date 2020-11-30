@@ -21,9 +21,6 @@ class ReaderViewModel(
     private val remoteProviderRepository: RemoteProviderRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModel() {
-    // menu
-    val isMenuVisible: MutableLiveData<Boolean> = MutableLiveData(false)
-
     // reader content
     private val mangaDetail: MutableLiveData<Result<MangaDetail>> = MutableLiveData()
     val readerContent: MutableLiveData<Result<List<String>>?> = MutableLiveData(null)
