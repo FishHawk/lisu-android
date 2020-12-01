@@ -21,14 +21,26 @@ class ReaderView @JvmOverloads constructor(
     private val binding = ReaderViewBinding.inflate(LayoutInflater.from(context), this, true)
 
     private val recyclerView = binding.content
-    private val pagerSnapHelper = PagerSnapHelper()
     private val layoutManager = LinearLayoutManager(context)
     val adapter = ImageListAdapter(context)
 
+    private val pagerSnapHelper = PagerSnapHelper()
     private var isSnapAttached = false
         set(value) {
+            adapter.isContinuous = !value
             if (value) pagerSnapHelper.attachToRecyclerView(binding.content)
             else pagerSnapHelper.attachToRecyclerView(null)
+            field = value
+        }
+
+    enum class ReadingDirection { LTR, RTL, TTB }
+
+    private var readingDirection = ReadingDirection.LTR
+        set(value) {
+            layoutManager.reverseLayout = (value == ReadingDirection.RTL)
+            layoutManager.orientation =
+                if (value == ReadingDirection.TTB) LinearLayoutManager.VERTICAL
+                else LinearLayoutManager.HORIZONTAL
             field = value
         }
 
@@ -38,28 +50,24 @@ class ReaderView @JvmOverloads constructor(
     }
 
 
-    enum class Mode { LTR, RTL, VERTICAL }
+    enum class Preset { LTR, RTL, VERTICAL }
 
-    var mode =
-        Mode.LTR
-        set(value) {
-            isSnapAttached = (value != Mode.VERTICAL)
-            layoutManager.reverseLayout = (value == Mode.RTL)
-            layoutManager.orientation =
-                if (value == Mode.VERTICAL) LinearLayoutManager.VERTICAL
-                else LinearLayoutManager.HORIZONTAL
-            adapter.isContinuous = !isSnapAttached
-
-            if (adapter.itemCount > 0) {
-                val page = getPage()
-                binding.content.adapter = binding.content.adapter
-                setPage(page)
-            } else {
-                binding.content.adapter = binding.content.adapter
-            }
-
-            field = value
+    fun applyPreset(preset: Preset) {
+        isSnapAttached = (preset != Preset.VERTICAL)
+        readingDirection = when (preset) {
+            Preset.LTR -> ReadingDirection.LTR
+            Preset.RTL -> ReadingDirection.RTL
+            Preset.VERTICAL -> ReadingDirection.TTB
         }
+
+        if (adapter.itemCount > 0) {
+            val page = getPage()
+            binding.content.adapter = binding.content.adapter
+            setPage(page)
+        } else {
+            binding.content.adapter = binding.content.adapter
+        }
+    }
 
     var isMenuVisible = false
     var onRequestPrevChapter: (() -> Unit)? = null
@@ -196,11 +204,11 @@ class ReaderView @JvmOverloads constructor(
                 onRequestMenu?.invoke(isMenuVisible)
             } else {
                 val onLeftAreaClicked = {
-                    if (mode == Mode.RTL) gotoNextPage()
+                    if (readingDirection == ReadingDirection.RTL) gotoNextPage()
                     else gotoPrevPage()
                 }
                 val onRightAreaClicked = {
-                    if (mode == Mode.RTL) gotoPrevPage()
+                    if (readingDirection == ReadingDirection.RTL) gotoPrevPage()
                     else gotoNextPage()
                 }
 

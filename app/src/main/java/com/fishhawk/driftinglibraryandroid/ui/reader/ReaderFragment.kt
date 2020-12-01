@@ -118,11 +118,12 @@ class ReaderFragment : Fragment() {
 
         GlobalPreference.readingDirection.asFlow()
             .onEach {
-                binding.reader.mode = when (it) {
-                    GlobalPreference.ReadingDirection.LTR -> ReaderView.Mode.LTR
-                    GlobalPreference.ReadingDirection.RTL -> ReaderView.Mode.RTL
-                    GlobalPreference.ReadingDirection.VERTICAL -> ReaderView.Mode.VERTICAL
+                val preset = when (it) {
+                    GlobalPreference.ReadingDirection.LTR -> ReaderView.Preset.LTR
+                    GlobalPreference.ReadingDirection.RTL -> ReaderView.Preset.RTL
+                    GlobalPreference.ReadingDirection.VERTICAL -> ReaderView.Preset.VERTICAL
                 }
+                binding.reader.applyPreset(preset)
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
