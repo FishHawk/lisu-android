@@ -19,7 +19,6 @@ import com.fishhawk.driftinglibraryandroid.databinding.ReaderFragmentBinding
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.ui.ReaderViewModelFactory
-import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import com.fishhawk.driftinglibraryandroid.ui.base.saveImage
 import com.fishhawk.driftinglibraryandroid.ui.base.shareImage
@@ -218,6 +217,8 @@ class ReaderFragment : Fragment() {
             binding.menuTopLayout.startAnimation(topAnim)
             binding.menuBottomLayout.startAnimation(bottomAnim)
         } else {
+            binding.readerIndicator.isVisible = true
+
             val topAnim =
                 AnimationUtils.loadAnimation(requireContext(), R.anim.exit_to_top)
             val bottomAnim =
@@ -226,7 +227,6 @@ class ReaderFragment : Fragment() {
                 object : SimpleAnimationListener() {
                     override fun onAnimationEnd(animation: Animation) {
                         binding.menuLayout.isVisible = false
-                        binding.readerIndicator.isVisible = true
                     }
                 }
             )
