@@ -65,11 +65,6 @@ class ReaderFragment : Fragment() {
         initializeReader()
         initializeOverlay()
         initializeMenu()
-
-        (requireActivity() as ReaderActivity).listener = object : ReaderActivity.OnVolumeKeyEvent {
-            override fun onVolumeUp() = binding.reader.gotoPrevPage()
-            override fun onVolumeDown() = binding.reader.gotoNextPage()
-        }
     }
 
     override fun onPause() {
@@ -125,6 +120,10 @@ class ReaderFragment : Fragment() {
                 }
                 binding.reader.applyPreset(preset)
             }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        GlobalPreference.useVolumeKey.asFlow()
+            .onEach { binding.reader.volumeKeysEnabled = it }
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
 

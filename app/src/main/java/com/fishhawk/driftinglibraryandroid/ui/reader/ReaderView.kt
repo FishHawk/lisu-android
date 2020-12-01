@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.GestureDetector
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.widget.FrameLayout
@@ -113,10 +114,7 @@ class ReaderView @JvmOverloads constructor(
     }
 
 
-    /*
-     * Scroll
-     */
-
+    /* Scroll */
     init {
         binding.content.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             private var isUserInput = false
@@ -162,13 +160,10 @@ class ReaderView @JvmOverloads constructor(
     }
 
 
-    /*
-     * Click
-     */
-
+    /* Move */
     private val smoothScrollFactor = 0.8
 
-    fun gotoNextPage() {
+    private fun toNext() {
         if (isSnapAttached) {
             val currentItem = layoutManager.findFirstVisibleItemPosition()
             if (currentItem == adapter.itemCount - 1) onRequestNextChapter?.invoke()
@@ -182,7 +177,7 @@ class ReaderView @JvmOverloads constructor(
         }
     }
 
-    fun gotoPrevPage() {
+    private fun toPrev() {
         if (isSnapAttached) {
             val currentItem = layoutManager.findFirstVisibleItemPosition()
             if (currentItem == 0) onRequestPrevChapter?.invoke()
@@ -196,6 +191,18 @@ class ReaderView @JvmOverloads constructor(
         }
     }
 
+    private fun toLeft() {
+        if (readingDirection == ReadingDirection.RTL) toNext()
+        else toPrev()
+    }
+
+    private fun toRight() {
+        if (readingDirection == ReadingDirection.RTL) toPrev()
+        else toNext()
+    }
+
+
+    /* Touch */
     private val detector = GestureDetectorCompat(context, object :
         GestureDetector.SimpleOnGestureListener() {
         override fun onSingleTapConfirmed(ev: MotionEvent?): Boolean {
@@ -203,22 +210,13 @@ class ReaderView @JvmOverloads constructor(
                 isMenuVisible = false
                 onRequestMenu?.invoke(isMenuVisible)
             } else {
-                val onLeftAreaClicked = {
-                    if (readingDirection == ReadingDirection.RTL) gotoNextPage()
-                    else gotoPrevPage()
-                }
-                val onRightAreaClicked = {
-                    if (readingDirection == ReadingDirection.RTL) gotoPrevPage()
-                    else gotoNextPage()
-                }
-
                 val percentageX = ev?.x?.div(width)
                 val threshold = 0.3
 
                 if (percentageX != null) {
                     when {
-                        percentageX < threshold -> onLeftAreaClicked()
-                        percentageX > 1 - threshold -> onRightAreaClicked()
+                        percentageX < threshold -> toLeft()
+                        percentageX > 1 - threshold -> toRight()
                         else -> {
                             isMenuVisible = true
                             onRequestMenu?.invoke(isMenuVisible)
@@ -238,5 +236,40 @@ class ReaderView @JvmOverloads constructor(
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         ev?.let { onTouchEvent(it) }
         return super.dispatchTouchEvent(ev)
+    }
+
+
+    /* Key Event */
+    var volumeKeysEnabled: Boolean = true
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        return when (event.keyCode) {
+            KeyEvent.KEYCODE_VOLUME_UP -> (volumeKeysEnabled && !isMenuVisible).also { if (it) toNext() }
+            KeyEvent.KEYCODE_VOLUME_DOWN -> (volumeKeysEnabled && !isMenuVisible).also { if (it) toPrev() }
+            else -> super.dispatchKeyEvent(event)
+        }
+    }
+
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_MENU -> {
+                isMenuVisible = !isMenuVisible
+                onRequestMenu?.invoke(isMenuVisible)
+            }
+
+            KeyEvent.KEYCODE_N -> onRequestNextChapter?.invoke()
+            KeyEvent.KEYCODE_P -> onRequestPrevChapter?.invoke()
+
+            KeyEvent.KEYCODE_DPAD_RIGHT -> toRight()
+            KeyEvent.KEYCODE_DPAD_LEFT -> toLeft()
+
+            KeyEvent.KEYCODE_DPAD_UP,
+            KeyEvent.KEYCODE_PAGE_UP -> toPrev()
+
+            KeyEvent.KEYCODE_DPAD_DOWN,
+            KeyEvent.KEYCODE_PAGE_DOWN -> toNext()
+            else -> return super.onKeyUp(keyCode, event)
+        }
+        return true
     }
 }

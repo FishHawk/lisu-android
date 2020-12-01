@@ -8,6 +8,7 @@ import android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityReaderBinding
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderView
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -37,7 +38,6 @@ class ReaderActivity : BaseActivity() {
             .onEach { setFlag(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, it) }
             .launchIn(lifecycleScope)
 
-
         combine(
             GlobalPreference.customBrightness.asFlow(),
             GlobalPreference.customBrightnessValue.asFlow()
@@ -48,21 +48,5 @@ class ReaderActivity : BaseActivity() {
             println(attrBrightness)
             window.attributes = window.attributes.apply { screenBrightness = attrBrightness }
         }.launchIn(lifecycleScope)
-    }
-
-    var listener: OnVolumeKeyEvent? = null
-
-    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        val useVolumeKey = GlobalPreference.useVolumeKey.get()
-        return when (event.keyCode) {
-            KeyEvent.KEYCODE_VOLUME_UP -> useVolumeKey.also { if (it) listener?.onVolumeUp() }
-            KeyEvent.KEYCODE_VOLUME_DOWN -> useVolumeKey.also { if (it) listener?.onVolumeDown() }
-            else -> super.dispatchKeyEvent(event)
-        }
-    }
-
-    interface OnVolumeKeyEvent {
-        fun onVolumeUp()
-        fun onVolumeDown()
     }
 }
