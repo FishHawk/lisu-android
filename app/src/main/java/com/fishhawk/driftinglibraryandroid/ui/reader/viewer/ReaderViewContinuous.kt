@@ -19,30 +19,6 @@ class ReaderViewContinuous constructor(
 
     val layoutManager = LinearLayoutManager(context)
 
-    override fun getPage(): Int = layoutManager.findFirstVisibleItemPosition()
-    override fun setPage(page: Int) {
-        if (adapter.itemCount != 0 && page >= 0 && page < adapter.itemCount)
-            binding.content.scrollToPosition(page)
-    }
-
-    override fun canScrollForward(): Boolean {
-        val direction = if (layoutManager.reverseLayout) -1 else 1
-        return when (layoutManager.orientation) {
-            RecyclerView.HORIZONTAL -> binding.content.canScrollHorizontally(direction)
-            RecyclerView.VERTICAL -> binding.content.canScrollVertically(direction)
-            else -> false
-        }
-    }
-
-    override fun canScrollBackward(): Boolean {
-        val direction = if (layoutManager.reverseLayout) 1 else -1
-        return when (layoutManager.orientation) {
-            RecyclerView.HORIZONTAL -> binding.content.canScrollHorizontally(direction)
-            RecyclerView.VERTICAL -> binding.content.canScrollVertically(direction)
-            else -> false
-        }
-    }
-
     init {
         adapter.isContinuous = true
 
@@ -91,6 +67,27 @@ class ReaderViewContinuous constructor(
                 onScrolled?.invoke(getPage())
             }
         })
+    }
+
+    override fun getPage(): Int = layoutManager.findFirstVisibleItemPosition()
+    override fun setPage(page: Int) = binding.content.scrollToPosition(page)
+
+    override fun canScrollForward(): Boolean {
+        val direction = if (layoutManager.reverseLayout) -1 else 1
+        return when (layoutManager.orientation) {
+            RecyclerView.HORIZONTAL -> binding.content.canScrollHorizontally(direction)
+            RecyclerView.VERTICAL -> binding.content.canScrollVertically(direction)
+            else -> false
+        }
+    }
+
+    override fun canScrollBackward(): Boolean {
+        val direction = if (layoutManager.reverseLayout) 1 else -1
+        return when (layoutManager.orientation) {
+            RecyclerView.HORIZONTAL -> binding.content.canScrollHorizontally(direction)
+            RecyclerView.VERTICAL -> binding.content.canScrollVertically(direction)
+            else -> false
+        }
     }
 
     private val smoothScrollFactor = 0.8

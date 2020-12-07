@@ -3,9 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.reader.viewer
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.PagerSnapHelper
-import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderViewPagerBinding
 
 class ReaderViewPager constructor(
@@ -18,42 +16,13 @@ class ReaderViewPager constructor(
         LayoutInflater.from(context), this, true
     )
 
-    private val pagerSnapHelper = PagerSnapHelper()
-
-    val layoutManager = LinearLayoutManager(context)
-    override fun getPage(): Int = layoutManager.findFirstVisibleItemPosition()
-    override fun setPage(page: Int) {
-        if (adapter.itemCount != 0 && page >= 0 && page < adapter.itemCount)
-            binding.content.scrollToPosition(page)
-    }
-
-    override fun canScrollForward(): Boolean {
-        val direction = if (layoutManager.reverseLayout) -1 else 1
-        return when (layoutManager.orientation) {
-            RecyclerView.HORIZONTAL -> binding.content.canScrollHorizontally(direction)
-            RecyclerView.VERTICAL -> binding.content.canScrollVertically(direction)
-            else -> false
-        }
-    }
-
-    override fun canScrollBackward(): Boolean {
-        val direction = if (layoutManager.reverseLayout) 1 else -1
-        return when (layoutManager.orientation) {
-            RecyclerView.HORIZONTAL -> binding.content.canScrollHorizontally(direction)
-            RecyclerView.VERTICAL -> binding.content.canScrollVertically(direction)
-            else -> false
-        }
-    }
-
     init {
         adapter.isContinuous = false
-        pagerSnapHelper.attachToRecyclerView(binding.content)
 
-        layoutManager.orientation = LinearLayoutManager.HORIZONTAL
-        binding.content.layoutManager = layoutManager
+        binding.content.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         binding.content.adapter = adapter
 
-        binding.content.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding.content.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             private var isUserInput = false
             private var hasSetting = false
             private var reachStart = false
@@ -66,9 +35,9 @@ class ReaderViewPager constructor(
                 reachEnd = false
             }
 
-            override fun onScrollStateChanged(recyclerView: RecyclerView, state: Int) {
+            override fun onPageScrollStateChanged(state: Int) {
                 when (state) {
-                    RecyclerView.SCROLL_STATE_IDLE -> {
+                    ViewPager2.SCROLL_STATE_IDLE -> {
                         reachStart = reachStart && !canScrollBackward()
                         reachEnd = reachEnd && !canScrollForward()
 
@@ -79,33 +48,52 @@ class ReaderViewPager constructor(
                         }
                         reset()
                     }
-                    RecyclerView.SCROLL_STATE_DRAGGING -> {
+                    ViewPager2.SCROLL_STATE_DRAGGING -> {
                         isUserInput = true
                         reachStart = !canScrollBackward()
                         reachEnd = !canScrollForward()
                     }
-                    RecyclerView.SCROLL_STATE_SETTLING -> {
+                    ViewPager2.SCROLL_STATE_SETTLING -> {
                         hasSetting = true
                     }
                 }
             }
 
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            override fun onPageSelected(position: Int) {
                 onScrolled?.invoke(getPage())
             }
         })
     }
 
+    override fun getPage(): Int = binding.content.currentItem
+    override fun setPage(page: Int) = binding.content.setCurrentItem(page, false)
+
+    override fun canScrollForward(): Boolean {
+        val direction = if (isReversed) -1 else 1
+        return when (binding.content.orientation) {
+            ViewPager2.ORIENTATION_HORIZONTAL -> binding.content.canScrollHorizontally(direction)
+            ViewPager2.ORIENTATION_VERTICAL -> binding.content.canScrollVertically(direction)
+            else -> false
+        }
+    }
+
+    override fun canScrollBackward(): Boolean {
+        val direction = if (isReversed) 1 else -1
+        return when (binding.content.orientation) {
+            ViewPager2.ORIENTATION_HORIZONTAL -> binding.content.canScrollHorizontally(direction)
+            ViewPager2.ORIENTATION_VERTICAL -> binding.content.canScrollVertically(direction)
+            else -> false
+        }
+    }
+
     override fun toNext() {
-        val currentItem = layoutManager.findFirstVisibleItemPosition()
-        if (currentItem == adapter.itemCount - 1) onRequestNextChapter?.invoke()
-        else binding.content.smoothScrollToPosition(currentItem + 1)
+        if (binding.content.currentItem == adapter.itemCount - 1) onRequestNextChapter?.invoke()
+        else binding.content.currentItem += 1
 
     }
 
     override fun toPrev() {
-        val currentItem = layoutManager.findFirstVisibleItemPosition()
-        if (currentItem == 0) onRequestPrevChapter?.invoke()
-        else binding.content.smoothScrollToPosition(currentItem - 1)
+        if (binding.content.currentItem == 0) onRequestPrevChapter?.invoke()
+        else binding.content.currentItem -= 1
     }
 }
