@@ -83,7 +83,7 @@ class ReaderFragment : Fragment() {
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         GlobalPreference.pageIntervalEnabled.asFlow()
-            .onEach { reader.pageIntervalEnabled = it }
+            .onEach { initializeReader() }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         GlobalPreference.volumeKeyEnabled.asFlow()
@@ -119,7 +119,11 @@ class ReaderFragment : Fragment() {
             else -> ReaderView.ReadingDirection.LTR
         }
 
+        reader.pageIntervalEnabled = GlobalPreference.pageIntervalEnabled.get()
+        reader.volumeKeysEnabled = GlobalPreference.volumeKeyEnabled.get()
+
         binding.readerContainer.addView(reader)
+        reader.requestFocus()
 
         reader.onRequestPrevChapter = { openPrevChapter() }
         reader.onRequestNextChapter = { openNextChapter() }

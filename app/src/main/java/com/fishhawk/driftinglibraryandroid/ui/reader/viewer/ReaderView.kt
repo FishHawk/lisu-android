@@ -31,7 +31,7 @@ abstract class ReaderView @JvmOverloads constructor(
         }
     abstract var pageIntervalEnabled: Boolean
 
-    val isRtl = readingDirection == ReadingDirection.RTL
+    val isRtl get() = readingDirection == ReadingDirection.RTL
 
     val adapter = ImageListAdapter(context)
     fun refreshPage(page: Int) = adapter.notifyItemChanged(page)
@@ -102,6 +102,8 @@ abstract class ReaderView @JvmOverloads constructor(
     var volumeKeysEnabled: Boolean = true
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_UP) return super.dispatchKeyEvent(event)
+
         return when (event.keyCode) {
             KeyEvent.KEYCODE_VOLUME_UP -> (volumeKeysEnabled && !isMenuVisible).also { if (it) toNext() }
             KeyEvent.KEYCODE_VOLUME_DOWN -> (volumeKeysEnabled && !isMenuVisible).also { if (it) toPrev() }
