@@ -22,6 +22,9 @@ import com.fishhawk.driftinglibraryandroid.ui.ReaderViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import com.fishhawk.driftinglibraryandroid.ui.base.saveImage
 import com.fishhawk.driftinglibraryandroid.ui.base.shareImage
+import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ReaderViewContinuous
+import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ReaderViewPager
+import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ReaderView
 import com.fishhawk.driftinglibraryandroid.widget.SimpleAnimationListener
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -48,6 +51,7 @@ class ReaderFragment : Fragment() {
         )
     }
     lateinit var binding: ReaderFragmentBinding
+    lateinit var reader: ReaderView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,6 +66,26 @@ class ReaderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         initializeReader()
+
+        viewModel.readerContent.observe(viewLifecycleOwner) { result ->
+            binding.title.text = viewModel.mangaTitle
+            when (result) {
+                is Result.Success -> {
+                    val content = result.data
+                    reader.setContent(content)
+                    viewModel.chapterPosition.value?.let { reader.setPage(it) }
+                }
+            }
+        }
+
+        GlobalPreference.readingDirection.asFlow()
+            .onEach { initializeReader() }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        GlobalPreference.useVolumeKey.asFlow()
+            .onEach { reader.volumeKeysEnabled = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
         initializeOverlay()
         initializeMenu()
     }
@@ -74,15 +98,26 @@ class ReaderFragment : Fragment() {
     }
 
     private fun initializeReader() {
-        binding.reader.onRequestPrevChapter = { openPrevChapter() }
-        binding.reader.onRequestNextChapter = { openNextChapter() }
-        binding.reader.onRequestMenu = { setMenuLayoutVisibility(it) }
-        binding.reader.onScrolled = { viewModel.chapterPosition.value = it }
-        binding.reader.onPageLongClicked = { position, url ->
+        binding.readerContainer.removeAllViews()
+        reader =
+            if (GlobalPreference.readingDirection.get() == GlobalPreference.ReadingDirection.VERTICAL)
+                ReaderViewContinuous(requireContext())
+            else
+                ReaderViewPager(requireContext())
+        binding.readerContainer.addView(reader)
+
+        reader.isReversed =
+            GlobalPreference.readingDirection.get() == GlobalPreference.ReadingDirection.RTL
+
+        reader.onRequestPrevChapter = { openPrevChapter() }
+        reader.onRequestNextChapter = { openNextChapter() }
+        reader.onRequestMenu = { setMenuLayoutVisibility(it) }
+        reader.onScrolled = { viewModel.chapterPosition.value = it }
+        reader.onPageLongClicked = { position, url ->
             if (GlobalPreference.longTapDialog.get())
                 ReaderPageSheet(requireContext(), object : ReaderPageSheet.Listener {
                     override fun onRefresh() {
-                        binding.reader.refreshPage(position)
+                        reader.refreshPage(position)
                     }
 
                     override fun onSave() {
@@ -98,32 +133,7 @@ class ReaderFragment : Fragment() {
                     }
                 }).show()
         }
-
-        viewModel.readerContent.observe(viewLifecycleOwner) { result ->
-            binding.title.text = viewModel.mangaTitle
-            when (result) {
-                is Result.Success -> {
-                    val content = result.data
-                    binding.reader.setContent(content)
-                    viewModel.chapterPosition.value?.let { binding.reader.setPage(it) }
-                }
-            }
-        }
-
-        GlobalPreference.readingDirection.asFlow()
-            .onEach {
-                val preset = when (it) {
-                    GlobalPreference.ReadingDirection.LTR -> ReaderView.Preset.LTR
-                    GlobalPreference.ReadingDirection.RTL -> ReaderView.Preset.RTL
-                    GlobalPreference.ReadingDirection.VERTICAL -> ReaderView.Preset.VERTICAL
-                }
-                binding.reader.applyPreset(preset)
-            }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
-
-        GlobalPreference.useVolumeKey.asFlow()
-            .onEach { binding.reader.volumeKeysEnabled = it }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.readerContent.value = viewModel.readerContent.value
     }
 
     private fun initializeOverlay() {
@@ -188,7 +198,7 @@ class ReaderFragment : Fragment() {
             override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}
             override fun onStartTrackingTouch(seek: SeekBar) {}
             override fun onStopTrackingTouch(seek: SeekBar) {
-                binding.reader.setPage(seek.progress)
+                reader.setPage(seek.progress)
             }
         })
 

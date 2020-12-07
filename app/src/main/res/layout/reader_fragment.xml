@@ -6,8 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".ui.reader.ReaderFragment">
 
-    <com.fishhawk.driftinglibraryandroid.ui.reader.ReaderView
-        android:id="@+id/reader"
+    <FrameLayout
+        android:id="@+id/reader_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

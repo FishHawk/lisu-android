@@ -2,13 +2,11 @@ package com.fishhawk.driftinglibraryandroid.ui.activity
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.view.KeyEvent
 import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityReaderBinding
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderView
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
