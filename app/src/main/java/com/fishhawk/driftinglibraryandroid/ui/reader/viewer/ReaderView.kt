@@ -37,9 +37,9 @@ abstract class ReaderView @JvmOverloads constructor(
     fun refreshPage(page: Int) = adapter.notifyItemChanged(page)
     fun setContent(content: List<String>) = adapter.setList(content)
 
-    var isMenuVisible = false
     var onRequestPrevChapter: (() -> Unit)? = null
     var onRequestNextChapter: (() -> Unit)? = null
+    var onRequestMenuVisibility: (() -> Boolean)? = null
     var onRequestMenu: ((isEnabled: Boolean) -> Unit)? = null
     var onPageChanged: ((Int) -> Unit)? = null
     var onPageLongClicked: ((Int, String) -> Unit)?
@@ -47,6 +47,9 @@ abstract class ReaderView @JvmOverloads constructor(
             adapter.onPageLongClicked = value
         }
         get() = adapter.onPageLongClicked
+
+    private val isMenuVisible: Boolean
+        get() = onRequestMenuVisibility?.invoke() == true
 
 
     abstract fun getPage(): Int
@@ -66,8 +69,7 @@ abstract class ReaderView @JvmOverloads constructor(
         GestureDetector.SimpleOnGestureListener() {
         override fun onSingleTapConfirmed(ev: MotionEvent): Boolean {
             if (isMenuVisible) {
-                isMenuVisible = false
-                onRequestMenu?.invoke(isMenuVisible)
+                onRequestMenu?.invoke(false)
             } else {
                 val percentageX = ev.x.div(width)
                 val threshold = 0.3
@@ -76,8 +78,7 @@ abstract class ReaderView @JvmOverloads constructor(
                     percentageX < threshold -> toLeft()
                     percentageX > 1 - threshold -> toRight()
                     else -> {
-                        isMenuVisible = true
-                        onRequestMenu?.invoke(isMenuVisible)
+                        onRequestMenu?.invoke(true)
                     }
                 }
             }
@@ -112,8 +113,7 @@ abstract class ReaderView @JvmOverloads constructor(
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
         when (keyCode) {
             KeyEvent.KEYCODE_MENU -> {
-                isMenuVisible = !isMenuVisible
-                onRequestMenu?.invoke(isMenuVisible)
+                onRequestMenu?.invoke(!isMenuVisible)
             }
 
             KeyEvent.KEYCODE_N -> onRequestNextChapter?.invoke()

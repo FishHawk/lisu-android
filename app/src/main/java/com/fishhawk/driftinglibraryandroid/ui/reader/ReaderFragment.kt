@@ -131,6 +131,7 @@ class ReaderFragment : Fragment() {
 
         reader.onRequestPrevChapter = { openPrevChapter() }
         reader.onRequestNextChapter = { openNextChapter() }
+        reader.onRequestMenuVisibility = { binding.menuLayout.isVisible }
         reader.onRequestMenu = { setMenuLayoutVisibility(it) }
         reader.onPageChanged = { viewModel.chapterPosition.value = it }
         reader.onPageLongClicked = { position, url ->
