@@ -3,8 +3,10 @@ package com.fishhawk.driftinglibraryandroid.ui.reader.viewer
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderViewPagerBinding
+import com.fishhawk.driftinglibraryandroid.util.dpToPx
 
 class ReaderViewPager constructor(
     context: Context,
@@ -16,10 +18,25 @@ class ReaderViewPager constructor(
         LayoutInflater.from(context), this, true
     )
 
+    override var readingOrientation: ReadingOrientation = ReadingOrientation.HORIZONTAL
+        set(value) {
+            binding.content.orientation = when (value) {
+                ReadingOrientation.HORIZONTAL -> ViewPager2.ORIENTATION_HORIZONTAL
+                ReadingOrientation.VERTICAL -> ViewPager2.ORIENTATION_VERTICAL
+            }
+            field = value
+        }
+
+    override var pageIntervalEnabled: Boolean = false
+        set(value) {
+            val transformer = if (value) MarginPageTransformer(context.dpToPx(16)) else null
+            binding.content.setPageTransformer(transformer)
+            field = value
+        }
+
     init {
         adapter.isContinuous = false
 
-        binding.content.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         binding.content.adapter = adapter
 
         binding.content.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -69,7 +86,7 @@ class ReaderViewPager constructor(
     override fun setPage(page: Int) = binding.content.setCurrentItem(page, false)
 
     override fun canScrollForward(): Boolean {
-        val direction = if (isReversed) -1 else 1
+        val direction = if (isRtl) -1 else 1
         return when (binding.content.orientation) {
             ViewPager2.ORIENTATION_HORIZONTAL -> binding.content.canScrollHorizontally(direction)
             ViewPager2.ORIENTATION_VERTICAL -> binding.content.canScrollVertically(direction)
@@ -78,7 +95,7 @@ class ReaderViewPager constructor(
     }
 
     override fun canScrollBackward(): Boolean {
-        val direction = if (isReversed) 1 else -1
+        val direction = if (isRtl) 1 else -1
         return when (binding.content.orientation) {
             ViewPager2.ORIENTATION_HORIZONTAL -> binding.content.canScrollHorizontally(direction)
             ViewPager2.ORIENTATION_VERTICAL -> binding.content.canScrollVertically(direction)

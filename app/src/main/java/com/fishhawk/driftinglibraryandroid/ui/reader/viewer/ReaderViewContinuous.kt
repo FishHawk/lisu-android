@@ -1,11 +1,15 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader.viewer
 
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderViewContinuousBinding
+import com.fishhawk.driftinglibraryandroid.util.dpToPx
 
 class ReaderViewContinuous constructor(
     context: Context,
@@ -19,10 +23,41 @@ class ReaderViewContinuous constructor(
 
     val layoutManager = LinearLayoutManager(context)
 
+    override var readingOrientation: ReadingOrientation = ReadingOrientation.VERTICAL
+        set(value) {
+            layoutManager.orientation = when (value) {
+                ReadingOrientation.HORIZONTAL -> ViewPager2.ORIENTATION_HORIZONTAL
+                ReadingOrientation.VERTICAL -> ViewPager2.ORIENTATION_VERTICAL
+            }
+            field = value
+        }
+
+    private val itemDecoration = object : RecyclerView.ItemDecoration() {
+        override fun getItemOffsets(
+            outRect: Rect,
+            view: View,
+            parent: RecyclerView,
+            state: RecyclerView.State
+        ) {
+            if (parent.getChildAdapterPosition(view) == 0) return
+            val offset = context.dpToPx(16)
+            when (readingOrientation) {
+                ReadingOrientation.HORIZONTAL -> outRect.left = offset
+                ReadingOrientation.VERTICAL -> outRect.top = offset
+            }
+        }
+    }
+
+    override var pageIntervalEnabled: Boolean = false
+        set(value) {
+            if (value) binding.content.addItemDecoration(itemDecoration)
+            else binding.content.removeItemDecoration(itemDecoration)
+            field = value
+        }
+
     init {
         adapter.isContinuous = true
 
-        layoutManager.orientation = LinearLayoutManager.VERTICAL
         binding.content.layoutManager = layoutManager
         binding.content.adapter = adapter
 

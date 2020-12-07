@@ -16,13 +16,22 @@ abstract class ReaderView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    var isReversed: Boolean = false
+    enum class ReadingOrientation { HORIZONTAL, VERTICAL }
+    enum class ReadingDirection { LTR, RTL }
+
+    abstract var readingOrientation: ReadingOrientation
+
+    var readingDirection = ReadingDirection.LTR
         set(value) {
-            layoutDirection =
-                if (value) RecyclerView.LAYOUT_DIRECTION_RTL
-                else RecyclerView.LAYOUT_DIRECTION_LTR
+            layoutDirection = when (value) {
+                ReadingDirection.LTR -> RecyclerView.LAYOUT_DIRECTION_LTR
+                ReadingDirection.RTL -> RecyclerView.LAYOUT_DIRECTION_RTL
+            }
             field = value
         }
+    abstract var pageIntervalEnabled: Boolean
+
+    val isRtl = readingDirection == ReadingDirection.RTL
 
     val adapter = ImageListAdapter(context)
     fun refreshPage(page: Int) = adapter.notifyItemChanged(page)
@@ -49,8 +58,8 @@ abstract class ReaderView @JvmOverloads constructor(
     protected abstract fun toNext()
     protected abstract fun toPrev()
 
-    protected fun toLeft() = if (isReversed) toNext() else toPrev()
-    protected fun toRight() = if (isReversed) toPrev() else toNext()
+    protected fun toLeft() = if (isRtl) toNext() else toPrev()
+    protected fun toRight() = if (isRtl) toPrev() else toNext()
 
     /* Touch */
     private val detector = GestureDetectorCompat(context, object :

@@ -99,15 +99,25 @@ class ReaderFragment : Fragment() {
 
     private fun initializeReader() {
         binding.readerContainer.removeAllViews()
-        reader =
-            if (GlobalPreference.readingDirection.get() == GlobalPreference.ReadingDirection.VERTICAL)
-                ReaderViewContinuous(requireContext())
-            else
-                ReaderViewPager(requireContext())
-        binding.readerContainer.addView(reader)
 
-        reader.isReversed =
-            GlobalPreference.readingDirection.get() == GlobalPreference.ReadingDirection.RTL
+        reader = when (GlobalPreference.readingDirection.get()) {
+            GlobalPreference.ReadingDirection.VERTICAL -> ReaderViewContinuous(requireContext())
+            else -> ReaderViewPager(requireContext())
+        }
+
+        reader.readingOrientation = when (GlobalPreference.readingDirection.get()) {
+            GlobalPreference.ReadingDirection.VERTICAL -> ReaderView.ReadingOrientation.VERTICAL
+            else -> ReaderView.ReadingOrientation.HORIZONTAL
+        }
+
+        reader.readingDirection = when (GlobalPreference.readingDirection.get()) {
+            GlobalPreference.ReadingDirection.RTL -> ReaderView.ReadingDirection.RTL
+            else -> ReaderView.ReadingDirection.LTR
+        }
+
+        reader.pageIntervalEnabled = true
+
+        binding.readerContainer.addView(reader)
 
         reader.onRequestPrevChapter = { openPrevChapter() }
         reader.onRequestNextChapter = { openNextChapter() }
