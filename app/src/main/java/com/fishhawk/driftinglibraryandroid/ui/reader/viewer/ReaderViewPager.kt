@@ -106,7 +106,6 @@ class ReaderViewPager constructor(
     override fun toNext() {
         if (binding.content.currentItem == adapter.itemCount - 1) onRequestNextChapter?.invoke()
         else binding.content.currentItem += 1
-
     }
 
     override fun toPrev() {

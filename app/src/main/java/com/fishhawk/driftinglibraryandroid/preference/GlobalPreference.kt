@@ -59,7 +59,7 @@ object GlobalPreference {
 
 
     // Settings reading
-    enum class ReadingDirection { LTR, RTL, VERTICAL }
+    enum class ReadingDirection { LTR, RTL, VERTICAL, CONTINUOUS }
     enum class ScreenOrientation { DEFAULT, LOCK, PORTRAIT, LANDSCAPE }
 
     val readingDirection by get("reading_direction", ReadingDirection.LTR)

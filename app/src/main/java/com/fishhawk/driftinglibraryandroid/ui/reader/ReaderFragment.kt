@@ -105,13 +105,17 @@ class ReaderFragment : Fragment() {
         binding.readerContainer.removeAllViews()
 
         reader = when (GlobalPreference.readingDirection.get()) {
-            GlobalPreference.ReadingDirection.VERTICAL -> ReaderViewContinuous(requireContext())
-            else -> ReaderViewPager(requireContext())
+            GlobalPreference.ReadingDirection.LTR,
+            GlobalPreference.ReadingDirection.RTL,
+            GlobalPreference.ReadingDirection.VERTICAL -> ReaderViewPager(requireContext())
+            GlobalPreference.ReadingDirection.CONTINUOUS -> ReaderViewContinuous(requireContext())
         }
 
         reader.readingOrientation = when (GlobalPreference.readingDirection.get()) {
-            GlobalPreference.ReadingDirection.VERTICAL -> ReaderView.ReadingOrientation.VERTICAL
-            else -> ReaderView.ReadingOrientation.HORIZONTAL
+            GlobalPreference.ReadingDirection.LTR,
+            GlobalPreference.ReadingDirection.RTL -> ReaderView.ReadingOrientation.HORIZONTAL
+            GlobalPreference.ReadingDirection.VERTICAL,
+            GlobalPreference.ReadingDirection.CONTINUOUS -> ReaderView.ReadingOrientation.VERTICAL
         }
 
         reader.readingDirection = when (GlobalPreference.readingDirection.get()) {
