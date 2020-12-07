@@ -21,7 +21,7 @@ class ReaderViewContinuous constructor(
         LayoutInflater.from(context), this, true
     )
 
-    val layoutManager = LinearLayoutManager(context)
+    private val layoutManager = LinearLayoutManager(context)
 
     override var readingOrientation: ReadingOrientation = ReadingOrientation.VERTICAL
         set(value) {
@@ -99,7 +99,7 @@ class ReaderViewContinuous constructor(
             }
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                onScrolled?.invoke(getPage())
+                onPageChanged?.invoke(getPage())
             }
         })
     }

@@ -3,7 +3,6 @@ package com.fishhawk.driftinglibraryandroid.ui.reader.viewer
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -19,24 +18,21 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
-class ImageListAdapter(
-    private val context: Context
-) : BaseAdapter<String>() {
+class ImageListAdapter(private val context: Context) : BaseAdapter<String>() {
+
     var onPageLongClicked: ((Int, String) -> Unit)? = null
     var isContinuous = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            ReaderChapterImageBinding.inflate(
-                LayoutInflater.from(context),
-                parent,
-                false
-            )
-        )
+        return ViewHolder(parent)
     }
 
     inner class ViewHolder(private val binding: ReaderChapterImageBinding) :
         BaseAdapter.ViewHolder<String>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(ReaderChapterImageBinding::inflate, parent)
+        )
 
         override fun bind(item: String, position: Int) {
             if (!isContinuous) {

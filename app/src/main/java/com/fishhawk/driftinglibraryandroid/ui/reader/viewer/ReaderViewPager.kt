@@ -77,7 +77,7 @@ class ReaderViewPager constructor(
             }
 
             override fun onPageSelected(position: Int) {
-                onScrolled?.invoke(getPage())
+                onPageChanged?.invoke(getPage())
             }
         })
     }

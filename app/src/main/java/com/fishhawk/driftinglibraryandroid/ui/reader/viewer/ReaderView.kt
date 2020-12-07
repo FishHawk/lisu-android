@@ -41,7 +41,7 @@ abstract class ReaderView @JvmOverloads constructor(
     var onRequestPrevChapter: (() -> Unit)? = null
     var onRequestNextChapter: (() -> Unit)? = null
     var onRequestMenu: ((isEnabled: Boolean) -> Unit)? = null
-    var onScrolled: ((Int) -> Unit)? = null
+    var onPageChanged: ((Int) -> Unit)? = null
     var onPageLongClicked: ((Int, String) -> Unit)?
         set(value) {
             adapter.onPageLongClicked = value
@@ -64,22 +64,20 @@ abstract class ReaderView @JvmOverloads constructor(
     /* Touch */
     private val detector = GestureDetectorCompat(context, object :
         GestureDetector.SimpleOnGestureListener() {
-        override fun onSingleTapConfirmed(ev: MotionEvent?): Boolean {
+        override fun onSingleTapConfirmed(ev: MotionEvent): Boolean {
             if (isMenuVisible) {
                 isMenuVisible = false
                 onRequestMenu?.invoke(isMenuVisible)
             } else {
-                val percentageX = ev?.x?.div(width)
+                val percentageX = ev.x.div(width)
                 val threshold = 0.3
 
-                if (percentageX != null) {
-                    when {
-                        percentageX < threshold -> toLeft()
-                        percentageX > 1 - threshold -> toRight()
-                        else -> {
-                            isMenuVisible = true
-                            onRequestMenu?.invoke(isMenuVisible)
-                        }
+                when {
+                    percentageX < threshold -> toLeft()
+                    percentageX > 1 - threshold -> toRight()
+                    else -> {
+                        isMenuVisible = true
+                        onRequestMenu?.invoke(isMenuVisible)
                     }
                 }
             }

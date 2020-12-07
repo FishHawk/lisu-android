@@ -132,7 +132,7 @@ class ReaderFragment : Fragment() {
         reader.onRequestPrevChapter = { openPrevChapter() }
         reader.onRequestNextChapter = { openNextChapter() }
         reader.onRequestMenu = { setMenuLayoutVisibility(it) }
-        reader.onScrolled = { viewModel.chapterPosition.value = it }
+        reader.onPageChanged = { viewModel.chapterPosition.value = it }
         reader.onPageLongClicked = { position, url ->
             if (GlobalPreference.longTapDialogEnabled.get())
                 ReaderPageSheet(requireContext(), object : ReaderPageSheet.Listener {

@@ -26,7 +26,6 @@ class ReaderColorFilterView(
             GlobalPreference.ColorFilterMode.LIGHTEN -> PorterDuff.Mode.LIGHTEN
             GlobalPreference.ColorFilterMode.DARKEN -> PorterDuff.Mode.DARKEN
         }.toXfermode()
-        println(filterMode)
 
         invalidate()
     }
