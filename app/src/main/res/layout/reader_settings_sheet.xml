@@ -55,13 +55,21 @@
         app:layout_constraintTop_toBottomOf="@id/direction" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/keep_screen_on"
+        android:id="@+id/page_interval"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Keep screen on"
+        android:text="Page interval"
         android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintTop_toBottomOf="@id/orientation" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/keep_screen_on"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Keep screen on"
+        android:textColor="?android:attr/textColorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/page_interval" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/use_volume_key"

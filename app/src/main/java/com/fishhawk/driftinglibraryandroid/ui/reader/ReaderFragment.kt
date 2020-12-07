@@ -82,7 +82,11 @@ class ReaderFragment : Fragment() {
             .onEach { initializeReader() }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        GlobalPreference.useVolumeKey.asFlow()
+        GlobalPreference.pageIntervalEnabled.asFlow()
+            .onEach { reader.pageIntervalEnabled = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
+        GlobalPreference.volumeKeyEnabled.asFlow()
             .onEach { reader.volumeKeysEnabled = it }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
@@ -115,8 +119,6 @@ class ReaderFragment : Fragment() {
             else -> ReaderView.ReadingDirection.LTR
         }
 
-        reader.pageIntervalEnabled = true
-
         binding.readerContainer.addView(reader)
 
         reader.onRequestPrevChapter = { openPrevChapter() }
@@ -124,7 +126,7 @@ class ReaderFragment : Fragment() {
         reader.onRequestMenu = { setMenuLayoutVisibility(it) }
         reader.onScrolled = { viewModel.chapterPosition.value = it }
         reader.onPageLongClicked = { position, url ->
-            if (GlobalPreference.longTapDialog.get())
+            if (GlobalPreference.longTapDialogEnabled.get())
                 ReaderPageSheet(requireContext(), object : ReaderPageSheet.Listener {
                     override fun onRefresh() {
                         reader.refreshPage(position)

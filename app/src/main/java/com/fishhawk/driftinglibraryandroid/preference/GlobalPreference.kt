@@ -64,9 +64,10 @@ object GlobalPreference {
 
     val readingDirection by get("reading_direction", ReadingDirection.LTR)
     val screenOrientation by get("screen_orientation", ScreenOrientation.DEFAULT)
+    val pageIntervalEnabled by get("page_interval_enabled", false)
     val keepScreenOn by get("keep_screen_on", false)
-    val useVolumeKey by get("use_volume_key", false)
-    val longTapDialog by get("long_tap_dialog", true)
+    val volumeKeyEnabled by get("volume_key_enabled", false)
+    val longTapDialogEnabled by get("long_tap_dialog_enabled", true)
 
 
     enum class ColorFilterMode { DEFAULT, MULTIPLY, SCREEN, OVERLAY, LIGHTEN, DARKEN }

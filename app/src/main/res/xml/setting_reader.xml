@@ -22,18 +22,24 @@
     <SwitchPreference
         app:defaultValue="false"
         app:iconSpaceReserved="false"
+        app:key="page_interval_enabled"
+        app:title="Page interval" />
+
+    <SwitchPreference
+        app:defaultValue="false"
+        app:iconSpaceReserved="false"
         app:key="keep_screen_on"
         app:title="Keep screen on" />
 
     <SwitchPreference
         app:defaultValue="false"
         app:iconSpaceReserved="false"
-        app:key="use_volume_key"
+        app:key="volume_key_enabled"
         app:title="Use volume key to turn pages" />
 
     <SwitchPreference
         app:defaultValue="true"
         app:iconSpaceReserved="false"
-        app:key="long_tap_dialog"
+        app:key="long_tap_dialog_enabled"
         app:title="Long tap dialog" />
 </PreferenceScreen>
