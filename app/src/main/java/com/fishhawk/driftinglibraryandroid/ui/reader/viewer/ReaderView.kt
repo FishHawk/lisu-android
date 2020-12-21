@@ -1,6 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader.viewer
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.GestureDetector
@@ -20,6 +19,8 @@ abstract class ReaderView @JvmOverloads constructor(
     enum class ReadingDirection { LTR, RTL }
 
     abstract var readingOrientation: ReadingOrientation
+    val isHorizontal get() = readingOrientation == ReadingOrientation.HORIZONTAL
+    val isVertical get() = readingOrientation == ReadingOrientation.VERTICAL
 
     var readingDirection = ReadingDirection.LTR
         set(value) {
@@ -29,9 +30,10 @@ abstract class ReaderView @JvmOverloads constructor(
             }
             field = value
         }
-    abstract var pageIntervalEnabled: Boolean
-
     val isRtl get() = readingDirection == ReadingDirection.RTL
+    val isLtr get() = readingDirection == ReadingDirection.LTR
+
+    abstract var pageIntervalEnabled: Boolean
 
     val adapter = ImageListAdapter(context)
     fun refreshPage(page: Int) = adapter.notifyItemChanged(page)
@@ -54,9 +56,6 @@ abstract class ReaderView @JvmOverloads constructor(
 
     abstract fun getPage(): Int
     abstract fun setPage(page: Int)
-
-    protected abstract fun canScrollForward(): Boolean
-    protected abstract fun canScrollBackward(): Boolean
 
     protected abstract fun toNext()
     protected abstract fun toPrev()
@@ -86,13 +85,8 @@ abstract class ReaderView @JvmOverloads constructor(
         }
     })
 
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(ev: MotionEvent): Boolean {
-        return detector.onTouchEvent(ev)
-    }
-
-    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        ev?.let { onTouchEvent(it) }
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        detector.onTouchEvent(ev)
         return super.dispatchTouchEvent(ev)
     }
 

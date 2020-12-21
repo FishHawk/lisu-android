@@ -107,7 +107,7 @@ class ReaderViewContinuous constructor(
     override fun getPage(): Int = layoutManager.findFirstVisibleItemPosition()
     override fun setPage(page: Int) = binding.content.scrollToPosition(page)
 
-    override fun canScrollForward(): Boolean {
+    fun canScrollForward(): Boolean {
         val direction = if (layoutManager.reverseLayout) -1 else 1
         return when (layoutManager.orientation) {
             RecyclerView.HORIZONTAL -> binding.content.canScrollHorizontally(direction)
@@ -116,7 +116,7 @@ class ReaderViewContinuous constructor(
         }
     }
 
-    override fun canScrollBackward(): Boolean {
+    fun canScrollBackward(): Boolean {
         val direction = if (layoutManager.reverseLayout) 1 else -1
         return when (layoutManager.orientation) {
             RecyclerView.HORIZONTAL -> binding.content.canScrollHorizontally(direction)
