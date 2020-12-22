@@ -37,7 +37,6 @@ abstract class ReaderView @JvmOverloads constructor(
 
     val adapter = ImageListAdapter(context)
     fun refreshPage(page: Int) = adapter.notifyItemChanged(page)
-    fun setContent(content: List<String>) = adapter.setList(content)
 
     var onRequestPrevChapter: (() -> Unit)? = null
     var onRequestNextChapter: (() -> Unit)? = null

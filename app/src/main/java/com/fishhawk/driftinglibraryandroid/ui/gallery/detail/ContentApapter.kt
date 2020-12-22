@@ -45,6 +45,7 @@ class ContentAdapter(
     private val id: String,
     private val providerId: String?
 ) : BaseAdapter<ContentItem>() {
+
     enum class ViewMode(val value: Int) {
         GRID(0),
         LINEAR(1)
@@ -108,7 +109,6 @@ class ContentAdapter(
         }
     }
 
-    override fun getItemCount() = list.size
 
     inner class ChapterViewHolder(private val binding: GalleryChapterGridBinding) :
         BaseAdapter.ViewHolder<ContentItem>(binding) {

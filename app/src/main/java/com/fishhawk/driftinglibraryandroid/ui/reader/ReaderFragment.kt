@@ -68,12 +68,13 @@ class ReaderFragment : Fragment() {
         viewModel.readerContent.observe(viewLifecycleOwner) { result ->
             binding.title.text = viewModel.mangaTitle
             when (result) {
-                is Result.Success -> {
-                    val content = result.data
-                    reader.setContent(content)
-                    viewModel.chapterPosition.value?.let { reader.setPage(it) }
+                is Result.Success -> reader.adapter.setContentPage(result.data)
+                is Result.Error -> {
+                    val message = result.exception.message ?: "Unknown error."
+                    reader.adapter.setErrorPage(message)
                 }
             }
+            viewModel.chapterPosition.value?.let { reader.setPage(it) }
         }
 
         combine(

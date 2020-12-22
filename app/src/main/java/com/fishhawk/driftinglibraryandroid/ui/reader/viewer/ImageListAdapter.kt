@@ -16,25 +16,86 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageBinding
+import com.fishhawk.driftinglibraryandroid.databinding.ReaderEmptyPageBinding
+import com.fishhawk.driftinglibraryandroid.databinding.ReaderErrorPageBinding
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
-class ImageListAdapter(private val context: Context) : BaseAdapter<String>() {
+sealed class Page {
+    data class ContentPage(val url: String) : Page()
+    data class ErrorPage(val message: String) : Page()
+    object EmptyPage : Page()
+}
+
+class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
 
     var onPageLongClicked: ((Int, String) -> Unit)? = null
     var isContinuous = false
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(parent)
+
+    enum class ViewType(val value: Int) {
+        CONTENT(0),
+        ERROR(1),
+        EMPTY(2),
     }
 
-    inner class ViewHolder(private val binding: ReaderChapterImageBinding) :
-        BaseAdapter.ViewHolder<String>(binding) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<Page> {
+        return when (viewType) {
+            ViewType.CONTENT.value -> ContentPageViewHolder(parent)
+            ViewType.ERROR.value -> ErrorPageViewHolder(parent)
+            ViewType.EMPTY.value -> EmptyPageViewHolder(parent)
+            else -> throw IllegalAccessError()
+        }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when (list[position]) {
+            is Page.ContentPage -> ViewType.CONTENT.value
+            is Page.ErrorPage -> ViewType.ERROR.value
+            is Page.EmptyPage -> ViewType.EMPTY.value
+        }
+    }
+
+    fun setContentPage(newList: List<String>) {
+        if (newList.isEmpty()) setList(listOf(Page.EmptyPage))
+        else setList(newList.map { Page.ContentPage(it) })
+    }
+
+    fun setErrorPage(message: String) {
+        setList(listOf(Page.ErrorPage(message)))
+    }
+
+
+    inner class EmptyPageViewHolder(binding: ReaderEmptyPageBinding) :
+        BaseAdapter.ViewHolder<Page>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(ReaderEmptyPageBinding::inflate, parent)
+        )
+    }
+
+    inner class ErrorPageViewHolder(private val binding: ReaderErrorPageBinding) :
+        BaseAdapter.ViewHolder<Page>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(ReaderErrorPageBinding::inflate, parent)
+        )
+
+        override fun bind(item: Page, position: Int) {
+            val message = (item as Page.ErrorPage).message
+            binding.message.text = message
+        }
+    }
+
+    inner class ContentPageViewHolder(private val binding: ReaderChapterImageBinding) :
+        BaseAdapter.ViewHolder<Page>(binding) {
 
         constructor(parent: ViewGroup) : this(
             viewBinding(ReaderChapterImageBinding::inflate, parent)
         )
 
-        override fun bind(item: String, position: Int) {
+        override fun bind(item: Page, position: Int) {
+            val url = (item as Page.ContentPage).url
+
             if (!isContinuous) {
                 binding.root.layoutParams = FrameLayout.LayoutParams(
                     FrameLayout.LayoutParams.MATCH_PARENT,
@@ -52,14 +113,14 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<String>() {
 
             binding.number.text = (position + 1).toString()
             binding.content.setOnLongClickListener {
-                onPageLongClicked?.invoke(position, item)
+                onPageLongClicked?.invoke(position, url)
                 true
             }
 
             Glide.with(context)
                 .asBitmap()
                 .timeout(20000)
-                .load(item)
+                .load(url)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                 .listener(object : RequestListener<Bitmap> {

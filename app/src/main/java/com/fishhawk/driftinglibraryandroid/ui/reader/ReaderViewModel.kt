@@ -65,16 +65,25 @@ class ReaderViewModel(
                 else remoteProviderRepository.getChapterContent(providerId, id, chapterId)
             when (result) {
                 is Result.Success -> {
-                    self.chapterIndex = chapterIndex
-                    self.chapterName.value = chapterName
-                    self.chapterTitle.value = chapterTitle
-                    self.chapterSize.value = result.data.size
-                    self.chapterPosition.value = when {
-                        startPage < 0 || startPage >= result.data.size -> result.data.size - 1
-                        else -> startPage
+                    if (result.data.isEmpty()) {
+                        self.chapterSize.value = 1
+                        self.chapterPosition.value = 0
+                    } else {
+                        self.chapterSize.value = result.data.size
+                        self.chapterPosition.value = when {
+                            startPage < 0 || startPage >= result.data.size -> result.data.size - 1
+                            else -> startPage
+                        }
                     }
                 }
+                is Result.Error -> {
+                    self.chapterSize.value = 1
+                    self.chapterPosition.value = 0
+                }
             }
+            self.chapterIndex = chapterIndex
+            self.chapterName.value = chapterName
+            self.chapterTitle.value = chapterTitle
             self.readerContent.value = result
             isLoading = false
         }
