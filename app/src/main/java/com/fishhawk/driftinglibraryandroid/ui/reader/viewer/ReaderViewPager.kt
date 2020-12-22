@@ -3,7 +3,6 @@ package com.fishhawk.driftinglibraryandroid.ui.reader.viewer
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.EdgeEffect
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.MarginPageTransformer
@@ -57,38 +56,38 @@ class ReaderViewPager constructor(
     }
 
 
-    private val onPageSelectedCallback = object : ViewPager2.OnPageChangeCallback() {
-        override fun onPageSelected(position: Int) {
-            onPageChanged?.invoke(getPage())
-        }
-    }
-
-    private val reachEdgeDetector = ReachEdgeDetector(this, binding.content)
-
     init {
-        binding.content.registerOnPageChangeCallback(onPageSelectedCallback)
-        reachEdgeDetector.attach()
+        binding.content.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) = onPageChanged?.invoke(getPage()) ?: Unit
+        })
+        object : OverScrollDetector(binding.content) {
+            override fun onOverScrollBackward() = onRequestPrevChapter?.invoke() ?: Unit
+            override fun onOverScrollForward() = onRequestNextChapter?.invoke() ?: Unit
+        }
     }
 }
 
-class ReachEdgeDetector(
-    private val reader: ReaderViewPager,
-    private val pager: ViewPager2
-) {
-    var isScrollingForward = false
+
+abstract class OverScrollDetector(private val pager: ViewPager2) {
+    abstract fun onOverScrollBackward()
+    abstract fun onOverScrollForward()
+
+    private var isScrollingForward = false
 
     private val factory = object : RecyclerView.EdgeEffectFactory() {
         override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
+            fun updateScrollDirection() {
+                isScrollingForward =
+                    if (pager.orientation == ViewPager2.ORIENTATION_HORIZONTAL) {
+                        if (pager.layoutDirection == ViewPager2.LAYOUT_DIRECTION_RTL)
+                            direction == DIRECTION_LEFT
+                        else direction == DIRECTION_RIGHT
+                    } else direction == DIRECTION_BOTTOM
+            }
+
             return object : EdgeEffect(view.context) {
                 override fun onPull(deltaDistance: Float, displacement: Float) {
-                    if (isFinished) {
-                        if (reader.isHorizontal && reader.isLtr)
-                            isScrollingForward = direction == DIRECTION_RIGHT
-                        else if (reader.isHorizontal && reader.isRtl)
-                            isScrollingForward = direction == DIRECTION_LEFT
-                        else if (reader.isVertical)
-                            isScrollingForward = direction == DIRECTION_BOTTOM
-                    }
+                    if (isFinished) updateScrollDirection()
                     super.onPull(deltaDistance, displacement)
                 }
             }
@@ -98,61 +97,52 @@ class ReachEdgeDetector(
     private val callback = object : ViewPager2.OnPageChangeCallback() {
         private var isUserInput = false
         private var hasSetting = false
-        private var reachStart = false
-        private var reachEnd = false
+        private var isFirstPage = false
+        private var isLastPage = false
 
-        fun reset() {
+        private fun reset() {
             hasSetting = false
             isUserInput = false
-            reachStart = false
-            reachEnd = false
+            isFirstPage = false
+            isLastPage = false
+        }
+
+        private fun isLastPage(): Boolean {
+            return pager.adapter?.let { pager.currentItem == it.itemCount - 1 } ?: true
+        }
+
+        private fun isFirstPage(): Boolean {
+            return pager.adapter?.let { pager.currentItem == 0 } ?: true
         }
 
         override fun onPageScrollStateChanged(state: Int) {
             when (state) {
                 ViewPager2.SCROLL_STATE_IDLE -> {
-                    reachStart = reachStart && !canScrollBackward()
-                    reachEnd = reachEnd && !canScrollForward()
+                    isFirstPage = isFirstPage && isFirstPage()
+                    isLastPage = isLastPage && isLastPage()
 
                     if (isUserInput && !hasSetting) {
-                        if (reachStart && !reachEnd) reader.onRequestPrevChapter?.invoke()
-                        else if (!reachStart && reachEnd) reader.onRequestNextChapter?.invoke()
-                        else if (reachStart && reachEnd) {
-                            if (isScrollingForward) reader.onRequestNextChapter?.invoke()
-                            else reader.onRequestPrevChapter?.invoke()
+                        if (isFirstPage && !isLastPage) onOverScrollBackward()
+                        else if (!isFirstPage && isLastPage) onOverScrollForward()
+                        else if (isFirstPage && isLastPage) {
+                            if (isScrollingForward) onOverScrollForward() else onOverScrollBackward()
                         }
                     }
                     reset()
                 }
                 ViewPager2.SCROLL_STATE_DRAGGING -> {
                     isUserInput = true
-                    reachStart = !canScrollBackward()
-                    reachEnd = !canScrollForward()
+                    isFirstPage = isFirstPage()
+                    isLastPage = isLastPage()
                 }
                 ViewPager2.SCROLL_STATE_SETTLING -> {
                     hasSetting = true
                 }
             }
         }
-
-        private fun canScrollForward(): Boolean {
-            val direction = if (reader.isRtl) -1 else 1
-            return when (reader.readingOrientation) {
-                ReaderView.ReadingOrientation.HORIZONTAL -> pager.canScrollHorizontally(direction)
-                ReaderView.ReadingOrientation.VERTICAL -> pager.canScrollVertically(direction)
-            }
-        }
-
-        private fun canScrollBackward(): Boolean {
-            val direction = if (reader.isRtl) 1 else -1
-            return when (reader.readingOrientation) {
-                ReaderView.ReadingOrientation.HORIZONTAL -> pager.canScrollHorizontally(direction)
-                ReaderView.ReadingOrientation.VERTICAL -> pager.canScrollVertically(direction)
-            }
-        }
     }
 
-    fun attach() {
+    init {
         pager.registerOnPageChangeCallback(callback)
         (pager.getChildAt(0) as RecyclerView).edgeEffectFactory = factory
     }
