@@ -65,8 +65,6 @@ class ReaderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initializeReader()
-
         viewModel.readerContent.observe(viewLifecycleOwner) { result ->
             binding.title.text = viewModel.mangaTitle
             when (result) {
@@ -78,12 +76,10 @@ class ReaderFragment : Fragment() {
             }
         }
 
-        GlobalPreference.readingDirection.asFlow()
-            .onEach { initializeReader() }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
-
-        GlobalPreference.pageIntervalEnabled.asFlow()
-            .onEach { initializeReader() }
+        combine(
+            GlobalPreference.readingDirection.asFlow(),
+            GlobalPreference.pageIntervalEnabled.asFlow()
+        ) { _, _ -> initializeReader() }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         GlobalPreference.volumeKeyEnabled.asFlow()

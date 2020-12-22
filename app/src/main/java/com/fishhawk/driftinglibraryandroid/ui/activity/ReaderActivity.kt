@@ -43,7 +43,6 @@ class ReaderActivity : BaseActivity() {
             val attrBrightness =
                 if (isEnabled) brightness.coerceIn(0, 100) / 100f
                 else BRIGHTNESS_OVERRIDE_NONE
-            println(attrBrightness)
             window.attributes = window.attributes.apply { screenBrightness = attrBrightness }
         }.launchIn(lifecycleScope)
     }
