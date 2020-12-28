@@ -3,14 +3,12 @@ package com.fishhawk.driftinglibraryandroid.ui.search
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
-import com.fishhawk.driftinglibraryandroid.ui.base.Page
-import com.fishhawk.driftinglibraryandroid.ui.base.PagingList
+import com.fishhawk.driftinglibraryandroid.ui.base.pagingList
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
@@ -20,21 +18,18 @@ class SearchViewModel(
     private val providerId: String,
     argKeywords: String
 ) : FeedbackViewModel() {
+
     val keywords = MutableLiveData(argKeywords)
 
-    val mangaList = object : PagingList<Int, MangaOutline>(viewModelScope) {
-        override suspend fun loadPage(key: Int?): Result<Page<Int, MangaOutline>> {
-            val page = key ?: 1
-            return remoteProviderRepository.search(
-                providerId = providerId,
-                keywords = keywords.value!!,
-                page = page
-            ).map { Page(data = it, nextPage = page + 1) }
-        }
-    }
-
-    init {
-        mangaList.list.addSource(keywords) { mangaList.load() }
+    val outlines = pagingList<Int, MangaOutline> { key ->
+        val page = key ?: 1
+        remoteProviderRepository.search(
+            providerId = providerId,
+            keywords = keywords.value!!,
+            page = page
+        ).map { Pair(page + 1, it) }
+    }.apply {
+        data.addSource(keywords) { reload() }
     }
 
     fun download(id: String, title: String) = viewModelScope.launch {

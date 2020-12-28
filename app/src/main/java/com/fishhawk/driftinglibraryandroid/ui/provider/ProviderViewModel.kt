@@ -9,7 +9,6 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionR
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderDetail
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
-import com.fishhawk.driftinglibraryandroid.ui.base.Page
 import com.fishhawk.driftinglibraryandroid.ui.base.PagingList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -18,14 +17,15 @@ typealias Option = MutableMap<String, Int>
 
 class ProviderMangaListComponent(
     scope: CoroutineScope,
-    private val loadPage: suspend (page: Int, option: Option) -> Result<List<MangaOutline>>
+    private val loadFunction: suspend (key: Int, option: Option) -> Result<List<MangaOutline>>
 ) : PagingList<Int, MangaOutline>(scope) {
+
     private var option: Option = mutableMapOf()
 
     fun selectOption(name: String, index: Int) {
         if (option[name] != index) {
             option[name] = index
-            load()
+            reload()
         }
     }
 
@@ -34,14 +34,13 @@ class ProviderMangaListComponent(
             option.filterKeys { option[it] != this.option[it] }.isNotEmpty()
         ) {
             this.option = option
-            load()
+            reload()
         }
     }
 
-    override suspend fun loadPage(key: Int?): Result<Page<Int, MangaOutline>> {
+    override suspend fun load(key: Int?): Result<Pair<Int?, List<MangaOutline>>> {
         val page = key ?: 1
-        return loadPage(key ?: 1, option)
-            .map { Page(data = it, nextPage = page + 1) }
+        return loadFunction(key ?: 1, option).map { Pair(page + 1, it) }
     }
 }
 

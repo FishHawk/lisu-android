@@ -86,7 +86,7 @@ class SearchFragment : Fragment() {
         bindToPagingList(
             binding.mangaList.multipleStatusView,
             binding.mangaList.refreshLayout,
-            viewModel.mangaList,
+            viewModel.outlines,
             mangaAdapter
         )
     }

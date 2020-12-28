@@ -1,9 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.base
 
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import com.classic.common.MultipleStatusView
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.repository.Event
@@ -13,14 +11,22 @@ import com.hippo.refreshlayout.RefreshLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-data class Page<KEY, ITEM>(
-    val data: List<ITEM>,
-    val nextPage: KEY?
-)
+sealed class NetworkResourceState {
+    object Loading : NetworkResourceState()
+    object Content : NetworkResourceState()
+    object Empty : NetworkResourceState()
+    data class Error(val exception: Throwable) : NetworkResourceState()
+}
 
-// TODO : fix consistency
+fun <KEY, ITEM> ViewModel.pagingList(
+    loadFunction: suspend (key: KEY?) -> Result<Pair<KEY?, List<ITEM>>>
+) = object : PagingList<KEY, ITEM>(viewModelScope) {
+    override suspend fun load(key: KEY?): Result<Pair<KEY?, List<ITEM>>> = loadFunction(key)
+}
+
 abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
-    val list: MediatorLiveData<Result<MutableList<ITEM>>?> = MediatorLiveData()
+    val state: MediatorLiveData<NetworkResourceState> = MediatorLiveData()
+    val data: MediatorLiveData<List<ITEM>> = MediatorLiveData()
 
     private val _refreshFinish: MutableLiveData<Event<Feedback>> = MutableLiveData()
     val refreshFinish: LiveData<Event<Feedback>> = _refreshFinish
@@ -28,35 +34,47 @@ abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
     private val _fetchMoreFinish: MutableLiveData<Event<Feedback>> = MutableLiveData()
     val fetchMoreFinish: LiveData<Event<Feedback>> = _fetchMoreFinish
 
-    private var nextPage: KEY? = null
-    private var canFetchMore: Boolean = true
+    private var nextKey: KEY? = null
+    private var isFinished: Boolean = false
 
-    protected abstract suspend fun loadPage(key: KEY?): Result<Page<KEY, ITEM>>
+    protected abstract suspend fun load(key: KEY?): Result<Pair<KEY?, List<ITEM>>>
 
-    private fun onNewPage(page: Page<KEY, ITEM>) {
-        nextPage = page.nextPage
-        if (page.data.isEmpty()) canFetchMore = false
-    }
+    fun reload() {
+        nextKey = null
+        isFinished = false
 
-    fun load() {
-        nextPage = null
-        list.value = null
+        state.value = NetworkResourceState.Loading
+        data.value = emptyList()
+
         scope.launch {
-            list.value = loadPage(null)
-                .onSuccess { onNewPage(it) }
-                .map { it.data.toMutableList() }
+            load(nextKey).onSuccess { (key, it) ->
+                nextKey = key
+                isFinished = it.isEmpty()
+
+                state.value =
+                    if (it.isEmpty()) NetworkResourceState.Empty
+                    else NetworkResourceState.Content
+                data.value = it
+            }.onFailure {
+                state.value = NetworkResourceState.Error(it)
+                data.value = emptyList()
+            }
         }
     }
 
     fun refresh() {
         scope.launch {
-            loadPage(null).onSuccess {
-                onNewPage(it)
+            load(null).onSuccess { (key, it) ->
+                nextKey = key
+                isFinished = it.isEmpty()
 
-                list.value = Result.Success(it.data.toMutableList())
+                state.value =
+                    if (it.isEmpty()) NetworkResourceState.Empty
+                    else NetworkResourceState.Content
+                data.value = it
 
                 _refreshFinish.value = Event(
-                    if (it.data.isEmpty()) Feedback.Hint(R.string.error_hint_empty_refresh_result)
+                    if (it.isEmpty()) Feedback.Hint(R.string.error_hint_empty_refresh_result)
                     else Feedback.Silent
                 )
             }.onFailure {
@@ -66,20 +84,24 @@ abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
     }
 
     fun fetchMore() {
-        if (!canFetchMore)
-            _fetchMoreFinish.value = Event(
-                Feedback.Hint(R.string.error_hint_empty_fetch_more_result)
-            )
-        else scope.launch {
-            loadPage(nextPage).onSuccess {
-                onNewPage(it)
+        if (isFinished)
+            _fetchMoreFinish.value =
+                Event(Feedback.Hint(R.string.error_hint_empty_fetch_more_result))
 
-                val items = (list.value as? Result.Success)?.data ?: mutableListOf()
-                items.addAll(it.data)
-                list.value = Result.Success(items)
+        scope.launch {
+            load(nextKey).onSuccess { (key, it) ->
+                nextKey = key
+                isFinished = it.isEmpty()
+
+                state.value =
+                    if (it.isEmpty()) NetworkResourceState.Empty
+                    else NetworkResourceState.Content
+                data.value =
+                    (data.value?.toMutableList() ?: mutableListOf())
+                        .apply { addAll(it) }
 
                 _fetchMoreFinish.value = Event(
-                    if (it.data.isEmpty()) Feedback.Hint(R.string.error_hint_empty_fetch_more_result)
+                    if (it.isEmpty()) Feedback.Hint(R.string.error_hint_empty_fetch_more_result)
                     else Feedback.Silent
                 )
             }.onFailure {
@@ -95,15 +117,14 @@ fun <Item> Fragment.bindToPagingList(
     component: PagingList<*, Item>,
     adapter: BaseAdapter<Item>
 ) {
-    component.list.observe(viewLifecycleOwner) { result ->
-        when (result) {
-            is Result.Success -> {
-                adapter.setList(result.data)
-                if (result.data.isEmpty()) multipleStatusView.showEmpty()
-                else multipleStatusView.showContent()
-            }
-            is Result.Error -> multipleStatusView.showError(result.exception.message)
-            null -> multipleStatusView.showLoading()
+    component.data.observe(viewLifecycleOwner) { adapter.setList(it) }
+
+    component.state.observe(viewLifecycleOwner) {
+        when (it) {
+            is NetworkResourceState.Loading -> multipleStatusView.showLoading()
+            is NetworkResourceState.Content -> multipleStatusView.showContent()
+            is NetworkResourceState.Empty -> multipleStatusView.showEmpty()
+            is NetworkResourceState.Error -> multipleStatusView.showError(it.exception.message)
         }
     }
 

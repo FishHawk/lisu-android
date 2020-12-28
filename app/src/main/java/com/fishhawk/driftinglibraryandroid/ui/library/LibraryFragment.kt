@@ -73,7 +73,7 @@ class LibraryFragment : Fragment() {
         bindToPagingList(
             binding.mangaList.multipleStatusView,
             binding.mangaList.refreshLayout,
-            viewModel.mangaList,
+            viewModel.outlines,
             adapter
         )
     }
