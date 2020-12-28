@@ -117,16 +117,16 @@ fun <Item> Fragment.bindToPagingList(
     component: PagingList<*, Item>,
     adapter: BaseAdapter<Item>
 ) {
-    component.data.observe(viewLifecycleOwner) { adapter.setList(it) }
+    component.data.observe(viewLifecycleOwner, Observer { adapter.setList(it) })
 
-    component.state.observe(viewLifecycleOwner) {
+    component.state.observe(viewLifecycleOwner, Observer {
         when (it) {
             is NetworkResourceState.Loading -> multipleStatusView.showLoading()
             is NetworkResourceState.Content -> multipleStatusView.showContent()
             is NetworkResourceState.Empty -> multipleStatusView.showEmpty()
             is NetworkResourceState.Error -> multipleStatusView.showError(it.exception.message)
         }
-    }
+    })
 
     component.refreshFinish.observe(viewLifecycleOwner, EventObserver {
         refreshLayout.isHeaderRefreshing = false
