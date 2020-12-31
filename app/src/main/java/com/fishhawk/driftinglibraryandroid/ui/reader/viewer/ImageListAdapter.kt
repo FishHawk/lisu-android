@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -107,12 +108,14 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
             binding.content.zoomable = !isContinuous
             binding.content.setImageResource(android.R.color.transparent)
 
-            binding.background.visibility = View.VISIBLE
-            binding.progress.visibility = View.VISIBLE
-            binding.errorHint.visibility = View.GONE
+
+            binding.background.isVisible = true
+            binding.progress.isVisible = true
+            binding.errorHint.isVisible = false
+            binding.content.isVisible = false
 
             binding.number.text = (position + 1).toString()
-            binding.content.setOnLongClickListener {
+            binding.root.setOnLongClickListener {
                 onPageLongClicked?.invoke(position, url)
                 true
             }
@@ -131,7 +134,8 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        binding.background.visibility = View.GONE
+                        binding.background.isVisible = false
+                        binding.content.isVisible = true
                         return false
                     }
 
@@ -141,8 +145,8 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
                         target: Target<Bitmap>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        binding.progress.visibility = View.GONE
-                        binding.errorHint.visibility = View.VISIBLE
+                        binding.progress.isVisible = false
+                        binding.errorHint.isVisible = true
                         if (e != null) binding.errorHint.text = e.message
                         else binding.errorHint.setText(R.string.image_unknown_error_hint)
                         return false
