@@ -3,6 +3,8 @@ package com.fishhawk.driftinglibraryandroid.ui.reader.viewer
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -15,6 +17,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
+import com.fishhawk.comicimageview.OnTapListener
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderEmptyPageBinding
@@ -30,6 +33,8 @@ sealed class Page {
 class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
 
     var onPageLongClicked: ((Int, String) -> Unit)? = null
+    var onPageTap: ((MotionEvent) -> Unit)? = null
+
     var isContinuous = false
 
 
@@ -90,6 +95,7 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
     inner class ContentPageViewHolder(private val binding: ReaderChapterImageBinding) :
         BaseAdapter.ViewHolder<Page>(binding) {
 
+
         constructor(parent: ViewGroup) : this(
             viewBinding(ReaderChapterImageBinding::inflate, parent)
         )
@@ -113,11 +119,40 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
             binding.progress.isVisible = true
             binding.errorHint.isVisible = false
             binding.content.isVisible = false
+            binding.retryButton.isVisible = false
+
+            binding.retryButton.setOnClickListener { notifyItemChanged(position) }
 
             binding.number.text = (position + 1).toString()
-            binding.root.setOnLongClickListener {
+
+            val detector =
+                GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
+                    override fun onDown(e: MotionEvent?): Boolean {
+                        return true
+                    }
+
+                    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                        onPageTap?.invoke(e)
+                        return true
+                    }
+
+                    override fun onLongPress(e: MotionEvent?) {
+                        onPageLongClicked?.invoke(position, url)
+                    }
+                })
+            binding.root.setOnTouchListener { v, event ->
+                detector.onTouchEvent(event)
+            }
+
+            binding.content.setOnLongClickListener {
                 onPageLongClicked?.invoke(position, url)
                 true
+            }
+
+            binding.content.onTapListener = object : OnTapListener {
+                override fun onTap(view: View?, ev: MotionEvent) {
+                    onPageTap?.invoke(ev)
+                }
             }
 
             Glide.with(context)
@@ -147,6 +182,7 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
                     ): Boolean {
                         binding.progress.isVisible = false
                         binding.errorHint.isVisible = true
+                        binding.retryButton.isVisible = true
                         if (e != null) binding.errorHint.text = e.message
                         else binding.errorHint.setText(R.string.image_unknown_error_hint)
                         return false

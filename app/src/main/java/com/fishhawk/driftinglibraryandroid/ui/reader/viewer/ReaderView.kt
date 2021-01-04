@@ -59,17 +59,16 @@ abstract class ReaderView @JvmOverloads constructor(
     protected abstract fun toNext()
     protected abstract fun toPrev()
 
-    protected fun toLeft() = if (isRtl) toNext() else toPrev()
-    protected fun toRight() = if (isRtl) toPrev() else toNext()
+    private fun toLeft() = if (isRtl) toNext() else toPrev()
+    private fun toRight() = if (isRtl) toPrev() else toNext()
 
     /* Touch */
-    private val detector = GestureDetectorCompat(context, object :
-        GestureDetector.SimpleOnGestureListener() {
-        override fun onSingleTapConfirmed(ev: MotionEvent): Boolean {
+    init {
+        adapter.onPageTap = { ev ->
             if (isMenuVisible) {
                 onRequestMenu?.invoke(false)
             } else {
-                val percentageX = ev.x.div(width)
+                val percentageX = (ev.rawX - left).div(width)
                 val threshold = 0.3
 
                 when {
@@ -80,13 +79,7 @@ abstract class ReaderView @JvmOverloads constructor(
                     }
                 }
             }
-            return true
         }
-    })
-
-    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        detector.onTouchEvent(ev)
-        return super.dispatchTouchEvent(ev)
     }
 
 
