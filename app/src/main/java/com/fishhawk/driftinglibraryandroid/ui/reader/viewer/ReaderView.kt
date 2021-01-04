@@ -2,11 +2,8 @@ package com.fishhawk.driftinglibraryandroid.ui.reader.viewer
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.GestureDetector
 import android.view.KeyEvent
-import android.view.MotionEvent
 import android.widget.FrameLayout
-import androidx.core.view.GestureDetectorCompat
 import androidx.recyclerview.widget.RecyclerView
 
 abstract class ReaderView @JvmOverloads constructor(
@@ -43,11 +40,11 @@ abstract class ReaderView @JvmOverloads constructor(
     var onRequestMenuVisibility: (() -> Boolean)? = null
     var onRequestMenu: ((isEnabled: Boolean) -> Unit)? = null
     var onPageChanged: ((Int) -> Unit)? = null
-    var onPageLongClicked: ((Int, String) -> Unit)?
+    var onPageLongClicked: ((Int, String) -> Unit)
         set(value) {
-            adapter.onPageLongClicked = value
+            adapter.onItemLongPress = value
         }
-        get() = adapter.onPageLongClicked
+        get() = adapter.onItemLongPress
 
     private val isMenuVisible: Boolean
         get() = onRequestMenuVisibility?.invoke() == true
@@ -64,7 +61,7 @@ abstract class ReaderView @JvmOverloads constructor(
 
     /* Touch */
     init {
-        adapter.onPageTap = { ev ->
+        adapter.onItemSingleTapConfirmed = { ev ->
             if (isMenuVisible) {
                 onRequestMenu?.invoke(false)
             } else {

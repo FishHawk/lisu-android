@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader.viewer
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -32,8 +33,8 @@ sealed class Page {
 
 class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
 
-    var onPageLongClicked: ((Int, String) -> Unit)? = null
-    var onPageTap: ((MotionEvent) -> Unit)? = null
+    var onItemLongPress: ((position: Int, url: String) -> Unit) = { _, _ -> }
+    var onItemSingleTapConfirmed: ((event: MotionEvent) -> Unit) = {}
 
     var isContinuous = false
 
@@ -100,8 +101,31 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
             viewBinding(ReaderChapterImageBinding::inflate, parent)
         )
 
+        private fun setLoading() {
+            binding.content.isVisible = false
+            binding.progress.isVisible = true
+            binding.retryButton.isVisible = false
+            binding.errorHint.isVisible = false
+        }
+
+        private fun setError() {
+            binding.content.isVisible = false
+            binding.progress.isVisible = false
+            binding.retryButton.isVisible = true
+            binding.errorHint.isVisible = true
+        }
+
+        private fun setContent() {
+            binding.content.isVisible = true
+            binding.progress.isVisible = false
+            binding.retryButton.isVisible = false
+            binding.errorHint.isVisible = false
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
         override fun bind(item: Page, position: Int) {
             val url = (item as Page.ContentPage).url
+            setLoading()
 
             if (!isContinuous) {
                 binding.root.layoutParams = FrameLayout.LayoutParams(
@@ -111,47 +135,35 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
                 binding.root.requestLayout()
             }
 
-            binding.content.zoomable = !isContinuous
-            binding.content.setImageResource(android.R.color.transparent)
+            val detector = GestureDetector(
+                context, object : GestureDetector.SimpleOnGestureListener() {
+                    override fun onDown(e: MotionEvent?): Boolean = true
 
+                    override fun onSingleTapConfirmed(e: MotionEvent): Boolean =
+                        onItemSingleTapConfirmed.invoke(e).let { true }
 
-            binding.background.isVisible = true
-            binding.progress.isVisible = true
-            binding.errorHint.isVisible = false
-            binding.content.isVisible = false
-            binding.retryButton.isVisible = false
-
-            binding.retryButton.setOnClickListener { notifyItemChanged(position) }
-
-            binding.number.text = (position + 1).toString()
-
-            val detector =
-                GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
-                    override fun onDown(e: MotionEvent?): Boolean {
-                        return true
-                    }
-
-                    override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                        onPageTap?.invoke(e)
-                        return true
-                    }
-
-                    override fun onLongPress(e: MotionEvent?) {
-                        onPageLongClicked?.invoke(position, url)
-                    }
+                    override fun onLongPress(e: MotionEvent) =
+                        onItemLongPress.invoke(position, url)
                 })
-            binding.root.setOnTouchListener { v, event ->
+
+            binding.root.setOnTouchListener { _, event ->
                 detector.onTouchEvent(event)
             }
 
+            binding.number.text = (position + 1).toString()
+
+            binding.retryButton.setOnClickListener { notifyItemChanged(position) }
+
+            binding.content.zoomable = !isContinuous
+            binding.content.setImageResource(android.R.color.transparent)
+
             binding.content.setOnLongClickListener {
-                onPageLongClicked?.invoke(position, url)
-                true
+                onItemLongPress.invoke(position, url).let { true }
             }
 
             binding.content.onTapListener = object : OnTapListener {
                 override fun onTap(view: View?, ev: MotionEvent) {
-                    onPageTap?.invoke(ev)
+                    onItemSingleTapConfirmed.invoke(ev)
                 }
             }
 
@@ -169,8 +181,7 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        binding.background.isVisible = false
-                        binding.content.isVisible = true
+                        setContent()
                         return false
                     }
 
@@ -180,9 +191,7 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
                         target: Target<Bitmap>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        binding.progress.isVisible = false
-                        binding.errorHint.isVisible = true
-                        binding.retryButton.isVisible = true
+                        setError()
                         if (e != null) binding.errorHint.text = e.message
                         else binding.errorHint.setText(R.string.image_unknown_error_hint)
                         return false
