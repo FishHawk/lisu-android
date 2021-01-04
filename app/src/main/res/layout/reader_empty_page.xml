@@ -9,6 +9,6 @@
         android:layout_height="500dp"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="Chapter load error."
+        android:text="Chapter is empty."
         android:textSize="40sp" />
 </FrameLayout>

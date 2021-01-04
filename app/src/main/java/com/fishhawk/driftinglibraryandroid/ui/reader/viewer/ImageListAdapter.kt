@@ -72,12 +72,25 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
     }
 
 
-    inner class EmptyPageViewHolder(binding: ReaderEmptyPageBinding) :
+    inner class EmptyPageViewHolder(private val binding: ReaderEmptyPageBinding) :
         BaseAdapter.ViewHolder<Page>(binding) {
 
         constructor(parent: ViewGroup) : this(
             viewBinding(ReaderEmptyPageBinding::inflate, parent)
         )
+
+        @SuppressLint("ClickableViewAccessibility")
+        override fun bind(item: Page, position: Int) {
+            val detector = GestureDetector(
+                context, object : GestureDetector.SimpleOnGestureListener() {
+                    override fun onDown(e: MotionEvent?): Boolean = true
+
+                    override fun onSingleTapConfirmed(e: MotionEvent): Boolean =
+                        onItemSingleTapConfirmed.invoke(e).let { true }
+                })
+
+            binding.root.setOnTouchListener { _, event -> detector.onTouchEvent(event) }
+        }
     }
 
     inner class ErrorPageViewHolder(private val binding: ReaderErrorPageBinding) :
@@ -87,9 +100,20 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
             viewBinding(ReaderErrorPageBinding::inflate, parent)
         )
 
+        @SuppressLint("ClickableViewAccessibility")
         override fun bind(item: Page, position: Int) {
             val message = (item as Page.ErrorPage).message
             binding.message.text = message
+
+            val detector = GestureDetector(
+                context, object : GestureDetector.SimpleOnGestureListener() {
+                    override fun onDown(e: MotionEvent?): Boolean = true
+
+                    override fun onSingleTapConfirmed(e: MotionEvent): Boolean =
+                        onItemSingleTapConfirmed.invoke(e).let { true }
+                })
+
+            binding.root.setOnTouchListener { _, event -> detector.onTouchEvent(event) }
         }
     }
 
