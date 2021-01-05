@@ -3,7 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.reader
 import android.content.Context
 import android.view.LayoutInflater
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderSettingsSheetBinding
-import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.widget.PreferenceBottomSheetDialog
 
 class ReaderSettingsSheet(context: Context) : PreferenceBottomSheetDialog(context) {

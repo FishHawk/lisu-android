@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ServerInfoCardBinding
-import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
+import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 class ServerInfoListAdapter(

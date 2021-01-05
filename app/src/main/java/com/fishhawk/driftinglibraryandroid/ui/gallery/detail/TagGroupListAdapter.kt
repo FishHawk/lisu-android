@@ -3,7 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery.detail
 import android.view.View
 import android.view.ViewGroup
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryTagGroupBinding
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.TagGroup
+import com.fishhawk.driftinglibraryandroid.data.remote.model.TagGroup
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 class TagGroupListAdapter(

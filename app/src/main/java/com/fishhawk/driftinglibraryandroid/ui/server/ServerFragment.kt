@@ -9,8 +9,8 @@ import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ServerFragmentBinding
-import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
-import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
+import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.flow.launchIn

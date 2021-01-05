@@ -3,9 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.base
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.repository.Event
-import com.fishhawk.driftinglibraryandroid.repository.EventObserver
-import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.data.Result
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import com.hippo.refreshlayout.RefreshLayout
 import kotlinx.coroutines.CoroutineScope

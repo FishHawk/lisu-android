@@ -3,7 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.provider
 import android.content.Context
 import android.view.LayoutInflater
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderActionSheetBinding
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class ProviderActionSheet(

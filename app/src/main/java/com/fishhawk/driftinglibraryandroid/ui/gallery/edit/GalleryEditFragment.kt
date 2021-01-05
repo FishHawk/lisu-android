@@ -11,10 +11,10 @@ import androidx.navigation.navGraphViewModels
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryEditFragmentBinding
-import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaStatus
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.MetadataDetail
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.TagGroup
+import com.fishhawk.driftinglibraryandroid.data.Result
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaStatus
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataDetail
+import com.fishhawk.driftinglibraryandroid.data.remote.model.TagGroup
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.bindToFeedbackViewModel
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel

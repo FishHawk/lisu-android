@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.SubscriptionCardBinding
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.Subscription
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Subscription
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 class SubscriptionListAdapter(

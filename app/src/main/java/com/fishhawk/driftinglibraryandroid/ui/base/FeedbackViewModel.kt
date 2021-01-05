@@ -4,9 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.fishhawk.driftinglibraryandroid.repository.Event
-import com.fishhawk.driftinglibraryandroid.repository.EventObserver
-import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.data.Result
 
 open class FeedbackViewModel : ViewModel() {
     private val _feedback: MutableLiveData<Event<Feedback>> = MutableLiveData()

@@ -6,7 +6,7 @@ import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.databinding.ActivityReaderBinding
-import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

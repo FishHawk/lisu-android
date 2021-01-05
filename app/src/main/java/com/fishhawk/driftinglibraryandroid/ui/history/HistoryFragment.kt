@@ -12,7 +12,7 @@ import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
-import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
+import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
 

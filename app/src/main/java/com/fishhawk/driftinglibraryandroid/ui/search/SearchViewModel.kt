@@ -3,10 +3,10 @@ package com.fishhawk.driftinglibraryandroid.ui.search
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
-import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
-import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.data.remote.RemoteDownloadRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.RemoteSubscriptionRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.remotePagingList
 import kotlinx.coroutines.launch

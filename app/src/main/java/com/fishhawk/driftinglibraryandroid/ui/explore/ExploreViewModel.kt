@@ -1,8 +1,8 @@
 package com.fishhawk.driftinglibraryandroid.ui.explore
 
 import androidx.lifecycle.*
-import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
-import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.base.remoteList
 
 class ExploreViewModel(

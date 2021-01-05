@@ -3,8 +3,8 @@ package com.fishhawk.driftinglibraryandroid.ui.download
 import android.view.View
 import android.view.ViewGroup
 import com.fishhawk.driftinglibraryandroid.databinding.DownloadTaskCardBinding
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadDesc
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadStatus
+import com.fishhawk.driftinglibraryandroid.data.remote.model.DownloadDesc
+import com.fishhawk.driftinglibraryandroid.data.remote.model.DownloadStatus
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 class DownloadTaskListAdapter(

@@ -7,7 +7,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryThumbnailBinding
-import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
+import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 import java.text.SimpleDateFormat
 import java.util.*

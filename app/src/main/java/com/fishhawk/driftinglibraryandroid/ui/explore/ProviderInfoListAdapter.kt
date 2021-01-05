@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.fishhawk.driftinglibraryandroid.databinding.ExploreProviderCardHeaderBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ExploreProviderCardItemBinding
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
 sealed class ListItem {

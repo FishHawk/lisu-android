@@ -1,9 +1,9 @@
 package com.fishhawk.driftinglibraryandroid.ui.download
 
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadDesc
+import com.fishhawk.driftinglibraryandroid.data.Result
+import com.fishhawk.driftinglibraryandroid.data.remote.RemoteDownloadRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.model.DownloadDesc
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.remoteList
 import com.fishhawk.driftinglibraryandroid.widget.ViewState

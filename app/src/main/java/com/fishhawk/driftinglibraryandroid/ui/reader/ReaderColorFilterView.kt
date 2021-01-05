@@ -7,7 +7,7 @@ import android.graphics.PorterDuff
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.graphics.toXfermode
-import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 
 class ReaderColorFilterView(
     context: Context,

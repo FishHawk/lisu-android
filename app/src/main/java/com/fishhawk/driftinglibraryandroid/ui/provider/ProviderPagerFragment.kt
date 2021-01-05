@@ -8,8 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderPagerFragmentBinding
-import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.preference.ProviderBrowseHistory
+import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.ProviderBrowseHistory
 import com.fishhawk.driftinglibraryandroid.ui.base.getDisplayModeIcon
 import com.fishhawk.driftinglibraryandroid.util.setNext
 

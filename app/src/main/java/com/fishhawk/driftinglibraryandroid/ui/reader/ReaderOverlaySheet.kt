@@ -3,7 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.reader
 import android.content.Context
 import android.view.LayoutInflater
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderOverlaySheetBinding
-import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.widget.PreferenceBottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn

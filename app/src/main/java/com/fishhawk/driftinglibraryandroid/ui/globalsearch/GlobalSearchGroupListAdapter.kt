@@ -3,9 +3,9 @@ package com.fishhawk.driftinglibraryandroid.ui.globalsearch
 import android.annotation.SuppressLint
 import android.view.ViewGroup
 import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchGroupBinding
-import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.data.Result
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
 

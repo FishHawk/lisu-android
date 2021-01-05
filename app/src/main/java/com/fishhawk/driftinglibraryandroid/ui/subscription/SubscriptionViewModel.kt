@@ -1,9 +1,9 @@
 package com.fishhawk.driftinglibraryandroid.ui.subscription
 
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.Subscription
+import com.fishhawk.driftinglibraryandroid.data.Result
+import com.fishhawk.driftinglibraryandroid.data.remote.RemoteSubscriptionRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Subscription
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.remoteList
 import com.fishhawk.driftinglibraryandroid.widget.ViewState

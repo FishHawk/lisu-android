@@ -1,9 +1,9 @@
 package com.fishhawk.driftinglibraryandroid.ui.globalsearch
 
 import androidx.lifecycle.*
-import com.fishhawk.driftinglibraryandroid.repository.Result
-import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.data.Result
+import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import kotlinx.coroutines.launch
 
 class GlobalSearchViewModel(

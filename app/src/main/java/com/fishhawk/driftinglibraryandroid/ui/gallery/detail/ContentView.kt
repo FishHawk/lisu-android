@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.Collection
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Collection
 
 class ContentView @JvmOverloads constructor(
     context: Context,

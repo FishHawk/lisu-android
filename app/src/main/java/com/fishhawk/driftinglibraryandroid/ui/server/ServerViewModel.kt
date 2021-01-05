@@ -1,9 +1,9 @@
 package com.fishhawk.driftinglibraryandroid.ui.server
 
 import androidx.lifecycle.*
-import com.fishhawk.driftinglibraryandroid.repository.local.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.repository.local.ServerInfoRepository
-import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
+import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
+import com.fishhawk.driftinglibraryandroid.data.database.ServerInfoRepository
+import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
 import kotlinx.coroutines.launch
 
 class ServerViewModel(

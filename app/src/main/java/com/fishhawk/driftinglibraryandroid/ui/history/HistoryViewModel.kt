@@ -1,9 +1,9 @@
 package com.fishhawk.driftinglibraryandroid.ui.history
 
 import androidx.lifecycle.*
-import com.fishhawk.driftinglibraryandroid.repository.local.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
+import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
+import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.launch
 

@@ -2,7 +2,7 @@ package com.fishhawk.driftinglibraryandroid.ui.history
 
 import androidx.appcompat.app.AlertDialog
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 
 fun HistoryFragment.createHistoryFilterSwitchDialog() {
     val checkedItem = when (GlobalPreference.historyFilter.get()) {

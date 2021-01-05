@@ -9,15 +9,15 @@ import androidx.room.Room
 import kotlinx.coroutines.runBlocking
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
-import com.fishhawk.driftinglibraryandroid.repository.local.ApplicationDatabase
-import com.fishhawk.driftinglibraryandroid.repository.local.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.repository.local.ServerInfoRepository
-import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
-import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryRepository
-import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepository
-import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
-import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
+import com.fishhawk.driftinglibraryandroid.data.database.ApplicationDatabase
+import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
+import com.fishhawk.driftinglibraryandroid.data.database.ServerInfoRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.RemoteDownloadRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.RemoteSubscriptionRepository
+import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 
 class MainApplication : Application() {
     private lateinit var database: ApplicationDatabase

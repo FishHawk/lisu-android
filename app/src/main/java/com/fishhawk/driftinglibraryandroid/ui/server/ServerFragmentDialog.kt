@@ -3,7 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.server
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import com.fishhawk.driftinglibraryandroid.databinding.ServerInfoDialogBinding
-import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
+import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
 
 fun ServerFragment.createServerInfoDialog(
     serverInfo: ServerInfo? = null,

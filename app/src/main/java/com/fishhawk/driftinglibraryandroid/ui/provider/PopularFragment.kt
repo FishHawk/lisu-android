@@ -1,6 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider
 
-import com.fishhawk.driftinglibraryandroid.repository.remote.model.OptionModels
+import com.fishhawk.driftinglibraryandroid.data.remote.model.OptionModels
 
 class PopularFragment : ProviderBaseFragment() {
     override val mangaListComponent: ProviderMangaListComponent by lazy { viewModel.popularMangaList }
