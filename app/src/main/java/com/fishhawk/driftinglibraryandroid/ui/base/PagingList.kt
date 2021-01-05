@@ -77,6 +77,9 @@ abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
     }
 
     fun fetchMore() {
+        if (state.value != ViewState.Content)
+            _fetchMoreFinish.value = Event(Feedback.Silent)
+
         if (isFinished)
             _fetchMoreFinish.value =
                 Event(Feedback.Hint(R.string.error_hint_empty_fetch_more_result))
@@ -86,9 +89,6 @@ abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
                 nextKey = key
                 isFinished = it.isEmpty()
 
-                state.value =
-                    if (it.isEmpty()) ViewState.Empty
-                    else ViewState.Content
                 data.value =
                     (data.value?.toMutableList() ?: mutableListOf())
                         .apply { addAll(it) }
