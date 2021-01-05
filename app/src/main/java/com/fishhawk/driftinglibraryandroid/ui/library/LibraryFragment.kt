@@ -64,18 +64,19 @@ class LibraryFragment : Fragment() {
         setupMenu(binding.toolbar.menu)
         binding.toolbar.setOnMenuItemClickListener(this::onMenuItemSelected)
 
-        binding.mangaList.list.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         GlobalPreference.displayMode.asFlow()
-            .onEach { binding.mangaList.list.changeMangaListDisplayMode(adapter) }
+            .onEach { binding.recyclerView.changeMangaListDisplayMode(adapter) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        bindToPagingList(
-            binding.mangaList.multipleStatusView,
-            binding.mangaList.refreshLayout,
-            viewModel.outlines,
-            adapter
-        )
+        viewModel.outlines.data.observe(viewLifecycleOwner) {
+            adapter.setList(it)
+        }
+        viewModel.outlines.state.observe(viewLifecycleOwner) {
+            binding.multiStateView.viewState = it
+        }
+        bindToPagingList(binding.refreshLayout, viewModel.outlines)
     }
 
     private fun setupMenu(menu: Menu) {

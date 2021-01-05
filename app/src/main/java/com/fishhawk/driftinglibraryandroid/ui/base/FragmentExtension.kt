@@ -18,13 +18,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.classic.common.MultipleStatusView
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
+import com.fishhawk.driftinglibraryandroid.widget.MultiStateView
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import com.hippo.refreshlayout.RefreshLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,7 +33,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 fun <T> Fragment.bindToListViewModel(
-    multipleStatusView: MultipleStatusView,
+    multiStateView: MultiStateView,
     refreshLayout: RefreshLayout,
     viewModel: RefreshableListViewModel<T>,
     adapter: BaseAdapter<T>
@@ -40,14 +41,14 @@ fun <T> Fragment.bindToListViewModel(
     bindToFeedbackViewModel(viewModel)
 
     viewModel.list.observe(viewLifecycleOwner) { result ->
-        when (result) {
+        if (result is Result.Success) adapter.setList(result.data)
+        multiStateView.viewState = when (result) {
             is Result.Success -> {
-                adapter.setList(result.data)
-                if (result.data.isEmpty()) multipleStatusView.showEmpty()
-                else multipleStatusView.showContent()
+                if (result.data.isEmpty()) ViewState.Empty
+                else ViewState.Content
             }
-            is Result.Error -> multipleStatusView.showError(result.exception.message)
-            null -> multipleStatusView.showLoading()
+            is Result.Error -> ViewState.Error(result.exception)
+            null -> ViewState.Loading
         }
     }
 

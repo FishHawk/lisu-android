@@ -33,10 +33,26 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include
-        android:id="@+id/manga_list"
-        layout="@layout/manga_list_view"
+
+    <com.fishhawk.driftinglibraryandroid.widget.MultiStateView
+        android:id="@+id/multi_state_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <com.hippo.refreshlayout.RefreshLayout
+            android:id="@+id/refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="4dp"
+                tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                tools:listitem="@layout/manga_grid_card"
+                tools:spanCount="3" />
+        </com.hippo.refreshlayout.RefreshLayout>
+    </com.fishhawk.driftinglibraryandroid.widget.MultiStateView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

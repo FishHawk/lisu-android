@@ -45,9 +45,9 @@ class DownloadFragment : Fragment() {
         binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
 
-        binding.list.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
-        bindToListViewModel(binding.multipleStatusView, binding.refreshLayout, viewModel, adapter)
+        bindToListViewModel(binding.multiStateView, binding.refreshLayout, viewModel, adapter)
         viewModel.load()
     }
 

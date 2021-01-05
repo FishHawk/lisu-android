@@ -179,12 +179,10 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
 
-        <com.classic.common.MultipleStatusView
-            android:id="@+id/multiple_status_view"
+        <com.fishhawk.driftinglibraryandroid.widget.MultiStateView
+            android:id="@+id/multi_state_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:errorView="@layout/status_error"
-            app:loadingView="@layout/status_loading">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:id="@+id/content_view"
@@ -315,6 +313,6 @@
                         android:textColor="?attr/colorSecondary" />
                 </LinearLayout>
             </LinearLayout>
-        </com.classic.common.MultipleStatusView>
+        </com.fishhawk.driftinglibraryandroid.widget.MultiStateView>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

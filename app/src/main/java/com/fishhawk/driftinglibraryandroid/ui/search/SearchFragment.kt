@@ -77,18 +77,19 @@ class SearchFragment : Fragment() {
         binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
 
-        binding.mangaList.list.adapter = mangaAdapter
+        binding.recyclerView.adapter = mangaAdapter
 
         GlobalPreference.displayMode.asFlow()
-            .onEach { binding.mangaList.list.changeMangaListDisplayMode(mangaAdapter) }
+            .onEach { binding.recyclerView.changeMangaListDisplayMode(mangaAdapter) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        bindToPagingList(
-            binding.mangaList.multipleStatusView,
-            binding.mangaList.refreshLayout,
-            viewModel.outlines,
-            mangaAdapter
-        )
+        viewModel.outlines.data.observe(viewLifecycleOwner) {
+            mangaAdapter.setList(it)
+        }
+        viewModel.outlines.state.observe(viewLifecycleOwner) {
+            binding.multiStateView.viewState = it
+        }
+        bindToPagingList(binding.refreshLayout, viewModel.outlines)
     }
 
     private fun setupMenu(menu: Menu) {

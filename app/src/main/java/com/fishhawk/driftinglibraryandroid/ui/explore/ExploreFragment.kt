@@ -19,6 +19,7 @@ import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -64,21 +65,21 @@ class ExploreFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupMenu(binding.toolbar.menu)
 
-        binding.list.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         GlobalPreference.lastUsedProvider.asFlow()
             .onEach { adapter.lastUsedProviderId = it }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         viewModel.providerList.observe(viewLifecycleOwner) { result ->
-            when (result) {
+            if (result is Result.Success) adapter.infoList = result.data
+            binding.multiStateView.viewState = when (result) {
                 is Result.Success -> {
-                    adapter.infoList = result.data
-                    if (binding.list.adapter!!.itemCount == 0) binding.multipleStatusView.showEmpty()
-                    else binding.multipleStatusView.showContent()
+                    if (binding.recyclerView.adapter!!.itemCount == 0) ViewState.Empty
+                    else ViewState.Content
                 }
-                is Result.Error -> binding.multipleStatusView.showError(result.exception.message)
-                null -> binding.multipleStatusView.showLoading()
+                is Result.Error -> ViewState.Error(result.exception)
+                null -> ViewState.Loading
             }
         }
     }

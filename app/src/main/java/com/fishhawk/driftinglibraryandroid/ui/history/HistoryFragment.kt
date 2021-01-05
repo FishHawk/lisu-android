@@ -60,14 +60,9 @@ class HistoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.toolbar.setOnMenuItemClickListener(this::onMenuItemSelected)
-
-        binding.list.adapter = adapter
-
-        viewModel.filteredReadingHistoryList.observe(viewLifecycleOwner) {
-            adapter.setList(it)
-            if (it.isEmpty()) binding.multipleStatusView.showEmpty()
-            else binding.multipleStatusView.showContent()
-        }
+        binding.recyclerView.adapter = adapter
+        viewModel.viewState.observe(viewLifecycleOwner) { binding.multiStateView.viewState = it }
+        viewModel.filteredHistoryList.observe(viewLifecycleOwner) { adapter.setList(it) }
     }
 
     private fun onMenuItemSelected(item: MenuItem): Boolean {

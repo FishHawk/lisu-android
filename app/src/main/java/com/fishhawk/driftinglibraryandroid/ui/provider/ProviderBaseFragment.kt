@@ -93,20 +93,21 @@ abstract class ProviderBaseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         providerBrowseHistory = ProviderBrowseHistory(requireContext())
 
-        binding.mangaList.list.adapter = mangaAdapter
+        binding.recyclerView.adapter = mangaAdapter
 
         binding.options.adapter = optionAdapter
 
         GlobalPreference.displayMode.asFlow()
-            .onEach { binding.mangaList.list.changeMangaListDisplayMode(mangaAdapter) }
+            .onEach { binding.recyclerView.changeMangaListDisplayMode(mangaAdapter) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        bindToPagingList(
-            binding.mangaList.multipleStatusView,
-            binding.mangaList.refreshLayout,
-            mangaListComponent,
-            mangaAdapter
-        )
+        mangaListComponent.data.observe(viewLifecycleOwner) {
+            mangaAdapter.setList(it)
+        }
+        mangaListComponent.state.observe(viewLifecycleOwner) {
+            binding.multiStateView.viewState = it
+        }
+        bindToPagingList(binding.refreshLayout, mangaListComponent)
 
         viewModel.detail.observe(viewLifecycleOwner) { result ->
             when (result) {

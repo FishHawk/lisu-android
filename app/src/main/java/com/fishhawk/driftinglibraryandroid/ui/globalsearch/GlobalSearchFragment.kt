@@ -54,7 +54,7 @@ class GlobalSearchFragment : Fragment() {
         binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
 
-        binding.list.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         viewModel.searchGroupList.observe(viewLifecycleOwner) { adapter.setList(it) }
     }

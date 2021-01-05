@@ -4,35 +4,36 @@ import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.repository.local.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.repository.local.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.launch
 
 class HistoryViewModel(
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModel() {
-    private val readingHistoryList: LiveData<List<ReadingHistory>> =
+    private val historyList: LiveData<List<ReadingHistory>> =
         GlobalPreference.selectedServer.asFlow().asLiveData().switchMap {
             readingHistoryRepository.observeAllReadingHistoryOfServer(it)
         }
 
-    val filteredReadingHistoryList: MediatorLiveData<List<ReadingHistory>> = MediatorLiveData()
+    private val _filteredHistoryList: MediatorLiveData<List<ReadingHistory>> = MediatorLiveData()
+    val filteredHistoryList: LiveData<List<ReadingHistory>> = _filteredHistoryList
 
-    init {
-        filteredReadingHistoryList.addSource(readingHistoryList) { list ->
-            val filter = GlobalPreference.historyFilter.get()
-            filteredReadingHistoryList.value = filterList(list, filter)
-        }
-        filteredReadingHistoryList.addSource(
-            GlobalPreference.historyFilter.asFlow().asLiveData()
-        ) { filter ->
-            val list = readingHistoryList.value
-            if (list != null) filteredReadingHistoryList.value = filterList(list, filter)
-        }
+    val viewState = _filteredHistoryList.map {
+        if (it.isEmpty()) ViewState.Empty
+        else ViewState.Content
     }
 
-    fun clearReadingHistory() = viewModelScope.launch {
-        readingHistoryRepository.clearReadingHistoryOfServer(
-            GlobalPreference.selectedServer.get()
-        )
+    init {
+        _filteredHistoryList.addSource(historyList) { list ->
+            val filter = GlobalPreference.historyFilter.get()
+            _filteredHistoryList.value = filterList(list, filter)
+        }
+        _filteredHistoryList.addSource(
+            GlobalPreference.historyFilter.asFlow().asLiveData()
+        ) { filter ->
+            val list = historyList.value
+            if (list != null) _filteredHistoryList.value = filterList(list, filter)
+        }
     }
 
     private fun filterList(
@@ -44,5 +45,11 @@ class HistoryViewModel(
             GlobalPreference.HistoryFilter.FROM_LIBRARY -> list.filter { it.providerId == null }
             GlobalPreference.HistoryFilter.FROM_SOURCES -> list.filter { it.providerId != null }
         }
+    }
+
+    fun clearReadingHistory() = viewModelScope.launch {
+        readingHistoryRepository.clearReadingHistoryOfServer(
+            GlobalPreference.selectedServer.get()
+        )
     }
 }

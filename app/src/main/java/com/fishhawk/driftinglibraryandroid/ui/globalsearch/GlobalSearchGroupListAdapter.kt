@@ -7,6 +7,7 @@ import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 
 data class SearchGroup(
     val provider: ProviderInfo,
@@ -37,16 +38,17 @@ class GlobalSearchGroupListAdapter(
                     listener.onItemClicked(item.provider, outline)
                 }
             })
-            binding.list.adapter = adapter
+            binding.recyclerView.adapter = adapter
 
-            when (val result = item.result) {
+            val result = item.result
+            if (result is Result.Success) adapter.setList(result.data)
+            binding.multiStateView.viewState = when (result) {
                 is Result.Success -> {
-                    adapter.setList(result.data)
-                    if (result.data.isEmpty()) binding.multipleStatusView.showEmpty()
-                    else binding.multipleStatusView.showContent()
+                    if (result.data.isEmpty()) ViewState.Empty
+                    else ViewState.Content
                 }
-                is Result.Error -> binding.multipleStatusView.showError(result.exception.message)
-                null -> binding.multipleStatusView.showLoading()
+                is Result.Error -> ViewState.Error(result.exception)
+                null -> ViewState.Loading
             }
         }
     }

@@ -2,21 +2,14 @@ package com.fishhawk.driftinglibraryandroid.ui.base
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
-import com.classic.common.MultipleStatusView
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.repository.Event
 import com.fishhawk.driftinglibraryandroid.repository.EventObserver
 import com.fishhawk.driftinglibraryandroid.repository.Result
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import com.hippo.refreshlayout.RefreshLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
-sealed class NetworkResourceState {
-    object Loading : NetworkResourceState()
-    object Content : NetworkResourceState()
-    object Empty : NetworkResourceState()
-    data class Error(val exception: Throwable) : NetworkResourceState()
-}
 
 fun <KEY, ITEM> ViewModel.pagingList(
     loadFunction: suspend (key: KEY?) -> Result<Pair<KEY?, List<ITEM>>>
@@ -25,7 +18,7 @@ fun <KEY, ITEM> ViewModel.pagingList(
 }
 
 abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
-    val state: MediatorLiveData<NetworkResourceState> = MediatorLiveData()
+    val state: MediatorLiveData<ViewState> = MediatorLiveData()
     val data: MediatorLiveData<List<ITEM>> = MediatorLiveData()
 
     private val _refreshFinish: MutableLiveData<Event<Feedback>> = MutableLiveData()
@@ -43,7 +36,7 @@ abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
         nextKey = null
         isFinished = false
 
-        state.value = NetworkResourceState.Loading
+        state.value = ViewState.Loading
         data.value = emptyList()
 
         scope.launch {
@@ -52,11 +45,11 @@ abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
                 isFinished = it.isEmpty()
 
                 state.value =
-                    if (it.isEmpty()) NetworkResourceState.Empty
-                    else NetworkResourceState.Content
+                    if (it.isEmpty()) ViewState.Empty
+                    else ViewState.Content
                 data.value = it
             }.onFailure {
-                state.value = NetworkResourceState.Error(it)
+                state.value = ViewState.Error(it)
                 data.value = emptyList()
             }
         }
@@ -69,8 +62,8 @@ abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
                 isFinished = it.isEmpty()
 
                 state.value =
-                    if (it.isEmpty()) NetworkResourceState.Empty
-                    else NetworkResourceState.Content
+                    if (it.isEmpty()) ViewState.Empty
+                    else ViewState.Content
                 data.value = it
 
                 _refreshFinish.value = Event(
@@ -94,8 +87,8 @@ abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
                 isFinished = it.isEmpty()
 
                 state.value =
-                    if (it.isEmpty()) NetworkResourceState.Empty
-                    else NetworkResourceState.Content
+                    if (it.isEmpty()) ViewState.Empty
+                    else ViewState.Content
                 data.value =
                     (data.value?.toMutableList() ?: mutableListOf())
                         .apply { addAll(it) }
@@ -112,22 +105,9 @@ abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
 }
 
 fun <Item> Fragment.bindToPagingList(
-    multipleStatusView: MultipleStatusView,
     refreshLayout: RefreshLayout,
     component: PagingList<*, Item>,
-    adapter: BaseAdapter<Item>
 ) {
-    component.data.observe(viewLifecycleOwner, Observer { adapter.setList(it) })
-
-    component.state.observe(viewLifecycleOwner, Observer {
-        when (it) {
-            is NetworkResourceState.Loading -> multipleStatusView.showLoading()
-            is NetworkResourceState.Content -> multipleStatusView.showContent()
-            is NetworkResourceState.Empty -> multipleStatusView.showEmpty()
-            is NetworkResourceState.Error -> multipleStatusView.showError(it.exception.message)
-        }
-    })
-
     component.refreshFinish.observe(viewLifecycleOwner, EventObserver {
         refreshLayout.isHeaderRefreshing = false
         processFeedback(it)

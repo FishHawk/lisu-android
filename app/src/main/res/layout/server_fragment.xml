@@ -20,16 +20,16 @@
             app:title="@string/label_server" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.classic.common.MultipleStatusView
-        android:id="@+id/multiple_status_view"
+    <com.fishhawk.driftinglibraryandroid.widget.MultiStateView
+        android:id="@+id/multi_state_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/list"
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/server_info_card" />
-    </com.classic.common.MultipleStatusView>
+    </com.fishhawk.driftinglibraryandroid.widget.MultiStateView>
 </LinearLayout>

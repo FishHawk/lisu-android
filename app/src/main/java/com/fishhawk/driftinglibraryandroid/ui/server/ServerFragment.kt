@@ -12,6 +12,7 @@ import com.fishhawk.driftinglibraryandroid.databinding.ServerFragmentBinding
 import com.fishhawk.driftinglibraryandroid.repository.local.model.ServerInfo
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -58,7 +59,7 @@ class ServerFragment : Fragment() {
         binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
 
-        binding.list.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         GlobalPreference.selectedServer.asFlow()
             .onEach { adapter.selectedId = it }
@@ -67,8 +68,9 @@ class ServerFragment : Fragment() {
         viewModel.serverInfoList.observe(viewLifecycleOwner) { data ->
             if (data.size == 1) GlobalPreference.selectedServer.set(data.first().id)
             adapter.setList(data)
-            if (data.isEmpty()) binding.multipleStatusView.showEmpty()
-            else binding.multipleStatusView.showContent()
+            binding.multiStateView.viewState =
+                if (data.isEmpty()) ViewState.Empty
+                else ViewState.Content
         }
     }
 

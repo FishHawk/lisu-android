@@ -23,6 +23,7 @@ import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.util.setNext
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -170,7 +171,7 @@ class GalleryFragment : Fragment() {
         viewModel.detail.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Success -> {
-                    binding.multipleStatusView.showContent()
+                    binding.multiStateView.viewState = ViewState.Content
 
                     val detail = result.data
                     detail.thumb?.let { setupThumb(it) }
@@ -248,8 +249,9 @@ class GalleryFragment : Fragment() {
                         binding.noChapterHint.isVisible = true
                     }
                 }
-                is Result.Error -> binding.multipleStatusView.showError(result.exception.message)
-                null -> binding.multipleStatusView.showLoading()
+                is Result.Error ->
+                    binding.multiStateView.viewState = ViewState.Error(result.exception)
+                null -> binding.multiStateView.viewState = ViewState.Loading
             }
         }
 

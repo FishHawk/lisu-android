@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -18,9 +19,24 @@
             app:title="@string/label_search" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include
-        android:id="@+id/manga_list"
-        layout="@layout/manga_list_view"
+    <com.fishhawk.driftinglibraryandroid.widget.MultiStateView
+        android:id="@+id/multi_state_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <com.hippo.refreshlayout.RefreshLayout
+            android:id="@+id/refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="4dp"
+                tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                tools:listitem="@layout/manga_grid_card"
+                tools:spanCount="3" />
+        </com.hippo.refreshlayout.RefreshLayout>
+    </com.fishhawk.driftinglibraryandroid.widget.MultiStateView>
 </LinearLayout>

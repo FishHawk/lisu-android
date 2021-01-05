@@ -21,20 +21,18 @@
             android:layout_margin="4dp"
             tools:text="Provider" />
 
-        <com.classic.common.MultipleStatusView
-            android:id="@+id/multiple_status_view"
+        <com.fishhawk.driftinglibraryandroid.widget.MultiStateView
+            android:id="@+id/multi_state_view"
             android:layout_width="match_parent"
-            android:layout_height="140dp"
-            app:errorView="@layout/status_error"
-            app:loadingView="@layout/status_loading">
+            android:layout_height="140dp">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/list"
+                android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/global_search_thumbnail" />
-        </com.classic.common.MultipleStatusView>
+        </com.fishhawk.driftinglibraryandroid.widget.MultiStateView>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
