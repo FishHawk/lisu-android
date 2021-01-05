@@ -14,7 +14,6 @@ import com.fishhawk.driftinglibraryandroid.databinding.StatePageErrorBinding
 import com.fishhawk.driftinglibraryandroid.databinding.StatePageLoadingBinding
 import kotlinx.parcelize.Parcelize
 
-
 sealed class ViewState : Parcelable {
     @Parcelize
     object Loading : ViewState()
@@ -69,13 +68,15 @@ class MultiStateView @JvmOverloads constructor(
         emptyBinding.root.isVisible = false
         contentView?.isVisible = false
 
-        val selectedView = when (viewState) {
-            ViewState.Loading -> loadingBinding.root
-            ViewState.Empty -> emptyBinding.root
-            is ViewState.Error -> errorBinding.root
-            ViewState.Content -> requireNotNull(contentView)
+        when (val state = viewState) {
+            ViewState.Loading -> loadingBinding.root.isVisible = true
+            ViewState.Empty -> emptyBinding.root.isVisible = true
+            ViewState.Content -> requireNotNull(contentView).isVisible = true
+            is ViewState.Error -> {
+                errorBinding.root.isVisible = true
+                errorBinding.message.text = state.exception.message
+            }
         }
-        selectedView.isVisible = true
     }
 
 
