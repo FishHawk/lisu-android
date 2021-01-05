@@ -4,13 +4,16 @@ import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteDownloadRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.DownloadDesc
-import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModel
+import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
+import com.fishhawk.driftinglibraryandroid.ui.base.remoteList
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.launch
 
 class DownloadViewModel(
     private val repository: RemoteDownloadRepository
-) : RefreshableListViewModel<DownloadDesc>() {
-    override suspend fun loadResult() = repository.getAllDownloadTasks()
+) : FeedbackViewModel() {
+
+    val downloads = remoteList { repository.getAllDownloadTasks() }
 
     fun startDownloadTask(id: String) = viewModelScope.launch {
         val result = repository.startDownloadTask(id)
@@ -40,28 +43,29 @@ class DownloadViewModel(
 
     private fun deleteItem(id: String, result: Result<DownloadDesc>) {
         resultWarp(result) { _ ->
-            (_list.value as? Result.Success)?.data?.let { taskList ->
-                val index = taskList.indexOfFirst { it.id == id }
-                taskList.removeAt(index)
+            downloads.data.value = downloads.data.value?.toMutableList()?.apply {
+                val index = indexOfFirst { it.id == id }
+                removeAt(index)
             }
         }
-        _list.value = _list.value
     }
 
     private fun updateItem(id: String, result: Result<DownloadDesc>) {
         resultWarp(result) { task ->
-            (_list.value as? Result.Success)?.data?.let { taskList ->
-                val index = taskList.indexOfFirst { it.id == id }
-                taskList[index] = task
+            downloads.data.value = downloads.data.value?.toMutableList()?.apply {
+                val index = indexOfFirst { it.id == id }
+                this[index] = task
             }
         }
-        _list.value = _list.value
     }
 
     private fun updateList(result: Result<List<DownloadDesc>>) {
-        when (result) {
-            is Result.Success -> _list.value = Result.Success(result.data.toMutableList())
-            is Result.Error -> _list.value = result
+        if (result is Result.Success) downloads.data.value = result.data
+        downloads.state.value = when (result) {
+            is Result.Success ->
+                if (result.data.isEmpty()) ViewState.Empty
+                else ViewState.Content
+            is Result.Error -> ViewState.Error(result.exception)
         }
     }
 }

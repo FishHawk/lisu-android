@@ -9,7 +9,7 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionR
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderDetail
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
-import com.fishhawk.driftinglibraryandroid.ui.base.PagingList
+import com.fishhawk.driftinglibraryandroid.ui.base.RemotePagingList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -18,7 +18,7 @@ typealias Option = MutableMap<String, Int>
 class ProviderMangaListComponent(
     scope: CoroutineScope,
     private val loadFunction: suspend (key: Int, option: Option) -> Result<List<MangaOutline>>
-) : PagingList<Int, MangaOutline>(scope) {
+) : RemotePagingList<Int, MangaOutline>(scope) {
 
     private var option: Option = mutableMapOf()
 

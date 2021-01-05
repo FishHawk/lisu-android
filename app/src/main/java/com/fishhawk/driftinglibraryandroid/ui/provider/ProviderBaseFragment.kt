@@ -107,7 +107,7 @@ abstract class ProviderBaseFragment : Fragment() {
         mangaListComponent.state.observe(viewLifecycleOwner) {
             binding.multiStateView.viewState = it
         }
-        bindToPagingList(binding.refreshLayout, mangaListComponent)
+        bindToRemotePagingList(binding.refreshLayout, mangaListComponent)
 
         viewModel.detail.observe(viewLifecycleOwner) { result ->
             when (result) {

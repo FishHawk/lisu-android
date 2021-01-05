@@ -8,8 +8,8 @@ import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.DownloadFragmentBinding
-import com.fishhawk.driftinglibraryandroid.ui.base.bindToListViewModel
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
+import com.fishhawk.driftinglibraryandroid.ui.base.bindToRemoteList
 
 class DownloadFragment : Fragment() {
     private lateinit var binding: DownloadFragmentBinding
@@ -47,8 +47,14 @@ class DownloadFragment : Fragment() {
 
         binding.recyclerView.adapter = adapter
 
-        bindToListViewModel(binding.multiStateView, binding.refreshLayout, viewModel, adapter)
-        viewModel.load()
+        viewModel.downloads.reload()
+        viewModel.downloads.data.observe(viewLifecycleOwner) {
+            adapter.setList(it)
+        }
+        viewModel.downloads.state.observe(viewLifecycleOwner) {
+            binding.multiStateView.viewState = it
+        }
+        bindToRemoteList(binding.refreshLayout, viewModel.downloads)
     }
 
     private fun onMenuItemSelected(item: MenuItem): Boolean {

@@ -4,13 +4,16 @@ import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.Subscription
-import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableListViewModel
+import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
+import com.fishhawk.driftinglibraryandroid.ui.base.remoteList
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.launch
 
 class SubscriptionViewModel(
     private val repository: RemoteSubscriptionRepository
-) : RefreshableListViewModel<Subscription>() {
-    override suspend fun loadResult() = repository.getAllSubscriptions()
+) : FeedbackViewModel() {
+
+    val subscriptions = remoteList { repository.getAllSubscriptions() }
 
     fun enableSubscription(id: String) = viewModelScope.launch {
         val result = repository.enableSubscription(id)
@@ -40,28 +43,33 @@ class SubscriptionViewModel(
 
     private fun deleteItem(id: String, result: Result<Subscription>) {
         resultWarp(result) { _ ->
-            (_list.value as? Result.Success)?.data?.let { taskList ->
-                val index = taskList.indexOfFirst { it.id == id }
-                taskList.removeAt(index)
+            subscriptions.data.value = subscriptions.data.value?.let { list ->
+                val newList = list.toMutableList()
+                val index = newList.indexOfFirst { it.id == id }
+                newList.removeAt(index)
+                newList
             }
         }
-        _list.value = _list.value
     }
 
     private fun updateItem(id: String, result: Result<Subscription>) {
         resultWarp(result) { subscription ->
-            (_list.value as? Result.Success)?.data?.let { taskList ->
-                val index = taskList.indexOfFirst { it.id == id }
-                taskList[index] = subscription
+            subscriptions.data.value = subscriptions.data.value?.let { list ->
+                val newList = list.toMutableList()
+                val index = newList.indexOfFirst { it.id == id }
+                newList[index] = subscription
+                newList
             }
         }
-        _list.value = _list.value
     }
 
     private fun updateList(result: Result<List<Subscription>>) {
-        when (result) {
-            is Result.Success -> _list.value = Result.Success(result.data.toMutableList())
-            is Result.Error -> _list.value = result
+        if (result is Result.Success) subscriptions.data.value = result.data
+        subscriptions.state.value = when (result) {
+            is Result.Success ->
+                if (result.data.isEmpty()) ViewState.Empty
+                else ViewState.Content
+            is Result.Error -> ViewState.Error(result.exception)
         }
     }
 }

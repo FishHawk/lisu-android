@@ -11,39 +11,27 @@ import com.hippo.refreshlayout.RefreshLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-fun <KEY, ITEM> ViewModel.pagingList(
-    loadFunction: suspend (key: KEY?) -> Result<Pair<KEY?, List<ITEM>>>
-) = object : PagingList<KEY, ITEM>(viewModelScope) {
-    override suspend fun load(key: KEY?): Result<Pair<KEY?, List<ITEM>>> = loadFunction(key)
+fun <ITEM> ViewModel.remoteList(
+    loadFunction: suspend () -> Result<List<ITEM>>
+) = object : RemoteList<ITEM>(viewModelScope) {
+    override suspend fun load(): Result<List<ITEM>> = loadFunction()
 }
 
-abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
+abstract class RemoteList<ITEM>(private val scope: CoroutineScope) {
     val state: MediatorLiveData<ViewState> = MediatorLiveData()
     val data: MediatorLiveData<List<ITEM>> = MediatorLiveData()
 
     private val _refreshFinish: MutableLiveData<Event<Feedback>> = MutableLiveData()
     val refreshFinish: LiveData<Event<Feedback>> = _refreshFinish
 
-    private val _fetchMoreFinish: MutableLiveData<Event<Feedback>> = MutableLiveData()
-    val fetchMoreFinish: LiveData<Event<Feedback>> = _fetchMoreFinish
-
-    private var nextKey: KEY? = null
-    private var isFinished: Boolean = false
-
-    protected abstract suspend fun load(key: KEY?): Result<Pair<KEY?, List<ITEM>>>
+    protected abstract suspend fun load(): Result<List<ITEM>>
 
     fun reload() {
-        nextKey = null
-        isFinished = false
-
         state.value = ViewState.Loading
         data.value = emptyList()
 
         scope.launch {
-            load(nextKey).onSuccess { (key, it) ->
-                nextKey = key
-                isFinished = it.isEmpty()
-
+            load().onSuccess {
                 state.value =
                     if (it.isEmpty()) ViewState.Empty
                     else ViewState.Content
@@ -57,10 +45,7 @@ abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
 
     fun refresh() {
         scope.launch {
-            load(null).onSuccess { (key, it) ->
-                nextKey = key
-                isFinished = it.isEmpty()
-
+            load().onSuccess {
                 state.value =
                     if (it.isEmpty()) ViewState.Empty
                     else ViewState.Content
@@ -75,46 +60,14 @@ abstract class PagingList<KEY, ITEM>(private val scope: CoroutineScope) {
             }
         }
     }
-
-    fun fetchMore() {
-        if (state.value != ViewState.Content)
-            _fetchMoreFinish.value = Event(Feedback.Silent)
-
-        if (isFinished)
-            _fetchMoreFinish.value =
-                Event(Feedback.Hint(R.string.error_hint_empty_fetch_more_result))
-
-        scope.launch {
-            load(nextKey).onSuccess { (key, it) ->
-                nextKey = key
-                isFinished = it.isEmpty()
-
-                data.value =
-                    (data.value?.toMutableList() ?: mutableListOf())
-                        .apply { addAll(it) }
-
-                _fetchMoreFinish.value = Event(
-                    if (it.isEmpty()) Feedback.Hint(R.string.error_hint_empty_fetch_more_result)
-                    else Feedback.Silent
-                )
-            }.onFailure {
-                _fetchMoreFinish.value = Event(Feedback.Failure(it))
-            }
-        }
-    }
 }
 
-fun <Item> Fragment.bindToPagingList(
+fun <Item> Fragment.bindToRemoteList(
     refreshLayout: RefreshLayout,
-    component: PagingList<*, Item>,
+    component: RemoteList<Item>
 ) {
     component.refreshFinish.observe(viewLifecycleOwner, EventObserver {
         refreshLayout.isHeaderRefreshing = false
-        processFeedback(it)
-    })
-
-    component.fetchMoreFinish.observe(viewLifecycleOwner, EventObserver {
-        refreshLayout.isFooterRefreshing = false
         processFeedback(it)
     })
 
@@ -137,7 +90,9 @@ fun <Item> Fragment.bindToPagingList(
         setOnRefreshListener(
             object : RefreshLayout.OnRefreshListener {
                 override fun onHeaderRefresh() = component.refresh()
-                override fun onFooterRefresh() = component.fetchMore()
+                override fun onFooterRefresh() {
+                    isFooterRefreshing = false
+                }
             }
         )
     }

@@ -20,82 +20,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.repository.EventObserver
-import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
-import com.fishhawk.driftinglibraryandroid.widget.MultiStateView
-import com.fishhawk.driftinglibraryandroid.widget.ViewState
-import com.hippo.refreshlayout.RefreshLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-
-fun <T> Fragment.bindToListViewModel(
-    multiStateView: MultiStateView,
-    refreshLayout: RefreshLayout,
-    viewModel: RefreshableListViewModel<T>,
-    adapter: BaseAdapter<T>
-) {
-    bindToFeedbackViewModel(viewModel)
-
-    viewModel.list.observe(viewLifecycleOwner) { result ->
-        if (result is Result.Success) adapter.setList(result.data)
-        multiStateView.viewState = when (result) {
-            is Result.Success -> {
-                if (result.data.isEmpty()) ViewState.Empty
-                else ViewState.Content
-            }
-            is Result.Error -> ViewState.Error(result.exception)
-            null -> ViewState.Loading
-        }
-    }
-
-    viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver {
-        refreshLayout.isHeaderRefreshing = false
-    })
-
-    if (viewModel is RefreshableListViewModelWithFetchMore) {
-        viewModel.fetchMoreFinish.observe(viewLifecycleOwner, EventObserver {
-            refreshLayout.isFooterRefreshing = false
-        })
-    }
-
-    with(refreshLayout) {
-        setHeaderColorSchemeResources(
-            R.color.loading_indicator_red,
-            R.color.loading_indicator_purple,
-            R.color.loading_indicator_blue,
-            R.color.loading_indicator_cyan,
-            R.color.loading_indicator_green,
-            R.color.loading_indicator_yellow
-        )
-        setFooterColorSchemeResources(
-            R.color.loading_indicator_red,
-            R.color.loading_indicator_blue,
-            R.color.loading_indicator_green,
-            R.color.loading_indicator_orange
-        )
-        val listener = when (viewModel) {
-            is RefreshableListViewModelWithFetchMore<*> -> {
-                object : RefreshLayout.OnRefreshListener {
-                    override fun onHeaderRefresh() = viewModel.refresh()
-                    override fun onFooterRefresh() = viewModel.fetchMore()
-                }
-            }
-            else -> {
-                object : RefreshLayout.OnRefreshListener {
-                    override fun onHeaderRefresh() = viewModel.refresh()
-                    override fun onFooterRefresh() {
-                        isFooterRefreshing = false
-                    }
-                }
-            }
-        }
-        setOnRefreshListener(listener)
-    }
-}
 
 fun RecyclerView.changeMangaListDisplayMode(adapter: MangaListAdapter) {
     val displayMode = GlobalPreference.displayMode.get()

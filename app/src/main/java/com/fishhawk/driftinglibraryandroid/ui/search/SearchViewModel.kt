@@ -8,7 +8,7 @@ import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteProviderRepos
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteSubscriptionRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
-import com.fishhawk.driftinglibraryandroid.ui.base.pagingList
+import com.fishhawk.driftinglibraryandroid.ui.base.remotePagingList
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
@@ -21,7 +21,7 @@ class SearchViewModel(
 
     val keywords = MutableLiveData(argKeywords)
 
-    val outlines = pagingList<Int, MangaOutline> { key ->
+    val outlines = remotePagingList<Int, MangaOutline> { key ->
         val page = key ?: 1
         remoteProviderRepository.search(
             providerId = providerId,

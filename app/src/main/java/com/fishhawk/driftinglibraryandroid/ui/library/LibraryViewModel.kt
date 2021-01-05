@@ -7,7 +7,7 @@ import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.repository.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
-import com.fishhawk.driftinglibraryandroid.ui.base.pagingList
+import com.fishhawk.driftinglibraryandroid.ui.base.remotePagingList
 import kotlinx.coroutines.launch
 
 class LibraryViewModel(
@@ -17,7 +17,7 @@ class LibraryViewModel(
 
     val keywords = MutableLiveData(argKeywords ?: "")
 
-    val outlines = pagingList<Long, MangaOutline> { key ->
+    val outlines = remotePagingList<Long, MangaOutline> { key ->
         repository.search(
             lastTime = key ?: Long.MAX_VALUE,
             keywords = keywords.value ?: "",

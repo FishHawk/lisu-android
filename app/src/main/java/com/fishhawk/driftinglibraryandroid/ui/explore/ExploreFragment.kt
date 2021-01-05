@@ -16,10 +16,8 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ExploreFragmentBinding
 import com.fishhawk.driftinglibraryandroid.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.repository.Result
 import com.fishhawk.driftinglibraryandroid.repository.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
-import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -71,16 +69,12 @@ class ExploreFragment : Fragment() {
             .onEach { adapter.lastUsedProviderId = it }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.providerList.observe(viewLifecycleOwner) { result ->
-            if (result is Result.Success) adapter.infoList = result.data
-            binding.multiStateView.viewState = when (result) {
-                is Result.Success -> {
-                    if (binding.recyclerView.adapter!!.itemCount == 0) ViewState.Empty
-                    else ViewState.Content
-                }
-                is Result.Error -> ViewState.Error(result.exception)
-                null -> ViewState.Loading
-            }
+
+        viewModel.providers.data.observe(viewLifecycleOwner) {
+            adapter.infoList = it
+        }
+        viewModel.providers.state.observe(viewLifecycleOwner) {
+            binding.multiStateView.viewState = it
         }
     }
 

@@ -76,7 +76,7 @@ class LibraryFragment : Fragment() {
         viewModel.outlines.state.observe(viewLifecycleOwner) {
             binding.multiStateView.viewState = it
         }
-        bindToPagingList(binding.refreshLayout, viewModel.outlines)
+        bindToRemotePagingList(binding.refreshLayout, viewModel.outlines)
     }
 
     private fun setupMenu(menu: Menu) {
