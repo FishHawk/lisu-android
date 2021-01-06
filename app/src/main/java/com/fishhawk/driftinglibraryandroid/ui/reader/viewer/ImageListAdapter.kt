@@ -24,6 +24,15 @@ import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderEmptyPageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderErrorPageBinding
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
+import com.fishhawk.driftinglibraryandroid.util.glide.OnProgressChangeListener
+import com.fishhawk.driftinglibraryandroid.util.glide.ProgressInterceptor
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import retrofit2.http.Url
+import java.net.URL
+import java.net.URLDecoder
+import java.net.URLEncoder
+
 
 sealed class Page {
     data class ContentPage(val url: String) : Page()
@@ -127,21 +136,21 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
 
         private fun setLoading() {
             binding.content.isVisible = false
-            binding.progress.isVisible = true
+            binding.progressBar.isVisible = true
             binding.retryButton.isVisible = false
             binding.errorHint.isVisible = false
         }
 
         private fun setError() {
             binding.content.isVisible = false
-            binding.progress.isVisible = false
+            binding.progressBar.isVisible = false
             binding.retryButton.isVisible = true
             binding.errorHint.isVisible = true
         }
 
         private fun setContent() {
             binding.content.isVisible = true
-            binding.progress.isVisible = false
+            binding.progressBar.isVisible = false
             binding.retryButton.isVisible = false
             binding.errorHint.isVisible = false
         }
@@ -191,6 +200,26 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
                 }
             }
 
+            binding.progressBar.isIndeterminate = true
+            ProgressInterceptor.addListener(
+                url.toHttpUrlOrNull().toString(),
+                object : OnProgressChangeListener {
+                    override fun onProgressChange(
+                        bytesRead: Long,
+                        contentLength: Long,
+                        done: Boolean
+                    ) {
+                        binding.progressBar.post {
+                            val max = binding.progressBar.max
+                            val progress = (max * bytesRead / contentLength).toInt()
+                            if (progress in 0..max) {
+                                binding.progressBar.isIndeterminate = false
+                                binding.progressBar.progress = progress.coerceIn(0, 100)
+                            }
+                        }
+                    }
+                })
+
             Glide.with(context)
                 .asBitmap()
                 .timeout(20000)
@@ -205,6 +234,7 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
+                        ProgressInterceptor.removeListener(url)
                         setContent()
                         return false
                     }
@@ -215,6 +245,7 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
                         target: Target<Bitmap>?,
                         isFirstResource: Boolean
                     ): Boolean {
+                        ProgressInterceptor.removeListener(url)
                         setError()
                         if (e != null) binding.errorHint.text = e.message
                         else binding.errorHint.setText(R.string.image_unknown_error_hint)
