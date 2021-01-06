@@ -45,7 +45,7 @@
             android:textSize="30sp" />
     </LinearLayout>
 
-    <com.fishhawk.comicimageview.ComicImageView
+    <com.fishhawk.driftinglibraryandroid.widget.comicimageview.ComicImageView
         android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

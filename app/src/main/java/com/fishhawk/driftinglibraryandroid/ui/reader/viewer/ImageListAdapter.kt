@@ -18,7 +18,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
-import com.fishhawk.comicimageview.OnTapListener
+import com.fishhawk.driftinglibraryandroid.widget.comicimageview.OnTapListener
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderEmptyPageBinding
@@ -26,13 +26,7 @@ import com.fishhawk.driftinglibraryandroid.databinding.ReaderErrorPageBinding
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 import com.fishhawk.driftinglibraryandroid.util.glide.OnProgressChangeListener
 import com.fishhawk.driftinglibraryandroid.util.glide.ProgressInterceptor
-import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import retrofit2.http.Url
-import java.net.URL
-import java.net.URLDecoder
-import java.net.URLEncoder
-
 
 sealed class Page {
     data class ContentPage(val url: String) : Page()

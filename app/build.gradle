@@ -96,5 +96,7 @@ dependencies {
 
     // ImageView
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
-    implementation 'com.github.FishHawk:ComicImageView:0.2.1'
+
+    // OpenCV
+    implementation 'com.quickbirdstudios:opencv:4.1.0'
 }
