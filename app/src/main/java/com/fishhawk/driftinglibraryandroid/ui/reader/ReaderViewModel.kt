@@ -46,8 +46,8 @@ class ReaderChapterPointer(
 }
 
 class ReaderViewModel(
-    private val id: String,
-    private val providerId: String?,
+    id: String,
+    providerId: String?,
     private val collectionIndex: Int,
     chapterIndex: Int,
     pageIndex: Int,
@@ -136,11 +136,14 @@ class ReaderViewModel(
 
         if (chapter.state is ViewState.Content) return
 
+        val providerId = mangaDetail.providerId
+        val mangaId = mangaDetail.id
         val chapterId = chapter.id
+
         val result =
             if (providerId == null)
-                remoteLibraryRepository.getChapterContent(id, collectionId, chapterId)
-            else remoteProviderRepository.getChapterContent(providerId, id, chapterId)
+                remoteLibraryRepository.getChapterContent(mangaId, collectionId, chapterId)
+            else remoteProviderRepository.getChapterContent(providerId, mangaId, chapterId)
 
         result.onSuccess {
             chapter.state = ViewState.Content
@@ -200,7 +203,7 @@ class ReaderViewModel(
                     GlobalPreference.selectedServer.get(),
                     mangaDetail.title,
                     mangaDetail.thumb ?: "",
-                    providerId,
+                    mangaDetail.providerId,
                     Calendar.getInstance().time.time,
                     collectionId,
                     collectionIndex,
