@@ -15,17 +15,17 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.ReaderFragmentBinding
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.data.Result
+import com.fishhawk.driftinglibraryandroid.databinding.ReaderFragmentBinding
 import com.fishhawk.driftinglibraryandroid.ui.ReaderViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import com.fishhawk.driftinglibraryandroid.ui.base.saveImage
 import com.fishhawk.driftinglibraryandroid.ui.base.shareImage
+import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ReaderView
 import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ReaderViewContinuous
 import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ReaderViewPager
-import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ReaderView
 import com.fishhawk.driftinglibraryandroid.widget.SimpleAnimationListener
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -65,16 +65,21 @@ class ReaderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.readerContent.observe(viewLifecycleOwner) { result ->
-            binding.title.text = viewModel.mangaTitle
-            when (result) {
-                is Result.Success -> reader.adapter.setContentPage(result.data)
-                is Result.Error -> {
-                    val message = result.exception.message ?: "Unknown error."
-                    reader.adapter.setErrorPage(message)
+        viewModel.mangaTitle.observe(viewLifecycleOwner) { binding.title.text = it }
+        viewModel.readerState.observe(viewLifecycleOwner) { binding.multiStateView.viewState = it }
+
+        viewModel.chapterPointer.observe(viewLifecycleOwner) { it ->
+            if (it != null) {
+                reader.adapter.setContentPage(it.currChapter.images)
+                if (!it.isOpened && it.currChapter.state == ViewState.Content) {
+                    it.isOpened = true
+                    reader.setPage(
+                        it.startPage
+                            .coerceAtMost(it.currChapter.images.size - 1)
+                            .coerceAtLeast(0)
+                    )
                 }
             }
-            viewModel.chapterPosition.value?.let { reader.setPage(it) }
         }
 
         combine(
@@ -126,8 +131,8 @@ class ReaderFragment : Fragment() {
         binding.readerContainer.addView(reader)
         reader.requestFocus()
 
-        reader.onRequestPrevChapter = { openPrevChapter() }
-        reader.onRequestNextChapter = { openNextChapter() }
+        reader.onRequestPrevChapter = { viewModel.moveToPrevChapter() }
+        reader.onRequestNextChapter = { viewModel.moveToNextChapter() }
         reader.onRequestMenuVisibility = { binding.menuLayout.isVisible }
         reader.onRequestMenu = { setMenuLayoutVisibility(it) }
         reader.onPageChanged = { viewModel.chapterPosition.value = it }
@@ -151,7 +156,7 @@ class ReaderFragment : Fragment() {
                     }
                 }).show()
         }
-        viewModel.readerContent.value = viewModel.readerContent.value
+        viewModel.chapterPointer.value = viewModel.chapterPointer.value
     }
 
     private fun initializeOverlay() {
@@ -220,8 +225,8 @@ class ReaderFragment : Fragment() {
             }
         })
 
-        binding.buttonPrevChapter.setOnClickListener { openPrevChapter() }
-        binding.buttonNextChapter.setOnClickListener { openNextChapter() }
+        binding.buttonPrevChapter.setOnClickListener { viewModel.openPrevChapter() }
+        binding.buttonNextChapter.setOnClickListener { viewModel.openNextChapter() }
 
 
         GlobalPreference.readingDirection.asFlow()
@@ -261,15 +266,5 @@ class ReaderFragment : Fragment() {
             binding.menuTopLayout.startAnimation(topAnim)
             binding.menuBottomLayout.startAnimation(bottomAnim)
         }
-    }
-
-    private fun openPrevChapter() {
-        if (viewModel.isLoading) return
-        if (!viewModel.openPrevChapter()) makeToast(R.string.toast_no_prev_chapter)
-    }
-
-    private fun openNextChapter() {
-        if (viewModel.isLoading) return
-        if (!viewModel.openNextChapter()) makeToast(R.string.toast_no_next_chapter)
     }
 }

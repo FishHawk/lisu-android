@@ -1,136 +1,211 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
-import androidx.lifecycle.*
-import com.fishhawk.driftinglibraryandroid.data.Result
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
+import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Chapter
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.math.absoluteValue
+
+//sealed class Page {
+//    data class ContentPage(val url: String) : Page()
+//    object EmptyPage : Page()
+//    data class PrevTransitionPage(val from: ReaderChapter, val to: ReaderChapter?) : Page()
+//    data class NextTransitionPage(val from: ReaderChapter, val to: ReaderChapter?) : Page()
+//}
+
+class ReaderChapter(val index: Int, chapter: Chapter) {
+    val id = chapter.id
+    val title = chapter.title
+    val name = chapter.name
+    var state: ViewState = ViewState.Loading
+    var images: List<String> = listOf()
+}
+
+class ReaderChapterPointer(
+    private val list: List<ReaderChapter>,
+    val startPage: Int,
+    var index: Int
+) {
+    var isOpened = false
+
+    val currChapter get() = list[index]
+    val nextChapter get() = list.getOrNull(index + 1)
+    val prevChapter get() = list.getOrNull(index - 1)
+}
 
 class ReaderViewModel(
     private val id: String,
     private val providerId: String?,
     private val collectionIndex: Int,
-    private var chapterIndex: Int,
+    chapterIndex: Int,
     pageIndex: Int,
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
-) : ViewModel() {
-    // reader content
-    private val mangaDetail: MutableLiveData<Result<MangaDetail>> = MutableLiveData()
-    val readerContent: MutableLiveData<Result<List<String>>?> = MutableLiveData(null)
+) : FeedbackViewModel() {
 
-    val mangaTitle: String?
-        get() = (mangaDetail.value as? Result.Success)?.data?.title
+    private val _readerState: MutableLiveData<ViewState> = MutableLiveData(ViewState.Loading)
+    val readerState: LiveData<ViewState> = _readerState
 
-    var isLoading: Boolean = true
+    private lateinit var mangaDetail: MangaDetail
+    private val _mangaTitle = MutableLiveData(id)
+    val mangaTitle: LiveData<String> = _mangaTitle
+
+    private lateinit var collectionId: String
+    private lateinit var chapters: List<ReaderChapter>
+
+    val chapterPointer: MutableLiveData<ReaderChapterPointer?> = MutableLiveData(null)
+    val chapterSize = chapterPointer.map { it?.currChapter?.images?.size ?: 0 }
+    val chapterName = chapterPointer.map { it?.currChapter?.name ?: "" }
+    val chapterTitle = chapterPointer.map { it?.currChapter?.title ?: "" }
     val chapterPosition: MutableLiveData<Int> = MutableLiveData(0)
-    val chapterSize: MutableLiveData<Int> = MutableLiveData(0)
-    val chapterName: MutableLiveData<String> = MutableLiveData("")
-    val chapterTitle: MutableLiveData<String> = MutableLiveData("")
+
+    init {
+        chapterPointer.observeForever {
+            if (it != null) _readerState.value = it.currChapter.state
+        }
+    }
+
 
     init {
         viewModelScope.launch {
-            val detail =
+            // load manga
+            val result =
                 if (providerId == null) remoteLibraryRepository.getManga(id)
                 else remoteProviderRepository.getManga(providerId, id)
-            mangaDetail.value = detail
-            when (detail) {
-                is Result.Success -> openChapter(chapterIndex, pageIndex)
-                is Result.Error -> readerContent.value = Result.Error(detail.exception)
+
+            result.onSuccess {
+                mangaDetail = it
+                _mangaTitle.value = it.title
+            }.onFailure {
+                _readerState.value = ViewState.Error(it)
+            }
+
+            // load chapter
+            result.onSuccess {
+                try {
+                    val collection = it.collections[collectionIndex]
+                    collectionId = collection.id
+                    chapters = collection.chapters.mapIndexed { index, chapter ->
+                        ReaderChapter(index, chapter)
+                    }
+                    val chapter = chapters[chapterIndex]
+                    openChapter(chapter, pageIndex)
+
+                } catch (e: Throwable) {
+                    _readerState.value = ViewState.Error(e)
+                }
             }
         }
     }
 
-    private fun openChapter(chapterIndex: Int, startPage: Int = 0) {
-        isLoading = true
+    private fun openChapter(chapter: ReaderChapter, pageIndex: Int) {
+        if (chapter.state !is ViewState.Content) chapter.state = ViewState.Loading
 
-        val detail = (mangaDetail.value as? Result.Success)?.data ?: return
-        val collection = detail.collections[collectionIndex]
-
-        val self = this
-        val chapterId = collection.chapters[chapterIndex].id
-        val chapterName = collection.chapters[chapterIndex].name
-        val chapterTitle = collection.chapters[chapterIndex].title
+        val pointer = ReaderChapterPointer(chapters, pageIndex, chapter.index)
+        chapterPointer.value = pointer
 
         viewModelScope.launch {
-            val result =
-                if (providerId == null)
-                    remoteLibraryRepository.getChapterContent(id, collection.id, chapterId)
-                else remoteProviderRepository.getChapterContent(providerId, id, chapterId)
-            when (result) {
-                is Result.Success -> {
-                    if (result.data.isEmpty()) {
-                        self.chapterSize.value = 1
-                        self.chapterPosition.value = 0
-                    } else {
-                        self.chapterSize.value = result.data.size
-                        self.chapterPosition.value = when {
-                            startPage < 0 || startPage >= result.data.size -> result.data.size - 1
-                            else -> startPage
-                        }
-                    }
-                }
-                is Result.Error -> {
-                    self.chapterSize.value = 1
-                    self.chapterPosition.value = 0
-                }
-            }
-            self.chapterIndex = chapterIndex
-            self.chapterName.value = chapterName
-            self.chapterTitle.value = chapterTitle
-            self.readerContent.value = result
-            isLoading = false
+            if (chapter.state !is ViewState.Content) loadChapter(chapter)
+            pointer.nextChapter?.let { if (it.state !is ViewState.Content) loadChapter(it) }
+            pointer.prevChapter?.let { if (it.state !is ViewState.Content) loadChapter(it) }
         }
     }
 
-    fun openNextChapter(): Boolean {
-        val detail = (mangaDetail.value as? Result.Success)?.data
-        if (detail != null) {
-            val collection = detail.collections[collectionIndex]
-            if (chapterIndex < collection.chapters.size - 1) {
-                openChapter(chapterIndex + 1)
-                return true
+    private suspend fun loadChapter(chapter: ReaderChapter) {
+        fun refreshPointerIfNeed() {
+            val pointer = chapterPointer.value
+            if (pointer != null &&
+                (pointer.index - chapter.index).absoluteValue <= 1
+            ) {
+                chapterPointer.value = pointer
             }
         }
-        return false
+
+        if (chapter.state is ViewState.Content) return
+
+        val chapterId = chapter.id
+        val result =
+            if (providerId == null)
+                remoteLibraryRepository.getChapterContent(id, collectionId, chapterId)
+            else remoteProviderRepository.getChapterContent(providerId, id, chapterId)
+
+        result.onSuccess {
+            chapter.state = ViewState.Content
+            chapter.images = it
+            refreshPointerIfNeed()
+        }.onFailure {
+            if (chapter.state != ViewState.Content) {
+                chapter.state = ViewState.Error(it)
+                refreshPointerIfNeed()
+            }
+        }
     }
 
-    fun openPrevChapter(): Boolean {
-        val detail = (mangaDetail.value as? Result.Success)?.data
-        if (detail != null) {
-            if (chapterIndex > 0) {
-                openChapter(chapterIndex - 1, -1)
-                return true
-            }
+    fun openNextChapter() {
+        val pointer = chapterPointer.value!!
+        val nextChapter = pointer.nextChapter
+            ?: return feed(R.string.toast_no_next_chapter)
+        openChapter(nextChapter, 0)
+    }
+
+    fun openPrevChapter() {
+        val pointer = chapterPointer.value!!
+        val prevChapter = pointer.prevChapter
+            ?: return feed(R.string.toast_no_prev_chapter)
+        openChapter(prevChapter, 0)
+    }
+
+    fun moveToNextChapter() {
+        val pointer = chapterPointer.value!!
+        val nextChapter = pointer.nextChapter
+            ?: return feed(R.string.toast_no_next_chapter)
+
+        if (nextChapter.state is ViewState.Content) {
+            openChapter(nextChapter, 0)
+        } else {
+            viewModelScope.launch { loadChapter(nextChapter) }
         }
-        return false
+    }
+
+    fun moveToPrevChapter() {
+        val pointer = chapterPointer.value!!
+        val prevChapter = pointer.prevChapter
+            ?: return feed(R.string.toast_no_prev_chapter)
+
+        if (prevChapter.state is ViewState.Content) {
+            openChapter(prevChapter, Int.MAX_VALUE)
+        } else {
+            viewModelScope.launch { loadChapter(prevChapter) }
+        }
     }
 
     suspend fun updateReadingHistory() {
-        val detail = (mangaDetail.value as? Result.Success)?.data
-
-        detail?.let {
-            val collection = detail.collections[collectionIndex]
+        chapterPointer.value?.let {
             val readingHistory =
                 ReadingHistory(
-                    it.id,
+                    mangaDetail.id,
                     GlobalPreference.selectedServer.get(),
-
-                    it.title,
-                    it.thumb ?: "",
-                    it.providerId,
+                    mangaDetail.title,
+                    mangaDetail.thumb ?: "",
+                    providerId,
                     Calendar.getInstance().time.time,
-
-                    collection.id,
+                    collectionId,
                     collectionIndex,
-                    collection.chapters[chapterIndex].name,
-                    chapterIndex,
+                    it.currChapter.name,
+                    it.currChapter.index,
                     chapterPosition.value ?: 0
                 )
             readingHistoryRepository.updateReadingHistory(readingHistory)
@@ -138,14 +213,8 @@ class ReaderViewModel(
     }
 
     fun makeImageFilenamePrefix(): String? {
-        val detail = (mangaDetail.value as? Result.Success)?.data ?: return null
-        val collection = detail.collections[collectionIndex]
-
-        val mangaTitle = detail.title
-        val collectionTitle = collection.id
-        val chapterTitle = collection.chapters[chapterIndex].title
-
-        return "$mangaTitle-$collectionTitle-$chapterTitle"
+        val pointer = chapterPointer.value ?: return null
+        return "${mangaDetail.title}-$collectionId-${pointer.currChapter.title}"
     }
 }
 
