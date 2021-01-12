@@ -18,13 +18,6 @@ import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.math.absoluteValue
 
-//sealed class Page {
-//    data class ContentPage(val url: String) : Page()
-//    object EmptyPage : Page()
-//    data class PrevTransitionPage(val from: ReaderChapter, val to: ReaderChapter?) : Page()
-//    data class NextTransitionPage(val from: ReaderChapter, val to: ReaderChapter?) : Page()
-//}
-
 class ReaderChapter(val index: Int, chapter: Chapter) {
     val id = chapter.id
     val title = chapter.title

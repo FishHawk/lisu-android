@@ -42,8 +42,10 @@ class ReaderViewPager constructor(
         binding.content.adapter = adapter
     }
 
-    override fun getPage(): Int = binding.content.currentItem
-    override fun setPage(page: Int) = binding.content.setCurrentItem(page, false)
+    override fun setPage(page: Int) {
+        val index = adapter.list.indexOfFirst { it is Page.ContentPage && it.index == page }
+        binding.content.setCurrentItem(index, false)
+    }
 
     override fun toNext() {
         if (binding.content.currentItem == adapter.itemCount - 1) onRequestNextChapter?.invoke()
@@ -58,7 +60,10 @@ class ReaderViewPager constructor(
 
     init {
         binding.content.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) = onPageChanged?.invoke(getPage()) ?: Unit
+            override fun onPageSelected(position: Int) {
+                val page = adapter.list[position]
+                if (page is Page.ContentPage) onPageChanged?.invoke(page.index) ?: Unit
+            }
         })
         object : OverScrollDetector(binding.content) {
             override fun onOverScrollBackward() = onRequestPrevChapter?.invoke() ?: Unit

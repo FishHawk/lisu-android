@@ -50,7 +50,6 @@ abstract class ReaderView @JvmOverloads constructor(
         get() = onRequestMenuVisibility?.invoke() == true
 
 
-    abstract fun getPage(): Int
     abstract fun setPage(page: Int)
 
     protected abstract fun toNext()

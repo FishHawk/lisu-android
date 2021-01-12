@@ -22,16 +22,22 @@ import com.fishhawk.driftinglibraryandroid.widget.comicimageview.OnTapListener
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderEmptyPageBinding
-import com.fishhawk.driftinglibraryandroid.databinding.ReaderErrorPageBinding
+import com.fishhawk.driftinglibraryandroid.databinding.ReaderPageTransitionNextBinding
+import com.fishhawk.driftinglibraryandroid.databinding.ReaderPageTransitionPrevBinding
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
+import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderChapter
+import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderChapterPointer
 import com.fishhawk.driftinglibraryandroid.util.glide.OnProgressChangeListener
 import com.fishhawk.driftinglibraryandroid.util.glide.ProgressInterceptor
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 sealed class Page {
-    data class ContentPage(val url: String) : Page()
-    data class ErrorPage(val message: String) : Page()
+    data class ContentPage(val index: Int, val url: String) : Page()
     object EmptyPage : Page()
+
+    data class PrevTransitionPage(val curr: ReaderChapter, val prev: ReaderChapter) : Page()
+    data class NextTransitionPage(val curr: ReaderChapter, val next: ReaderChapter) : Page()
 }
 
 class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
@@ -44,15 +50,17 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
 
     enum class ViewType(val value: Int) {
         CONTENT(0),
-        ERROR(1),
-        EMPTY(2),
+        EMPTY(1),
+        PREV_TRANSITION(2),
+        NEXT_TRANSITION(3),
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<Page> {
         return when (viewType) {
             ViewType.CONTENT.value -> ContentPageViewHolder(parent)
-            ViewType.ERROR.value -> ErrorPageViewHolder(parent)
             ViewType.EMPTY.value -> EmptyPageViewHolder(parent)
+            ViewType.PREV_TRANSITION.value -> PrevTransitionPageViewHolder(parent)
+            ViewType.NEXT_TRANSITION.value -> NextTransitionPageViewHolder(parent)
             else -> throw IllegalAccessError()
         }
     }
@@ -60,18 +68,43 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
     override fun getItemViewType(position: Int): Int {
         return when (list[position]) {
             is Page.ContentPage -> ViewType.CONTENT.value
-            is Page.ErrorPage -> ViewType.ERROR.value
             is Page.EmptyPage -> ViewType.EMPTY.value
+            is Page.PrevTransitionPage -> ViewType.PREV_TRANSITION.value
+            is Page.NextTransitionPage -> ViewType.NEXT_TRANSITION.value
         }
     }
 
-    fun setContentPage(newList: List<String>) {
-        if (newList.isEmpty()) setList(listOf(Page.EmptyPage))
-        else setList(newList.map { Page.ContentPage(it) })
+    override val enableDiffUtil: Boolean = true
+    override fun areItemsTheSame(a: Page, b: Page): Boolean {
+        if (a is Page.ContentPage
+            && b is Page.ContentPage
+            && a.index == b.index
+            && a.url == b.url
+        ) return true
+        return super.areItemsTheSame(a, b)
     }
 
-    fun setErrorPage(message: String) {
-        setList(listOf(Page.ErrorPage(message)))
+    fun setChapterPointer(pointer: ReaderChapterPointer) {
+        val newList = mutableListOf<Page>()
+
+        val currChapter = pointer.currChapter
+        val prevChapter = pointer.prevChapter
+        val nextChapter = pointer.nextChapter
+
+        if (prevChapter != null && prevChapter.state != ViewState.Content)
+            newList.add(Page.PrevTransitionPage(currChapter, prevChapter))
+
+        if (currChapter.images.isEmpty())
+            newList.add(Page.EmptyPage)
+        else
+            newList.addAll(currChapter.images.mapIndexed { index, url ->
+                Page.ContentPage(index, url)
+            })
+
+        if (nextChapter != null && nextChapter.state != ViewState.Content)
+            newList.add(Page.NextTransitionPage(currChapter, nextChapter))
+
+        setList(newList)
     }
 
 
@@ -96,17 +129,67 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
         }
     }
 
-    inner class ErrorPageViewHolder(private val binding: ReaderErrorPageBinding) :
+    inner class PrevTransitionPageViewHolder(private val binding: ReaderPageTransitionPrevBinding) :
         BaseAdapter.ViewHolder<Page>(binding) {
 
         constructor(parent: ViewGroup) : this(
-            viewBinding(ReaderErrorPageBinding::inflate, parent)
+            viewBinding(ReaderPageTransitionPrevBinding::inflate, parent)
         )
 
-        @SuppressLint("ClickableViewAccessibility")
+        @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
         override fun bind(item: Page, position: Int) {
-            val message = (item as Page.ErrorPage).message
-            binding.message.text = message
+            val page = (item as Page.PrevTransitionPage)
+            binding.currChapterName.text = "${page.curr.name} ${page.curr.title}"
+            binding.prevChapterName.text = "${page.prev.name} ${page.prev.title}"
+
+            when (val state = page.prev.state) {
+                is ViewState.Loading -> {
+                    binding.progressBar.isVisible = true
+                    binding.errorHint.isVisible = false
+                }
+                is ViewState.Error -> {
+                    binding.progressBar.isVisible = false
+                    binding.errorHint.isVisible = true
+                    binding.errorHint.text = state.exception.message
+                }
+            }
+
+            val detector = GestureDetector(
+                context, object : GestureDetector.SimpleOnGestureListener() {
+                    override fun onDown(e: MotionEvent?): Boolean = true
+
+                    override fun onSingleTapConfirmed(e: MotionEvent): Boolean =
+                        onItemSingleTapConfirmed.invoke(e).let { true }
+                })
+
+            binding.root.setOnTouchListener { _, event -> detector.onTouchEvent(event) }
+        }
+    }
+
+    inner class NextTransitionPageViewHolder(private val binding: ReaderPageTransitionNextBinding) :
+        BaseAdapter.ViewHolder<Page>(binding) {
+
+        constructor(parent: ViewGroup) : this(
+            viewBinding(ReaderPageTransitionNextBinding::inflate, parent)
+        )
+
+        @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
+        override fun bind(item: Page, position: Int) {
+            val page = (item as Page.NextTransitionPage)
+            binding.currChapterName.text = "${page.curr.name} ${page.curr.title}"
+            binding.nextChapterName.text = "${page.next.name} ${page.next.title}"
+
+            when (val state = page.next.state) {
+                is ViewState.Loading -> {
+                    binding.progressBar.isVisible = true
+                    binding.errorHint.isVisible = false
+                }
+                is ViewState.Error -> {
+                    binding.progressBar.isVisible = false
+                    binding.errorHint.isVisible = true
+                    binding.errorHint.text = state.exception.message
+                }
+            }
 
             val detector = GestureDetector(
                 context, object : GestureDetector.SimpleOnGestureListener() {
@@ -151,7 +234,7 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
 
         @SuppressLint("ClickableViewAccessibility")
         override fun bind(item: Page, position: Int) {
-            val url = (item as Page.ContentPage).url
+            val page = item as Page.ContentPage
             setLoading()
 
             if (!isContinuous) {
@@ -170,22 +253,22 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
                         onItemSingleTapConfirmed.invoke(e).let { true }
 
                     override fun onLongPress(e: MotionEvent) =
-                        onItemLongPress.invoke(position, url)
+                        onItemLongPress.invoke(page.index, page.url)
                 })
 
             binding.root.setOnTouchListener { _, event ->
                 detector.onTouchEvent(event)
             }
 
-            binding.number.text = (position + 1).toString()
+            binding.number.text = (page.index + 1).toString()
 
-            binding.retryButton.setOnClickListener { notifyItemChanged(position) }
+            binding.retryButton.setOnClickListener { notifyItemChanged(page.index) }
 
             binding.content.zoomable = !isContinuous
             binding.content.setImageResource(android.R.color.transparent)
 
             binding.content.setOnLongClickListener {
-                onItemLongPress.invoke(position, url).let { true }
+                onItemLongPress.invoke(page.index, page.url).let { true }
             }
 
             binding.content.onTapListener = object : OnTapListener {
@@ -196,7 +279,7 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
 
             binding.progressBar.isIndeterminate = true
             ProgressInterceptor.addListener(
-                url.toHttpUrlOrNull().toString(),
+                page.url.toHttpUrlOrNull().toString(),
                 object : OnProgressChangeListener {
                     override fun onProgressChange(
                         bytesRead: Long,
@@ -217,7 +300,7 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
             Glide.with(context)
                 .asBitmap()
                 .timeout(20000)
-                .load(url)
+                .load(page.url)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
                 .listener(object : RequestListener<Bitmap> {
@@ -228,7 +311,7 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        ProgressInterceptor.removeListener(url)
+                        ProgressInterceptor.removeListener(page.url)
                         setContent()
                         return false
                     }
@@ -239,7 +322,7 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
                         target: Target<Bitmap>?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        ProgressInterceptor.removeListener(url)
+                        ProgressInterceptor.removeListener(page.url)
                         setError()
                         if (e != null) binding.errorHint.text = e.message
                         else binding.errorHint.setText(R.string.image_unknown_error_hint)

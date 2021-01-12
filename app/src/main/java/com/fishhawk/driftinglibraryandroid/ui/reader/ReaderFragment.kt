@@ -70,9 +70,9 @@ class ReaderFragment : Fragment() {
         viewModel.mangaTitle.observe(viewLifecycleOwner) { binding.title.text = it }
         viewModel.readerState.observe(viewLifecycleOwner) { binding.multiStateView.viewState = it }
 
-        viewModel.chapterPointer.observe(viewLifecycleOwner) { it ->
+        viewModel.chapterPointer.observe(viewLifecycleOwner) {
             if (it != null) {
-                reader.adapter.setContentPage(it.currChapter.images)
+                reader.adapter.setChapterPointer(it)
                 if (!it.isOpened && it.currChapter.state == ViewState.Content) {
                     it.isOpened = true
                     reader.setPage(
