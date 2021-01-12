@@ -18,6 +18,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderFragmentBinding
 import com.fishhawk.driftinglibraryandroid.ui.ReaderViewModelFactory
+import com.fishhawk.driftinglibraryandroid.ui.base.bindToFeedbackViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import com.fishhawk.driftinglibraryandroid.ui.base.saveImage
 import com.fishhawk.driftinglibraryandroid.ui.base.shareImage
@@ -64,6 +65,7 @@ class ReaderFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        bindToFeedbackViewModel(viewModel)
 
         viewModel.mangaTitle.observe(viewLifecycleOwner) { binding.title.text = it }
         viewModel.readerState.observe(viewLifecycleOwner) { binding.multiStateView.viewState = it }
