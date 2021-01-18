@@ -18,6 +18,7 @@ import com.fishhawk.driftinglibraryandroid.databinding.ExploreFragmentBinding
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
+import com.fishhawk.driftinglibraryandroid.ui.base.bindToRemoteList
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -76,6 +77,7 @@ class ExploreFragment : Fragment() {
         viewModel.providers.state.observe(viewLifecycleOwner) {
             binding.multiStateView.viewState = it
         }
+        bindToRemoteList(binding.refreshLayout, viewModel.providers)
     }
 
     private fun setupMenu(menu: Menu) {
