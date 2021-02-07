@@ -36,6 +36,8 @@ class MultiStateView @JvmOverloads constructor(
 
     private var contentView: View? = null
 
+    var onRetry: () -> Unit = {}
+
     val loadingBinding: StatePageLoadingBinding
     val errorBinding: StatePageErrorBinding
     val emptyBinding: StatePageEmptyBinding
@@ -45,6 +47,8 @@ class MultiStateView @JvmOverloads constructor(
         loadingBinding = StatePageLoadingBinding.inflate(inflater, this, true)
         errorBinding = StatePageErrorBinding.inflate(inflater, this, true)
         emptyBinding = StatePageEmptyBinding.inflate(inflater, this, true)
+
+        errorBinding.retryButton.setOnClickListener { onRetry.invoke() }
     }
 
     var viewState: ViewState = ViewState.Loading

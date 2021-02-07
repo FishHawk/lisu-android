@@ -70,6 +70,8 @@ class LibraryFragment : Fragment() {
             .onEach { binding.recyclerView.changeMangaListDisplayMode(adapter) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
+        binding.multiStateView.onRetry = { viewModel.outlines.reload() }
+
         viewModel.outlines.data.observe(viewLifecycleOwner) {
             adapter.setList(it)
         }
