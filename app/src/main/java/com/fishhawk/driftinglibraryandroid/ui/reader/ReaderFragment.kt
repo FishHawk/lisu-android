@@ -18,10 +18,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderFragmentBinding
 import com.fishhawk.driftinglibraryandroid.ui.ReaderViewModelFactory
-import com.fishhawk.driftinglibraryandroid.ui.base.bindToFeedbackViewModel
-import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
-import com.fishhawk.driftinglibraryandroid.ui.base.saveImage
-import com.fishhawk.driftinglibraryandroid.ui.base.shareImage
+import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.*
 import com.fishhawk.driftinglibraryandroid.widget.SimpleAnimationListener
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
@@ -93,6 +90,12 @@ class ReaderFragment : Fragment() {
                 }
             }
         }
+        viewModel.prevChapterStateChanged.observe(viewLifecycleOwner, EventObserver {
+            reader.setPrevChapterState(it)
+        })
+        viewModel.nextChapterStateChanged.observe(viewLifecycleOwner, EventObserver {
+            reader.setNextChapterState(it)
+        })
 
         combine(
             GlobalPreference.readingDirection.asFlow(),
