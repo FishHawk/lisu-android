@@ -69,6 +69,8 @@ class ReaderViewAdapter(private val context: Context) : BaseAdapter<Page>() {
     var onItemLongPress: ((position: Int, url: String) -> Unit) = { _, _ -> }
     var onItemSingleTapConfirmed: ((event: MotionEvent) -> Unit) = {}
 
+    lateinit var readerView: ReaderView
+
     var isContinuous = false
 
     enum class ViewType(val value: Int) {
@@ -194,18 +196,8 @@ class ReaderViewAdapter(private val context: Context) : BaseAdapter<Page>() {
             val page = (item as Page.PrevTransitionPage)
             binding.currChapterName.text = page.currTitle
             binding.prevChapterName.text = page.prevTitle
-
-            when (val state = page.prevState) {
-                is ViewState.Loading -> {
-                    binding.progressBar.isVisible = true
-                    binding.errorHint.isVisible = false
-                }
-                is ViewState.Error -> {
-                    binding.progressBar.isVisible = false
-                    binding.errorHint.isVisible = true
-                    binding.errorHint.text = state.exception.message
-                }
-            }
+            binding.multiStateView.viewState = page.prevState
+            binding.multiStateView.onRetry = { readerView.onRequestPrevChapter?.invoke() }
 
             val detector = GestureDetector(
                 context, object : GestureDetector.SimpleOnGestureListener() {
@@ -231,18 +223,8 @@ class ReaderViewAdapter(private val context: Context) : BaseAdapter<Page>() {
             val page = (item as Page.NextTransitionPage)
             binding.currChapterName.text = page.currTitle
             binding.nextChapterName.text = page.nextTitle
-
-            when (val state = page.nextState) {
-                is ViewState.Loading -> {
-                    binding.progressBar.isVisible = true
-                    binding.errorHint.isVisible = false
-                }
-                is ViewState.Error -> {
-                    binding.progressBar.isVisible = false
-                    binding.errorHint.isVisible = true
-                    binding.errorHint.text = state.exception.message
-                }
-            }
+            binding.multiStateView.viewState = page.nextState
+            binding.multiStateView.onRetry = { readerView.onRequestNextChapter?.invoke() }
 
             val detector = GestureDetector(
                 context, object : GestureDetector.SimpleOnGestureListener() {

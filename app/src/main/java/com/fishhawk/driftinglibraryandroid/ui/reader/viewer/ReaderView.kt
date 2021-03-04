@@ -80,6 +80,7 @@ abstract class ReaderView @JvmOverloads constructor(
                 }
             }
         }
+        adapter.readerView = this
         loadingBinding.root.setOnClickListener { onRequestMenu?.invoke(!isMenuVisible) }
         errorBinding.root.setOnClickListener { onRequestMenu?.invoke(!isMenuVisible) }
     }
