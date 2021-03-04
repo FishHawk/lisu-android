@@ -22,9 +22,7 @@ import com.fishhawk.driftinglibraryandroid.ui.base.bindToFeedbackViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.makeToast
 import com.fishhawk.driftinglibraryandroid.ui.base.saveImage
 import com.fishhawk.driftinglibraryandroid.ui.base.shareImage
-import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ReaderView
-import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ReaderViewContinuous
-import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ReaderViewPager
+import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.*
 import com.fishhawk.driftinglibraryandroid.widget.SimpleAnimationListener
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.flow.combine
@@ -70,14 +68,26 @@ class ReaderFragment : Fragment() {
         viewModel.mangaTitle.observe(viewLifecycleOwner) { binding.title.text = it }
         viewModel.readerState.observe(viewLifecycleOwner) { binding.multiStateView.viewState = it }
 
-        viewModel.chapterPointer.observe(viewLifecycleOwner) {
-            if (it != null) {
-                reader.adapter.setChapterPointer(it)
-                if (!it.isOpened && it.currChapter.state == ViewState.Content) {
-                    it.isOpened = true
+        viewModel.chapterPointer.observe(viewLifecycleOwner) { pointer ->
+            if (pointer != null) {
+                val prev = pointer.prevChapter?.let {
+                    AdjacentChapter("${it.name} ${it.title}", it.state)
+                }
+                val next = pointer.nextChapter?.let {
+                    AdjacentChapter("${it.name} ${it.title}", it.state)
+                }
+
+                val chapterContent = ReaderContent(
+                    "${pointer.currChapter.name} ${pointer.currChapter.title}",
+                    pointer.currChapter.images, prev, next
+                )
+                reader.adapter.setReaderContent(chapterContent)
+
+                if (!pointer.isOpened && pointer.currChapter.state == ViewState.Content) {
+                    pointer.isOpened = true
                     reader.setPage(
-                        it.startPage
-                            .coerceAtMost(it.currChapter.images.size - 1)
+                        pointer.startPage
+                            .coerceAtMost(pointer.currChapter.images.size - 1)
                             .coerceAtLeast(0)
                     )
                 }

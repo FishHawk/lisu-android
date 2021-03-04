@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.KeyEvent
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 
 abstract class ReaderView @JvmOverloads constructor(
     context: Context,
@@ -32,7 +33,9 @@ abstract class ReaderView @JvmOverloads constructor(
 
     abstract var pageIntervalEnabled: Boolean
 
-    val adapter = ImageListAdapter(context)
+    val adapter = ReaderViewAdapter(context)
+    abstract fun setPrevChapterState(state: ViewState)
+    abstract fun setNextChapterState(state: ViewState)
     fun refreshPage(page: Int) = adapter.notifyItemChanged(page)
 
     var onRequestPrevChapter: (() -> Unit)? = null

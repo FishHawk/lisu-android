@@ -12,6 +12,8 @@ import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Chapter
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
+import com.fishhawk.driftinglibraryandroid.ui.base.Event
+import com.fishhawk.driftinglibraryandroid.ui.base.Feedback
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.launch
@@ -60,6 +62,9 @@ class ReaderViewModel(
     private lateinit var chapters: List<ReaderChapter>
 
     val chapterPointer: MutableLiveData<ReaderChapterPointer?> = MutableLiveData(null)
+    val prevChapterStateChanged: MutableLiveData<Event<ViewState>> = MutableLiveData()
+    val nextChapterStateChanged: MutableLiveData<Event<ViewState>> = MutableLiveData()
+
     val chapterSize = chapterPointer.map { it?.currChapter?.images?.size ?: 0 }
     val chapterName = chapterPointer.map { it?.currChapter?.name ?: "" }
     val chapterTitle = chapterPointer.map { it?.currChapter?.title ?: "" }
@@ -119,11 +124,12 @@ class ReaderViewModel(
 
     private suspend fun loadChapter(chapter: ReaderChapter) {
         fun refreshPointerIfNeed() {
-            val pointer = chapterPointer.value
-            if (pointer != null &&
-                (pointer.index - chapter.index).absoluteValue <= 1
-            ) {
-                chapterPointer.value = pointer
+            chapterPointer.value?.let { pointer ->
+                when (chapter.index - pointer.index) {
+                    -1 -> prevChapterStateChanged.value = Event(chapter.state)
+                    1 -> nextChapterStateChanged.value = Event(chapter.state)
+                    0 -> chapterPointer.value = pointer
+                }
             }
         }
 

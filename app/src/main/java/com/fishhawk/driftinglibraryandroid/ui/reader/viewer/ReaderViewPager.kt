@@ -9,6 +9,7 @@ import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderViewPagerBinding
 import com.fishhawk.driftinglibraryandroid.util.dpToPx
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 
 class ReaderViewPager constructor(
     context: Context,
@@ -40,6 +41,20 @@ class ReaderViewPager constructor(
     init {
         adapter.isContinuous = false
         binding.content.adapter = adapter
+    }
+
+    override fun setPrevChapterState(state: ViewState) {
+        if (state is ViewState.Content &&
+            adapter.list[binding.content.currentItem] !is Page.PrevTransitionPage
+        ) adapter.removePrevChapterState()
+        else adapter.updatePrevChapterState(state)
+    }
+
+    override fun setNextChapterState(state: ViewState) {
+        if (state is ViewState.Content &&
+            adapter.list[binding.content.currentItem] !is Page.NextTransitionPage
+        ) adapter.removeNextChapterState()
+        else adapter.updateNextChapterState(state)
     }
 
     override fun setPage(page: Int) {

@@ -18,35 +18,58 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
-import com.fishhawk.driftinglibraryandroid.widget.comicimageview.OnTapListener
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderEmptyPageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderPageTransitionNextBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderPageTransitionPrevBinding
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
-import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderChapter
-import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderChapterPointer
 import com.fishhawk.driftinglibraryandroid.util.glide.OnProgressChangeListener
 import com.fishhawk.driftinglibraryandroid.util.glide.ProgressInterceptor
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
+import com.fishhawk.driftinglibraryandroid.widget.comicimageview.OnTapListener
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
+data class AdjacentChapter(
+    val title: String,
+    var state: ViewState
+)
+
+data class ReaderContent(
+    val title: String,
+    var imageUrls: List<String>,
+
+    val prev: AdjacentChapter?,
+    val next: AdjacentChapter?
+)
+
 sealed class Page {
-    data class ContentPage(val index: Int, val url: String) : Page()
     object EmptyPage : Page()
 
-    data class PrevTransitionPage(val curr: ReaderChapter, val prev: ReaderChapter) : Page()
-    data class NextTransitionPage(val curr: ReaderChapter, val next: ReaderChapter) : Page()
+    data class ContentPage(
+        val index: Int,
+        val url: String
+    ) : Page()
+
+    data class PrevTransitionPage(
+        val currTitle: String,
+        val prevTitle: String,
+        var prevState: ViewState
+    ) : Page()
+
+    data class NextTransitionPage(
+        val currTitle: String,
+        val nextTitle: String,
+        var nextState: ViewState
+    ) : Page()
 }
 
-class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
+class ReaderViewAdapter(private val context: Context) : BaseAdapter<Page>() {
 
     var onItemLongPress: ((position: Int, url: String) -> Unit) = { _, _ -> }
     var onItemSingleTapConfirmed: ((event: MotionEvent) -> Unit) = {}
 
     var isContinuous = false
-
 
     enum class ViewType(val value: Int) {
         CONTENT(0),
@@ -74,35 +97,65 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
         }
     }
 
-    override val enableDiffUtil: Boolean = true
-    override fun areItemsTheSame(a: Page, b: Page): Boolean {
-        if (a is Page.ContentPage
-            && b is Page.ContentPage
-            && a.index == b.index
-            && a.url == b.url
-        ) return true
-        return super.areItemsTheSame(a, b)
+    fun updatePrevChapterState(state: ViewState) {
+        val page = list.first()
+        if (page is Page.PrevTransitionPage) {
+            page.prevState = state
+            notifyItemChanged(0)
+        }
     }
 
-    fun setChapterPointer(pointer: ReaderChapterPointer) {
+    fun removePrevChapterState() {
+        val page = list.first()
+        if (page is Page.PrevTransitionPage) {
+            list.removeFirst()
+            notifyItemRemoved(0)
+        }
+    }
+
+    fun updateNextChapterState(state: ViewState) {
+        val page = list.last()
+        if (page is Page.NextTransitionPage) {
+            page.nextState = state
+            notifyItemChanged(list.lastIndex)
+        }
+    }
+
+    fun removeNextChapterState() {
+        val page = list.last()
+        if (page is Page.NextTransitionPage) {
+            list.removeLast()
+            notifyItemRemoved(list.size)
+        }
+    }
+
+    fun setReaderContent(content: ReaderContent) {
         val newList = mutableListOf<Page>()
 
-        val currChapter = pointer.currChapter
-        val prevChapter = pointer.prevChapter
-        val nextChapter = pointer.nextChapter
+        if (content.prev != null &&
+            content.prev.state != ViewState.Content
+        ) newList.add(
+            Page.PrevTransitionPage(
+                content.title,
+                content.prev.title,
+                content.prev.state
+            )
+        )
 
-        if (prevChapter != null && prevChapter.state != ViewState.Content)
-            newList.add(Page.PrevTransitionPage(currChapter, prevChapter))
+        if (content.imageUrls.isEmpty()) newList.add(Page.EmptyPage)
+        else newList.addAll(content.imageUrls.mapIndexed { index, url ->
+            Page.ContentPage(index, url)
+        })
 
-        if (currChapter.images.isEmpty())
-            newList.add(Page.EmptyPage)
-        else
-            newList.addAll(currChapter.images.mapIndexed { index, url ->
-                Page.ContentPage(index, url)
-            })
-
-        if (nextChapter != null && nextChapter.state != ViewState.Content)
-            newList.add(Page.NextTransitionPage(currChapter, nextChapter))
+        if (content.next != null &&
+            content.next.state != ViewState.Content
+        ) newList.add(
+            Page.NextTransitionPage(
+                content.title,
+                content.next.title,
+                content.next.state
+            )
+        )
 
         setList(newList)
     }
@@ -139,10 +192,10 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
         @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
         override fun bind(item: Page, position: Int) {
             val page = (item as Page.PrevTransitionPage)
-            binding.currChapterName.text = "${page.curr.name} ${page.curr.title}"
-            binding.prevChapterName.text = "${page.prev.name} ${page.prev.title}"
+            binding.currChapterName.text = page.currTitle
+            binding.prevChapterName.text = page.prevTitle
 
-            when (val state = page.prev.state) {
+            when (val state = page.prevState) {
                 is ViewState.Loading -> {
                     binding.progressBar.isVisible = true
                     binding.errorHint.isVisible = false
@@ -176,10 +229,10 @@ class ImageListAdapter(private val context: Context) : BaseAdapter<Page>() {
         @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
         override fun bind(item: Page, position: Int) {
             val page = (item as Page.NextTransitionPage)
-            binding.currChapterName.text = "${page.curr.name} ${page.curr.title}"
-            binding.nextChapterName.text = "${page.next.name} ${page.next.title}"
+            binding.currChapterName.text = page.currTitle
+            binding.nextChapterName.text = page.nextTitle
 
-            when (val state = page.next.state) {
+            when (val state = page.nextState) {
                 is ViewState.Loading -> {
                     binding.progressBar.isVisible = true
                     binding.errorHint.isVisible = false

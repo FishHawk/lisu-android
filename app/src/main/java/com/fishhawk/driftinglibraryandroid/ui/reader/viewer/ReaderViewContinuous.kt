@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderViewContinuousBinding
 import com.fishhawk.driftinglibraryandroid.util.dpToPx
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 
 class ReaderViewContinuous constructor(
     context: Context,
@@ -102,6 +103,14 @@ class ReaderViewContinuous constructor(
                 onPageChanged?.invoke(layoutManager.findFirstVisibleItemPosition())
             }
         })
+    }
+
+    override fun setPrevChapterState(state: ViewState) {
+        TODO("Not yet implemented")
+    }
+
+    override fun setNextChapterState(state: ViewState) {
+        TODO("Not yet implemented")
     }
 
     override fun setPage(page: Int) {
