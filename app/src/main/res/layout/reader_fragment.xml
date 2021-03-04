@@ -97,7 +97,7 @@
             <LinearLayout
                 android:id="@+id/menu_bottom_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="56dp"
                 android:layout_gravity="bottom"
                 android:background="#AA000000"
                 android:gravity="center_vertical"

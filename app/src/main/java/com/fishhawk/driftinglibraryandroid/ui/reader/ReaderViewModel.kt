@@ -13,12 +13,10 @@ import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Chapter
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.ui.base.Event
-import com.fishhawk.driftinglibraryandroid.ui.base.Feedback
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.math.absoluteValue
 
 class ReaderChapter(val index: Int, chapter: Chapter) {
     val id = chapter.id
@@ -57,6 +55,9 @@ class ReaderViewModel(
     private lateinit var mangaDetail: MangaDetail
     private val _mangaTitle = MutableLiveData(id)
     val mangaTitle: LiveData<String> = _mangaTitle
+
+    private val _isOnlyOneChapter: MutableLiveData<Boolean> = MutableLiveData()
+    val isOnlyOneChapter: LiveData<Boolean> = _isOnlyOneChapter
 
     private lateinit var collectionId: String
     private lateinit var chapters: List<ReaderChapter>
@@ -99,6 +100,7 @@ class ReaderViewModel(
                         ReaderChapter(index, chapter)
                     }
                     val chapter = chapters[chapterIndex]
+                    _isOnlyOneChapter.value = chapters.size <= 1
                     openChapter(chapter, pageIndex)
                     _readerState.value = ViewState.Content
 

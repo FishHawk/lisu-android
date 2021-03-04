@@ -97,6 +97,10 @@ class ReaderFragment : Fragment() {
         viewModel.nextChapterStateChanged.observe(viewLifecycleOwner, EventObserver {
             reader.setNextChapterState(it)
         })
+        viewModel.isOnlyOneChapter.observe(viewLifecycleOwner) {
+            binding.buttonPrevChapter.isVisible = !it
+            binding.buttonNextChapter.isVisible = !it
+        }
 
         combine(
             GlobalPreference.readingDirection.asFlow(),
