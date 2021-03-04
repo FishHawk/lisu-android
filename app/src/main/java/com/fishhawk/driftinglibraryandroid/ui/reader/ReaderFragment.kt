@@ -218,10 +218,17 @@ class ReaderFragment : Fragment() {
             viewModel.chapterPosition.asFlow(),
             viewModel.chapterSize.asFlow()
         ) { name, title, position, size ->
-            val indicator = "$name $title ${position + 1}/$size"
-            binding.readerIndicator.text = indicator
+            binding.readerIndicator.text =
+                if (size != 0) "$name $title ${position + 1}/$size"
+                else "$name $title"
+
+            binding.chapterPositionLabel.isVisible = size != 0
             binding.chapterPositionLabel.text = (position + 1).toString()
+
+            binding.chapterSizeLabel.isVisible = size != 0
             binding.chapterSizeLabel.text = size.toString()
+
+            binding.chapterProgress.isEnabled = size > 1
             binding.chapterProgress.max = size - 1
             binding.chapterProgress.progress = position
         }.launchIn(viewLifecycleOwner.lifecycleScope)
