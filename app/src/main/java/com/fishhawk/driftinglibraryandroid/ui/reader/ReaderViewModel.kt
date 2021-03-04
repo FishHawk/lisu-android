@@ -71,13 +71,6 @@ class ReaderViewModel(
     val chapterPosition: MutableLiveData<Int> = MutableLiveData(0)
 
     init {
-        chapterPointer.observeForever {
-            if (it != null) _readerState.value = it.currChapter.state
-        }
-    }
-
-
-    init {
         viewModelScope.launch {
             // load manga
             val result =
@@ -101,6 +94,7 @@ class ReaderViewModel(
                     }
                     val chapter = chapters[chapterIndex]
                     openChapter(chapter, pageIndex)
+                    _readerState.value = ViewState.Content
 
                 } catch (e: Throwable) {
                     _readerState.value = ViewState.Error(e)

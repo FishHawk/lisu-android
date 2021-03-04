@@ -67,18 +67,18 @@ class ReaderFragment : Fragment() {
 
         viewModel.chapterPointer.observe(viewLifecycleOwner) { pointer ->
             if (pointer != null) {
-                val prev = pointer.prevChapter?.let {
-                    AdjacentChapter("${it.name} ${it.title}", it.state)
-                }
-                val next = pointer.nextChapter?.let {
-                    AdjacentChapter("${it.name} ${it.title}", it.state)
-                }
-
                 val chapterContent = ReaderContent(
                     "${pointer.currChapter.name} ${pointer.currChapter.title}",
-                    pointer.currChapter.images, prev, next
+                    pointer.currChapter.images,
+                    pointer.prevChapter?.let {
+                        AdjacentChapter("${it.name} ${it.title}", it.state)
+                    },
+                    pointer.nextChapter?.let {
+                        AdjacentChapter("${it.name} ${it.title}", it.state)
+                    }
                 )
                 reader.adapter.setReaderContent(chapterContent)
+                reader.viewState = pointer.currChapter.state
 
                 if (!pointer.isOpened && pointer.currChapter.state == ViewState.Content) {
                     pointer.isOpened = true

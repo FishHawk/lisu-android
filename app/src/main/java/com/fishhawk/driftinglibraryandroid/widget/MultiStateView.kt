@@ -28,7 +28,7 @@ sealed class ViewState : Parcelable {
     data class Error(val exception: Throwable) : ViewState()
 }
 
-class MultiStateView @JvmOverloads constructor(
+open class MultiStateView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0

@@ -5,13 +5,14 @@ import android.util.AttributeSet
 import android.view.KeyEvent
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.fishhawk.driftinglibraryandroid.widget.MultiStateView
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
 
 abstract class ReaderView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : FrameLayout(context, attrs, defStyleAttr) {
+) : MultiStateView(context, attrs, defStyleAttr) {
 
     enum class ReadingOrientation { HORIZONTAL, VERTICAL }
     enum class ReadingDirection { LTR, RTL }
@@ -79,6 +80,8 @@ abstract class ReaderView @JvmOverloads constructor(
                 }
             }
         }
+        loadingBinding.root.setOnClickListener { onRequestMenu?.invoke(!isMenuVisible) }
+        errorBinding.root.setOnClickListener { onRequestMenu?.invoke(!isMenuVisible) }
     }
 
 
