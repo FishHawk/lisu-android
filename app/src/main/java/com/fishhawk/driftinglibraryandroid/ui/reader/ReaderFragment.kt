@@ -62,6 +62,7 @@ class ReaderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         bindToFeedbackViewModel(viewModel)
 
+        binding.multiStateView.onRetry = { viewModel.initReader() }
         viewModel.mangaTitle.observe(viewLifecycleOwner) { binding.title.text = it }
         viewModel.readerState.observe(viewLifecycleOwner) { binding.multiStateView.viewState = it }
 
@@ -170,6 +171,11 @@ class ReaderFragment : Fragment() {
                         shareImage(url, "$prefix-$position")
                     }
                 }).show()
+        }
+        reader.onRetry = {
+            viewModel.chapterPointer.value?.let { pointer ->
+                viewModel.openChapter(pointer.currChapter, pointer.startPage)
+            }
         }
         viewModel.chapterPointer.value = viewModel.chapterPointer.value
     }

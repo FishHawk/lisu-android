@@ -41,11 +41,11 @@ class ReaderChapterPointer(
 }
 
 class ReaderViewModel(
-    id: String,
-    providerId: String?,
+    private val id: String,
+    private val providerId: String?,
     private val collectionIndex: Int,
-    chapterIndex: Int,
-    pageIndex: Int,
+    private val chapterIndex: Int,
+    private val pageIndex: Int,
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
     private val readingHistoryRepository: ReadingHistoryRepository
@@ -71,6 +71,12 @@ class ReaderViewModel(
     val chapterPosition: MutableLiveData<Int> = MutableLiveData(0)
 
     init {
+        initReader()
+    }
+
+    fun initReader() {
+        _readerState.value = ViewState.Loading
+
         viewModelScope.launch {
             // load manga
             val result =
@@ -103,7 +109,7 @@ class ReaderViewModel(
         }
     }
 
-    private fun openChapter(chapter: ReaderChapter, pageIndex: Int) {
+    fun openChapter(chapter: ReaderChapter, pageIndex: Int) {
         if (chapter.state !is ViewState.Content) chapter.state = ViewState.Loading
 
         val pointer = ReaderChapterPointer(chapters, pageIndex, chapter.index)
