@@ -64,12 +64,20 @@
         app:layout_constraintTop_toBottomOf="@id/orientation" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/show_info_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Show info bar"
+        android:textColor="?android:attr/textColorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/page_interval" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/keep_screen_on"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Keep screen on"
         android:textColor="?android:attr/textColorPrimary"
-        app:layout_constraintTop_toBottomOf="@id/page_interval" />
+        app:layout_constraintTop_toBottomOf="@id/show_info_bar" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/use_volume_key"

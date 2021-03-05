@@ -65,6 +65,7 @@ object GlobalPreference {
     val readingDirection by get("reading_direction", ReadingDirection.LTR)
     val screenOrientation by get("screen_orientation", ScreenOrientation.DEFAULT)
     val pageIntervalEnabled by get("page_interval_enabled", false)
+    val showInfoBar by get("show_info_bar", true)
     val keepScreenOn by get("keep_screen_on", false)
     val volumeKeyEnabled by get("volume_key_enabled", false)
     val longTapDialogEnabled by get("long_tap_dialog_enabled", true)

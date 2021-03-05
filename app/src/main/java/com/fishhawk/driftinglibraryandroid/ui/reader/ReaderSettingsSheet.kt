@@ -18,6 +18,7 @@ class ReaderSettingsSheet(context: Context) : PreferenceBottomSheetDialog(contex
         bindPreference(GlobalPreference.screenOrientation, binding.orientation)
 
         bindPreference(GlobalPreference.pageIntervalEnabled, binding.pageInterval)
+        bindPreference(GlobalPreference.showInfoBar, binding.showInfoBar)
         bindPreference(GlobalPreference.keepScreenOn, binding.keepScreenOn)
         bindPreference(GlobalPreference.volumeKeyEnabled, binding.useVolumeKey)
         bindPreference(GlobalPreference.longTapDialogEnabled, binding.longTapDialog)

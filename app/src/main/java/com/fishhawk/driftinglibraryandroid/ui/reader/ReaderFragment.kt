@@ -217,13 +217,17 @@ class ReaderFragment : Fragment() {
     }
 
     private fun initializeMenu() {
+        GlobalPreference.showInfoBar.asFlow()
+            .onEach { if (!binding.menuLayout.isVisible) binding.infoBar.isVisible = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
         combine(
             viewModel.chapterName.asFlow(),
             viewModel.chapterTitle.asFlow(),
             viewModel.chapterPosition.asFlow(),
             viewModel.chapterSize.asFlow()
         ) { name, title, position, size ->
-            binding.readerIndicator.text =
+            binding.infoBar.text =
                 if (size != 0) "$name $title ${position + 1}/$size"
                 else "$name $title"
             binding.title.text = "$name $title"
@@ -276,7 +280,7 @@ class ReaderFragment : Fragment() {
     private fun setMenuLayoutVisibility(isVisible: Boolean) {
         if (isVisible) {
             binding.menuLayout.isVisible = true
-            binding.readerIndicator.isVisible = false
+            binding.infoBar.isVisible = false
 
             val topAnim =
                 AnimationUtils.loadAnimation(requireContext(), R.anim.enter_from_top)
@@ -285,7 +289,7 @@ class ReaderFragment : Fragment() {
             binding.menuTopLayout.startAnimation(topAnim)
             binding.menuBottomLayout.startAnimation(bottomAnim)
         } else {
-            binding.readerIndicator.isVisible = true
+            if (GlobalPreference.showInfoBar.get()) binding.infoBar.isVisible = true
 
             val topAnim =
                 AnimationUtils.loadAnimation(requireContext(), R.anim.exit_to_top)

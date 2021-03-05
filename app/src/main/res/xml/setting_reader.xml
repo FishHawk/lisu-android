@@ -26,6 +26,12 @@
         app:title="Page interval" />
 
     <SwitchPreference
+        app:defaultValue="true"
+        app:iconSpaceReserved="false"
+        app:key="show_info_bar"
+        app:title="Show info bar" />
+
+    <SwitchPreference
         app:defaultValue="false"
         app:iconSpaceReserved="false"
         app:key="keep_screen_on"
