@@ -63,7 +63,7 @@ class ReaderFragment : Fragment() {
         bindToFeedbackViewModel(viewModel)
 
         binding.multiStateView.onRetry = { viewModel.initReader() }
-        viewModel.mangaTitle.observe(viewLifecycleOwner) { binding.title.text = it }
+//        viewModel.mangaTitle.observe(viewLifecycleOwner) { binding.title.text = it }
         viewModel.readerState.observe(viewLifecycleOwner) { binding.multiStateView.viewState = it }
 
         viewModel.chapterPointer.observe(viewLifecycleOwner) { pointer ->
@@ -227,6 +227,7 @@ class ReaderFragment : Fragment() {
             binding.readerIndicator.text =
                 if (size != 0) "$name $title ${position + 1}/$size"
                 else "$name $title"
+            binding.title.text = "$name $title"
 
             binding.chapterPositionLabel.isVisible = size != 0
             binding.chapterPositionLabel.text = (position + 1).toString()
@@ -239,6 +240,7 @@ class ReaderFragment : Fragment() {
             binding.chapterProgress.progress = position
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
+        binding.backButton.setOnClickListener { requireActivity().finish() }
         binding.settingButton.setOnClickListener { ReaderSettingsSheet(requireContext()).show() }
         binding.overlayButton.setOnClickListener {
             ReaderOverlaySheet(requireContext(), viewLifecycleOwner.lifecycleScope)
