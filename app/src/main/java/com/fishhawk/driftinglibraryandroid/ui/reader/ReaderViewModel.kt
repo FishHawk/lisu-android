@@ -28,11 +28,9 @@ class ReaderChapter(val index: Int, chapter: Chapter) {
 
 class ReaderChapterPointer(
     private val list: List<ReaderChapter>,
-    val startPage: Int,
+    var startPage: Int,
     var index: Int
 ) {
-    var isOpened = false
-
     val currChapter get() = list[index]
     val nextChapter get() = list.getOrNull(index + 1)
     val prevChapter get() = list.getOrNull(index - 1)

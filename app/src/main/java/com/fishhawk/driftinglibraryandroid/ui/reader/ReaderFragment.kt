@@ -81,8 +81,7 @@ class ReaderFragment : Fragment() {
                 reader.adapter.setReaderContent(chapterContent)
                 reader.viewState = pointer.currChapter.state
 
-                if (!pointer.isOpened && pointer.currChapter.state == ViewState.Content) {
-                    pointer.isOpened = true
+                if (pointer.currChapter.state == ViewState.Content) {
                     reader.setPage(
                         pointer.startPage
                             .coerceAtMost(pointer.currChapter.images.size - 1)
@@ -180,6 +179,9 @@ class ReaderFragment : Fragment() {
             viewModel.chapterPointer.value?.let { pointer ->
                 viewModel.openChapter(pointer.currChapter, pointer.startPage)
             }
+        }
+        viewModel.chapterPointer.value?.let {
+            it.startPage = viewModel.chapterPosition.value ?: it.startPage
         }
         viewModel.chapterPointer.value = viewModel.chapterPointer.value
     }
