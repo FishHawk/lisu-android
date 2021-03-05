@@ -63,7 +63,6 @@ class ReaderFragment : Fragment() {
         bindToFeedbackViewModel(viewModel)
 
         binding.multiStateView.onRetry = { viewModel.initReader() }
-//        viewModel.mangaTitle.observe(viewLifecycleOwner) { binding.title.text = it }
         viewModel.readerState.observe(viewLifecycleOwner) { binding.multiStateView.viewState = it }
 
         viewModel.chapterPointer.observe(viewLifecycleOwner) { pointer ->
