@@ -62,8 +62,10 @@ class ReaderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         bindToFeedbackViewModel(viewModel)
 
-        binding.multiStateView.onRetry = { viewModel.initReader() }
-        viewModel.readerState.observe(viewLifecycleOwner) { binding.multiStateView.viewState = it }
+//        binding.multiStateView.onRetry = { viewModel.initReader() }
+        viewModel.readerState.observe(viewLifecycleOwner) {
+            if (it is ViewState.Error) reader.viewState = it
+        }
 
         viewModel.chapterPointer.observe(viewLifecycleOwner) { pointer ->
             if (pointer != null) {
@@ -152,7 +154,10 @@ class ReaderFragment : Fragment() {
         reader.onRequestPrevChapter = { viewModel.moveToPrevChapter() }
         reader.onRequestNextChapter = { viewModel.moveToNextChapter() }
         reader.onRequestMenuVisibility = { binding.menuLayout.isVisible }
-        reader.onRequestMenu = { setMenuLayoutVisibility(it) }
+        reader.onRequestMenu = {
+            if (viewModel.readerState.value is ViewState.Content)
+                setMenuLayoutVisibility(it)
+        }
         reader.onPageChanged = { viewModel.chapterPosition.value = it }
         reader.onPageLongClicked = { position, url ->
             if (GlobalPreference.longTapDialogEnabled.get())
@@ -174,11 +179,7 @@ class ReaderFragment : Fragment() {
                     }
                 }).show()
         }
-        reader.onRetry = {
-            viewModel.chapterPointer.value?.let { pointer ->
-                viewModel.openChapter(pointer.currChapter, pointer.startPage)
-            }
-        }
+        reader.onRetry = { viewModel.refreshReader() }
         viewModel.chapterPointer.value?.let {
             it.startPage = viewModel.chapterPosition.value ?: it.startPage
         }

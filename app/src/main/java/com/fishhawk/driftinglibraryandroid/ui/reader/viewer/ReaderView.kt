@@ -3,7 +3,6 @@ package com.fishhawk.driftinglibraryandroid.ui.reader.viewer
 import android.content.Context
 import android.util.AttributeSet
 import android.view.KeyEvent
-import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.fishhawk.driftinglibraryandroid.widget.MultiStateView
 import com.fishhawk.driftinglibraryandroid.widget.ViewState

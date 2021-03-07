@@ -51,8 +51,6 @@ class ReaderViewModel(
     val readerState: LiveData<ViewState> = _readerState
 
     private lateinit var mangaDetail: MangaDetail
-    private val _mangaTitle = MutableLiveData(id)
-    val mangaTitle: LiveData<String> = _mangaTitle
 
     private val _isOnlyOneChapter: MutableLiveData<Boolean> = MutableLiveData()
     val isOnlyOneChapter: LiveData<Boolean> = _isOnlyOneChapter
@@ -73,6 +71,14 @@ class ReaderViewModel(
         initReader()
     }
 
+    fun refreshReader() {
+        if (_readerState.value == ViewState.Content)
+            chapterPointer.value?.let { pointer ->
+                openChapter(pointer.currChapter, pointer.startPage)
+            }
+        else initReader()
+    }
+
     fun initReader() {
         _readerState.value = ViewState.Loading
 
@@ -84,7 +90,6 @@ class ReaderViewModel(
 
             result.onSuccess {
                 mangaDetail = it
-                _mangaTitle.value = it.title
             }.onFailure {
                 _readerState.value = ViewState.Error(it)
             }
