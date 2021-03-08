@@ -30,7 +30,7 @@ class ReaderViewPager constructor(
             field = value
         }
 
-    override var pageIntervalEnabled: Boolean = false
+    override var isPageIntervalEnabled: Boolean = false
         set(value) {
             val transformer = if (value) MarginPageTransformer(context.dpToPx(16)) else null
             binding.content.setPageTransformer(transformer)

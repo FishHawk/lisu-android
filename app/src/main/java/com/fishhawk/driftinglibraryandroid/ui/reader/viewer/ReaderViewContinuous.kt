@@ -49,7 +49,7 @@ class ReaderViewContinuous constructor(
         }
     }
 
-    override var pageIntervalEnabled: Boolean = false
+    override var isPageIntervalEnabled: Boolean = false
         set(value) {
             if (value) binding.content.addItemDecoration(itemDecoration)
             else binding.content.removeItemDecoration(itemDecoration)

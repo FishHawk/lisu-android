@@ -22,37 +22,37 @@
     <SwitchPreference
         app:defaultValue="false"
         app:iconSpaceReserved="false"
-        app:key="page_interval_enabled"
-        app:title="Page interval" />
+        app:key="is_page_interval_enabled"
+        app:title="@string/settings_is_page_interval_enabled" />
 
     <SwitchPreference
         app:defaultValue="true"
         app:iconSpaceReserved="false"
         app:key="show_info_bar"
-        app:title="Show info bar" />
+        app:title="@string/settings_show_info_bar" />
 
     <SwitchPreference
         app:defaultValue="false"
         app:iconSpaceReserved="false"
         app:key="keep_screen_on"
-        app:title="Keep screen on" />
+        app:title="@string/settings_keep_screen_on" />
 
     <SwitchPreference
         app:defaultValue="false"
         app:iconSpaceReserved="false"
-        app:key="volume_key_enabled"
-        app:title="Use volume key to turn pages" />
+        app:key="use_volume_key"
+        app:title="@string/settings_use_volume_key" />
 
     <SwitchPreference
         app:defaultValue="true"
         app:iconSpaceReserved="false"
-        app:key="long_tap_dialog_enabled"
-        app:title="Long tap dialog" />
+        app:key="is_long_tap_dialog_enabled"
+        app:title="@string/settings_is_long_tap_dialog_enabled" />
 
     <SwitchPreference
         app:defaultValue="false"
         app:iconSpaceReserved="false"
-        app:key="area_interpolation_enabled"
-        app:summary="Resampling using pixel area relation for moire’-free results"
-        app:title="Area interpolation" />
+        app:key="is_area_interpolation_enabled"
+        app:summary="@string/settings_is_area_interpolation_enabled_summary"
+        app:title="@string/settings_is_area_interpolation_enabled" />
 </PreferenceScreen>

@@ -17,13 +17,13 @@ class ReaderSettingsSheet(context: Context) : PreferenceBottomSheetDialog(contex
         bindPreference(GlobalPreference.readingDirection, binding.direction)
         bindPreference(GlobalPreference.screenOrientation, binding.orientation)
 
-        bindPreference(GlobalPreference.pageIntervalEnabled, binding.pageInterval)
+        bindPreference(GlobalPreference.isPageIntervalEnabled, binding.pageInterval)
         bindPreference(GlobalPreference.showInfoBar, binding.showInfoBar)
         bindPreference(GlobalPreference.keepScreenOn, binding.keepScreenOn)
-        bindPreference(GlobalPreference.volumeKeyEnabled, binding.useVolumeKey)
-        bindPreference(GlobalPreference.longTapDialogEnabled, binding.longTapDialog)
+        bindPreference(GlobalPreference.useVolumeKey, binding.useVolumeKey)
+        bindPreference(GlobalPreference.isLongTapDialogEnabled, binding.longTapDialog)
 
-        bindPreference(GlobalPreference.areaInterpolationEnabled, binding.areaInterpolationEnabled)
+        bindPreference(GlobalPreference.isAreaInterpolationEnabled, binding.areaInterpolationEnabled)
 
         setContentView(binding.root)
     }

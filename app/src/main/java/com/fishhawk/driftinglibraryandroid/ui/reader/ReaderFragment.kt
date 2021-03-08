@@ -103,13 +103,13 @@ class ReaderFragment : Fragment() {
 
         combine(
             GlobalPreference.readingDirection.asFlow(),
-            GlobalPreference.pageIntervalEnabled.asFlow(),
-            GlobalPreference.areaInterpolationEnabled.asFlow()
+            GlobalPreference.isPageIntervalEnabled.asFlow(),
+            GlobalPreference.isAreaInterpolationEnabled.asFlow()
         ) { _, _, _ -> initializeReader() }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        GlobalPreference.volumeKeyEnabled.asFlow()
-            .onEach { reader.volumeKeysEnabled = it }
+        GlobalPreference.useVolumeKey.asFlow()
+            .onEach { reader.useVolumeKey = it }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         initializeOverlay()
@@ -145,11 +145,14 @@ class ReaderFragment : Fragment() {
             else -> ReaderView.ReadingDirection.LTR
         }
 
-        reader.adapter.isAreaInterpolationEnabled = GlobalPreference.areaInterpolationEnabled.get()
-        reader.pageIntervalEnabled = GlobalPreference.pageIntervalEnabled.get()
-        reader.volumeKeysEnabled = GlobalPreference.volumeKeyEnabled.get()
+        reader.adapter.isAreaInterpolationEnabled =
+            GlobalPreference.isAreaInterpolationEnabled.get()
+        reader.isPageIntervalEnabled = GlobalPreference.isPageIntervalEnabled.get()
+        reader.useVolumeKey = GlobalPreference.useVolumeKey.get()
 
         binding.readerContainer.addView(reader)
+        reader.isFocusable = true
+        reader.isFocusableInTouchMode = true
         reader.requestFocus()
 
         reader.onRequestPrevChapter = { viewModel.moveToPrevChapter() }
@@ -161,7 +164,7 @@ class ReaderFragment : Fragment() {
         }
         reader.onPageChanged = { viewModel.chapterPosition.value = it }
         reader.onPageLongClicked = { position, url ->
-            if (GlobalPreference.longTapDialogEnabled.get())
+            if (GlobalPreference.isLongTapDialogEnabled.get())
                 ReaderPageSheet(requireContext(), object : ReaderPageSheet.Listener {
                     override fun onRefresh() {
                         reader.refreshPage(position)

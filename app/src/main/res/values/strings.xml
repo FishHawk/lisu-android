@@ -80,12 +80,29 @@
     <string name="settings_screen_orientation_portrait">Portrait</string>
     <string name="settings_screen_orientation_landscape">Landscape</string>
 
+    <string name="settings_is_page_interval_enabled">Page interval</string>
+    <string name="settings_show_info_bar">Show info bar</string>
+    <string name="settings_keep_screen_on">Keep screen on</string>
+    <string name="settings_use_volume_key">Use volume key to turn pages</string>
+    <string name="settings_is_long_tap_dialog_enabled">Long tap dialog</string>
+
+    <string name="settings_is_area_interpolation_enabled">Area interpolation</string>
+    <string name="settings_is_area_interpolation_enabled_summary">Resampling using pixel area relation for moire’-free results</string>
+
     <string name="settings_filter_mode_default">Default</string>
     <string name="settings_filter_mode_multiply">Multiply</string>
     <string name="settings_filter_mode_screen">Screen</string>
     <string name="settings_filter_mode_overlay">Overlay</string>
     <string name="settings_filter_mode_lighten">Lighten</string>
     <string name="settings_filter_mode_darken">Darken</string>
+
+
+    <!-- setting reader fragment -->
+    <string name="settings_clear_image_cache">Clear image cache</string>
+    <string name="settings_clear_image_cache_summary">Clear thumb and chapter image cache</string>
+
+    <string name="settings_secure_mode">Secure mode</string>
+    <string name="settings_secure_mode_summary">Hide app contents when switch apps and block screenshots</string>
 
 
     <!-- about fragment -->

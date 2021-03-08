@@ -78,7 +78,7 @@ class ComicImageViewAttacher(private val imageView: ComicImageView) : View.OnTou
 
     private val zoomable
         get() = imageView.zoomable
-    private val isOpenCVEnabled
+    private val isAreaInterpolationEnabled
         get() = imageView.isAreaInterpolationEnabled
 
     private val allowParentInterceptOnHorizontalEdge
@@ -350,7 +350,7 @@ class ComicImageViewAttacher(private val imageView: ComicImageView) : View.OnTou
     }
 
     private fun resizeBitmap() {
-        if (!isOpenCVEnabled) return
+        if (!isAreaInterpolationEnabled) return
         if (drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) return
 
         val scale = matrix.getScale()

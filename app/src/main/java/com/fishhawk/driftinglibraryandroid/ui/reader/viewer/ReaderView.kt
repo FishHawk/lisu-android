@@ -31,7 +31,7 @@ abstract class ReaderView @JvmOverloads constructor(
     val isRtl get() = readingDirection == ReadingDirection.RTL
     val isLtr get() = readingDirection == ReadingDirection.LTR
 
-    abstract var pageIntervalEnabled: Boolean
+    abstract var isPageIntervalEnabled: Boolean
 
     val adapter = ReaderViewAdapter(context)
     abstract fun setPrevChapterState(state: ViewState)
@@ -86,14 +86,14 @@ abstract class ReaderView @JvmOverloads constructor(
 
 
     /* Key Event */
-    var volumeKeysEnabled: Boolean = true
+    var useVolumeKey: Boolean = true
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (event.action == KeyEvent.ACTION_UP) return super.dispatchKeyEvent(event)
 
         return when (event.keyCode) {
-            KeyEvent.KEYCODE_VOLUME_UP -> (volumeKeysEnabled && !isMenuVisible).also { if (it) toNext() }
-            KeyEvent.KEYCODE_VOLUME_DOWN -> (volumeKeysEnabled && !isMenuVisible).also { if (it) toPrev() }
+            KeyEvent.KEYCODE_VOLUME_UP -> (useVolumeKey && !isMenuVisible).also { if (it) toNext() }
+            KeyEvent.KEYCODE_VOLUME_DOWN -> (useVolumeKey && !isMenuVisible).also { if (it) toPrev() }
             else -> super.dispatchKeyEvent(event)
         }
     }

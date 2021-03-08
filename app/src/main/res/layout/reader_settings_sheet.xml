@@ -19,7 +19,7 @@
         style="@style/Theme.TextAppearance.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Direction"
+        android:text="@string/settings_reading_direction"
         app:layout_constraintBaseline_toBaselineOf="@id/direction"
         app:layout_constraintEnd_toStartOf="@id/vertical_center"
         app:layout_constraintStart_toStartOf="parent" />
@@ -39,7 +39,7 @@
         style="@style/Theme.TextAppearance.Body1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Orientation"
+        android:text="@string/settings_screen_orientation"
         app:layout_constraintBaseline_toBaselineOf="@id/orientation"
         app:layout_constraintEnd_toStartOf="@id/vertical_center"
         app:layout_constraintStart_toStartOf="parent" />
@@ -59,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Page interval"
+        android:text="@string/settings_is_page_interval_enabled"
         android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintTop_toBottomOf="@id/orientation" />
 
@@ -67,7 +67,7 @@
         android:id="@+id/show_info_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Show info bar"
+        android:text="@string/settings_show_info_bar"
         android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintTop_toBottomOf="@id/page_interval" />
 
@@ -75,7 +75,7 @@
         android:id="@+id/keep_screen_on"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Keep screen on"
+        android:text="@string/settings_keep_screen_on"
         android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintTop_toBottomOf="@id/show_info_bar" />
 
@@ -83,7 +83,7 @@
         android:id="@+id/use_volume_key"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Use volume key to turn pages"
+        android:text="@string/settings_use_volume_key"
         android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintTop_toBottomOf="@id/keep_screen_on" />
 
@@ -91,7 +91,7 @@
         android:id="@+id/long_tap_dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Long tap dialog"
+        android:text="@string/settings_is_long_tap_dialog_enabled"
         android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintTop_toBottomOf="@id/use_volume_key" />
 
@@ -99,7 +99,7 @@
         android:id="@+id/area_interpolation_enabled"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Area interpolation"
+        android:text="@string/settings_is_area_interpolation_enabled"
         android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintTop_toBottomOf="@id/long_tap_dialog" />
 </androidx.constraintlayout.widget.ConstraintLayout>
