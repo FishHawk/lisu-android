@@ -14,5 +14,5 @@
     android:paddingTop="8dp"
     android:paddingEnd="2dp"
     android:paddingBottom="8dp"
-    android:textColor="@color/md_white_1000"
+    android:textColor="@color/white"
     tools:text="No.1" />

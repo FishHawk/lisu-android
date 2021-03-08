@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorAccent">#1e88e5</color>
-
     <color name="loading_indicator_red">@color/red_600</color>
     <color name="loading_indicator_purple">@color/purple_700</color>
     <color name="loading_indicator_blue">@color/blue_600</color>
@@ -9,15 +7,6 @@
     <color name="loading_indicator_green">@color/light_green_600</color>
     <color name="loading_indicator_yellow">@color/yellow_800</color>
     <color name="loading_indicator_orange">@color/deep_orange_400</color>
-
-
-    <!-- Application Colors -->
-    <color name="colorPrimary">#54759E</color>
-    <color name="colorPrimaryDark">#435E7E</color>
-
-    <!-- Dark Application Colors -->
-    <color name="colorDarkPrimary">#212121</color>
-    <color name="colorDarkPrimaryDark">#1C1C1D</color>
 
     <!-- Light Theme -->
     <color name="colorAccentLight">@color/blue_A400</color>
@@ -27,27 +16,18 @@
     <color name="dividerLight">@color/md_black_1000_12</color>
     <color name="rippleColorLight">@color/md_black_1000_12</color>
     <color name="backgroundLight">@color/grey_50</color>
-    <color name="dialogLight">@color/white</color>
-    <color name="selectorColorLight">@color/md_blue_A400_38</color>
 
     <!-- Dark Theme -->
+    <color name="colorDarkPrimary">#212121</color>
+    <color name="colorDarkPrimaryDark">#1C1C1D</color>
     <color name="colorAccentDark">#3399FF</color>
-    <color name="textColorPrimaryDark">@color/md_white_1000</color>
+    <color name="textColorPrimaryDark">@color/white</color>
     <color name="textColorSecondaryDark">@color/md_white_1000_70</color>
     <color name="textColorHintDark">@color/md_white_1000_50</color>
     <color name="dividerDark">@color/md_white_1000_12</color>
     <color name="rippleColorDark">@color/md_white_1000_20</color>-
     <color name="backgroundDark">@color/colorDarkPrimaryDark</color>
-    <color name="dialogDark">@color/colorDarkPrimary</color>
     <color name="selectorColorDark">@color/md_blue_A200_50</color>
-
-    <!-- Reader Theme -->
-    <color name="readerColorDarkPrimary">@color/colorDarkPrimary</color>
-    <color name="pageNumberBackgroundLight">@color/md_grey_50_75</color>
-    <color name="pageNumberBackgroundDark">@color/md_grey_900_75</color>
-
-    <color name="filterColorLight">#FFC107</color>
-    <color name="filterColorDark">#FFEB3B</color>
 
     <!-- Text Colors -->
     <color name="md_black_1000_87">#DE000000</color>
@@ -55,34 +35,12 @@
     <color name="md_black_1000_38">#61000000</color>
     <color name="md_black_1000_12">#1F000000</color>
 
-    <color name="md_white_1000">#FFFFFFFF</color>
     <color name="md_white_1000_70">#B3FFFFFF</color>
-    <color name="md_white_1000_54">#8AFFFFFF</color>
     <color name="md_white_1000_50">#80FFFFFF</color>
     <color name="md_white_1000_20">#33FFFFFF</color>
     <color name="md_white_1000_12">#1FFFFFFF</color>
 
-    <!-- Material Design Colors -->
-    <color name="md_black_1000">#000000</color>
-
-    <color name="md_grey_50">#FAFAFA</color>
-    <color name="md_grey_50_75">#BFFAFAFA</color>
-    <color name="md_grey_100">#F5F5F5</color>
-    <color name="md_grey_300">#E0E0E0</color>
-    <color name="md_grey_800">#424242</color>
-    <color name="md_grey_900">#212121</color>
-    <color name="md_grey_900_75">#BF212121</color>
-
-    <color name="md_blue_A200">#448AFF</color>
     <color name="md_blue_A200_50">#80448AFF</color>
-
-    <color name="md_blue_A400">#2979FF</color>
-    <color name="md_blue_A400_38">#612979FF</color>
-
-    <color name="md_blue_grey_900">#263238</color>
-    <color name="md_blue_grey_800">#37474F</color>
-
-    <color name="pale_green">#99CC99</color>
 
 
     <!-- material design color palette -->
