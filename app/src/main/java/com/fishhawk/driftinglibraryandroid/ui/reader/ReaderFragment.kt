@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -221,6 +222,7 @@ class ReaderFragment : Fragment() {
         }.launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initializeMenu() {
         GlobalPreference.showInfoBar.asFlow()
             .onEach { if (!binding.menuLayout.isVisible) binding.infoBar.isVisible = it }

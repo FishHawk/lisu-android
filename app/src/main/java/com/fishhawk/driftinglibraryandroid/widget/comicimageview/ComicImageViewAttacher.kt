@@ -268,7 +268,7 @@ class ComicImageViewAttacher(private val imageView: ComicImageView) : View.OnTou
     private fun scaleImage(scaleFactor: Float, focusX: Float, focusY: Float) {
         if (!scaleFactor.isFinite() || scaleFactor < 0) return
         if (getScale() < maxScale || scaleFactor < 1f) {
-            matrix.postScale(scaleFactor, scaleFactor, focusX, focusY);
+            matrix.postScale(scaleFactor, scaleFactor, focusX, focusY)
             correctBound()
             applyMatrix()
         }

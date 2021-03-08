@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.widget;
+package com.fishhawk.driftinglibraryandroid.widget
 
 import android.view.animation.Animation
 
