@@ -70,6 +70,8 @@ object GlobalPreference {
     val volumeKeyEnabled by get("volume_key_enabled", false)
     val longTapDialogEnabled by get("long_tap_dialog_enabled", true)
 
+    val areaInterpolationEnabled by get("area_interpolation_enabled", false)
+
 
     enum class ColorFilterMode { DEFAULT, MULTIPLY, SCREEN, OVERLAY, LIGHTEN, DARKEN }
 

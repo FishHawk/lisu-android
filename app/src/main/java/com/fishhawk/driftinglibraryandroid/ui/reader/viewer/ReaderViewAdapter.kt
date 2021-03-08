@@ -72,6 +72,7 @@ class ReaderViewAdapter(private val context: Context) : BaseAdapter<Page>() {
     lateinit var readerView: ReaderView
 
     var isContinuous = false
+    var isAreaInterpolationEnabled = false
 
     enum class ViewType(val value: Int) {
         CONTENT(0),
@@ -300,6 +301,7 @@ class ReaderViewAdapter(private val context: Context) : BaseAdapter<Page>() {
             binding.retryButton.setOnClickListener { notifyItemChanged(page.index) }
 
             binding.content.zoomable = !isContinuous
+            binding.content.isAreaInterpolationEnabled = isAreaInterpolationEnabled
             binding.content.setImageResource(android.R.color.transparent)
 
             binding.content.setOnLongClickListener {

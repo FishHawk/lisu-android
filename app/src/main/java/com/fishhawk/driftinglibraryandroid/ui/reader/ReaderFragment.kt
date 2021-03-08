@@ -62,7 +62,6 @@ class ReaderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         bindToFeedbackViewModel(viewModel)
 
-//        binding.multiStateView.onRetry = { viewModel.initReader() }
         viewModel.readerState.observe(viewLifecycleOwner) {
             if (it is ViewState.Error) reader.viewState = it
         }
@@ -104,8 +103,9 @@ class ReaderFragment : Fragment() {
 
         combine(
             GlobalPreference.readingDirection.asFlow(),
-            GlobalPreference.pageIntervalEnabled.asFlow()
-        ) { _, _ -> initializeReader() }
+            GlobalPreference.pageIntervalEnabled.asFlow(),
+            GlobalPreference.areaInterpolationEnabled.asFlow()
+        ) { _, _, _ -> initializeReader() }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         GlobalPreference.volumeKeyEnabled.asFlow()
@@ -145,6 +145,7 @@ class ReaderFragment : Fragment() {
             else -> ReaderView.ReadingDirection.LTR
         }
 
+        reader.adapter.isAreaInterpolationEnabled = GlobalPreference.areaInterpolationEnabled.get()
         reader.pageIntervalEnabled = GlobalPreference.pageIntervalEnabled.get()
         reader.volumeKeysEnabled = GlobalPreference.volumeKeyEnabled.get()
 

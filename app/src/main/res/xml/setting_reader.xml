@@ -48,4 +48,11 @@
         app:iconSpaceReserved="false"
         app:key="long_tap_dialog_enabled"
         app:title="Long tap dialog" />
+
+    <SwitchPreference
+        app:defaultValue="false"
+        app:iconSpaceReserved="false"
+        app:key="area_interpolation_enabled"
+        app:summary="Resampling using pixel area relation for moire’-free results"
+        app:title="Area interpolation" />
 </PreferenceScreen>

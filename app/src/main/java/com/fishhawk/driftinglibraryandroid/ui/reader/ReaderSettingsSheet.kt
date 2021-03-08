@@ -23,6 +23,8 @@ class ReaderSettingsSheet(context: Context) : PreferenceBottomSheetDialog(contex
         bindPreference(GlobalPreference.volumeKeyEnabled, binding.useVolumeKey)
         bindPreference(GlobalPreference.longTapDialogEnabled, binding.longTapDialog)
 
+        bindPreference(GlobalPreference.areaInterpolationEnabled, binding.areaInterpolationEnabled)
+
         setContentView(binding.root)
     }
 }

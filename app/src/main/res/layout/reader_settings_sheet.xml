@@ -94,4 +94,12 @@
         android:text="Long tap dialog"
         android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintTop_toBottomOf="@id/use_volume_key" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/area_interpolation_enabled"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Area interpolation"
+        android:textColor="?android:attr/textColorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/long_tap_dialog" />
 </androidx.constraintlayout.widget.ConstraintLayout>

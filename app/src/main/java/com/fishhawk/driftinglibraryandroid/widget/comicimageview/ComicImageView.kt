@@ -64,7 +64,7 @@ class ComicImageView : AppCompatImageView {
     }
 
     var zoomable = true
-    var isOpenCVEnabled = true
+    var isAreaInterpolationEnabled = true
 
     companion object {
         private const val DEFAULT_MAX_SCALE = 2.5f

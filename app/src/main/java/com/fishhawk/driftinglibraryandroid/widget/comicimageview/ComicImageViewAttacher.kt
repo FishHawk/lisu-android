@@ -79,7 +79,7 @@ class ComicImageViewAttacher(private val imageView: ComicImageView) : View.OnTou
     private val zoomable
         get() = imageView.zoomable
     private val isOpenCVEnabled
-        get() = imageView.isOpenCVEnabled
+        get() = imageView.isAreaInterpolationEnabled
 
     private val allowParentInterceptOnHorizontalEdge
         get() = imageView.allowParentInterceptOnHorizontalEdge
