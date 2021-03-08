@@ -351,11 +351,12 @@ class ComicImageViewAttacher(private val imageView: ComicImageView) : View.OnTou
 
     private fun resizeBitmap() {
         if (!isOpenCVEnabled) return
+        if (drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) return
 
         val scale = matrix.getScale()
         val bitmap = ScaleAlgorithm.scale(drawable.toBitmap(), initScale * fixScale * scale)
         val newD = BitmapDrawable(imageView.context.resources, bitmap)
-        (imageView as ComicImageView).setImageDrawableMy(newD)
+        imageView.setImageDrawableMy(newD)
 
         val (tx, ty) = matrix.getTranslate()
         fixScale *= scale
