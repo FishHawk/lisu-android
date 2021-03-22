@@ -23,7 +23,7 @@ class SearchViewModel(
 
     val outlines = remotePagingList<Int, MangaOutline> { key ->
         val page = key ?: 1
-        remoteProviderRepository.search(
+        remoteProviderRepository.listManga(
             providerId = providerId,
             keywords = keywords.value!!,
             page = page

@@ -10,50 +10,50 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import retrofit2.http.QueryMap
 
 interface RemoteProviderService {
-    @GET("/provider/list")
-    suspend fun getProviders(): List<ProviderInfo>
+    @GET("/providers")
+    suspend fun listProvider(): List<ProviderInfo>
 
-    @GET("/provider/item/{providerId}/detail")
-    suspend fun getProviderDetail(
+    @GET("/providers/{providerId}")
+    suspend fun getProvider(
         @Path("providerId") providerId: String
     ): ProviderDetail
 
-    @GET("/provider/item/{providerId}/search")
-    suspend fun search(
+    @GET("/providers/{providerId}/popular")
+    suspend fun listPopularManga(
+        @Path("providerId") providerId: String,
+        @Query("page") page: Int,
+        @QueryMap option: Map<String, Int>
+    ): List<MangaOutline>
+
+    @GET("/providers/{providerId}/latest")
+    suspend fun listLatestManga(
+        @Path("providerId") providerId: String,
+        @Query("page") page: Int,
+        @QueryMap option: Map<String, Int>
+    ): List<MangaOutline>
+
+    @GET("/providers/{providerId}/category")
+    suspend fun listCategoryManga(
+        @Path("providerId") providerId: String,
+        @Query("page") page: Int,
+        @QueryMap option: Map<String, Int>
+    ): List<MangaOutline>
+
+    @GET("/providers/{providerId}/mangas")
+    suspend fun listManga(
         @Path("providerId") providerId: String,
         @Query("keywords") keywords: String,
         @Query("page") page: Int
     ): List<MangaOutline>
 
-    @GET("/provider/item/{providerId}/popular")
-    suspend fun getPopular(
-        @Path("providerId") providerId: String,
-        @Query("page") page: Int,
-        @QueryMap option:Map<String, Int>
-    ): List<MangaOutline>
-
-    @GET("/provider/item/{providerId}/latest")
-    suspend fun getLatest(
-        @Path("providerId") providerId: String,
-        @Query("page") page: Int,
-        @QueryMap option:Map<String, Int>
-    ): List<MangaOutline>
-
-    @GET("/provider/item/{providerId}/category")
-    suspend fun getCategory(
-        @Path("providerId") providerId: String,
-        @Query("page") page: Int,
-        @QueryMap option:Map<String, Int>
-    ): List<MangaOutline>
-
-    @GET("/provider/item/{providerId}/manga/{mangaId}")
+    @GET("/providers/{providerId}/mangas/{mangaId}")
     suspend fun getManga(
         @Path("providerId") providerId: String,
         @Path("mangaId") id: String
     ): MangaDetail
 
-    @GET("/provider/item/{providerId}/chapter/{mangaId}/{chapterId}")
-    suspend fun getChapterContent(
+    @GET("/providers/{providerId}/mangas/{mangaId}/chapters/{chapterId}")
+    suspend fun getChapter(
         @Path("providerId") providerId: String,
         @Path("mangaId") mangaId: String,
         @Path("chapterId") chapterId: String

@@ -9,7 +9,7 @@ class ExploreViewModel(
     private val remoteProviderRepository: RemoteProviderRepository
 ) : ViewModel() {
     val providers = remoteList {
-        remoteProviderRepository.getProvidersInfo()
+        remoteProviderRepository.listProvider()
     }.apply {
         data.addSource(GlobalPreference.selectedServer.asFlow().asLiveData()) { reload() }
     }

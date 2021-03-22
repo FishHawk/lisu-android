@@ -7,36 +7,36 @@ import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface RemoteLibraryService {
-    @GET("library/search")
-    suspend fun search(
+    @GET("library/mangas")
+    suspend fun listManga(
         @Query("lastTime") lastTime: Long,
         @Query("keywords") keywords: String,
         @Query("limit") limit: Int
     ): List<MangaOutline>
 
-    @GET("library/manga/{mangaId}")
+    @GET("library/mangas/{mangaId}")
     suspend fun getManga(@Path("mangaId") mangaId: String): MangaDetail
 
-    @DELETE("library/manga/{mangaId}")
+    @DELETE("library/mangas/{mangaId}")
     suspend fun deleteManga(@Path("mangaId") mangaId: String): String
 
-    @PATCH("library/manga/{mangaId}/metadata")
-    suspend fun patchMangaMetadata(
+    @PUT("library/mangas/{mangaId}/metadata")
+    suspend fun updateMangaMetadata(
         @Path("mangaId") mangaId: String,
         @Body metadata: MetadataDetail
     ): MangaDetail
 
     @Multipart
-    @PATCH("library/manga/{mangaId}/thumb")
-    suspend fun patchMangaThumb(
+    @PUT("library/mangas/{mangaId}/thumb")
+    suspend fun updateMangaThumb(
         @Path("mangaId") mangaId: String,
         @Part("thumb\"; filename=\"thumb\" ") thumb: RequestBody
     ): MangaDetail
 
-    @GET("library/chapter/{mangaId}")
-    suspend fun getChapterContent(
+    @GET("library/mangas/{mangaId}/chapters/{collectionId}/{chapterId}")
+    suspend fun getChapter(
         @Path("mangaId") mangaId: String,
-        @Query("collection") collection: String,
-        @Query("chapter") chapter: String
+        @Path("collectionId") collectionId: String,
+        @Path("chapterId") chapterId: String
     ): List<String>
 }

@@ -18,7 +18,7 @@ class LibraryViewModel(
     val keywords = MutableLiveData(argKeywords ?: "")
 
     val outlines = remotePagingList<Long, MangaOutline> { key ->
-        repository.search(
+        repository.listManga(
             lastTime = key ?: Long.MAX_VALUE,
             keywords = keywords.value ?: "",
             limit = 20

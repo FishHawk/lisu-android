@@ -13,7 +13,7 @@ class GlobalSearchViewModel(
 
     private val providerList: LiveData<Result<List<ProviderInfo>>?> = liveData {
         emit(null)
-        emit(remoteLibraryRepository.getProvidersInfo())
+        emit(remoteLibraryRepository.listProvider())
     }
 
     val searchGroupList: MediatorLiveData<List<SearchGroup>> = MediatorLiveData()
@@ -33,7 +33,7 @@ class GlobalSearchViewModel(
             }
 
             searchGroupList.value = providerList.map { info ->
-                SearchGroup(info, remoteLibraryRepository.search(info.id, keywords, 1))
+                SearchGroup(info, remoteLibraryRepository.listManga(info.id, keywords, 1))
             }
         }
 }

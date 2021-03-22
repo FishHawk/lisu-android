@@ -56,20 +56,20 @@ class ProviderViewModel(
     val detail: LiveData<Result<ProviderDetail>?> = providerId.switchMap {
         liveData {
             emit(null)
-            emit(remoteProviderRepository.getProvidersDetail(it))
+            emit(remoteProviderRepository.getProvider(it))
         }
     }
 
     val popularMangaList = ProviderMangaListComponent(viewModelScope) { page, option ->
-        remoteProviderRepository.getPopularMangaList(providerId.value!!, page, option)
+        remoteProviderRepository.listPopularManga(providerId.value!!, page, option)
     }
 
     val latestMangaList = ProviderMangaListComponent(viewModelScope) { page, option ->
-        remoteProviderRepository.getLatestMangaList(providerId.value!!, page, option)
+        remoteProviderRepository.listLatestManga(providerId.value!!, page, option)
     }
 
     val categoryMangaList = ProviderMangaListComponent(viewModelScope) { page, option ->
-        remoteProviderRepository.getCategoryMangaList(providerId.value!!, page, option)
+        remoteProviderRepository.listCategoryManga(providerId.value!!, page, option)
     }
 
 

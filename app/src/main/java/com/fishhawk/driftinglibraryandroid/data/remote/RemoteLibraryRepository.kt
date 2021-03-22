@@ -14,27 +14,21 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
         this.service = builder?.create(RemoteLibraryService::class.java)
     }
 
-    suspend fun search(
+    suspend fun listManga(
         lastTime: Long,
         keywords: String,
         limit: Int = 20
     ): Result<List<MangaOutline>> =
         resultWrap {
-            it.search(lastTime, keywords, limit).apply {
-                for (outline in this) {
-                    outline.thumb =
-                        if (outline.thumb.isNullOrBlank()) null
-                        else "${url}library/image/${outline.id}/${outline.thumb}"
-                }
+            it.listManga(lastTime, keywords, limit).onEach { outline ->
+                outline.thumb = "${url}library/mangas/${outline.id}/thumb"
             }
         }
 
     suspend fun getManga(mangaId: String): Result<MangaDetail> =
         resultWrap {
             it.getManga(mangaId).apply {
-                thumb =
-                    if (thumb.isNullOrBlank()) null
-                    else "${url}library/image/${mangaId}/${thumb}"
+                thumb = "${url}library/mangas/${mangaId}/thumb"
             }
         }
 
@@ -45,29 +39,29 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
         mangaId: String,
         metadata: MetadataDetail
     ): Result<MangaDetail> =
-        resultWrap { it.patchMangaMetadata(mangaId, metadata).apply {
-            thumb =
-                if (thumb.isNullOrBlank()) null
-                else "${url}library/image/${mangaId}/${thumb}"
-        } }
+        resultWrap {
+            it.updateMangaMetadata(mangaId, metadata).apply {
+                thumb = "${url}library/mangas/${mangaId}/thumb"
+            }
+        }
 
     suspend fun updateMangaThumb(
         mangaId: String,
         requestBody: RequestBody
     ): Result<MangaDetail> =
-        resultWrap { it.patchMangaThumb(mangaId, requestBody).apply {
-            thumb =
-                if (thumb.isNullOrBlank()) null
-                else "${url}library/image/${mangaId}/${thumb}"
-        } }
+        resultWrap {
+            it.updateMangaThumb(mangaId, requestBody).apply {
+                thumb = "${url}library/mangas/${mangaId}/thumb"
+            }
+        }
 
     suspend fun getChapterContent(
         mangaId: String,
-        collection: String,
-        chapter: String
+        collectionId: String,
+        chapterId: String
     ): Result<List<String>> =
         resultWrap { service ->
-            service.getChapterContent(mangaId, collection, chapter)
-                .map { "${url}library/image/$mangaId/$collection/$chapter/$it" }
+            service.getChapter(mangaId, collectionId, chapterId)
+                .map { "${url}library/mangas/$mangaId/images/$collectionId/$chapterId/$it" }
         }
 }
