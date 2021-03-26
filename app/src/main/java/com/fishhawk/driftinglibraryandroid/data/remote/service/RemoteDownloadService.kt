@@ -4,29 +4,29 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.DownloadDesc
 import retrofit2.http.*
 
 interface RemoteDownloadService {
-    @GET("/download/list")
+    @GET("/downloads/")
     suspend fun getAllDownloadTasks(): List<DownloadDesc>
 
-    @PATCH("/download/list/start")
+    @PATCH("/downloads/start")
     suspend fun startAllDownloadTasks(): List<DownloadDesc>
 
-    @PATCH("/download/list/pause")
+    @PATCH("/downloads/pause")
     suspend fun pauseAllDownloadTasks(): List<DownloadDesc>
 
     @FormUrlEncoded
-    @POST("/download/item")
+    @POST("/downloads/")
     suspend fun postDownloadTask(
         @Field("providerId") providerId: String,
         @Field("sourceManga") sourceManga: String,
         @Field("targetManga") targetManga: String
     ): DownloadDesc
 
-    @DELETE("/download/item/{id}")
+    @DELETE("/downloads/{id}")
     suspend fun deleteDownloadTask(@Path("id") id: String): DownloadDesc
 
-    @PATCH("/download/item/{id}/start")
+    @PATCH("/downloads/{id}/start")
     suspend fun startDownloadTask(@Path("id") id: String): DownloadDesc
 
-    @PATCH("/download/item/{id}/pause")
+    @PATCH("/downloads/{id}/pause")
     suspend fun pauseDownloadTask(@Path("id") id: String): DownloadDesc
 }
