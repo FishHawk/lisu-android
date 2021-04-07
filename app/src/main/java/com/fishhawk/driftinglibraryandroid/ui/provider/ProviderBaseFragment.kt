@@ -101,6 +101,8 @@ abstract class ProviderBaseFragment : Fragment() {
             .onEach { binding.recyclerView.changeMangaListDisplayMode(mangaAdapter) }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
+        binding.multiStateView.onRetry = { mangaListComponent.reload() }
+
         mangaListComponent.data.observe(viewLifecycleOwner) {
             mangaAdapter.setList(it)
         }

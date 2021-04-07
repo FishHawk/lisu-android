@@ -70,6 +70,7 @@ class ExploreFragment : Fragment() {
             .onEach { adapter.lastUsedProviderId = it }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
+        binding.multiStateView.onRetry = { viewModel.providers.reload() }
 
         viewModel.providers.data.observe(viewLifecycleOwner) {
             adapter.infoList = it
