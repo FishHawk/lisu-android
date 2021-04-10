@@ -4,6 +4,23 @@ apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 
 android {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+    signingConfigs {
+        debug {
+            storeFile file(properties.getProperty('signingConfigs.storeFile'))
+            storePassword properties.getProperty('signingConfigs.storePassword')
+            keyAlias properties.getProperty('signingConfigs.keyAlias')
+            keyPassword properties.getProperty('signingConfigs.keyPassword')
+        }
+        release {
+            storeFile file(properties.getProperty('signingConfigs.storeFile'))
+            storePassword properties.getProperty('signingConfigs.storePassword')
+            keyAlias properties.getProperty('signingConfigs.keyAlias')
+            keyPassword properties.getProperty('signingConfigs.keyPassword')
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "29.0.3"
 
