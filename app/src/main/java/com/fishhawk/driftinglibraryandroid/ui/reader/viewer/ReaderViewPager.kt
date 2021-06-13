@@ -41,6 +41,7 @@ class ReaderViewPager constructor(
     init {
         adapter.isContinuous = false
         binding.content.adapter = adapter
+        binding.content.offscreenPageLimit = 3
     }
 
     override fun setPrevChapterState(state: ViewState) {

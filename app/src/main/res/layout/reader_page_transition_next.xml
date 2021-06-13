@@ -1,48 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:layout_marginStart="64dp"
-    android:layout_marginEnd="64dp"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <TextView
-        style="@style/Theme.TextAppearance.Title"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Current:" />
-
-    <TextView
-        android:id="@+id/curr_chapter_name"
-        style="@style/Theme.TextAppearance.Subtitle1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="Ch2.test" />
-
-    <TextView
-        style="@style/Theme.TextAppearance.Title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Next:" />
-
-    <TextView
-        android:id="@+id/next_chapter_name"
-        style="@style/Theme.TextAppearance.Subtitle1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:text="Ch3.test" />
-
-    <com.fishhawk.driftinglibraryandroid.widget.MultiStateView
-        android:id="@+id/multi_state_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_gravity="center"
+        android:layout_marginStart="64dp"
+        android:layout_marginEnd="64dp"
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
 
         <TextView
-            android:layout_width="wrap_content"
+            style="@style/Theme.TextAppearance.Title"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Completed" />
-    </com.fishhawk.driftinglibraryandroid.widget.MultiStateView>
-</LinearLayout>
+            android:text="Current:" />
+
+        <TextView
+            android:id="@+id/curr_chapter_name"
+            style="@style/Theme.TextAppearance.Subtitle1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Ch2.test" />
+
+        <TextView
+            style="@style/Theme.TextAppearance.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Next:" />
+
+        <TextView
+            android:id="@+id/next_chapter_name"
+            style="@style/Theme.TextAppearance.Subtitle1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Ch3.test" />
+
+        <com.fishhawk.driftinglibraryandroid.widget.MultiStateView
+            android:id="@+id/multi_state_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Completed" />
+        </com.fishhawk.driftinglibraryandroid.widget.MultiStateView>
+    </LinearLayout>
+</FrameLayout>
