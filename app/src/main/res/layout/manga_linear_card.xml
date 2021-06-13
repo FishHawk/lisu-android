@@ -12,6 +12,15 @@
         android:layout_height="match_parent"
         android:background="@android:color/transparent">
 
+        <ImageView
+            android:id="@+id/thumb"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="H,4:3"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <jp.shts.android.library.TriangleLabelView
             android:id="@+id/new_mark"
             android:layout_width="match_parent"
@@ -24,15 +33,6 @@
             app:primaryText="New"
             app:primaryTextColor="@color/white"
             app:primaryTextSize="8sp" />
-
-        <ImageView
-            android:id="@+id/thumb"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:contentDescription="@null"
-            android:scaleType="centerCrop"
-            app:layout_constraintDimensionRatio="H,4:3"
-            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
             android:id="@+id/title"

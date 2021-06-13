@@ -11,19 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <jp.shts.android.library.TriangleLabelView
-            android:id="@+id/new_mark"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:backgroundColor="@color/red_900"
-            app:corner="leftTop"
-            app:labelBottomPadding="5dp"
-            app:labelCenterPadding="0dp"
-            app:labelTopPadding="8dp"
-            app:primaryText="New"
-            app:primaryTextColor="@color/white"
-            app:primaryTextSize="8sp" />
-
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -58,5 +45,18 @@
                 android:padding="8dp"
                 tools:text="Sample name" />
         </FrameLayout>
+
+        <jp.shts.android.library.TriangleLabelView
+            android:id="@+id/new_mark"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:backgroundColor="@color/red_900"
+            app:corner="leftTop"
+            app:labelBottomPadding="5dp"
+            app:labelCenterPadding="0dp"
+            app:labelTopPadding="8dp"
+            app:primaryText="New"
+            app:primaryTextColor="@color/white"
+            app:primaryTextSize="8sp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
