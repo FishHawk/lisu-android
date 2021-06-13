@@ -21,6 +21,7 @@ class ReaderSettingsSheet(context: Context) : PreferenceBottomSheetDialog(contex
         bindPreference(GlobalPreference.showInfoBar, binding.showInfoBar)
         bindPreference(GlobalPreference.keepScreenOn, binding.keepScreenOn)
         bindPreference(GlobalPreference.useVolumeKey, binding.useVolumeKey)
+        bindPreference(GlobalPreference.invertVolumeKey, binding.invertVolumeKey)
         bindPreference(GlobalPreference.isLongTapDialogEnabled, binding.longTapDialog)
 
         bindPreference(GlobalPreference.isAreaInterpolationEnabled, binding.areaInterpolationEnabled)

@@ -44,6 +44,12 @@
         app:title="@string/settings_use_volume_key" />
 
     <SwitchPreference
+        app:defaultValue="false"
+        app:iconSpaceReserved="false"
+        app:key="invert_volume_key"
+        app:title="@string/settings_invert_volume_key" />
+
+    <SwitchPreference
         app:defaultValue="true"
         app:iconSpaceReserved="false"
         app:key="is_long_tap_dialog_enabled"

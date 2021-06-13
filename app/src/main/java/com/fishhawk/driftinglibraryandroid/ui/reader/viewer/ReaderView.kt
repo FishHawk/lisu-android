@@ -87,13 +87,22 @@ abstract class ReaderView @JvmOverloads constructor(
 
     /* Key Event */
     var useVolumeKey: Boolean = true
+    var invertVolumeKey: Boolean = true
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (event.action == KeyEvent.ACTION_UP) return super.dispatchKeyEvent(event)
 
         return when (event.keyCode) {
-            KeyEvent.KEYCODE_VOLUME_UP -> (useVolumeKey && !isMenuVisible).also { if (it) toNext() }
-            KeyEvent.KEYCODE_VOLUME_DOWN -> (useVolumeKey && !isMenuVisible).also { if (it) toPrev() }
+            KeyEvent.KEYCODE_VOLUME_UP ->
+                if (useVolumeKey && !isMenuVisible) {
+                    if (invertVolumeKey) toNext() else toPrev()
+                    true
+                } else false
+            KeyEvent.KEYCODE_VOLUME_DOWN ->
+                if (useVolumeKey && !isMenuVisible) {
+                    if (invertVolumeKey) toPrev() else toNext()
+                    true
+                } else false
             else -> super.dispatchKeyEvent(event)
         }
     }

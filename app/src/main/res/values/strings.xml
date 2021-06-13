@@ -83,7 +83,8 @@
     <string name="settings_is_page_interval_enabled">Page interval</string>
     <string name="settings_show_info_bar">Show info bar</string>
     <string name="settings_keep_screen_on">Keep screen on</string>
-    <string name="settings_use_volume_key">Use volume key to turn pages</string>
+    <string name="settings_use_volume_key">Use volume keys to turn pages</string>
+    <string name="settings_invert_volume_key">Invert volume keys</string>
     <string name="settings_is_long_tap_dialog_enabled">Long tap dialog</string>
 
     <string name="settings_is_area_interpolation_enabled">Area interpolation</string>

@@ -68,6 +68,7 @@ object GlobalPreference {
     val showInfoBar by get("show_info_bar", true)
     val keepScreenOn by get("keep_screen_on", false)
     val useVolumeKey by get("use_volume_key", false)
+    val invertVolumeKey by get("invert_volume_key", false)
     val isLongTapDialogEnabled by get("is_long_tap_dialog_enabled", true)
     val isAreaInterpolationEnabled by get("is_area_interpolation_enabled", false)
 

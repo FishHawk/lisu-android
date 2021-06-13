@@ -88,12 +88,20 @@
         app:layout_constraintTop_toBottomOf="@id/keep_screen_on" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/invert_volume_key"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/settings_invert_volume_key"
+        android:textColor="?android:attr/textColorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/use_volume_key" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/long_tap_dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/settings_is_long_tap_dialog_enabled"
         android:textColor="?android:attr/textColorPrimary"
-        app:layout_constraintTop_toBottomOf="@id/use_volume_key" />
+        app:layout_constraintTop_toBottomOf="@id/invert_volume_key" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/area_interpolation_enabled"

@@ -113,6 +113,10 @@ class ReaderFragment : Fragment() {
             .onEach { reader.useVolumeKey = it }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
+        GlobalPreference.invertVolumeKey.asFlow()
+            .onEach { reader.invertVolumeKey = it }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
         initializeOverlay()
         initializeMenu()
     }
@@ -150,6 +154,7 @@ class ReaderFragment : Fragment() {
             GlobalPreference.isAreaInterpolationEnabled.get()
         reader.isPageIntervalEnabled = GlobalPreference.isPageIntervalEnabled.get()
         reader.useVolumeKey = GlobalPreference.useVolumeKey.get()
+        reader.invertVolumeKey = GlobalPreference.invertVolumeKey.get()
 
         binding.readerContainer.addView(reader)
         reader.isFocusable = true
