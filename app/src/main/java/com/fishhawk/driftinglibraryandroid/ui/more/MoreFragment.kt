@@ -17,8 +17,6 @@ class MoreFragment : PreferenceFragmentCompat() {
         super.onCreate(savedInstanceState)
 
         setPreferenceNavigation("server", R.id.action_more_to_server)
-        setPreferenceNavigation("download", R.id.action_more_to_download)
-        setPreferenceNavigation("subscription", R.id.action_more_to_subscription)
 
         setPreferenceNavigation("setting_general", R.id.action_more_to_setting_general)
         setPreferenceNavigation("setting_reader", R.id.action_more_to_setting_reader)

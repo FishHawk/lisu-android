@@ -7,33 +7,55 @@ import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface RemoteLibraryService {
-    @GET("library/mangas")
+    @GET("/library/mangas")
     suspend fun listManga(
         @Query("lastTime") lastTime: Long,
         @Query("keywords") keywords: String,
         @Query("limit") limit: Int
     ): List<MangaOutline>
 
-    @GET("library/mangas/{mangaId}")
+    @POST("/library/mangas")
+    suspend fun createManga(
+        @Field("mangaId") mangaId: String,
+        @Field("providerId") providerId: String,
+        @Field("sourceMangaId") sourceMangaId: String,
+        @Field("shouldDeleteAfterUpdated") shouldDeleteAfterUpdated: Boolean
+    )
+
+    @GET("/library/mangas/{mangaId}")
     suspend fun getManga(@Path("mangaId") mangaId: String): MangaDetail
 
-    @DELETE("library/mangas/{mangaId}")
+    @DELETE("/library/mangas/{mangaId}")
     suspend fun deleteManga(@Path("mangaId") mangaId: String): String
 
-    @PUT("library/mangas/{mangaId}/metadata")
+    @PUT("/library/mangas/{mangaId}/metadata")
     suspend fun updateMangaMetadata(
         @Path("mangaId") mangaId: String,
         @Body metadata: MetadataDetail
     ): MangaDetail
 
+    @POST("/library/mangas/{mangaId}/source")
+    suspend fun createMangaSource(
+        @Path("mangaId") mangaId: String,
+        @Field("providerId") providerId: String,
+        @Field("sourceMangaId") sourceMangaId: String,
+        @Field("shouldDeleteAfterUpdated") shouldDeleteAfterUpdated: Boolean
+    )
+
+    @DELETE("/library/mangas/{mangaId}/source")
+    suspend fun deleteMangaSource(@Path("mangaId") mangaId: String)
+
+    @POST("/library/mangas/{mangaId}/source/sync")
+    suspend fun syncMangaSource(@Path("mangaId") mangaId: String)
+
     @Multipart
-    @PUT("library/mangas/{mangaId}/thumb")
+    @PUT("/library/mangas/{mangaId}/thumb")
     suspend fun updateMangaThumb(
         @Path("mangaId") mangaId: String,
         @Part("thumb\"; filename=\"thumb\" ") thumb: RequestBody
     ): MangaDetail
 
-    @GET("library/mangas/{mangaId}/chapters/{collectionId}/{chapterId}")
+    @GET("/library/mangas/{mangaId}/chapters/{collectionId}/{chapterId}")
     suspend fun getChapter(
         @Path("mangaId") mangaId: String,
         @Path("collectionId") collectionId: String,

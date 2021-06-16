@@ -232,6 +232,20 @@
                             app:icon="@drawable/ic_baseline_edit_24" />
 
                         <com.google.android.material.button.MaterialButton
+                            android:id="@+id/delete_source_button"
+                            style="@style/Theme.Widget.Button.Icon.Textless"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:icon="@drawable/ic_baseline_delete_forever_24" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/sync_source_button"
+                            style="@style/Theme.Widget.Button.Icon.Textless"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:icon="@drawable/ic_baseline_code_24" />
+
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/read_button"
                             style="@style/Theme.Widget.Button.Icon"
                             android:layout_width="wrap_content"
@@ -239,6 +253,15 @@
                             android:text="@string/gallery_read_button_hint"
                             app:icon="@drawable/ic_baseline_play_arrow_24" />
                     </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/source"
+                        style="@style/Theme.TextAppearance.Body2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        tools:text="Provider - 10000" />
 
                     <TextView
                         android:id="@+id/description"

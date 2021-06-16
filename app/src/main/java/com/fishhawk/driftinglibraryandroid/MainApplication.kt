@@ -13,10 +13,8 @@ import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
 import com.fishhawk.driftinglibraryandroid.data.database.ApplicationDatabase
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.database.ServerInfoRepository
-import com.fishhawk.driftinglibraryandroid.data.remote.RemoteDownloadRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
-import com.fishhawk.driftinglibraryandroid.data.remote.RemoteSubscriptionRepository
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 
 class MainApplication : Application() {
@@ -29,8 +27,6 @@ class MainApplication : Application() {
 
     val remoteLibraryRepository = RemoteLibraryRepository()
     val remoteProviderRepository = RemoteProviderRepository()
-    val remoteDownloadRepository = RemoteDownloadRepository()
-    val remoteSubscriptionRepository = RemoteSubscriptionRepository()
 
     override fun onCreate() {
         super.onCreate()
@@ -85,7 +81,5 @@ class MainApplication : Application() {
 
         remoteLibraryRepository.connect(url, retrofit)
         remoteProviderRepository.connect(url, retrofit)
-        remoteDownloadRepository.connect(url, retrofit)
-        remoteSubscriptionRepository.connect(url, retrofit)
     }
 }

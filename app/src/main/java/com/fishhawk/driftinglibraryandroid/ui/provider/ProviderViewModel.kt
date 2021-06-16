@@ -3,9 +3,8 @@ package com.fishhawk.driftinglibraryandroid.ui.provider
 import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.Result
-import com.fishhawk.driftinglibraryandroid.data.remote.RemoteDownloadRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
-import com.fishhawk.driftinglibraryandroid.data.remote.RemoteSubscriptionRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderDetail
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
@@ -45,9 +44,8 @@ class ProviderMangaListComponent(
 }
 
 class ProviderViewModel(
+    private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
-    private val remoteDownloadRepository: RemoteDownloadRepository,
-    private val remoteSubscriptionRepository: RemoteSubscriptionRepository,
     argProviderId: String
 ) : FeedbackViewModel() {
 
@@ -72,14 +70,23 @@ class ProviderViewModel(
         remoteProviderRepository.listCategoryManga(providerId.value!!, page, option)
     }
 
-
-    fun download(id: String, title: String) = viewModelScope.launch {
-        val result = remoteDownloadRepository.postDownloadTask(providerId.value!!, id, title)
+    fun download(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
+        val result = remoteLibraryRepository.createManga(
+            targetMangaId,
+            providerId.value!!,
+            sourceMangaId,
+            true
+        )
         resultWarp(result) { feed(R.string.download_task_created) }
     }
 
-    fun subscribe(id: String, title: String) = viewModelScope.launch {
-        val result = remoteSubscriptionRepository.postSubscription(providerId.value!!, id, title)
+    fun subscribe(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
+        val result = remoteLibraryRepository.createManga(
+            targetMangaId,
+            providerId.value!!,
+            sourceMangaId,
+            false
+        )
         resultWarp(result) { feed(R.string.subscription_created) }
     }
 }

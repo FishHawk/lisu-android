@@ -15,6 +15,7 @@ data class MangaOutline(
     val id: String,
     var thumb: String?,
     val updateTime: Long?,
+    val source: Source?,
     val metadata: MetadataOutline,
     var hasNewMark: Boolean?
 ) : Parcelable {

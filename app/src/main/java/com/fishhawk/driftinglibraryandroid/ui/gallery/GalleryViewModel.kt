@@ -8,10 +8,8 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.Result
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.data.remote.RemoteDownloadRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
-import com.fishhawk.driftinglibraryandroid.data.remote.RemoteSubscriptionRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataDetail
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
@@ -22,8 +20,6 @@ import okhttp3.RequestBody
 class GalleryViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
-    private val remoteDownloadRepository: RemoteDownloadRepository,
-    private val remoteSubscriptionRepository: RemoteSubscriptionRepository,
     private val readingHistoryRepository: ReadingHistoryRepository,
     private val mangaId: String,
     private val providerId: String?
@@ -75,13 +71,38 @@ class GalleryViewModel(
         }
     }
 
+    fun syncSource() {
+        (detail.value as? Result.Success)?.let {
+            if (it.data.providerId != null) return
+            viewModelScope.launch {
+                val result = remoteLibraryRepository.syncMangaSource(it.data.id)
+                resultWarp(result) { feed(R.string.download_task_created) }
+            }
+        }
+    }
+
+    fun deleteSource() {
+        (detail.value as? Result.Success)?.let {
+            if (it.data.providerId != null) return
+            viewModelScope.launch {
+                val result = remoteLibraryRepository.deleteMangaSource(it.data.id)
+                resultWarp(result) { feed(R.string.download_task_created) }
+            }
+        }
+    }
+
     fun download() {
         (detail.value as? Result.Success)?.let {
-            val id = it.data.id
-            val title = it.data.title
+            val sourceMangaId = it.data.id
+            val targetMangaId = it.data.title
             val providerId = it.data.providerId ?: return
             viewModelScope.launch {
-                val result = remoteDownloadRepository.postDownloadTask(providerId, id, title)
+                val result = remoteLibraryRepository.createManga(
+                    targetMangaId,
+                    providerId,
+                    sourceMangaId,
+                    true
+                )
                 resultWarp(result) { feed(R.string.download_task_created) }
             }
         }
@@ -89,11 +110,16 @@ class GalleryViewModel(
 
     fun subscribe() {
         (detail.value as? Result.Success)?.let {
-            val id = it.data.id
-            val title = it.data.title
+            val sourceMangaId = it.data.id
+            val targetMangaId = it.data.title
             val providerId = it.data.providerId ?: return
             viewModelScope.launch {
-                val result = remoteSubscriptionRepository.postSubscription(providerId, id, title)
+                val result = remoteLibraryRepository.createManga(
+                    targetMangaId,
+                    providerId,
+                    sourceMangaId,
+                    false
+                )
                 resultWarp(result) { feed(R.string.subscription_created) }
             }
         }

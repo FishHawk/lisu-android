@@ -37,6 +37,7 @@ data class MangaDetail(
     val id: String,
     var thumb: String?,
     val updateTime: Long?,
+    val source: Source?,
     val metadata: MetadataDetail,
     val collections: List<Collection>
 ) : Parcelable {

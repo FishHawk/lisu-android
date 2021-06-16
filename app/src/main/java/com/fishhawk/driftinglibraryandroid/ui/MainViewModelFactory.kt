@@ -5,7 +5,6 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.MainApplication
-import com.fishhawk.driftinglibraryandroid.ui.download.DownloadViewModel
 import com.fishhawk.driftinglibraryandroid.ui.explore.ExploreViewModel
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.globalsearch.GlobalSearchViewModel
@@ -14,7 +13,6 @@ import com.fishhawk.driftinglibraryandroid.ui.library.LibraryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderViewModel
 import com.fishhawk.driftinglibraryandroid.ui.search.SearchViewModel
 import com.fishhawk.driftinglibraryandroid.ui.server.ServerViewModel
-import com.fishhawk.driftinglibraryandroid.ui.subscription.SubscriptionViewModel
 
 @Suppress("UNCHECKED_CAST")
 class MainViewModelFactory constructor(
@@ -40,17 +38,15 @@ class MainViewModelFactory constructor(
 
             isAssignableFrom(ProviderViewModel::class.java) ->
                 ProviderViewModel(
+                    application.remoteLibraryRepository,
                     application.remoteProviderRepository,
-                    application.remoteDownloadRepository,
-                    application.remoteSubscriptionRepository,
                     bundle.getString("providerId")!!,
                 )
 
             isAssignableFrom(SearchViewModel::class.java) ->
                 SearchViewModel(
+                    application.remoteLibraryRepository,
                     application.remoteProviderRepository,
-                    application.remoteDownloadRepository,
-                    application.remoteSubscriptionRepository,
                     bundle.getString("providerId")!!,
                     bundle.getString("keywords")!!
                 )
@@ -61,18 +57,10 @@ class MainViewModelFactory constructor(
                     application.serverInfoRepository
                 )
 
-            isAssignableFrom(DownloadViewModel::class.java) ->
-                DownloadViewModel(application.remoteDownloadRepository)
-
-            isAssignableFrom(SubscriptionViewModel::class.java) ->
-                SubscriptionViewModel(application.remoteSubscriptionRepository)
-
             isAssignableFrom(GalleryViewModel::class.java) ->
                 GalleryViewModel(
                     application.remoteLibraryRepository,
                     application.remoteProviderRepository,
-                    application.remoteDownloadRepository,
-                    application.remoteSubscriptionRepository,
                     application.readingHistoryRepository,
                     bundle.getString("id")!!,
                     bundle.getString("providerId")

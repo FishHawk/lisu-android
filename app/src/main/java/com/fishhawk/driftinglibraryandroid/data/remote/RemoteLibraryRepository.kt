@@ -25,6 +25,20 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
             }
         }
 
+    suspend fun createManga(
+        mangaId: String,
+        providerId: String,
+        sourceMangaId: String,
+        shouldDeleteAfterUpdated: Boolean
+    ) = resultWrap {
+        it.createManga(
+            mangaId,
+            providerId,
+            sourceMangaId,
+            shouldDeleteAfterUpdated
+        )
+    }
+
     suspend fun getManga(mangaId: String): Result<MangaDetail> =
         resultWrap {
             it.getManga(mangaId).apply {
@@ -44,6 +58,28 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
                 thumb = "${url}library/mangas/${mangaId}/thumb"
             }
         }
+
+    suspend fun createMangaSource(
+        mangaId: String,
+        providerId: String,
+        sourceMangaId: String,
+        shouldDeleteAfterUpdated: Boolean
+    ) = resultWrap {
+        it.createMangaSource(
+            mangaId,
+            providerId,
+            sourceMangaId,
+            shouldDeleteAfterUpdated
+        )
+    }
+
+    suspend fun deleteMangaSource(mangaId: String) = resultWrap {
+        it.deleteMangaSource(mangaId)
+    }
+
+    suspend fun syncMangaSource(mangaId: String) = resultWrap {
+        it.syncMangaSource(mangaId)
+    }
 
     suspend fun updateMangaThumb(
         mangaId: String,

@@ -210,9 +210,15 @@ class GalleryFragment : Fragment() {
                     }
 
                     val isFromProvider = (detail.providerId != null)
+                    val hasSource = !isFromProvider && (detail.source != null)
                     binding.downloadButton.isVisible = isFromProvider
                     binding.subscribeButton.isVisible = isFromProvider
                     binding.editButton.isVisible = !isFromProvider
+                    binding.deleteSourceButton.isVisible = hasSource
+                    binding.syncSourceButton.isVisible = hasSource
+
+                    if (hasSource) binding.source.text =
+                        "${detail.source!!.providerId} - ${detail.source!!.mangaId}"
 
                     detail.metadata.description?.let {
                         if (it.isBlank()) null
@@ -295,6 +301,8 @@ class GalleryFragment : Fragment() {
         binding.editButton.setOnClickListener {
             findNavController().navigate(R.id.action_to_gallery_edit)
         }
+        binding.deleteSourceButton.setOnClickListener { viewModel.deleteSource() }
+        binding.syncSourceButton.setOnClickListener { viewModel.syncSource() }
         binding.subscribeButton.setOnClickListener { viewModel.subscribe() }
         binding.downloadButton.setOnClickListener { viewModel.download() }
     }
