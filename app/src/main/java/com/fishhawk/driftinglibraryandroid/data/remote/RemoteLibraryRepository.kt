@@ -32,10 +32,12 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
         shouldDeleteAfterUpdated: Boolean
     ) = resultWrap {
         it.createManga(
-            mangaId,
-            providerId,
-            sourceMangaId,
-            shouldDeleteAfterUpdated
+            RemoteLibraryService.CreateMangaBody(
+                mangaId,
+                providerId,
+                sourceMangaId,
+                shouldDeleteAfterUpdated
+            )
         )
     }
 
@@ -67,9 +69,11 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
     ) = resultWrap {
         it.createMangaSource(
             mangaId,
-            providerId,
-            sourceMangaId,
-            shouldDeleteAfterUpdated
+            RemoteLibraryService.CreateMangaSourceBody(
+                providerId,
+                sourceMangaId,
+                shouldDeleteAfterUpdated
+            )
         )
     }
 

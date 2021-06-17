@@ -19,6 +19,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.Result
+import com.fishhawk.driftinglibraryandroid.data.remote.model.SourceState
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
@@ -217,8 +218,16 @@ class GalleryFragment : Fragment() {
                     binding.deleteSourceButton.isVisible = hasSource
                     binding.syncSourceButton.isVisible = hasSource
 
-                    if (hasSource) binding.source.text =
-                        "${detail.source!!.providerId} - ${detail.source!!.mangaId}"
+                    val source = detail.source
+                    if (source != null) {
+                        binding.source.text = "From ${source.providerId} - ${source.mangaId}"
+                        when (source.state) {
+                            SourceState.DOWNLOADING -> binding.source.setTextColor(R.color.blue_400)
+                            SourceState.WAITING -> binding.source.setTextColor(R.color.green_400)
+                            SourceState.ERROR -> binding.source.setTextColor(R.color.red_400)
+                        }
+                    }
+
 
                     detail.metadata.description?.let {
                         if (it.isBlank()) null

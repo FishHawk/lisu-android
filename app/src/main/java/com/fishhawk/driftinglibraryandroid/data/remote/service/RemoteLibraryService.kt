@@ -14,13 +14,15 @@ interface RemoteLibraryService {
         @Query("limit") limit: Int
     ): List<MangaOutline>
 
-    @POST("/library/mangas")
-    suspend fun createManga(
-        @Field("mangaId") mangaId: String,
-        @Field("providerId") providerId: String,
-        @Field("sourceMangaId") sourceMangaId: String,
-        @Field("shouldDeleteAfterUpdated") shouldDeleteAfterUpdated: Boolean
+    data class CreateMangaBody(
+        val mangaId: String,
+        val providerId: String,
+        val sourceMangaId: String,
+        val shouldDeleteAfterUpdated: Boolean
     )
+
+    @POST("/library/mangas")
+    suspend fun createManga(@Body body: CreateMangaBody)
 
     @GET("/library/mangas/{mangaId}")
     suspend fun getManga(@Path("mangaId") mangaId: String): MangaDetail
@@ -34,12 +36,16 @@ interface RemoteLibraryService {
         @Body metadata: MetadataDetail
     ): MangaDetail
 
+    data class CreateMangaSourceBody(
+        val providerId: String,
+        val sourceMangaId: String,
+        val shouldDeleteAfterUpdated: Boolean
+    )
+
     @POST("/library/mangas/{mangaId}/source")
     suspend fun createMangaSource(
         @Path("mangaId") mangaId: String,
-        @Field("providerId") providerId: String,
-        @Field("sourceMangaId") sourceMangaId: String,
-        @Field("shouldDeleteAfterUpdated") shouldDeleteAfterUpdated: Boolean
+        @Body body: CreateMangaSourceBody
     )
 
     @DELETE("/library/mangas/{mangaId}/source")
