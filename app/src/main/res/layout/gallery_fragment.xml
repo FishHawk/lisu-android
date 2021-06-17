@@ -21,7 +21,8 @@
                 android:layout_height="match_parent"
                 android:alpha="0.3"
                 android:scaleType="centerCrop"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"
+                tools:src="@tools:sample/avatars" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -45,7 +46,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:contentDescription="@null"
-                        android:scaleType="centerCrop" />
+                        android:scaleType="centerCrop"
+                        tools:src="@tools:sample/avatars" />
                 </androidx.cardview.widget.CardView>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -77,7 +79,8 @@
                         android:text="@string/gallery_author_label"
                         android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/title" />
+                        app:layout_constraintTop_toBottomOf="@+id/title"
+                        tools:visibility="visible" />
 
                     <TextView
                         android:id="@+id/author"
@@ -93,7 +96,8 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/author_label"
                         app:layout_constraintTop_toBottomOf="@+id/title"
-                        tools:text="Sample author" />
+                        tools:text="Sample author"
+                        tools:visibility="visible" />
 
                     <TextView
                         android:id="@+id/status_label"
@@ -104,7 +108,8 @@
                         android:text="@string/gallery_status_label"
                         android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/author_label" />
+                        app:layout_constraintTop_toBottomOf="@+id/author_label"
+                        tools:visibility="visible" />
 
                     <TextView
                         android:id="@+id/status"
@@ -120,7 +125,8 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/status_label"
                         app:layout_constraintTop_toBottomOf="@+id/author_label"
-                        tools:text="Sample status" />
+                        tools:text="Sample status"
+                        tools:visibility="visible" />
 
                     <TextView
                         android:id="@+id/update_label"
@@ -131,7 +137,8 @@
                         android:text="@string/gallery_update_label"
                         android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/status_label" />
+                        app:layout_constraintTop_toBottomOf="@+id/status_label"
+                        tools:visibility="visible" />
 
                     <TextView
                         android:id="@+id/update"
@@ -147,7 +154,8 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/update_label"
                         app:layout_constraintTop_toBottomOf="@+id/status_label"
-                        tools:text="Sample update" />
+                        tools:text="Sample update"
+                        tools:visibility="visible" />
 
                     <TextView
                         android:id="@+id/provider_label"
@@ -158,7 +166,8 @@
                         android:text="@string/gallery_provider_label"
                         android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/update_label" />
+                        app:layout_constraintTop_toBottomOf="@+id/update_label"
+                        tools:visibility="visible" />
 
                     <TextView
                         android:id="@+id/provider"
@@ -174,7 +183,8 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/provider_label"
                         app:layout_constraintTop_toBottomOf="@+id/update_label"
-                        tools:text="Sample provider" />
+                        tools:text="Sample provider"
+                        tools:visibility="visible" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
@@ -317,7 +327,8 @@
                             android:id="@+id/display_mode_button"
                             style="@style/Theme.Widget.Button.Icon.Textless"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            tools:icon="@drawable/ic_baseline_view_module_24" />
                     </LinearLayout>
 
                     <com.fishhawk.driftinglibraryandroid.ui.gallery.detail.ContentView

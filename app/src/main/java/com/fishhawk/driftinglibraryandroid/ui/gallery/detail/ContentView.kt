@@ -34,8 +34,7 @@ class ContentView @JvmOverloads constructor(
     enum class ViewMode { GRID, LINEAR }
     enum class ViewOrder { ASCEND, DESCEND }
 
-    var viewMode =
-        ViewMode.GRID
+    var viewMode = ViewMode.GRID
         set(value) {
             field = value
             adapter?.viewMode = when (value) {
@@ -49,8 +48,7 @@ class ContentView @JvmOverloads constructor(
             adapter = adapter
         }
 
-    var viewOrder =
-        ViewOrder.ASCEND
+    var viewOrder = ViewOrder.ASCEND
         set(value) {
             field = value
             adapter = adapter

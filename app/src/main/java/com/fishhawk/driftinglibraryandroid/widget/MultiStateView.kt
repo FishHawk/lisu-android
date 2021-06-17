@@ -59,6 +59,10 @@ open class MultiStateView @JvmOverloads constructor(
             }
         }
 
+    init {
+        if (isInEditMode) viewState = ViewState.Content
+    }
+
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         if (contentView == null) throw IllegalArgumentException("Content view is not defined")
