@@ -18,7 +18,7 @@ interface RemoteLibraryService {
         val mangaId: String,
         val providerId: String,
         val sourceMangaId: String,
-        val shouldDeleteAfterUpdated: Boolean
+        val keepAfterCompleted: Boolean
     )
 
     @POST("/library/mangas")
@@ -39,7 +39,7 @@ interface RemoteLibraryService {
     data class CreateMangaSourceBody(
         val providerId: String,
         val sourceMangaId: String,
-        val shouldDeleteAfterUpdated: Boolean
+        val keepAfterCompleted: Boolean
     )
 
     @POST("/library/mangas/{mangaId}/source")

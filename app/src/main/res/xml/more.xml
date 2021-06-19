@@ -7,16 +7,6 @@
             app:icon="@drawable/ic_baseline_storage_24"
             app:key="server"
             app:title="@string/more_server" />
-
-        <Preference
-            app:icon="@drawable/ic_baseline_cloud_download_24"
-            app:key="download"
-            app:title="@string/more_download" />
-
-        <Preference
-            app:icon="@drawable/ic_baseline_rss_feed_24"
-            app:key="subscription"
-            app:title="@string/more_subscribe" />
     </PreferenceCategory>
 
     <PreferenceCategory>

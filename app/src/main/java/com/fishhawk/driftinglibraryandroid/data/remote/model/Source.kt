@@ -22,7 +22,7 @@ enum class SourceState(val value: String) {
 data class Source(
     val providerId: String,
     val mangaId: String,
-    val shouldDeleteAfterUpdated: Boolean,
+    val keepAfterEnded: Boolean,
     val state: SourceState,
     val message: String?
 ) : Parcelable
