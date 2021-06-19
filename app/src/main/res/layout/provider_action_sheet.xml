@@ -27,18 +27,10 @@
         app:icon="@drawable/ic_baseline_menu_book_24" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/download_button"
+        android:id="@+id/library_add_button"
         style="@style/Theme.Widget.Button.TextButton.NoColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/thumb_action_download"
-        app:icon="@drawable/ic_baseline_cloud_download_24" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/subscribe_button"
-        style="@style/Theme.Widget.Button.TextButton.NoColor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/thumb_action_subscribe"
-        app:icon="@drawable/ic_baseline_rss_feed_24" />
+        android:text="@string/thumb_action_library_add"
+        app:icon="@drawable/ic_baseline_library_add_24" />
 </LinearLayout>

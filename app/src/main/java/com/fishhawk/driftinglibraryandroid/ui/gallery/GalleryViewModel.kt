@@ -76,7 +76,7 @@ class GalleryViewModel(
             if (it.data.providerId != null) return
             viewModelScope.launch {
                 val result = remoteLibraryRepository.syncMangaSource(it.data.id)
-                resultWarp(result) { feed(R.string.download_task_created) }
+                resultWarp(result) { feed(R.string.successfully_create_sync_task) }
             }
         }
     }
@@ -86,41 +86,25 @@ class GalleryViewModel(
             if (it.data.providerId != null) return
             viewModelScope.launch {
                 val result = remoteLibraryRepository.deleteMangaSource(it.data.id)
-                resultWarp(result) { feed(R.string.download_task_created) }
+                resultWarp(result) { feed(R.string.successfully_delete_source) }
             }
         }
     }
 
-    fun download() {
+    fun addMangaToLibrary(keepAfterCompleted: Boolean) {
         (detail.value as? Result.Success)?.let {
             val sourceMangaId = it.data.id
             val targetMangaId = it.data.title
             val providerId = it.data.providerId ?: return
+
             viewModelScope.launch {
                 val result = remoteLibraryRepository.createManga(
                     targetMangaId,
                     providerId,
                     sourceMangaId,
-                    true
+                    keepAfterCompleted
                 )
-                resultWarp(result) { feed(R.string.download_task_created) }
-            }
-        }
-    }
-
-    fun subscribe() {
-        (detail.value as? Result.Success)?.let {
-            val sourceMangaId = it.data.id
-            val targetMangaId = it.data.title
-            val providerId = it.data.providerId ?: return
-            viewModelScope.launch {
-                val result = remoteLibraryRepository.createManga(
-                    targetMangaId,
-                    providerId,
-                    sourceMangaId,
-                    false
-                )
-                resultWarp(result) { feed(R.string.subscription_created) }
+                resultWarp(result) { feed(R.string.successfully_add_to_library) }
             }
         }
     }

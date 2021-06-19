@@ -70,23 +70,13 @@ class ProviderViewModel(
         remoteProviderRepository.listCategoryManga(providerId.value!!, page, option)
     }
 
-    fun download(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
+    fun addToLibrary(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
         val result = remoteLibraryRepository.createManga(
             targetMangaId,
             providerId.value!!,
             sourceMangaId,
             true
         )
-        resultWarp(result) { feed(R.string.download_task_created) }
-    }
-
-    fun subscribe(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
-        val result = remoteLibraryRepository.createManga(
-            targetMangaId,
-            providerId.value!!,
-            sourceMangaId,
-            false
-        )
-        resultWarp(result) { feed(R.string.subscription_created) }
+        resultWarp(result) { feed(R.string.successfully_add_to_library) }
     }
 }

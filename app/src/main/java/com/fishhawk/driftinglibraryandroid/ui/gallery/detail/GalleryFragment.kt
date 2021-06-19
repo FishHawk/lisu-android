@@ -212,15 +212,16 @@ class GalleryFragment : Fragment() {
 
                     val isFromProvider = (detail.providerId != null)
                     val hasSource = !isFromProvider && (detail.source != null)
-                    binding.downloadButton.isVisible = isFromProvider
-                    binding.subscribeButton.isVisible = isFromProvider
+
+                    binding.libraryAddButton.isVisible = isFromProvider
                     binding.editButton.isVisible = !isFromProvider
-                    binding.deleteSourceButton.isVisible = hasSource
-                    binding.syncSourceButton.isVisible = hasSource
+                    binding.syncButton.isVisible = hasSource
+                    binding.source.isVisible = hasSource
 
                     val source = detail.source
                     if (source != null) {
-                        binding.source.text = "From ${source.providerId} - ${source.mangaId}"
+                        binding.source.text =
+                            "From ${source.providerId} - ${source.mangaId} ${source.state}"
                         when (source.state) {
                             SourceState.DOWNLOADING -> binding.source.setTextColor(R.color.blue_400)
                             SourceState.WAITING -> binding.source.setTextColor(R.color.green_400)
@@ -310,9 +311,12 @@ class GalleryFragment : Fragment() {
         binding.editButton.setOnClickListener {
             findNavController().navigate(R.id.action_to_gallery_edit)
         }
-        binding.deleteSourceButton.setOnClickListener { viewModel.deleteSource() }
-        binding.syncSourceButton.setOnClickListener { viewModel.syncSource() }
-        binding.subscribeButton.setOnClickListener { viewModel.subscribe() }
-        binding.downloadButton.setOnClickListener { viewModel.download() }
+        binding.syncButton.setOnClickListener { viewModel.syncSource() }
+
+        binding.libraryAddButton.setOnClickListener { viewModel.addMangaToLibrary(false) }
+        binding.libraryAddButton.setOnLongClickListener {
+            viewModel.addMangaToLibrary(true)
+            true
+        }
     }
 }

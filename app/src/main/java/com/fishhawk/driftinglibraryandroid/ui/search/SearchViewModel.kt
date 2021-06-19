@@ -30,23 +30,13 @@ class SearchViewModel(
         data.addSource(keywords) { reload() }
     }
 
-    fun download(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
-        val result = remoteLibraryRepository.createManga(
-            targetMangaId,
-            providerId,
-            sourceMangaId,
-            true
-        )
-        resultWarp(result) { feed(R.string.download_task_created) }
-    }
-
-    fun subscribe(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
+    fun addToLibrary(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
         val result = remoteLibraryRepository.createManga(
             targetMangaId,
             providerId,
             sourceMangaId,
             false
         )
-        resultWarp(result) { feed(R.string.subscription_created) }
+        resultWarp(result) { feed(R.string.successfully_add_to_library) }
     }
 }

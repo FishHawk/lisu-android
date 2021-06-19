@@ -25,19 +25,14 @@ class ProviderActionSheet(
             listener.onReadClick(outline, providerId)
             dismiss()
         }
-        binding.downloadButton.setOnClickListener {
-            listener.onDownloadClick(outline, providerId)
-            dismiss()
-        }
-        binding.subscribeButton.setOnClickListener {
-            listener.onSubscribeClick(outline, providerId)
+        binding.libraryAddButton.setOnClickListener {
+            listener.onLibraryAddClick(outline, providerId)
             dismiss()
         }
     }
 
     interface Listener {
         fun onReadClick(outline: MangaOutline, provider: String)
-        fun onDownloadClick(outline: MangaOutline, provider: String)
-        fun onSubscribeClick(outline: MangaOutline, provider: String)
+        fun onLibraryAddClick(outline: MangaOutline, provider: String)
     }
 }

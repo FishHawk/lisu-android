@@ -47,12 +47,8 @@ abstract class ProviderBaseFragment : Fragment() {
             navToReaderActivity(outline.id, viewModel.providerId.value!!, 0, 0, 0)
         }
 
-        override fun onDownloadClick(outline: MangaOutline, provider: String) {
-            viewModel.download(outline.id, outline.title)
-        }
-
-        override fun onSubscribeClick(outline: MangaOutline, provider: String) {
-            viewModel.subscribe(outline.id, outline.title)
+        override fun onLibraryAddClick(outline: MangaOutline, provider: String) {
+            viewModel.addToLibrary(outline.id, outline.title)
         }
     }
 
