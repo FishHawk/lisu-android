@@ -214,8 +214,13 @@ class GalleryFragment : Fragment() {
                     val hasSource = !isFromProvider && (detail.source != null)
 
                     binding.libraryAddButton.isVisible = isFromProvider
-                    binding.editButton.isVisible = !isFromProvider
-                    binding.syncButton.isVisible = hasSource
+
+                    if (!isFromProvider) binding.backdrop.setOnLongClickListener {
+                        findNavController().navigate(R.id.action_to_gallery_edit)
+                        true
+                    }
+                    else binding.backdrop.setOnLongClickListener(null)
+
                     binding.source.isVisible = hasSource
 
                     val source = detail.source
@@ -227,6 +232,12 @@ class GalleryFragment : Fragment() {
                             SourceState.WAITING -> binding.source.setTextColor(R.color.green_400)
                             SourceState.ERROR -> binding.source.setTextColor(R.color.red_400)
                         }
+                        binding.source.setOnLongClickListener {
+                            viewModel.syncSource()
+                            true
+                        }
+                    } else {
+                        binding.source.setOnLongClickListener(null)
                     }
 
 
@@ -308,11 +319,6 @@ class GalleryFragment : Fragment() {
                 } ?: navToReaderActivity(detail.id, detail.providerId)
             }
         }
-        binding.editButton.setOnClickListener {
-            findNavController().navigate(R.id.action_to_gallery_edit)
-        }
-        binding.syncButton.setOnClickListener { viewModel.syncSource() }
-
         binding.libraryAddButton.setOnClickListener { viewModel.addMangaToLibrary(false) }
         binding.libraryAddButton.setOnLongClickListener {
             viewModel.addMangaToLibrary(true)
