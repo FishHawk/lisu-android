@@ -20,7 +20,10 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.Result
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Collection
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Source
 import com.fishhawk.driftinglibraryandroid.data.remote.model.SourceState
+import com.fishhawk.driftinglibraryandroid.data.remote.model.TagGroup
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.*
@@ -193,18 +196,8 @@ class GalleryFragment : Fragment() {
 
                     detail.providerId.let {
                         val isFromProvider = (it != null)
-
                         binding.provider.isVisible = isFromProvider
                         binding.provider.text = it
-
-                        binding.libraryAddButton.isVisible = isFromProvider
-                        binding.libraryAddButton.setOnClickListener {
-                            viewModel.addMangaToLibrary(false)
-                        }
-                        binding.libraryAddButton.setOnLongClickListener {
-                            viewModel.addMangaToLibrary(true)
-                            true
-                        }
 
                         if (!isFromProvider) binding.backdrop.setOnLongClickListener {
                             findNavController().navigate(R.id.action_to_gallery_edit)
@@ -213,80 +206,10 @@ class GalleryFragment : Fragment() {
                         else binding.backdrop.setOnLongClickListener(null)
                     }
 
-                    detail.source.let {
-                        val hasSource = it != null
-
-                        binding.source.isVisible = hasSource
-                        if (it != null) {
-                            binding.source.text =
-                                "From ${it.providerId} - ${it.mangaId} ${it.state}"
-                            when (it.state) {
-                                SourceState.DOWNLOADING -> binding.source.setTextColor(R.color.blue_400)
-                                SourceState.WAITING -> binding.source.setTextColor(R.color.green_400)
-                                SourceState.ERROR -> binding.source.setTextColor(R.color.red_400)
-                            }
-                            binding.source.setOnLongClickListener {
-                                viewModel.syncSource()
-                                true
-                            }
-                        } else {
-                            binding.source.setOnLongClickListener(null)
-                        }
-                    }
-
-                    detail.metadata.description?.let {
-                        if (it.isBlank()) null
-                        else it
-                    }.let {
-                        binding.description.isVisible = (it != null)
-                        binding.description.text = it
-
-                        fun TextView.hasEllipsize() = layout.text.toString() != text
-                        binding.description.doOnLayout {
-                            binding.descriptionEllipsizeHint.isVisible =
-                                binding.description.hasEllipsize()
-                            binding.descriptionEllipsizeHintScrim.isVisible =
-                                binding.description.hasEllipsize()
-                        }
-                        binding.description.setOnClickListener {
-                            binding.description.maxLines =
-                                if (binding.description.maxLines < Int.MAX_VALUE) Int.MAX_VALUE else 3
-
-                            binding.description.doOnLayout {
-
-                                if (binding.description.hasEllipsize()) {
-                                    binding.descriptionEllipsizeHint.visibility = View.VISIBLE
-                                    binding.descriptionEllipsizeHintScrim.visibility = View.VISIBLE
-                                } else {
-                                    binding.descriptionEllipsizeHint.visibility = View.INVISIBLE
-                                    binding.descriptionEllipsizeHintScrim.visibility =
-                                        View.INVISIBLE
-                                }
-                            }
-                        }
-
-                        binding.description.setOnLongClickListener {
-                            copyToClipboard(binding.description.text as String)
-                            makeToast(R.string.toast_manga_description_copied)
-                            true
-                        }
-                    }
-
-                    if (!detail.metadata.tags.isNullOrEmpty()) {
-                        binding.tags.isVisible = true
-                        tagAdapter.setList(detail.metadata.tags)
-                    } else {
-                        binding.tags.isVisible = false
-                    }
-
-                    if (detail.collections.isNotEmpty()) {
-                        binding.chapters.isVisible = true
-                        binding.noChapterHint.isVisible = false
-                        binding.chapters.collections = detail.collections
-                    } else {
-                        binding.chapters.isVisible = false
-                        binding.noChapterHint.isVisible = true
-                    }
+                    setupSource(detail.source)
+                    setupDescription(detail.metadata.description)
+                    setupTags(detail.metadata.tags)
+                    setupCollections(detail.collections)
                 }
                 is Result.Error ->
                     binding.multiStateView.viewState = ViewState.Error(result.exception)
@@ -301,7 +224,6 @@ class GalleryFragment : Fragment() {
         }
     }
 
-
     private fun setupThumb(thumb: String) {
         Glide.with(this)
             .load(thumb)
@@ -314,6 +236,72 @@ class GalleryFragment : Fragment() {
             .placeholder(binding.backdrop.drawable)
             .diskCacheStrategy(DiskCacheStrategy.DATA)
             .into(binding.backdrop)
+    }
+
+    private fun setupDescription(description: String?) {
+        val hasDescription = !description.isNullOrBlank()
+        binding.description.isVisible = hasDescription
+        binding.descriptionEllipsizeHint.isVisible = hasDescription
+        binding.descriptionEllipsizeHintScrim.isVisible = hasDescription
+
+        binding.description.text = description
+
+        fun updateHint() = binding.description.doOnLayout {
+            fun TextView.hasEllipsize() = layout.text.toString() != text
+            val visibility =
+                if (binding.description.hasEllipsize()) View.VISIBLE
+                else View.INVISIBLE
+            binding.descriptionEllipsizeHint.visibility = visibility
+            binding.descriptionEllipsizeHintScrim.visibility = visibility
+        }
+
+        if (hasDescription) updateHint()
+        binding.description.setOnClickListener {
+            binding.description.maxLines =
+                if (binding.description.maxLines < Int.MAX_VALUE) Int.MAX_VALUE else 3
+            updateHint()
+        }
+        binding.description.setOnLongClickListener {
+            copyToClipboard(binding.description.text as String)
+            makeToast(R.string.toast_manga_description_copied)
+            true
+        }
+    }
+
+    private fun setupSource(source: Source?) {
+        binding.source.isVisible = source != null
+        if (source == null) return
+        binding.source.text = "From ${source.providerId} - ${source.mangaId} ${source.state}"
+
+        when (source.state) {
+            SourceState.DOWNLOADING -> binding.source.setTextColor(R.color.blue_400)
+            SourceState.WAITING -> binding.source.setTextColor(R.color.green_400)
+            SourceState.ERROR -> binding.source.setTextColor(R.color.red_400)
+        }
+        binding.source.setOnLongClickListener {
+            viewModel.syncSource()
+            true
+        }
+    }
+
+    private fun setupTags(tags: List<TagGroup>?) {
+        if (!tags.isNullOrEmpty()) {
+            binding.tags.isVisible = true
+            tagAdapter.setList(tags)
+        } else {
+            binding.tags.isVisible = false
+        }
+    }
+
+    private fun setupCollections(collections: List<Collection>) {
+        if (collections.isNotEmpty()) {
+            binding.chapters.isVisible = true
+            binding.noChapterHint.isVisible = false
+            binding.chapters.collections = collections
+        } else {
+            binding.chapters.isVisible = false
+            binding.noChapterHint.isVisible = true
+        }
     }
 
     private fun setupActionButton() {
@@ -330,6 +318,16 @@ class GalleryFragment : Fragment() {
                     )
                 } ?: navToReaderActivity(detail.id, detail.providerId)
             }
+        }
+
+        val isFromProvider = (providerId != null)
+        binding.libraryAddButton.isVisible = isFromProvider
+        binding.libraryAddButton.setOnClickListener {
+            viewModel.addMangaToLibrary(false)
+        }
+        binding.libraryAddButton.setOnLongClickListener {
+            viewModel.addMangaToLibrary(true)
+            true
         }
     }
 }
