@@ -167,10 +167,6 @@ class GalleryFragment : Fragment() {
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
         binding.title.text = title
-        providerId.let {
-            binding.provider.isVisible = (it != null)
-            binding.provider.text = it
-        }
         viewModel.detail.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Success -> {
@@ -204,6 +200,9 @@ class GalleryFragment : Fragment() {
                             true
                         }
                         else binding.backdrop.setOnLongClickListener(null)
+
+                        binding.provider.isVisible = isFromProvider
+                        binding.provider.text = it
                     }
 
                     setupSource(detail.source)

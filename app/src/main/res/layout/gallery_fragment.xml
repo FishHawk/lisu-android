@@ -61,13 +61,18 @@
                         android:id="@+id/title"
                         style="@style/Theme.TextAppearance.Title"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="60sp"
                         android:ellipsize="end"
-                        android:maxLines="2"
+                        android:gravity="bottom"
+                        android:maxLines="3"
                         android:textIsSelectable="false"
+                        app:autoSizeMaxTextSize="20sp"
+                        app:autoSizeMinTextSize="12sp"
+                        app:autoSizeStepGranularity="2sp"
+                        app:autoSizeTextType="uniform"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/author"
                         tools:text="Sample title" />
 
                     <TextView
@@ -82,7 +87,7 @@
                         android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/title"
+                        app:layout_constraintBottom_toTopOf="@+id/status"
                         tools:text="Sample author"
                         tools:visibility="visible" />
 
@@ -96,8 +101,8 @@
                         android:maxLines="1"
                         android:textIsSelectable="false"
                         android:visibility="gone"
+                        app:layout_constraintBottom_toTopOf="@+id/read_button"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/author"
                         tools:text="Completed"
                         tools:visibility="visible" />
 
@@ -112,9 +117,9 @@
                         android:maxLines="1"
                         android:textIsSelectable="false"
                         android:visibility="gone"
+                        app:layout_constraintBottom_toTopOf="@+id/read_button"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/status"
-                        app:layout_constraintTop_toBottomOf="@+id/author"
                         tools:text="Provider"
                         tools:visibility="visible" />
 
@@ -123,7 +128,6 @@
                         style="@style/Theme.Widget.Button.Icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:insetTop="0dp"
                         android:insetBottom="0dp"
                         android:text="@string/gallery_read_button_hint"
                         app:icon="@drawable/ic_baseline_play_arrow_24"
@@ -135,7 +139,6 @@
                         style="@style/Theme.Widget.Button.Icon.Textless"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:insetTop="0dp"
                         android:insetBottom="0dp"
                         android:visibility="gone"
                         app:icon="@drawable/ic_baseline_library_add_24"
