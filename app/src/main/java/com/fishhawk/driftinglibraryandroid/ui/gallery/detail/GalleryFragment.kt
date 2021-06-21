@@ -305,9 +305,9 @@ class GalleryFragment : Fragment() {
         binding.source.text = "From ${source.providerId} - ${source.mangaId} ${source.state}"
 
         when (source.state) {
-            SourceState.DOWNLOADING -> binding.source.setTextColor(R.color.blue_400)
-            SourceState.WAITING -> binding.source.setTextColor(R.color.green_400)
-            SourceState.ERROR -> binding.source.setTextColor(R.color.red_400)
+            SourceState.DOWNLOADING -> binding.source.setTextColor(resources.getColor(R.color.blue_400))
+            SourceState.WAITING -> binding.source.setTextColor(resources.getColor(R.color.green_400))
+            SourceState.ERROR -> binding.source.setTextColor(resources.getColor(R.color.red_400))
         }
     }
 
