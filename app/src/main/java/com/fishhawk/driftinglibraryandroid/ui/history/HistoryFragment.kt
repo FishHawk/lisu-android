@@ -13,6 +13,8 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataOutline
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
 
@@ -28,9 +30,14 @@ class HistoryFragment : Fragment() {
                 findNavController().navigate(
                     R.id.action_to_gallery_detail,
                     bundleOf(
-                        "id" to mangaId,
-                        "title" to title,
-                        "thumb" to thumb,
+                        "outline" to MangaOutline(
+                            mangaId,
+                            thumb,
+                            null,
+                            null,
+                            MetadataOutline(title, null, null),
+                            null
+                        ),
                         "providerId" to providerId
                     )
                 )

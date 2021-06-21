@@ -88,12 +88,12 @@ class GalleryFragment : Fragment() {
         bindToFeedbackViewModel(viewModel)
 
         providerId = requireArguments().getString("providerId")
-        val outline: MangaOutline? = requireArguments().getParcelable("outline")
+        val outline: MangaOutline = requireArguments().getParcelable("outline")!!
 
-        (outline?.thumb ?: requireArguments().getString("thumb"))?.let { setupThumb(it) }
-        binding.title.text = outline?.title ?: requireArguments().getString("title")!!
-        setupAuthors(outline?.metadata?.authors)
-        setupStatus(outline?.metadata?.status)
+        setupThumb(outline.thumb)
+        setupTitle(outline.title)
+        setupAuthors(outline.metadata.authors)
+        setupStatus(outline.metadata.status)
         setupProvider(providerId)
 
         binding.title.setOnLongClickListener {
@@ -181,11 +181,7 @@ class GalleryFragment : Fragment() {
 
         binding.tags.adapter = tagAdapter
 
-        val contentAdapter = ContentAdapter(
-            this,
-            outline?.id ?: requireArguments().getString("id")!!,
-            providerId
-        )
+        val contentAdapter = ContentAdapter(this, outline.id, providerId)
         binding.chapters.adapter = contentAdapter
 
         binding.displayModeButton.setOnClickListener {
@@ -220,8 +216,8 @@ class GalleryFragment : Fragment() {
                     binding.multiStateView.viewState = ViewState.Content
 
                     val detail = result.data
-                    detail.thumb?.let { setupThumb(it) }
-                    binding.title.text = detail.title
+                    setupThumb(detail.thumb)
+                    setupTitle(detail.title)
                     setupAuthors(detail.metadata.authors)
                     setupStatus(detail.metadata.status)
                     setupProvider(detail.providerId)
@@ -244,7 +240,8 @@ class GalleryFragment : Fragment() {
         }
     }
 
-    private fun setupThumb(thumb: String) {
+    private fun setupThumb(thumb: String?) {
+        if (thumb == null) return
         Glide.with(this)
             .load(thumb)
             .placeholder(binding.thumb.drawable)
@@ -256,6 +253,10 @@ class GalleryFragment : Fragment() {
             .placeholder(binding.backdrop.drawable)
             .diskCacheStrategy(DiskCacheStrategy.DATA)
             .into(binding.backdrop)
+    }
+
+    private fun setupTitle(title: String) {
+        binding.title.text = title
     }
 
     private fun setupAuthors(authors: List<String>?) {
