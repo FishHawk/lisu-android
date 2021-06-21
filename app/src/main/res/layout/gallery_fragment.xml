@@ -118,22 +118,6 @@
                         tools:text="Provider"
                         tools:visibility="visible" />
 
-                    <TextView
-                        android:id="@+id/update"
-                        style="@style/Theme.TextAppearance.Body2"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:textIsSelectable="false"
-                        android:visibility="gone"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/status"
-                        tools:text="2020-01-01"
-                        tools:visibility="visible" />
-
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/read_button"
                         style="@style/Theme.Widget.Button.Icon"

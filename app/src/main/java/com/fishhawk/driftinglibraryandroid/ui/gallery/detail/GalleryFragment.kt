@@ -29,8 +29,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.text.SimpleDateFormat
-import java.util.*
 
 class GalleryFragment : Fragment() {
     private lateinit var binding: GalleryFragmentBinding
@@ -189,15 +187,6 @@ class GalleryFragment : Fragment() {
                     detail.metadata.status.let {
                         binding.status.isVisible = (it != null)
                         binding.status.text = it.toString()
-                    }
-
-                    detail.updateTime?.let {
-                        val date = Date(it)
-                        val format = SimpleDateFormat("yyyy-MM-dd")
-                        format.format(date)
-                    }.let {
-                        binding.update.isVisible = (it != null)
-                        binding.update.text = it
                     }
 
                     detail.providerId.let {
