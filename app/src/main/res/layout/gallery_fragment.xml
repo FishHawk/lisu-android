@@ -19,7 +19,7 @@
                 android:id="@+id/backdrop"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:alpha="0.3"
+                android:alpha="0.2"
                 android:scaleType="centerCrop"
                 tools:ignore="ContentDescription"
                 tools:src="@tools:sample/avatars" />
@@ -71,44 +71,19 @@
                         tools:text="Sample title" />
 
                     <TextView
-                        android:id="@+id/author_label"
-                        style="@style/Theme.TextAppearance.Body1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/gallery_author_label"
-                        android:visibility="gone"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/title"
-                        tools:visibility="visible" />
-
-                    <TextView
                         android:id="@+id/author"
                         style="@style/Theme.TextAppearance.Body2"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
                         android:layout_marginTop="4dp"
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:textIsSelectable="false"
                         android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/author_label"
+                        app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/title"
                         tools:text="Sample author"
-                        tools:visibility="visible" />
-
-                    <TextView
-                        android:id="@+id/status_label"
-                        style="@style/Theme.TextAppearance.Body1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/gallery_status_label"
-                        android:visibility="gone"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/author_label"
                         tools:visibility="visible" />
 
                     <TextView
@@ -116,57 +91,14 @@
                         style="@style/Theme.TextAppearance.Body2"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
                         android:layout_marginTop="4dp"
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:textIsSelectable="false"
                         android:visibility="gone"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/status_label"
-                        app:layout_constraintTop_toBottomOf="@+id/author_label"
-                        tools:text="Sample status"
-                        tools:visibility="visible" />
-
-                    <TextView
-                        android:id="@+id/update_label"
-                        style="@style/Theme.TextAppearance.Body1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/gallery_update_label"
-                        android:visibility="gone"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/status_label"
-                        tools:visibility="visible" />
-
-                    <TextView
-                        android:id="@+id/update"
-                        style="@style/Theme.TextAppearance.Body2"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="4dp"
-                        android:ellipsize="end"
-                        android:maxLines="1"
-                        android:textIsSelectable="false"
-                        android:visibility="gone"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/update_label"
-                        app:layout_constraintTop_toBottomOf="@+id/status_label"
-                        tools:text="Sample update"
-                        tools:visibility="visible" />
-
-                    <TextView
-                        android:id="@+id/provider_label"
-                        style="@style/Theme.TextAppearance.Body1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/gallery_provider_label"
-                        android:visibility="gone"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/update_label"
+                        app:layout_constraintTop_toBottomOf="@+id/author"
+                        tools:text="Completed"
                         tools:visibility="visible" />
 
                     <TextView
@@ -181,9 +113,50 @@
                         android:textIsSelectable="false"
                         android:visibility="gone"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/provider_label"
-                        app:layout_constraintTop_toBottomOf="@+id/update_label"
-                        tools:text="Sample provider"
+                        app:layout_constraintStart_toEndOf="@+id/status"
+                        app:layout_constraintTop_toBottomOf="@+id/author"
+                        tools:text="Provider"
+                        tools:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/update"
+                        style="@style/Theme.TextAppearance.Body2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textIsSelectable="false"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/status"
+                        tools:text="2020-01-01"
+                        tools:visibility="visible" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/read_button"
+                        style="@style/Theme.Widget.Button.Icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/gallery_read_button_hint"
+                        app:icon="@drawable/ic_baseline_play_arrow_24"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/library_add_button"
+                        style="@style/Theme.Widget.Button.Icon.Textless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:visibility="gone"
+                        app:icon="@drawable/ic_baseline_library_add_24"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/read_button"
                         tools:visibility="visible" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -198,43 +171,16 @@
                 android:id="@+id/content_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
                 android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="8dp"
                     android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            style="@style/Theme.TextAppearance.Subtitle1"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="About:" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/library_add_button"
-                            style="@style/Theme.Widget.Button.Icon.Textless"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:icon="@drawable/ic_baseline_library_add_24" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/read_button"
-                            style="@style/Theme.Widget.Button.Icon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/gallery_read_button_hint"
-                            app:icon="@drawable/ic_baseline_play_arrow_24" />
-                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/source"
@@ -271,8 +217,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
+
                     android:layout_marginBottom="8dp"
                     android:orientation="vertical">
 

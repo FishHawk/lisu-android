@@ -165,7 +165,6 @@ class GalleryFragment : Fragment() {
 
         binding.title.text = title
         providerId.let {
-            binding.providerLabel.isVisible = (it != null)
             binding.provider.isVisible = (it != null)
             binding.provider.text = it
         }
@@ -183,13 +182,11 @@ class GalleryFragment : Fragment() {
                         if (it.isEmpty()) null
                         else it.joinToString(separator = ";")
                     }.let {
-                        binding.authorLabel.isVisible = (it != null)
                         binding.author.isVisible = (it != null)
                         binding.author.text = it
                     }
 
                     detail.metadata.status.let {
-                        binding.statusLabel.isVisible = (it != null)
                         binding.status.isVisible = (it != null)
                         binding.status.text = it.toString()
                     }
@@ -199,47 +196,52 @@ class GalleryFragment : Fragment() {
                         val format = SimpleDateFormat("yyyy-MM-dd")
                         format.format(date)
                     }.let {
-                        binding.updateLabel.isVisible = (it != null)
                         binding.update.isVisible = (it != null)
                         binding.update.text = it
                     }
 
                     detail.providerId.let {
-                        binding.providerLabel.isVisible = (it != null)
-                        binding.provider.isVisible = (it != null)
+                        val isFromProvider = (it != null)
+
+                        binding.provider.isVisible = isFromProvider
                         binding.provider.text = it
-                    }
 
-                    val isFromProvider = (detail.providerId != null)
-                    val hasSource = !isFromProvider && (detail.source != null)
-
-                    binding.libraryAddButton.isVisible = isFromProvider
-
-                    if (!isFromProvider) binding.backdrop.setOnLongClickListener {
-                        findNavController().navigate(R.id.action_to_gallery_edit)
-                        true
-                    }
-                    else binding.backdrop.setOnLongClickListener(null)
-
-                    binding.source.isVisible = hasSource
-
-                    val source = detail.source
-                    if (source != null) {
-                        binding.source.text =
-                            "From ${source.providerId} - ${source.mangaId} ${source.state}"
-                        when (source.state) {
-                            SourceState.DOWNLOADING -> binding.source.setTextColor(R.color.blue_400)
-                            SourceState.WAITING -> binding.source.setTextColor(R.color.green_400)
-                            SourceState.ERROR -> binding.source.setTextColor(R.color.red_400)
+                        binding.libraryAddButton.isVisible = isFromProvider
+                        binding.libraryAddButton.setOnClickListener {
+                            viewModel.addMangaToLibrary(false)
                         }
-                        binding.source.setOnLongClickListener {
-                            viewModel.syncSource()
+                        binding.libraryAddButton.setOnLongClickListener {
+                            viewModel.addMangaToLibrary(true)
                             true
                         }
-                    } else {
-                        binding.source.setOnLongClickListener(null)
+
+                        if (!isFromProvider) binding.backdrop.setOnLongClickListener {
+                            findNavController().navigate(R.id.action_to_gallery_edit)
+                            true
+                        }
+                        else binding.backdrop.setOnLongClickListener(null)
                     }
 
+                    detail.source.let {
+                        val hasSource = it != null
+
+                        binding.source.isVisible = hasSource
+                        if (it != null) {
+                            binding.source.text =
+                                "From ${it.providerId} - ${it.mangaId} ${it.state}"
+                            when (it.state) {
+                                SourceState.DOWNLOADING -> binding.source.setTextColor(R.color.blue_400)
+                                SourceState.WAITING -> binding.source.setTextColor(R.color.green_400)
+                                SourceState.ERROR -> binding.source.setTextColor(R.color.red_400)
+                            }
+                            binding.source.setOnLongClickListener {
+                                viewModel.syncSource()
+                                true
+                            }
+                        } else {
+                            binding.source.setOnLongClickListener(null)
+                        }
+                    }
 
                     detail.metadata.description?.let {
                         if (it.isBlank()) null
@@ -318,11 +320,6 @@ class GalleryFragment : Fragment() {
                     )
                 } ?: navToReaderActivity(detail.id, detail.providerId)
             }
-        }
-        binding.libraryAddButton.setOnClickListener { viewModel.addMangaToLibrary(false) }
-        binding.libraryAddButton.setOnLongClickListener {
-            viewModel.addMangaToLibrary(true)
-            true
         }
     }
 }
