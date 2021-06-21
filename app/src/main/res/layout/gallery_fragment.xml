@@ -70,9 +70,9 @@
                         app:autoSizeMinTextSize="12sp"
                         app:autoSizeStepGranularity="2sp"
                         app:autoSizeTextType="uniform"
+                        app:layout_constraintBottom_toTopOf="@+id/author"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintBottom_toTopOf="@+id/author"
                         tools:text="Sample title" />
 
                     <TextView
@@ -85,9 +85,9 @@
                         android:maxLines="1"
                         android:textIsSelectable="false"
                         android:visibility="gone"
+                        app:layout_constraintBottom_toTopOf="@+id/status"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintBottom_toTopOf="@+id/status"
                         tools:text="Sample author"
                         tools:visibility="visible" />
 
@@ -169,19 +169,20 @@
                     style="@style/Theme.TextAppearance.Body2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
                     android:ellipsize="end"
                     android:maxLines="1"
                     tools:text="Provider - 10000" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp">
 
                     <TextView
                         android:id="@+id/description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
                         android:clickable="true"
                         android:ellipsize="end"
                         android:focusable="true"
@@ -228,6 +229,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:orientation="horizontal">
 
                     <TextView
