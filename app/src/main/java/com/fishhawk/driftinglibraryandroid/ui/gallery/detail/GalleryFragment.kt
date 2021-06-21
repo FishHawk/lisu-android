@@ -90,6 +90,7 @@ class GalleryFragment : Fragment() {
         providerId = requireArguments().getString("providerId")
         val outline: MangaOutline? = requireArguments().getParcelable("outline")
 
+        (outline?.thumb ?: requireArguments().getString("thumb"))?.let { setupThumb(it) }
         binding.title.text = outline?.title ?: requireArguments().getString("title")!!
         setupAuthors(outline?.metadata?.authors)
         setupStatus(outline?.metadata?.status)
@@ -107,8 +108,34 @@ class GalleryFragment : Fragment() {
             true
         }
 
-        (outline?.thumb ?: requireArguments().getString("thumb"))?.let { setupThumb(it) }
-        setupActionButton()
+        binding.readButton.setOnClickListener {
+            (viewModel.detail.value as? Result.Success)?.let { result ->
+                val detail = result.data
+                viewModel.history.value?.let { history ->
+                    navToReaderActivity(
+                        detail.id,
+                        detail.providerId,
+                        history.collectionIndex,
+                        history.chapterIndex,
+                        history.pageIndex
+                    )
+                } ?: navToReaderActivity(detail.id, detail.providerId)
+            }
+        }
+
+        binding.libraryAddButton.isVisible = providerId != null
+        binding.libraryAddButton.setOnClickListener {
+            viewModel.addMangaToLibrary(false)
+        }
+        binding.libraryAddButton.setOnLongClickListener {
+            viewModel.addMangaToLibrary(true)
+            true
+        }
+
+        if (providerId == null) binding.backdrop.setOnLongClickListener {
+            findNavController().navigate(R.id.action_to_gallery_edit)
+            true
+        }
 
         binding.thumbCard.setOnLongClickListener {
             GalleryThumbSheet(requireContext(), object : GalleryThumbSheet.Listener {
@@ -133,6 +160,22 @@ class GalleryFragment : Fragment() {
                 }
             }).show()
 
+            true
+        }
+
+        binding.source.setOnLongClickListener {
+            viewModel.syncSource()
+            true
+        }
+
+        binding.description.setOnClickListener {
+            binding.description.maxLines =
+                if (binding.description.maxLines < Int.MAX_VALUE) Int.MAX_VALUE else 3
+            updateDescriptionHint()
+        }
+        binding.description.setOnLongClickListener {
+            copyToClipboard(binding.description.text as String)
+            makeToast(R.string.toast_manga_description_copied)
             true
         }
 
@@ -178,9 +221,7 @@ class GalleryFragment : Fragment() {
 
                     val detail = result.data
                     detail.thumb?.let { setupThumb(it) }
-
                     binding.title.text = detail.title
-
                     setupAuthors(detail.metadata.authors)
                     setupStatus(detail.metadata.status)
                     setupProvider(detail.providerId)
@@ -236,12 +277,15 @@ class GalleryFragment : Fragment() {
         val isFromProvider = (providerId != null)
         binding.provider.isVisible = isFromProvider
         binding.provider.text = providerId
+    }
 
-        if (!isFromProvider) binding.backdrop.setOnLongClickListener {
-            findNavController().navigate(R.id.action_to_gallery_edit)
-            true
-        }
-        else binding.backdrop.setOnLongClickListener(null)
+    private fun updateDescriptionHint() = binding.description.doOnLayout {
+        fun TextView.hasEllipsize() = layout.text.toString() != text
+        val visibility =
+            if (binding.description.hasEllipsize()) View.VISIBLE
+            else View.INVISIBLE
+        binding.descriptionEllipsizeHint.visibility = visibility
+        binding.descriptionEllipsizeHintScrim.visibility = visibility
     }
 
     private fun setupDescription(description: String?) {
@@ -251,27 +295,7 @@ class GalleryFragment : Fragment() {
         binding.descriptionEllipsizeHintScrim.isVisible = hasDescription
 
         binding.description.text = description
-
-        fun updateHint() = binding.description.doOnLayout {
-            fun TextView.hasEllipsize() = layout.text.toString() != text
-            val visibility =
-                if (binding.description.hasEllipsize()) View.VISIBLE
-                else View.INVISIBLE
-            binding.descriptionEllipsizeHint.visibility = visibility
-            binding.descriptionEllipsizeHintScrim.visibility = visibility
-        }
-
-        if (hasDescription) updateHint()
-        binding.description.setOnClickListener {
-            binding.description.maxLines =
-                if (binding.description.maxLines < Int.MAX_VALUE) Int.MAX_VALUE else 3
-            updateHint()
-        }
-        binding.description.setOnLongClickListener {
-            copyToClipboard(binding.description.text as String)
-            makeToast(R.string.toast_manga_description_copied)
-            true
-        }
+        if (hasDescription) updateDescriptionHint()
     }
 
     private fun setupSource(source: Source?) {
@@ -283,10 +307,6 @@ class GalleryFragment : Fragment() {
             SourceState.DOWNLOADING -> binding.source.setTextColor(R.color.blue_400)
             SourceState.WAITING -> binding.source.setTextColor(R.color.green_400)
             SourceState.ERROR -> binding.source.setTextColor(R.color.red_400)
-        }
-        binding.source.setOnLongClickListener {
-            viewModel.syncSource()
-            true
         }
     }
 
@@ -307,33 +327,6 @@ class GalleryFragment : Fragment() {
         } else {
             binding.chapters.isVisible = false
             binding.noChapterHint.isVisible = true
-        }
-    }
-
-    private fun setupActionButton() {
-        binding.readButton.setOnClickListener {
-            (viewModel.detail.value as? Result.Success)?.let { result ->
-                val detail = result.data
-                viewModel.history.value?.let { history ->
-                    navToReaderActivity(
-                        detail.id,
-                        detail.providerId,
-                        history.collectionIndex,
-                        history.chapterIndex,
-                        history.pageIndex
-                    )
-                } ?: navToReaderActivity(detail.id, detail.providerId)
-            }
-        }
-
-        val isFromProvider = (providerId != null)
-        binding.libraryAddButton.isVisible = isFromProvider
-        binding.libraryAddButton.setOnClickListener {
-            viewModel.addMangaToLibrary(false)
-        }
-        binding.libraryAddButton.setOnLongClickListener {
-            viewModel.addMangaToLibrary(true)
-            true
         }
     }
 }
