@@ -34,11 +34,7 @@ class LibraryFragment : Fragment() {
         override fun onCardClick(outline: MangaOutline) {
             findNavController().navigate(
                 R.id.action_to_gallery,
-                bundleOf(
-                    "id" to outline.id,
-                    "title" to outline.title,
-                    "thumb" to outline.thumb
-                )
+                bundleOf("outline" to outline)
             )
         }
 

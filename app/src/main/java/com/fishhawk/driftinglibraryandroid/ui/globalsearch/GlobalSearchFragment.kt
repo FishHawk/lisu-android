@@ -27,9 +27,7 @@ class GlobalSearchFragment : Fragment() {
                 findNavController().navigate(
                     R.id.action_to_gallery_detail,
                     bundleOf(
-                        "id" to outline.id,
-                        "title" to outline.title,
-                        "thumb" to outline.thumb,
+                        "outline" to outline,
                         "providerId" to info.id
                     )
                 )

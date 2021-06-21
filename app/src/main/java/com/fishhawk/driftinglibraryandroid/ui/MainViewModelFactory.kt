@@ -5,6 +5,7 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.MainApplication
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.ui.explore.ExploreViewModel
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.globalsearch.GlobalSearchViewModel
@@ -62,7 +63,7 @@ class MainViewModelFactory constructor(
                     application.remoteLibraryRepository,
                     application.remoteProviderRepository,
                     application.readingHistoryRepository,
-                    bundle.getString("id")!!,
+                    bundle.getParcelable<MangaOutline>("outline")?.id ?: bundle.getString("id")!!,
                     bundle.getString("providerId")
                 )
 

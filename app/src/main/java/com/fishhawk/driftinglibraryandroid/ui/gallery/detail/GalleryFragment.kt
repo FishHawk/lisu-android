@@ -20,10 +20,8 @@ import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.Result
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.remote.model.*
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Collection
-import com.fishhawk.driftinglibraryandroid.data.remote.model.Source
-import com.fishhawk.driftinglibraryandroid.data.remote.model.SourceState
-import com.fishhawk.driftinglibraryandroid.data.remote.model.TagGroup
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.*
@@ -89,10 +87,13 @@ class GalleryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         bindToFeedbackViewModel(viewModel)
 
-        val id: String = requireArguments().getString("id")!!
-        val title: String = requireArguments().getString("title")!!
         providerId = requireArguments().getString("providerId")
-        val thumb = requireArguments().getString("thumb")
+        val outline: MangaOutline? = requireArguments().getParcelable("outline")
+
+        binding.title.text = outline?.title ?: requireArguments().getString("title")!!
+        setupAuthors(outline?.metadata?.authors)
+        setupStatus(outline?.metadata?.status)
+        setupProvider(providerId)
 
         binding.title.setOnLongClickListener {
             copyToClipboard(binding.title.text as String)
@@ -106,7 +107,7 @@ class GalleryFragment : Fragment() {
             true
         }
 
-        thumb?.let { setupThumb(it) }
+        (outline?.thumb ?: requireArguments().getString("thumb"))?.let { setupThumb(it) }
         setupActionButton()
 
         binding.thumbCard.setOnLongClickListener {
@@ -137,7 +138,11 @@ class GalleryFragment : Fragment() {
 
         binding.tags.adapter = tagAdapter
 
-        val contentAdapter = ContentAdapter(this, id, providerId)
+        val contentAdapter = ContentAdapter(
+            this,
+            outline?.id ?: requireArguments().getString("id")!!,
+            providerId
+        )
         binding.chapters.adapter = contentAdapter
 
         binding.displayModeButton.setOnClickListener {
@@ -166,7 +171,6 @@ class GalleryFragment : Fragment() {
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        binding.title.text = title
         viewModel.detail.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Success -> {
@@ -177,33 +181,9 @@ class GalleryFragment : Fragment() {
 
                     binding.title.text = detail.title
 
-                    detail.metadata.authors?.let {
-                        if (it.isEmpty()) null
-                        else it.joinToString(separator = ";")
-                    }.let {
-                        binding.author.isVisible = (it != null)
-                        binding.author.text = it
-                    }
-
-                    detail.metadata.status.let {
-                        binding.status.isVisible = (it != null)
-                        binding.status.text = it.toString()
-                    }
-
-                    detail.providerId.let {
-                        val isFromProvider = (it != null)
-                        binding.provider.isVisible = isFromProvider
-                        binding.provider.text = it
-
-                        if (!isFromProvider) binding.backdrop.setOnLongClickListener {
-                            findNavController().navigate(R.id.action_to_gallery_edit)
-                            true
-                        }
-                        else binding.backdrop.setOnLongClickListener(null)
-
-                        binding.provider.isVisible = isFromProvider
-                        binding.provider.text = it
-                    }
+                    setupAuthors(detail.metadata.authors)
+                    setupStatus(detail.metadata.status)
+                    setupProvider(detail.providerId)
 
                     setupSource(detail.source)
                     setupDescription(detail.metadata.description)
@@ -235,6 +215,33 @@ class GalleryFragment : Fragment() {
             .placeholder(binding.backdrop.drawable)
             .diskCacheStrategy(DiskCacheStrategy.DATA)
             .into(binding.backdrop)
+    }
+
+    private fun setupAuthors(authors: List<String>?) {
+        authors?.let {
+            if (it.isEmpty()) null
+            else it.joinToString(separator = ";")
+        }.let {
+            binding.author.isVisible = (it != null)
+            binding.author.text = it
+        }
+    }
+
+    private fun setupStatus(status: MangaStatus?) {
+        binding.status.isVisible = (status != null)
+        binding.status.text = status.toString()
+    }
+
+    private fun setupProvider(providerId: String?) {
+        val isFromProvider = (providerId != null)
+        binding.provider.isVisible = isFromProvider
+        binding.provider.text = providerId
+
+        if (!isFromProvider) binding.backdrop.setOnLongClickListener {
+            findNavController().navigate(R.id.action_to_gallery_edit)
+            true
+        }
+        else binding.backdrop.setOnLongClickListener(null)
     }
 
     private fun setupDescription(description: String?) {
