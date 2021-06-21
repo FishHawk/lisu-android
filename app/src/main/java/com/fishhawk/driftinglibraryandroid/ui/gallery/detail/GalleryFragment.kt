@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -16,10 +18,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.Result
+import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.model.SourceState
+import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
@@ -239,9 +241,28 @@ class GalleryFragment : Fragment() {
                         binding.description.isVisible = (it != null)
                         binding.description.text = it
 
+                        fun TextView.hasEllipsize() = layout.text.toString() != text
+                        binding.description.doOnLayout {
+                            binding.descriptionEllipsizeHint.isVisible =
+                                binding.description.hasEllipsize()
+                            binding.descriptionEllipsizeHintScrim.isVisible =
+                                binding.description.hasEllipsize()
+                        }
                         binding.description.setOnClickListener {
                             binding.description.maxLines =
                                 if (binding.description.maxLines < Int.MAX_VALUE) Int.MAX_VALUE else 3
+
+                            binding.description.doOnLayout {
+
+                                if (binding.description.hasEllipsize()) {
+                                    binding.descriptionEllipsizeHint.visibility = View.VISIBLE
+                                    binding.descriptionEllipsizeHintScrim.visibility = View.VISIBLE
+                                } else {
+                                    binding.descriptionEllipsizeHint.visibility = View.INVISIBLE
+                                    binding.descriptionEllipsizeHintScrim.visibility =
+                                        View.INVISIBLE
+                                }
+                            }
                         }
 
                         binding.description.setOnLongClickListener {
