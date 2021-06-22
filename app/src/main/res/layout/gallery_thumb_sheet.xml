@@ -45,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Save cover"
-        app:icon="@drawable/ic_baseline_refresh_24" />
+        app:icon="@drawable/ic_baseline_file_download_24" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/share_cover_button"
