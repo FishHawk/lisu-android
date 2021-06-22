@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
@@ -24,10 +23,7 @@ import kotlinx.coroutines.flow.onEach
 class LibraryFragment : Fragment() {
     private lateinit var binding: LibraryFragmentBinding
     private val viewModel: LibraryViewModel by viewModels {
-        MainViewModelFactory(
-            requireActivity().application as MainApplication,
-            arguments ?: bundleOf()
-        )
+        MainViewModelFactory(this)
     }
 
     val adapter = MangaListAdapter(object : MangaListAdapter.Listener {

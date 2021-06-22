@@ -7,7 +7,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.GlobalSearchFragmentBinding
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
@@ -18,7 +17,7 @@ import com.fishhawk.driftinglibraryandroid.ui.base.closeInputMethod
 class GlobalSearchFragment : Fragment() {
     private lateinit var binding: GlobalSearchFragmentBinding
     private val viewModel: GlobalSearchViewModel by viewModels {
-        MainViewModelFactory(requireActivity().application as MainApplication, requireArguments())
+        MainViewModelFactory(this)
     }
 
     private val adapter = GlobalSearchGroupListAdapter(

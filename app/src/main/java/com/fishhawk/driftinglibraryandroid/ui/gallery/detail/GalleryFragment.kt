@@ -36,7 +36,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 class GalleryFragment : Fragment() {
     private lateinit var binding: GalleryFragmentBinding
     private val viewModel: GalleryViewModel by navGraphViewModels(R.id.nav_graph_gallery_internal) {
-        MainViewModelFactory(requireActivity().application as MainApplication, requireArguments())
+        MainViewModelFactory(this)
     }
 
     private val thumbSheet by lazy {

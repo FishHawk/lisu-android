@@ -20,10 +20,7 @@ import com.fishhawk.driftinglibraryandroid.util.setNext
 class ProviderPagerFragment : Fragment() {
     private lateinit var binding: ProviderPagerFragmentBinding
     private val viewModel: ProviderViewModel by viewModels {
-        MainViewModelFactory(
-            requireActivity().application as MainApplication,
-            requireArguments()
-        )
+        MainViewModelFactory(this)
     }
 
     private lateinit var providerBrowseHistory: ProviderBrowseHistory
@@ -63,7 +60,6 @@ class ProviderPagerFragment : Fragment() {
     }
 
     private fun setupMenu(menu: Menu) {
-        val provider: ProviderInfo = requireArguments().getParcelable("provider")!!
         with(menu.findItem(R.id.action_search).actionView as SearchView) {
             queryHint = getString(R.string.menu_search_hint)
             maxWidth = Int.MAX_VALUE
@@ -74,7 +70,7 @@ class ProviderPagerFragment : Fragment() {
                     findNavController().navigate(
                         R.id.action_to_search,
                         bundleOf(
-                            "provider" to provider,
+                            "provider" to viewModel.provider.id,
                             "keywords" to query
                         )
                     )

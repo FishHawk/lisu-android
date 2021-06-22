@@ -23,7 +23,7 @@ import java.security.Provider
 class HistoryFragment : Fragment() {
     private lateinit var binding: HistoryFragmentBinding
     val viewModel: HistoryViewModel by viewModels {
-        MainViewModelFactory(requireActivity().application as MainApplication)
+        MainViewModelFactory(this)
     }
 
     val adapter = HistoryListAdapter(object : HistoryListAdapter.Listener {

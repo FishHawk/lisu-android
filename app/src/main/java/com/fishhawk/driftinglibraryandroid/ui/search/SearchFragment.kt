@@ -8,12 +8,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderSearchFragmentBinding
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActionSheet
@@ -24,14 +22,12 @@ import kotlinx.coroutines.flow.onEach
 class SearchFragment : Fragment() {
     private lateinit var binding: ProviderSearchFragmentBinding
     private val viewModel: SearchViewModel by viewModels {
-        MainViewModelFactory(requireActivity().application as MainApplication, requireArguments())
+        MainViewModelFactory(this)
     }
-
-    private lateinit var providerId: String
 
     private val actionAdapter = object : ProviderActionSheet.Listener {
         override fun onReadClick(outline: MangaOutline, provider: String) {
-            navToReaderActivity(outline.id, providerId, 0, 0, 0)
+            navToReaderActivity(outline.id, viewModel.provider.id, 0, 0, 0)
         }
 
         override fun onLibraryAddClick(outline: MangaOutline, provider: String) {
@@ -45,13 +41,18 @@ class SearchFragment : Fragment() {
                 R.id.action_to_gallery_detail,
                 bundleOf(
                     "outline" to outline,
-                    "provider" to providerId
+                    "provider" to viewModel.provider.id
                 )
             )
         }
 
         override fun onCardLongClick(outline: MangaOutline) {
-            ProviderActionSheet(requireContext(), outline, providerId, actionAdapter).show()
+            ProviderActionSheet(
+                requireContext(),
+                outline,
+                viewModel.provider.id,
+                actionAdapter
+            ).show()
         }
     })
 
@@ -65,8 +66,6 @@ class SearchFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        providerId = requireArguments().getParcelable<ProviderInfo>("provider")!!.id
-
         setupMenu(binding.toolbar.menu)
         binding.toolbar.setOnMenuItemClickListener(this::onMenuItemSelected)
         binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)

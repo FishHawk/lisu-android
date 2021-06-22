@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.onEach
 class ServerFragment : Fragment() {
     private lateinit var binding: ServerFragmentBinding
     private val viewModel: ServerViewModel by viewModels {
-        MainViewModelFactory(requireActivity().application as MainApplication)
+        MainViewModelFactory(this)
     }
 
     val adapter = ServerInfoListAdapter(object : ServerInfoListAdapter.Listener {

@@ -23,10 +23,7 @@ import kotlinx.coroutines.flow.onEach
 abstract class ProviderBaseFragment : Fragment() {
     protected val viewModel: ProviderViewModel by viewModels(
         ownerProducer = { requireParentFragment() }
-    ) {
-        val application = requireActivity().application as MainApplication
-        MainViewModelFactory(application, requireArguments())
-    }
+    ) { MainViewModelFactory(this) }
 
     abstract val mangaListComponent: ProviderMangaListComponent
 

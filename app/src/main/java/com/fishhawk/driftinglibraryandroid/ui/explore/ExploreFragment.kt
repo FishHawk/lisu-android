@@ -12,7 +12,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ExploreFragmentBinding
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
@@ -25,7 +24,7 @@ import kotlinx.coroutines.flow.onEach
 class ExploreFragment : Fragment() {
     private lateinit var binding: ExploreFragmentBinding
     private val viewModel: ExploreViewModel by viewModels {
-        MainViewModelFactory(requireActivity().application as MainApplication)
+        MainViewModelFactory(this)
     }
 
     private val adapter = ProviderInfoListAdapter(object : ProviderInfoListAdapter.Listener {

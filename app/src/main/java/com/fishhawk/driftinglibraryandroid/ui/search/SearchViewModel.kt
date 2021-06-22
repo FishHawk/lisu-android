@@ -6,6 +6,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.remotePagingList
 import kotlinx.coroutines.launch
@@ -13,7 +14,7 @@ import kotlinx.coroutines.launch
 class SearchViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
-    private val providerId: String,
+    val provider: ProviderInfo,
     argKeywords: String
 ) : FeedbackViewModel() {
 
@@ -22,7 +23,7 @@ class SearchViewModel(
     val outlines = remotePagingList<Int, MangaOutline> { key ->
         val page = key ?: 1
         remoteProviderRepository.listManga(
-            providerId = providerId,
+            providerId = provider.id,
             keywords = keywords.value!!,
             page = page
         ).map { Pair(page + 1, it) }
@@ -33,7 +34,7 @@ class SearchViewModel(
     fun addToLibrary(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
         val result = remoteLibraryRepository.createManga(
             targetMangaId,
-            providerId,
+            provider.id,
             sourceMangaId,
             false
         )

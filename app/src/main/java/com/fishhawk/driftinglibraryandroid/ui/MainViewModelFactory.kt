@@ -1,11 +1,11 @@
 package com.fishhawk.driftinglibraryandroid.ui
 
+import android.app.Activity
 import android.os.Bundle
-import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.MainApplication
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.explore.ExploreViewModel
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.globalsearch.GlobalSearchViewModel
@@ -16,16 +16,16 @@ import com.fishhawk.driftinglibraryandroid.ui.search.SearchViewModel
 import com.fishhawk.driftinglibraryandroid.ui.server.ServerViewModel
 
 @Suppress("UNCHECKED_CAST")
-class MainViewModelFactory constructor(
-    private val application: MainApplication,
-    private val bundle: Bundle = bundleOf()
-) : ViewModelProvider.Factory {
+class MainViewModelFactory constructor(fragment: Fragment) : ViewModelProvider.Factory {
+    private val arguments = fragment.arguments
+    private val application = fragment.requireActivity().application as MainApplication
+
     override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
         when {
             isAssignableFrom(LibraryViewModel::class.java) ->
                 LibraryViewModel(
                     application.remoteLibraryRepository,
-                    bundle.getString("keywords")
+                    arguments?.getString("keywords")
                 )
 
             isAssignableFrom(HistoryViewModel::class.java) ->
@@ -37,22 +37,22 @@ class MainViewModelFactory constructor(
             isAssignableFrom(GlobalSearchViewModel::class.java) ->
                 GlobalSearchViewModel(
                     application.remoteProviderRepository,
-                    bundle.getString("keywords")!!
+                    arguments?.getString("keywords")!!
                 )
 
             isAssignableFrom(ProviderViewModel::class.java) ->
                 ProviderViewModel(
                     application.remoteLibraryRepository,
                     application.remoteProviderRepository,
-                    bundle.getParcelable("provider")!!
+                    arguments?.getParcelable("provider")!!
                 )
 
             isAssignableFrom(SearchViewModel::class.java) ->
                 SearchViewModel(
                     application.remoteLibraryRepository,
                     application.remoteProviderRepository,
-                    bundle.getParcelable<ProviderInfo>("provider")!!.id,
-                    bundle.getString("keywords")!!
+                    arguments?.getParcelable("provider")!!,
+                    arguments.getString("keywords")!!
                 )
 
             isAssignableFrom(ServerViewModel::class.java) ->
@@ -66,8 +66,8 @@ class MainViewModelFactory constructor(
                     application.remoteLibraryRepository,
                     application.remoteProviderRepository,
                     application.readingHistoryRepository,
-                    bundle.getParcelable("outline")!!,
-                    bundle.getParcelable("provider"),
+                    arguments?.getParcelable("outline")!!,
+                    arguments.getParcelable("provider"),
                 )
 
             else ->

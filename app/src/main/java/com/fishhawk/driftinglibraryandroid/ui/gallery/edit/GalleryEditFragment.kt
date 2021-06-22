@@ -23,7 +23,7 @@ import com.fishhawk.driftinglibraryandroid.ui.gallery.detail.TagGroupAdapter
 class GalleryEditFragment : Fragment() {
     private lateinit var binding: GalleryEditFragmentBinding
     private val viewModel: GalleryViewModel by navGraphViewModels(R.id.nav_graph_gallery_internal) {
-        MainViewModelFactory(requireActivity().application as MainApplication)
+        MainViewModelFactory(this)
     }
 
     private val authorsAdapter = TagGroupAdapter(editable = true)
