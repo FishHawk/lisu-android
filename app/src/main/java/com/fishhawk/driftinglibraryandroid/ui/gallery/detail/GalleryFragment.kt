@@ -75,16 +75,17 @@ class GalleryFragment : Fragment() {
         })
     }
 
-    private var providerId: String? = null
+    private var provider: ProviderInfo? = null
+
     private val tagAdapter = TagGroupListAdapter(object : TagGroupListAdapter.Listener {
         override fun onTagClick(key: String, value: String) {
             val keywords = if (key.isBlank()) value else "${key}:$value"
-            providerId?.let {
+            provider?.let {
                 findNavController().navigate(
                     R.id.action_to_provider_search,
                     bundleOf(
                         "keywords" to keywords,
-                        "providerId" to it
+                        "provider" to it
                     )
                 )
             } ?: findNavController().navigate(
@@ -123,14 +124,14 @@ class GalleryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         bindToFeedbackViewModel(viewModel)
 
-        providerId = requireArguments().getString("providerId")
+        provider = requireArguments().getParcelable("provider")
         val outline: MangaOutline = requireArguments().getParcelable("outline")!!
 
         setupThumb(outline.thumb)
         setupTitle(outline.title)
         setupAuthors(outline.metadata.authors)
         setupStatus(outline.metadata.status)
-        setupProvider(providerId)
+        setupProvider(provider)
 
         binding.title.setOnClickListener {
             findNavController().navigate(
@@ -162,16 +163,16 @@ class GalleryFragment : Fragment() {
                 viewModel.history.value?.let { history ->
                     navToReaderActivity(
                         detail.id,
-                        detail.providerId,
+                        detail.provider?.id,
                         history.collectionIndex,
                         history.chapterIndex,
                         history.pageIndex
                     )
-                } ?: navToReaderActivity(detail.id, detail.providerId)
+                } ?: navToReaderActivity(detail.id, detail.provider?.id)
             }
         }
 
-        binding.libraryAddButton.isVisible = providerId != null
+        binding.libraryAddButton.isVisible = provider != null
         binding.libraryAddButton.setOnClickListener {
             viewModel.addMangaToLibrary(false)
         }
@@ -195,7 +196,7 @@ class GalleryFragment : Fragment() {
 
         binding.tags.adapter = tagAdapter
 
-        val contentAdapter = ContentAdapter(this, outline.id, providerId)
+        val contentAdapter = ContentAdapter(this, outline.id, provider?.id)
         binding.chapters.adapter = contentAdapter
 
         binding.displayModeButton.setOnClickListener {
@@ -234,7 +235,7 @@ class GalleryFragment : Fragment() {
                     setupTitle(detail.title)
                     setupAuthors(detail.metadata.authors)
                     setupStatus(detail.metadata.status)
-                    setupProvider(detail.providerId)
+                    setupProvider(detail.provider)
 
                     setupSource(detail.source)
                     setupDescription(detail.metadata.description)
@@ -288,10 +289,10 @@ class GalleryFragment : Fragment() {
         binding.status.text = status.toString()
     }
 
-    private fun setupProvider(providerId: String?) {
-        val isFromProvider = (providerId != null)
+    private fun setupProvider(provider: ProviderInfo?) {
+        val isFromProvider = (provider != null)
         binding.provider.isVisible = isFromProvider
-        binding.provider.text = providerId
+        binding.provider.text = provider?.let { "${it.name}(${it.lang})" }
         thumbSheet.isFromProvider = isFromProvider
     }
 

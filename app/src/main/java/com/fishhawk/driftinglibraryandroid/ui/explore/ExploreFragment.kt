@@ -32,10 +32,7 @@ class ExploreFragment : Fragment() {
         override fun onItemClick(providerInfo: ProviderInfo) {
             findNavController().navigate(
                 R.id.action_explore_to_provider_pager,
-                bundleOf(
-                    "providerId" to providerInfo.id,
-                    "providerName" to providerInfo.name
-                )
+                bundleOf("provider" to providerInfo)
             )
             GlobalPreference.lastUsedProvider.set(providerInfo.id)
         }
@@ -43,10 +40,7 @@ class ExploreFragment : Fragment() {
         override fun onBrowseClick(providerInfo: ProviderInfo) {
             findNavController().navigate(
                 R.id.action_explore_to_provider_pager,
-                bundleOf(
-                    "providerId" to providerInfo.id,
-                    "providerName" to providerInfo.name
-                )
+                bundleOf("provider" to providerInfo)
             )
             GlobalPreference.lastUsedProvider.set(providerInfo.id)
         }

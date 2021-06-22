@@ -140,7 +140,7 @@ class ReaderViewModel(
 
         if (chapter.state is ViewState.Content) return
 
-        val providerId = mangaDetail.providerId
+        val providerId = mangaDetail.provider?.id
         val mangaId = mangaDetail.id
         val chapterId = chapter.id
 
@@ -207,7 +207,7 @@ class ReaderViewModel(
                     GlobalPreference.selectedServer.get(),
                     mangaDetail.title,
                     mangaDetail.thumb ?: "",
-                    mangaDetail.providerId,
+                    mangaDetail.provider?.id,
                     Calendar.getInstance().time.time,
                     collectionId,
                     collectionIndex,

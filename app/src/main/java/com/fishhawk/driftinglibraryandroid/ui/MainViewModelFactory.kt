@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.explore.ExploreViewModel
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.globalsearch.GlobalSearchViewModel
@@ -44,14 +45,14 @@ class MainViewModelFactory constructor(
                 ProviderViewModel(
                     application.remoteLibraryRepository,
                     application.remoteProviderRepository,
-                    bundle.getString("providerId")!!,
+                    bundle.getParcelable<ProviderInfo>("provider")!!.id,
                 )
 
             isAssignableFrom(SearchViewModel::class.java) ->
                 SearchViewModel(
                     application.remoteLibraryRepository,
                     application.remoteProviderRepository,
-                    bundle.getString("providerId")!!,
+                    bundle.getParcelable<ProviderInfo>("provider")!!.id,
                     bundle.getString("keywords")!!
                 )
 
@@ -67,7 +68,7 @@ class MainViewModelFactory constructor(
                     application.remoteProviderRepository,
                     application.readingHistoryRepository,
                     bundle.getParcelable<MangaOutline>("outline")!!.id,
-                    bundle.getString("providerId")
+                    bundle.getParcelable<ProviderInfo>("provider")?.id,
                 )
 
             else ->

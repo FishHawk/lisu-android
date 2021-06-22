@@ -73,7 +73,7 @@ class GalleryViewModel(
 
     fun syncSource() {
         (detail.value as? Result.Success)?.let {
-            if (it.data.providerId != null) return
+            if (it.data.provider != null) return
             viewModelScope.launch {
                 val result = remoteLibraryRepository.syncMangaSource(it.data.id)
                 resultWarp(result) { feed(R.string.successfully_create_sync_task) }
@@ -83,7 +83,7 @@ class GalleryViewModel(
 
     fun deleteSource() {
         (detail.value as? Result.Success)?.let {
-            if (it.data.providerId != null) return
+            if (it.data.provider != null) return
             viewModelScope.launch {
                 val result = remoteLibraryRepository.deleteMangaSource(it.data.id)
                 resultWarp(result) { feed(R.string.successfully_delete_source) }
@@ -95,7 +95,7 @@ class GalleryViewModel(
         (detail.value as? Result.Success)?.let {
             val sourceMangaId = it.data.id
             val targetMangaId = it.data.title
-            val providerId = it.data.providerId ?: return
+            val providerId = it.data.provider?.id ?: return
 
             viewModelScope.launch {
                 val result = remoteLibraryRepository.createManga(

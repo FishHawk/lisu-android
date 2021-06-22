@@ -28,7 +28,7 @@ class GlobalSearchFragment : Fragment() {
                     R.id.action_to_provider_search,
                     bundleOf(
                         "keywords" to viewModel.keywords.value,
-                        "providerId" to info.id
+                        "provider" to info
                     )
                 )
             }
@@ -38,7 +38,7 @@ class GlobalSearchFragment : Fragment() {
                     R.id.action_to_gallery_detail,
                     bundleOf(
                         "outline" to outline,
-                        "providerId" to info.id
+                        "provider" to info
                     )
                 )
             }

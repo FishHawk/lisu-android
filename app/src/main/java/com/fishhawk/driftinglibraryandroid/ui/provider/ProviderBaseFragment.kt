@@ -58,7 +58,7 @@ abstract class ProviderBaseFragment : Fragment() {
                 R.id.action_to_gallery_detail,
                 bundleOf(
                     "outline" to outline,
-                    "providerId" to viewModel.providerId.value!!
+                    "provider" to viewModel.detail.value!!.map { it }
                 )
             )
         }

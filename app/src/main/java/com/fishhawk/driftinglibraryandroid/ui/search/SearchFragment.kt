@@ -13,6 +13,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderSearchFragmentBinding
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActionSheet
@@ -44,7 +45,7 @@ class SearchFragment : Fragment() {
                 R.id.action_to_gallery_detail,
                 bundleOf(
                     "outline" to outline,
-                    "providerId" to providerId
+                    "provider" to providerId
                 )
             )
         }
@@ -64,7 +65,7 @@ class SearchFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        providerId = requireArguments().getString("providerId")!!
+        providerId = requireArguments().getParcelable<ProviderInfo>("provider")!!.id
 
         setupMenu(binding.toolbar.menu)
         binding.toolbar.setOnMenuItemClickListener(this::onMenuItemSelected)

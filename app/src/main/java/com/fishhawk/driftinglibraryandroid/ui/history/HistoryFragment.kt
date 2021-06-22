@@ -15,8 +15,10 @@ import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataOutline
+import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
+import java.security.Provider
 
 class HistoryFragment : Fragment() {
     private lateinit var binding: HistoryFragmentBinding
@@ -38,7 +40,7 @@ class HistoryFragment : Fragment() {
                             MetadataOutline(title, null, null),
                             null
                         ),
-                        "providerId" to providerId
+                        "provider" to providerId?.let { ProviderInfo(it, it, "", "") }
                     )
                 )
             }
