@@ -84,12 +84,17 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:textIsSelectable="false"
-                        android:visibility="gone"
-                        app:layout_constraintBottom_toTopOf="@+id/status"
+                        app:layout_constraintBottom_toTopOf="@+id/author_bottom"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        tools:text="Sample author"
-                        tools:visibility="visible" />
+                        tools:text="Sample author" />
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/author_bottom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="top"
+                        app:constraint_referenced_ids="status,provider" />
 
                     <TextView
                         android:id="@+id/status"
@@ -100,11 +105,9 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:textIsSelectable="false"
-                        android:visibility="gone"
                         app:layout_constraintBottom_toTopOf="@+id/read_button"
                         app:layout_constraintStart_toStartOf="parent"
-                        tools:text="Completed"
-                        tools:visibility="visible" />
+                        tools:text="Completed" />
 
                     <TextView
                         android:id="@+id/provider"
@@ -116,12 +119,10 @@
                         android:ellipsize="end"
                         android:maxLines="1"
                         android:textIsSelectable="false"
-                        android:visibility="gone"
                         app:layout_constraintBottom_toTopOf="@+id/read_button"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@+id/status"
-                        tools:text="Provider"
-                        tools:visibility="visible" />
+                        tools:text="Provider" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/read_button"
@@ -140,11 +141,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:insetBottom="0dp"
-                        android:visibility="gone"
                         app:icon="@drawable/ic_baseline_library_add_24"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/read_button"
-                        tools:visibility="visible" />
+                        app:layout_constraintStart_toEndOf="@id/read_button" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>

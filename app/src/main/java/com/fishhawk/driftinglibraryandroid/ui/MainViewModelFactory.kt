@@ -67,8 +67,8 @@ class MainViewModelFactory constructor(
                     application.remoteLibraryRepository,
                     application.remoteProviderRepository,
                     application.readingHistoryRepository,
-                    bundle.getParcelable<MangaOutline>("outline")!!.id,
-                    bundle.getParcelable<ProviderInfo>("provider")?.id,
+                    bundle.getParcelable("outline")!!,
+                    bundle.getParcelable("provider"),
                 )
 
             else ->

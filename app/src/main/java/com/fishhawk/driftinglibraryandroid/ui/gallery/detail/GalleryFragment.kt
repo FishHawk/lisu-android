@@ -75,20 +75,16 @@ class GalleryFragment : Fragment() {
         })
     }
 
-    private var provider: ProviderInfo? = null
-
     private val tagAdapter = TagGroupListAdapter(object : TagGroupListAdapter.Listener {
         override fun onTagClick(key: String, value: String) {
             val keywords = if (key.isBlank()) value else "${key}:$value"
-            provider?.let {
-                findNavController().navigate(
-                    R.id.action_to_provider_search,
-                    bundleOf(
-                        "keywords" to keywords,
-                        "provider" to it
-                    )
+            if (viewModel.isFromProvider) findNavController().navigate(
+                R.id.action_to_provider_search,
+                bundleOf(
+                    "keywords" to keywords,
+                    "provider" to viewModel.provider!!
                 )
-            } ?: findNavController().navigate(
+            ) else findNavController().navigate(
                 R.id.action_to_library,
                 bundleOf("keywords" to keywords)
             )
@@ -124,14 +120,15 @@ class GalleryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         bindToFeedbackViewModel(viewModel)
 
-        provider = requireArguments().getParcelable("provider")
-        val outline: MangaOutline = requireArguments().getParcelable("outline")!!
+        setupThumb(viewModel.outline.thumb)
+        setupTitle(viewModel.outline.title)
+        setupAuthors(viewModel.outline.metadata.authors)
+        setupStatus(viewModel.outline.metadata.status)
+        setupProvider(viewModel.provider)
 
-        setupThumb(outline.thumb)
-        setupTitle(outline.title)
-        setupAuthors(outline.metadata.authors)
-        setupStatus(outline.metadata.status)
-        setupProvider(provider)
+        binding.provider.isVisible = viewModel.isFromProvider
+        binding.libraryAddButton.isVisible = viewModel.isFromProvider
+        thumbSheet.isFromProvider = viewModel.isFromProvider
 
         binding.title.setOnClickListener {
             findNavController().navigate(
@@ -172,7 +169,6 @@ class GalleryFragment : Fragment() {
             }
         }
 
-        binding.libraryAddButton.isVisible = provider != null
         binding.libraryAddButton.setOnClickListener {
             viewModel.addMangaToLibrary(false)
         }
@@ -196,7 +192,7 @@ class GalleryFragment : Fragment() {
 
         binding.tags.adapter = tagAdapter
 
-        val contentAdapter = ContentAdapter(this, outline.id, provider?.id)
+        val contentAdapter = ContentAdapter(this, viewModel.mangaId, viewModel.providerId)
         binding.chapters.adapter = contentAdapter
 
         binding.displayModeButton.setOnClickListener {
@@ -290,10 +286,7 @@ class GalleryFragment : Fragment() {
     }
 
     private fun setupProvider(provider: ProviderInfo?) {
-        val isFromProvider = (provider != null)
-        binding.provider.isVisible = isFromProvider
-        binding.provider.text = provider?.let { "${it.name}(${it.lang})" }
-        thumbSheet.isFromProvider = isFromProvider
+        binding.provider.text = provider?.title
     }
 
     private fun updateDescriptionHint() = binding.description.doOnLayout {

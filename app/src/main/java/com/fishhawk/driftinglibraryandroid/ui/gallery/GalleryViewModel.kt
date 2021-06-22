@@ -13,6 +13,8 @@ import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataDetail
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import kotlinx.coroutines.launch
 import okhttp3.RequestBody
@@ -21,9 +23,13 @@ class GalleryViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
     private val readingHistoryRepository: ReadingHistoryRepository,
-    private val mangaId: String,
-    private val providerId: String?
+    val outline: MangaOutline,
+    val provider: ProviderInfo?
 ) : FeedbackViewModel() {
+
+    val mangaId = outline.id
+    val providerId = provider?.id
+    val isFromProvider = provider != null
 
     private val _detail: MutableLiveData<Result<MangaDetail>?> = MutableLiveData(null)
     val detail: LiveData<Result<MangaDetail>?> = _detail
@@ -39,9 +45,9 @@ class GalleryViewModel(
     private fun loadManga() {
         _detail.value = null
         viewModelScope.launch {
-            _detail.value = providerId?.let {
-                remoteProviderRepository.getManga(it, mangaId)
-            } ?: remoteLibraryRepository.getManga(mangaId)
+            _detail.value =
+                if (providerId == null) remoteLibraryRepository.getManga(mangaId)
+                else remoteProviderRepository.getManga(providerId, mangaId)
         }
     }
 
