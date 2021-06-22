@@ -37,14 +37,14 @@ abstract class ProviderBaseFragment : Fragment() {
 
     private val optionAdapter = OptionGroupListAdapter(object : OptionGroupListAdapter.Listener {
         override fun onOptionSelect(name: String, index: Int) {
-            providerBrowseHistory.setOptionHistory(viewModel.providerId.value!!, page, name, index)
+            providerBrowseHistory.setOptionHistory(viewModel.provider.id, page, name, index)
             mangaListComponent.selectOption(name, index)
         }
     })
 
     private val actionAdapter = object : ProviderActionSheet.Listener {
         override fun onReadClick(outline: MangaOutline, provider: String) {
-            navToReaderActivity(outline.id, viewModel.providerId.value!!, 0, 0, 0)
+            navToReaderActivity(outline.id, viewModel.provider.id, 0, 0, 0)
         }
 
         override fun onLibraryAddClick(outline: MangaOutline, provider: String) {
@@ -58,7 +58,7 @@ abstract class ProviderBaseFragment : Fragment() {
                 R.id.action_to_gallery_detail,
                 bundleOf(
                     "outline" to outline,
-                    "provider" to viewModel.detail.value!!.map { it }
+                    "provider" to viewModel.provider
                 )
             )
         }
@@ -67,7 +67,7 @@ abstract class ProviderBaseFragment : Fragment() {
             ProviderActionSheet(
                 requireContext(),
                 outline,
-                viewModel.providerId.value!!,
+                viewModel.provider.id,
                 actionAdapter
             ).show()
         }
@@ -113,7 +113,7 @@ abstract class ProviderBaseFragment : Fragment() {
                     optionAdapter.setList(model.map { (name, options) ->
                         val selectedIndex =
                             providerBrowseHistory.getOptionHistory(
-                                viewModel.providerId.value!!, page, name
+                                viewModel.provider.id, page, name
                             )
                         option[name] = selectedIndex
                         OptionGroup(name, options, selectedIndex)

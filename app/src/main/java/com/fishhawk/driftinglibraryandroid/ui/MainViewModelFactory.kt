@@ -5,7 +5,6 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.fishhawk.driftinglibraryandroid.MainApplication
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.explore.ExploreViewModel
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
@@ -45,7 +44,7 @@ class MainViewModelFactory constructor(
                 ProviderViewModel(
                     application.remoteLibraryRepository,
                     application.remoteProviderRepository,
-                    bundle.getParcelable<ProviderInfo>("provider")!!.id,
+                    bundle.getParcelable("provider")!!
                 )
 
             isAssignableFrom(SearchViewModel::class.java) ->

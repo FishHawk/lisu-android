@@ -5,17 +5,27 @@ import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderPagerFragmentBinding
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.preference.ProviderBrowseHistory
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.getDisplayModeIcon
 import com.fishhawk.driftinglibraryandroid.util.setNext
 
 class ProviderPagerFragment : Fragment() {
     private lateinit var binding: ProviderPagerFragmentBinding
+    private val viewModel: ProviderViewModel by viewModels {
+        MainViewModelFactory(
+            requireActivity().application as MainApplication,
+            requireArguments()
+        )
+    }
+
     private lateinit var providerBrowseHistory: ProviderBrowseHistory
 
     override fun onCreateView(
@@ -27,15 +37,12 @@ class ProviderPagerFragment : Fragment() {
         return binding.root
     }
 
-    val provider: ProviderInfo by lazy { requireArguments().getParcelable("provider")!! }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         providerBrowseHistory = ProviderBrowseHistory(requireContext())
 
-
         setupMenu(binding.toolbar.menu)
         binding.toolbar.setOnMenuItemClickListener(this::onMenuItemSelected)
-        binding.toolbar.title = provider.name
+        binding.toolbar.title = viewModel.provider.title
         binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
 
@@ -46,13 +53,13 @@ class ProviderPagerFragment : Fragment() {
             requireArguments()
         )
         binding.viewPager.currentItem =
-            providerBrowseHistory.getPageHistory(provider.id).coerceIn(0, 2)
+            providerBrowseHistory.getPageHistory(viewModel.provider.id).coerceIn(0, 2)
         binding.tabs.setupWithViewPager(binding.viewPager)
     }
 
     override fun onPause() {
         super.onPause()
-        providerBrowseHistory.setPageHistory(provider.id, binding.viewPager.currentItem)
+        providerBrowseHistory.setPageHistory(viewModel.provider.id, binding.viewPager.currentItem)
     }
 
     private fun setupMenu(menu: Menu) {

@@ -7,6 +7,7 @@ import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderDetail
+import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.RemotePagingList
 import kotlinx.coroutines.CoroutineScope
@@ -46,34 +47,30 @@ class ProviderMangaListComponent(
 class ProviderViewModel(
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
-    argProviderId: String
+    val provider: ProviderInfo
 ) : FeedbackViewModel() {
 
-    val providerId: MutableLiveData<String> = MutableLiveData(argProviderId)
-
-    val detail: LiveData<Result<ProviderDetail>?> = providerId.switchMap {
-        liveData {
-            emit(null)
-            emit(remoteProviderRepository.getProvider(it))
-        }
+    val detail: LiveData<Result<ProviderDetail>?> = liveData {
+        emit(null)
+        emit(remoteProviderRepository.getProvider(provider.id))
     }
 
     val popularMangaList = ProviderMangaListComponent(viewModelScope) { page, option ->
-        remoteProviderRepository.listPopularManga(providerId.value!!, page, option)
+        remoteProviderRepository.listPopularManga(provider.id, page, option)
     }
 
     val latestMangaList = ProviderMangaListComponent(viewModelScope) { page, option ->
-        remoteProviderRepository.listLatestManga(providerId.value!!, page, option)
+        remoteProviderRepository.listLatestManga(provider.id, page, option)
     }
 
     val categoryMangaList = ProviderMangaListComponent(viewModelScope) { page, option ->
-        remoteProviderRepository.listCategoryManga(providerId.value!!, page, option)
+        remoteProviderRepository.listCategoryManga(provider.id, page, option)
     }
 
     fun addToLibrary(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
         val result = remoteLibraryRepository.createManga(
             targetMangaId,
-            providerId.value!!,
+            provider.id,
             sourceMangaId,
             true
         )
