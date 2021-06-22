@@ -23,6 +23,16 @@ class GlobalSearchFragment : Fragment() {
 
     private val adapter = GlobalSearchGroupListAdapter(
         object : GlobalSearchGroupListAdapter.Listener {
+            override fun onForward(info: ProviderInfo) {
+                findNavController().navigate(
+                    R.id.action_to_provider_search,
+                    bundleOf(
+                        "keywords" to viewModel.keywords.value,
+                        "providerId" to info.id
+                    )
+                )
+            }
+
             override fun onItemClicked(info: ProviderInfo, outline: MangaOutline) {
                 findNavController().navigate(
                     R.id.action_to_gallery_detail,

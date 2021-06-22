@@ -67,5 +67,9 @@
         <action
             android:id="@+id/action_to_gallery_detail"
             app:destination="@id/nav_graph_gallery_internal" />
+
+        <action
+            android:id="@+id/action_to_provider_search"
+            app:destination="@id/nav_search" />
     </fragment>
 </navigation>

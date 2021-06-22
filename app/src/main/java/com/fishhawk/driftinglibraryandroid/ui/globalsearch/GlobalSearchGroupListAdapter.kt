@@ -32,6 +32,7 @@ class GlobalSearchGroupListAdapter(
         @SuppressLint("SetTextI18n")
         override fun bind(item: SearchGroup, position: Int) {
             binding.provider.text = "${item.provider.lang} - ${item.provider.name}"
+            binding.forwardButton.setOnClickListener { listener.onForward(item.provider) }
 
             val adapter = GlobalSearchGroupAdapter(object : GlobalSearchGroupAdapter.Listener {
                 override fun onItemClicked(outline: MangaOutline) {
@@ -54,6 +55,7 @@ class GlobalSearchGroupListAdapter(
     }
 
     interface Listener {
+        fun onForward(info: ProviderInfo)
         fun onItemClicked(info: ProviderInfo, outline: MangaOutline)
     }
 }
