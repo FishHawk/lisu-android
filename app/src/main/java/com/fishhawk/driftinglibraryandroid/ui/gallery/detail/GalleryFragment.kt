@@ -132,12 +132,24 @@ class GalleryFragment : Fragment() {
         setupStatus(outline.metadata.status)
         setupProvider(providerId)
 
+        binding.title.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_to_global_search,
+                bundleOf("keywords" to binding.title.text)
+            )
+        }
         binding.title.setOnLongClickListener {
             copyToClipboard(binding.title.text as String)
             makeToast(R.string.toast_manga_title_copied)
             true
         }
 
+        binding.author.setOnClickListener {
+            findNavController().navigate(
+                R.id.action_to_global_search,
+                bundleOf("keywords" to binding.author.text)
+            )
+        }
         binding.author.setOnLongClickListener {
             copyToClipboard(binding.author.text as String)
             makeToast(R.string.toast_manga_author_copied)

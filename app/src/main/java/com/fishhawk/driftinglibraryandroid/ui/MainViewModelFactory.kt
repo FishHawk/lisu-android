@@ -35,7 +35,10 @@ class MainViewModelFactory constructor(
                 ExploreViewModel(application.remoteProviderRepository)
 
             isAssignableFrom(GlobalSearchViewModel::class.java) ->
-                GlobalSearchViewModel(application.remoteProviderRepository)
+                GlobalSearchViewModel(
+                    application.remoteProviderRepository,
+                    bundle.getString("keywords")!!
+                )
 
             isAssignableFrom(ProviderViewModel::class.java) ->
                 ProviderViewModel(

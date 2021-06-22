@@ -7,9 +7,11 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import kotlinx.coroutines.launch
 
 class GlobalSearchViewModel(
-    private val remoteLibraryRepository: RemoteProviderRepository
+    private val remoteLibraryRepository: RemoteProviderRepository,
+    argKeywords: String
 ) : ViewModel() {
-    val keywords: MutableLiveData<String> = MutableLiveData("")
+
+    val keywords = MutableLiveData(argKeywords)
 
     private val providerList: LiveData<Result<List<ProviderInfo>>?> = liveData {
         emit(null)

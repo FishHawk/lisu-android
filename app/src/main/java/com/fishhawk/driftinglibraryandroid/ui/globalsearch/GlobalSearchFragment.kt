@@ -18,7 +18,7 @@ import com.fishhawk.driftinglibraryandroid.ui.base.closeInputMethod
 class GlobalSearchFragment : Fragment() {
     private lateinit var binding: GlobalSearchFragmentBinding
     private val viewModel: GlobalSearchViewModel by viewModels {
-        MainViewModelFactory(requireActivity().application as MainApplication)
+        MainViewModelFactory(requireActivity().application as MainApplication, requireArguments())
     }
 
     private val adapter = GlobalSearchGroupListAdapter(
@@ -45,9 +45,6 @@ class GlobalSearchFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        if (viewModel.keywords.value.isNullOrBlank())
-            viewModel.keywords.value = arguments?.getString("keywords")!!
-
         setupMenu(binding.toolbar.menu)
         binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
@@ -58,18 +55,19 @@ class GlobalSearchFragment : Fragment() {
     }
 
     private fun setupMenu(menu: Menu) {
-        val searchView = menu.findItem(R.id.action_search_global).actionView as SearchView
-        searchView.queryHint = getString(R.string.menu_search_global_hint)
-        searchView.maxWidth = Int.MAX_VALUE
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                viewModel.keywords.value = query
-                closeInputMethod()
-                return true
-            }
+        with(menu.findItem(R.id.action_search_global).actionView as SearchView) {
+            queryHint = getString(R.string.menu_search_global_hint)
+            maxWidth = Int.MAX_VALUE
+            setQuery(viewModel.keywords.value, false)
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    viewModel.keywords.value = query
+                    closeInputMethod()
+                    return true
+                }
 
-            override fun onQueryTextChange(query: String): Boolean = true
-        })
-        searchView.setQuery(viewModel.keywords.value, false)
+                override fun onQueryTextChange(query: String): Boolean = true
+            })
+        }
     }
 }
