@@ -2,6 +2,7 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery.detail
 
 import android.content.Context
 import android.view.LayoutInflater
+import androidx.core.view.isVisible
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryThumbSheetBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
@@ -13,28 +14,64 @@ class GalleryThumbSheet(
         LayoutInflater.from(context), null, false
     )
 
+    var isFromProvider = false
+        set(value) {
+            field = value
+            updateVisibility()
+        }
+
+    var hasSource = false
+        set(value) {
+            field = value
+            updateVisibility()
+        }
+
+    private fun updateVisibility() {
+        binding.editCoverButton.isVisible = !isFromProvider
+        binding.syncSourceButton.isVisible = !isFromProvider && hasSource
+        binding.deleteSourceButton.isVisible = !isFromProvider && hasSource
+    }
+
     init {
         setContentView(binding.root)
 
-        binding.editButton.setOnClickListener {
-            listener.onEdit()
+        binding.syncSourceButton.setOnClickListener {
+            listener.onSyncSource()
             dismiss()
         }
 
-        binding.saveButton.setOnClickListener {
-            listener.onSave()
+        binding.deleteSourceButton.setOnClickListener {
+            listener.onDeleteSource()
             dismiss()
         }
 
-        binding.shareButton.setOnClickListener {
-            listener.onShare()
+        binding.editMetadataButton.setOnClickListener {
+            listener.onEditMetadata()
+            dismiss()
+        }
+
+        binding.editCoverButton.setOnClickListener {
+            listener.onEditCover()
+            dismiss()
+        }
+
+        binding.saveCoverButton.setOnClickListener {
+            listener.onSaveCover()
+            dismiss()
+        }
+
+        binding.shareCoverButton.setOnClickListener {
+            listener.onShareCover()
             dismiss()
         }
     }
 
     interface Listener {
-        fun onEdit()
-        fun onSave()
-        fun onShare()
+        fun onSyncSource()
+        fun onDeleteSource()
+        fun onEditMetadata()
+        fun onEditCover()
+        fun onSaveCover()
+        fun onShareCover()
     }
 }

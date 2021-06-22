@@ -8,7 +8,31 @@
     android:padding="16dp">
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/edit_button"
+        android:id="@+id/sync_source_button"
+        style="@style/Theme.Widget.Button.TextButton.NoColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sync source"
+        app:icon="@drawable/ic_baseline_refresh_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/delete_source_button"
+        style="@style/Theme.Widget.Button.TextButton.NoColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete source"
+        app:icon="@drawable/ic_baseline_delete_forever_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/edit_metadata_button"
+        style="@style/Theme.Widget.Button.TextButton.NoColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Edit metadata"
+        app:icon="@drawable/ic_baseline_edit_24" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/edit_cover_button"
         style="@style/Theme.Widget.Button.TextButton.NoColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,7 +40,7 @@
         app:icon="@drawable/ic_baseline_edit_24" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/save_button"
+        android:id="@+id/save_cover_button"
         style="@style/Theme.Widget.Button.TextButton.NoColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,7 +48,7 @@
         app:icon="@drawable/ic_baseline_refresh_24" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/share_button"
+        android:id="@+id/share_cover_button"
         style="@style/Theme.Widget.Button.TextButton.NoColor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

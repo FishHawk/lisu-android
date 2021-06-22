@@ -39,6 +39,42 @@ class GalleryFragment : Fragment() {
         MainViewModelFactory(requireActivity().application as MainApplication, requireArguments())
     }
 
+    private val thumbSheet by lazy {
+        GalleryThumbSheet(requireContext(), object : GalleryThumbSheet.Listener {
+            override fun onSyncSource() {
+                viewModel.syncSource()
+            }
+
+            override fun onDeleteSource() {
+                viewModel.deleteSource()
+            }
+
+            override fun onEditMetadata() {
+                findNavController().navigate(R.id.action_to_gallery_edit)
+            }
+
+            override fun onEditCover() {
+                pickPictureLauncher.launch("image/*")
+            }
+
+            override fun onSaveCover() {
+                val detail = (viewModel.detail.value as? Result.Success)?.data
+                    ?: return makeToast(R.string.toast_manga_not_loaded)
+                val url = detail.thumb
+                    ?: return makeToast(R.string.toast_manga_no_cover)
+                saveImage(url, "${detail.id}-thumb")
+            }
+
+            override fun onShareCover() {
+                val detail = (viewModel.detail.value as? Result.Success)?.data
+                    ?: return makeToast(R.string.toast_manga_not_loaded)
+                val url = detail.thumb
+                    ?: return makeToast(R.string.toast_manga_no_cover)
+                shareImage(url, "${detail.id}-thumb")
+            }
+        })
+    }
+
     private var providerId: String? = null
     private val tagAdapter = TagGroupListAdapter(object : TagGroupListAdapter.Listener {
         override fun onTagClick(key: String, value: String) {
@@ -132,41 +168,7 @@ class GalleryFragment : Fragment() {
             true
         }
 
-        if (providerId == null) binding.backdrop.setOnLongClickListener {
-            findNavController().navigate(R.id.action_to_gallery_edit)
-            true
-        }
-
-        binding.thumbCard.setOnLongClickListener {
-            GalleryThumbSheet(requireContext(), object : GalleryThumbSheet.Listener {
-                override fun onEdit() {
-                    pickPictureLauncher.launch("image/*")
-                }
-
-                override fun onSave() {
-                    val detail = (viewModel.detail.value as? Result.Success)?.data
-                        ?: return makeToast(R.string.toast_manga_not_loaded)
-                    val url = detail.thumb
-                        ?: return makeToast(R.string.toast_manga_no_cover)
-                    saveImage(url, "${detail.id}-thumb")
-                }
-
-                override fun onShare() {
-                    val detail = (viewModel.detail.value as? Result.Success)?.data
-                        ?: return makeToast(R.string.toast_manga_not_loaded)
-                    val url = detail.thumb
-                        ?: return makeToast(R.string.toast_manga_no_cover)
-                    shareImage(url, "${detail.id}-thumb")
-                }
-            }).show()
-
-            true
-        }
-
-        binding.source.setOnLongClickListener {
-            viewModel.syncSource()
-            true
-        }
+        binding.thumbCard.setOnClickListener { thumbSheet.show() }
 
         binding.description.setOnClickListener {
             binding.description.maxLines =
@@ -278,6 +280,7 @@ class GalleryFragment : Fragment() {
         val isFromProvider = (providerId != null)
         binding.provider.isVisible = isFromProvider
         binding.provider.text = providerId
+        thumbSheet.isFromProvider = isFromProvider
     }
 
     private fun updateDescriptionHint() = binding.description.doOnLayout {
@@ -301,7 +304,9 @@ class GalleryFragment : Fragment() {
 
     private fun setupSource(source: Source?) {
         binding.source.isVisible = source != null
+        thumbSheet.hasSource = source != null
         if (source == null) return
+
         binding.source.text = "From ${source.providerId} - ${source.mangaId} ${source.state}"
 
         when (source.state) {
