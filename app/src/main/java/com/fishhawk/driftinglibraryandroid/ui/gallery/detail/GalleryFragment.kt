@@ -39,7 +39,7 @@ class GalleryFragment : Fragment() {
     }
 
     private val coverSheet by lazy {
-        GalleryThumbSheet(requireContext(), object : GalleryThumbSheet.Listener {
+        GalleryCoverSheet(requireContext(), object : GalleryCoverSheet.Listener {
             override fun onSyncSource() {
                 viewModel.syncSource()
             }
@@ -103,7 +103,7 @@ class GalleryFragment : Fragment() {
             val type =
                 uri?.let { requireContext().contentResolver.getType(uri)?.toMediaTypeOrNull() }
             if (content != null && type != null)
-                viewModel.updateThumb(content.toRequestBody(type))
+                viewModel.updateCover(content.toRequestBody(type))
         }
 
     override fun onCreateView(
@@ -119,7 +119,7 @@ class GalleryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         bindToFeedbackViewModel(viewModel)
 
-        setupThumb(viewModel.outline.cover)
+        setupCover(viewModel.outline.cover)
         setupTitle(viewModel.outline.title)
         setupAuthors(viewModel.outline.metadata.authors)
         setupStatus(viewModel.outline.metadata.status)
@@ -226,7 +226,7 @@ class GalleryFragment : Fragment() {
                     binding.multiStateView.viewState = ViewState.Content
 
                     val detail = result.data
-                    setupThumb(detail.cover)
+                    setupCover(detail.cover)
                     setupTitle(detail.title)
                     setupAuthors(detail.metadata.authors)
                     setupStatus(detail.metadata.status)
@@ -250,7 +250,7 @@ class GalleryFragment : Fragment() {
         }
     }
 
-    private fun setupThumb(cover: String?) {
+    private fun setupCover(cover: String?) {
         if (cover == null) return
         Glide.with(this)
             .load(cover)

@@ -90,12 +90,12 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
         it.syncMangaSource(mangaId)
     }
 
-    suspend fun updateMangaThumb(
+    suspend fun updateMangaCover(
         mangaId: String,
         requestBody: RequestBody
     ): Result<MangaDetail> =
         resultWrap {
-            it.updateMangaThumb(mangaId, requestBody).apply {
+            it.updateMangaCover(mangaId, requestBody).apply {
                 cover = "${url}library/mangas/${mangaId}/cover"
             }
         }

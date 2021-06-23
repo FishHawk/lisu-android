@@ -55,10 +55,10 @@ class GalleryViewModel(
         loadManga()
     }
 
-    fun updateThumb(requestBody: RequestBody) = viewModelScope.launch {
+    fun updateCover(requestBody: RequestBody) = viewModelScope.launch {
         (detail.value as? Result.Success)?.let {
             val id = it.data.id
-            val result = remoteLibraryRepository.updateMangaThumb(id, requestBody)
+            val result = remoteLibraryRepository.updateMangaCover(id, requestBody)
             resultWarp(result) {
                 _detail.value = result
                 feed(R.string.toast_manga_cover_updated)

@@ -50,13 +50,13 @@ class HistoryListAdapter(
                 .apply(RequestOptions().dontTransform())
                 .into(binding.cover)
 
-            binding.cover.setOnClickListener { listener.onThumbClicked(item) }
+            binding.cover.setOnClickListener { listener.onCoverClicked(item) }
             binding.root.setOnClickListener { listener.onCardClicked(item) }
         }
     }
 
     interface Listener {
-        fun onThumbClicked(history: ReadingHistory)
+        fun onCoverClicked(history: ReadingHistory)
         fun onCardClicked(history: ReadingHistory)
     }
 }

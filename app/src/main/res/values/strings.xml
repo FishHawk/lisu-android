@@ -96,7 +96,7 @@
 
     <!-- setting reader fragment -->
     <string name="settings_clear_image_cache">Clear image cache</string>
-    <string name="settings_clear_image_cache_summary">Clear thumb and chapter image cache</string>
+    <string name="settings_clear_image_cache_summary">Clear cover and chapter image cache</string>
 
     <string name="settings_secure_mode">Secure mode</string>
     <string name="settings_secure_mode_summary">Hide app contents when switch apps and block screenshots</string>
@@ -140,8 +140,8 @@
     <string name="page_action_share">Share image</string>
     <string name="page_action_save">Save image</string>
 
-    <string name="thumb_action_read">Read</string>
-    <string name="thumb_action_library_add">Add to library</string>
+    <string name="cover_action_read">Read</string>
+    <string name="cover_action_library_add">Add to library</string>
 
 
     <!-- toast -->

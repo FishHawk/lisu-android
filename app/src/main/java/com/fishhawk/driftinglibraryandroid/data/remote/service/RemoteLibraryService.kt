@@ -56,7 +56,7 @@ interface RemoteLibraryService {
 
     @Multipart
     @PUT("/library/mangas/{mangaId}/cover")
-    suspend fun updateMangaThumb(
+    suspend fun updateMangaCover(
         @Path("mangaId") mangaId: String,
         @Part("cover\"; filename=\"cover\" ") cover: RequestBody
     ): MangaDetail

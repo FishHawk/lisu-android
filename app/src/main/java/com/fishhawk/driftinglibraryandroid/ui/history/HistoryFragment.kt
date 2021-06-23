@@ -25,7 +25,7 @@ class HistoryFragment : Fragment() {
     }
 
     val adapter = HistoryListAdapter(object : HistoryListAdapter.Listener {
-        override fun onThumbClicked(history: ReadingHistory) {
+        override fun onCoverClicked(history: ReadingHistory) {
             with(history) {
                 findNavController().navigate(
                     R.id.action_to_gallery_detail,

@@ -3,14 +3,14 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery.detail
 import android.content.Context
 import android.view.LayoutInflater
 import androidx.core.view.isVisible
-import com.fishhawk.driftinglibraryandroid.databinding.GalleryThumbSheetBinding
+import com.fishhawk.driftinglibraryandroid.databinding.GalleryCoverSheetBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
-class GalleryThumbSheet(
+class GalleryCoverSheet(
     context: Context,
     private val listener: Listener
 ) : BottomSheetDialog(context) {
-    private val binding = GalleryThumbSheetBinding.inflate(
+    private val binding = GalleryCoverSheetBinding.inflate(
         LayoutInflater.from(context), null, false
     )
 
