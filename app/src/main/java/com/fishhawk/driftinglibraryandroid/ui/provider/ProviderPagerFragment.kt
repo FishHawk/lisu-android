@@ -70,7 +70,7 @@ class ProviderPagerFragment : Fragment() {
                     findNavController().navigate(
                         R.id.action_to_search,
                         bundleOf(
-                            "provider" to viewModel.provider.id,
+                            "provider" to viewModel.provider,
                             "keywords" to query
                         )
                     )
