@@ -35,7 +35,7 @@ data class MetadataDetail(
 data class MangaDetail(
     val provider: ProviderInfo?,
     val id: String,
-    var thumb: String?,
+    var cover: String?,
     val updateTime: Long?,
     val source: Source?,
     val metadata: MetadataDetail,

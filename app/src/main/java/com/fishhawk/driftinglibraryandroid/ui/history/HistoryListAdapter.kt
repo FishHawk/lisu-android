@@ -44,13 +44,13 @@ class HistoryListAdapter(
             binding.seen.text = seenHint
             binding.date.text = dateFormat.format(Date(item.date))
 
-            Glide.with(itemView.context).load(item.thumb)
+            Glide.with(itemView.context).load(item.cover)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                 .override(300, 400)
                 .apply(RequestOptions().dontTransform())
-                .into(binding.thumb)
+                .into(binding.cover)
 
-            binding.thumb.setOnClickListener { listener.onThumbClicked(item) }
+            binding.cover.setOnClickListener { listener.onThumbClicked(item) }
             binding.root.setOnClickListener { listener.onCardClicked(item) }
         }
     }

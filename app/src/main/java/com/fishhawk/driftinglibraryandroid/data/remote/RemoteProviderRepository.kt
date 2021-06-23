@@ -68,7 +68,7 @@ class RemoteProviderRepository : BaseRemoteRepository<RemoteProviderService>() {
     suspend fun getManga(providerId: String, mangaId: String): Result<MangaDetail> =
         resultWrap { service ->
             service.getManga(providerId, mangaId)
-                .apply { thumb = thumb?.let { processImageUrl(providerId, it) } }
+                .apply { cover = cover?.let { processImageUrl(providerId, it) } }
         }
 
     suspend fun getChapterContent(
@@ -82,7 +82,7 @@ class RemoteProviderRepository : BaseRemoteRepository<RemoteProviderService>() {
         }
 
     private fun processMangaOutline(providerId: String, outline: MangaOutline): MangaOutline {
-        outline.thumb = outline.thumb?.let { processImageUrl(providerId, it) }
+        outline.cover = outline.cover?.let { processImageUrl(providerId, it) }
         return outline
     }
 

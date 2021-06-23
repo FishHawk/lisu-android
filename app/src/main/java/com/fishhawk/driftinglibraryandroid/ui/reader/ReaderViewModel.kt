@@ -206,7 +206,7 @@ class ReaderViewModel(
                     mangaDetail.id,
                     GlobalPreference.selectedServer.get(),
                     mangaDetail.title,
-                    mangaDetail.thumb ?: "",
+                    mangaDetail.cover ?: "",
                     mangaDetail.provider?.id,
                     Calendar.getInstance().time.time,
                     collectionId,

@@ -13,7 +13,7 @@ data class MetadataOutline(
 @Parcelize
 data class MangaOutline(
     val id: String,
-    var thumb: String?,
+    var cover: String?,
     val updateTime: Long?,
     val source: Source?,
     val metadata: MetadataOutline,

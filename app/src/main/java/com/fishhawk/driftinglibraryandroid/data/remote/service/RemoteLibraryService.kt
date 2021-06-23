@@ -55,10 +55,10 @@ interface RemoteLibraryService {
     suspend fun syncMangaSource(@Path("mangaId") mangaId: String)
 
     @Multipart
-    @PUT("/library/mangas/{mangaId}/thumb")
+    @PUT("/library/mangas/{mangaId}/cover")
     suspend fun updateMangaThumb(
         @Path("mangaId") mangaId: String,
-        @Part("thumb\"; filename=\"thumb\" ") thumb: RequestBody
+        @Part("cover\"; filename=\"cover\" ") cover: RequestBody
     ): MangaDetail
 
     @GET("/library/mangas/{mangaId}/chapters/{collectionId}/{chapterId}")

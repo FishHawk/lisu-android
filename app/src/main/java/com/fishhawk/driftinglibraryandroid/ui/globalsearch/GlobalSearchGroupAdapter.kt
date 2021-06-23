@@ -25,9 +25,9 @@ class GlobalSearchGroupAdapter(
         override fun bind(item: MangaOutline, position: Int) {
             binding.title.text = item.title
 
-            Glide.with(itemView.context).load(item.thumb)
+            Glide.with(itemView.context).load(item.cover)
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .into(binding.thumb)
+                .into(binding.cover)
 
             binding.root.setOnClickListener { listener.onItemClicked(item) }
         }

@@ -21,7 +21,7 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
     ): Result<List<MangaOutline>> =
         resultWrap {
             it.listManga(lastTime, keywords, limit).onEach { outline ->
-                outline.thumb = "${url}library/mangas/${outline.id}/thumb"
+                outline.cover = "${url}library/mangas/${outline.id}/cover"
             }
         }
 
@@ -46,7 +46,7 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
             it.getManga(mangaId).apply {
                 val collectionId = collections.firstOrNull()?.id
                 val chapterId = collections.firstOrNull()?.chapters?.firstOrNull()?.id
-                thumb = "${url}library/mangas/${mangaId}/thumb"
+                cover = "${url}library/mangas/${mangaId}/cover"
                 preview = preview?.map { imageId ->
                     makeImageUrl(mangaId, collectionId, chapterId, imageId)
                 }
@@ -62,7 +62,7 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
     ): Result<MangaDetail> =
         resultWrap {
             it.updateMangaMetadata(mangaId, metadata).apply {
-                thumb = "${url}library/mangas/${mangaId}/thumb"
+                cover = "${url}library/mangas/${mangaId}/cover"
             }
         }
 
@@ -96,7 +96,7 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
     ): Result<MangaDetail> =
         resultWrap {
             it.updateMangaThumb(mangaId, requestBody).apply {
-                thumb = "${url}library/mangas/${mangaId}/thumb"
+                cover = "${url}library/mangas/${mangaId}/cover"
             }
         }
 

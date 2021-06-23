@@ -13,7 +13,7 @@
         android:background="@android:color/transparent">
 
         <ImageView
-            android:id="@+id/thumb"
+            android:id="@+id/cover"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:contentDescription="@null"
@@ -45,7 +45,7 @@
             android:ellipsize="end"
             android:maxLines="2"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/thumb"
+            app:layout_constraintStart_toEndOf="@+id/cover"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Sample title" />
 
@@ -59,7 +59,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/thumb"
+            app:layout_constraintStart_toEndOf="@+id/cover"
             app:layout_constraintTop_toBottomOf="@+id/title"
             tools:text="Sample author" />
 
@@ -76,7 +76,7 @@
             android:maxLines="1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/thumb"
+            app:layout_constraintStart_toEndOf="@+id/cover"
             tools:text="2020-06-22" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

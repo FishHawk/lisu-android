@@ -31,7 +31,7 @@
                 android:fitsSystemWindows="true">
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/thumb_card"
+                    android:id="@+id/cover_card"
                     style="@style/Theme.Widget.CardView"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -42,7 +42,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
-                        android:id="@+id/thumb"
+                        android:id="@+id/cover"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:contentDescription="@null"
@@ -55,7 +55,7 @@
                     android:layout_height="match_parent"
                     android:layout_margin="16dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/thumb_card">
+                    app:layout_constraintStart_toEndOf="@+id/cover_card">
 
                     <TextView
                         android:id="@+id/title"

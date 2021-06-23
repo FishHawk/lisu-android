@@ -13,7 +13,7 @@
         android:background="@android:color/transparent">
 
         <ImageView
-            android:id="@+id/thumb"
+            android:id="@+id/cover"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:contentDescription="@null"
@@ -32,7 +32,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/thumb"
+            app:layout_constraintStart_toEndOf="@+id/cover"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -43,7 +43,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
             android:text="@string/history_thumbnail_seen"
-            app:layout_constraintStart_toEndOf="@+id/thumb"
+            app:layout_constraintStart_toEndOf="@+id/cover"
             app:layout_constraintTop_toBottomOf="@+id/title" />
 
         <TextView
@@ -67,7 +67,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
             android:text="@string/history_thumbnail_date"
-            app:layout_constraintStart_toEndOf="@+id/thumb"
+            app:layout_constraintStart_toEndOf="@+id/cover"
             app:layout_constraintTop_toBottomOf="@+id/seen_label" />
 
         <TextView
@@ -91,7 +91,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
             android:text="@string/history_thumbnail_provider"
-            app:layout_constraintStart_toEndOf="@+id/thumb"
+            app:layout_constraintStart_toEndOf="@+id/cover"
             app:layout_constraintTop_toBottomOf="@+id/date_label" />
 
         <TextView

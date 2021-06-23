@@ -16,7 +16,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.Result
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
@@ -39,7 +38,7 @@ class GalleryFragment : Fragment() {
         MainViewModelFactory(this)
     }
 
-    private val thumbSheet by lazy {
+    private val coverSheet by lazy {
         GalleryThumbSheet(requireContext(), object : GalleryThumbSheet.Listener {
             override fun onSyncSource() {
                 viewModel.syncSource()
@@ -60,17 +59,17 @@ class GalleryFragment : Fragment() {
             override fun onSaveCover() {
                 val detail = (viewModel.detail.value as? Result.Success)?.data
                     ?: return makeToast(R.string.toast_manga_not_loaded)
-                val url = detail.thumb
+                val url = detail.cover
                     ?: return makeToast(R.string.toast_manga_no_cover)
-                saveImage(url, "${detail.id}-thumb")
+                saveImage(url, "${detail.id}-cover")
             }
 
             override fun onShareCover() {
                 val detail = (viewModel.detail.value as? Result.Success)?.data
                     ?: return makeToast(R.string.toast_manga_not_loaded)
-                val url = detail.thumb
+                val url = detail.cover
                     ?: return makeToast(R.string.toast_manga_no_cover)
-                shareImage(url, "${detail.id}-thumb")
+                shareImage(url, "${detail.id}-cover")
             }
         })
     }
@@ -120,7 +119,7 @@ class GalleryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         bindToFeedbackViewModel(viewModel)
 
-        setupThumb(viewModel.outline.thumb)
+        setupThumb(viewModel.outline.cover)
         setupTitle(viewModel.outline.title)
         setupAuthors(viewModel.outline.metadata.authors)
         setupStatus(viewModel.outline.metadata.status)
@@ -128,7 +127,7 @@ class GalleryFragment : Fragment() {
 
         binding.provider.isVisible = viewModel.isFromProvider
         binding.libraryAddButton.isVisible = viewModel.isFromProvider
-        thumbSheet.isFromProvider = viewModel.isFromProvider
+        coverSheet.isFromProvider = viewModel.isFromProvider
 
         binding.title.setOnClickListener {
             findNavController().navigate(
@@ -177,7 +176,7 @@ class GalleryFragment : Fragment() {
             true
         }
 
-        binding.thumbCard.setOnClickListener { thumbSheet.show() }
+        binding.coverCard.setOnClickListener { coverSheet.show() }
 
         binding.description.setOnClickListener {
             binding.description.maxLines =
@@ -227,7 +226,7 @@ class GalleryFragment : Fragment() {
                     binding.multiStateView.viewState = ViewState.Content
 
                     val detail = result.data
-                    setupThumb(detail.thumb)
+                    setupThumb(detail.cover)
                     setupTitle(detail.title)
                     setupAuthors(detail.metadata.authors)
                     setupStatus(detail.metadata.status)
@@ -251,16 +250,16 @@ class GalleryFragment : Fragment() {
         }
     }
 
-    private fun setupThumb(thumb: String?) {
-        if (thumb == null) return
+    private fun setupThumb(cover: String?) {
+        if (cover == null) return
         Glide.with(this)
-            .load(thumb)
-            .placeholder(binding.thumb.drawable)
+            .load(cover)
+            .placeholder(binding.cover.drawable)
             .diskCacheStrategy(DiskCacheStrategy.DATA)
-            .into(binding.thumb)
+            .into(binding.cover)
 
         Glide.with(this)
-            .load(thumb)
+            .load(cover)
             .placeholder(binding.backdrop.drawable)
             .diskCacheStrategy(DiskCacheStrategy.DATA)
             .into(binding.backdrop)
@@ -310,7 +309,7 @@ class GalleryFragment : Fragment() {
 
     private fun setupSource(source: Source?) {
         binding.source.isVisible = source != null
-        thumbSheet.hasSource = source != null
+        coverSheet.hasSource = source != null
         if (source == null) return
 
         binding.source.text = "From ${source.providerId} - ${source.mangaId} ${source.state}"
@@ -336,7 +335,7 @@ class GalleryFragment : Fragment() {
         val hasChapter = collections.isNotEmpty()
 
         binding.previewPages.isVisible = hasPreview
-        binding.chapterHeader.isVisible = !hasPreview
+        binding.chapterHeader.isVisible = !hasPreview && hasChapter
         binding.chapters.isVisible = !hasPreview && hasChapter
         binding.noChapterHint.isVisible = !hasPreview && !hasChapter
         if (hasChapter) binding.chapters.collections = collections

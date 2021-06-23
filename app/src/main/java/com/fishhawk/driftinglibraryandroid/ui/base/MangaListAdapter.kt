@@ -47,9 +47,9 @@ class MangaListAdapter(
                 else View.GONE
 
             Glide.with(itemView.context)
-                .load(item.thumb)
+                .load(item.cover)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
-                .into(binding.thumb)
+                .into(binding.cover)
 
             binding.root.setOnClickListener {
                 listener.onCardClick(item)
@@ -85,9 +85,9 @@ class MangaListAdapter(
                 else View.GONE
 
             Glide.with(itemView.context)
-                .load(item.thumb)
+                .load(item.cover)
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
-                .into(binding.thumb)
+                .into(binding.cover)
 
             binding.root.setOnClickListener {
                 listener.onCardClick(item)

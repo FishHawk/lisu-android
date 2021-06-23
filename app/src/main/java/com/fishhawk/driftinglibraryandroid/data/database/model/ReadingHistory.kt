@@ -9,7 +9,7 @@ data class ReadingHistory(
     val serverId: Int,
 
     var title: String,
-    var thumb: String,
+    var cover: String,
     var providerId: String?,
     var date: Long,
 

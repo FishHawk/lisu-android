@@ -9,7 +9,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.HistoryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
@@ -18,7 +17,6 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
-import java.security.Provider
 
 class HistoryFragment : Fragment() {
     private lateinit var binding: HistoryFragmentBinding
@@ -34,7 +32,7 @@ class HistoryFragment : Fragment() {
                     bundleOf(
                         "outline" to MangaOutline(
                             mangaId,
-                            thumb,
+                            cover,
                             null,
                             null,
                             MetadataOutline(title, null, null),
