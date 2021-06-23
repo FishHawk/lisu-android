@@ -67,4 +67,15 @@ interface RemoteLibraryService {
         @Path("collectionId") collectionId: String,
         @Path("chapterId") chapterId: String
     ): List<String>
+
+    @GET("/library/mangas/{mangaId}/chapters/{chapterId}")
+    suspend fun getChapter(
+        @Path("mangaId") mangaId: String,
+        @Path("chapterId") chapterId: String
+    ): List<String>
+
+    @GET("/library/mangas/{mangaId}/chapters/")
+    suspend fun getChapter(
+        @Path("mangaId") mangaId: String
+    ): List<String>
 }

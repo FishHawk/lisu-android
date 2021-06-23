@@ -226,6 +226,7 @@
                     tools:listitem="@layout/gallery_tag_group" />
 
                 <LinearLayout
+                    android:id="@+id/chapter_header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -267,6 +268,15 @@
                     android:layout_marginTop="4dp"
                     android:text="@string/gallery_no_chapters_hint"
                     android:textColor="?attr/colorSecondary" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/preview_pages"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="16dp"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:spanCount="3"
+                    tools:listitem="@layout/gallery_preview_page" />
             </LinearLayout>
         </com.fishhawk.driftinglibraryandroid.widget.MultiStateView>
     </LinearLayout>

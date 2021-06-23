@@ -44,7 +44,12 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
     suspend fun getManga(mangaId: String): Result<MangaDetail> =
         resultWrap {
             it.getManga(mangaId).apply {
+                val collectionId = collections.firstOrNull()?.id
+                val chapterId = collections.firstOrNull()?.chapters?.firstOrNull()?.id
                 thumb = "${url}library/mangas/${mangaId}/thumb"
+                preview = preview?.map { imageId ->
+                    makeImageUrl(mangaId, collectionId, chapterId, imageId)
+                }
             }
         }
 
@@ -101,7 +106,22 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
         chapterId: String
     ): Result<List<String>> =
         resultWrap { service ->
-            service.getChapter(mangaId, collectionId, chapterId)
-                .map { "${url}library/mangas/$mangaId/images/$collectionId/$chapterId/$it" }
+            val content =
+                if (collectionId.isBlank())
+                    if (chapterId.isBlank()) service.getChapter(mangaId)
+                    else service.getChapter(mangaId, chapterId)
+                else service.getChapter(mangaId, collectionId, chapterId)
+            content.map { makeImageUrl(mangaId, collectionId, chapterId, it) }
         }
+
+    private fun makeImageUrl(
+        mangaId: String,
+        collectionId: String?,
+        chapterId: String?,
+        imageId: String
+    ): String {
+        val collectionPath = if (collectionId.isNullOrBlank()) "" else "$collectionId/"
+        val chapterPath = if (chapterId.isNullOrBlank()) "" else "$chapterId/"
+        return "${url}library/mangas/$mangaId/images/$collectionPath$chapterPath$imageId"
+    }
 }

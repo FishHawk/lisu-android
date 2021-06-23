@@ -40,7 +40,7 @@ data class MangaDetail(
     val source: Source?,
     val metadata: MetadataDetail,
     val collections: List<Collection>,
-    val preview: List<String>?
+    var preview: List<String>?
 ) : Parcelable {
     val title
         get() = metadata.title ?: id

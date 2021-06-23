@@ -236,7 +236,7 @@ class GalleryFragment : Fragment() {
                     setupSource(detail.source)
                     setupDescription(detail.metadata.description)
                     setupTags(detail.metadata.tags)
-                    setupCollections(detail.collections)
+                    setupCollections(detail.collections, detail.preview)
                 }
                 is Result.Error ->
                     binding.multiStateView.viewState = ViewState.Error(result.exception)
@@ -331,14 +331,26 @@ class GalleryFragment : Fragment() {
         }
     }
 
-    private fun setupCollections(collections: List<Collection>) {
-        if (collections.isNotEmpty()) {
-            binding.chapters.isVisible = true
-            binding.noChapterHint.isVisible = false
-            binding.chapters.collections = collections
-        } else {
-            binding.chapters.isVisible = false
-            binding.noChapterHint.isVisible = true
-        }
+    private fun setupCollections(collections: List<Collection>, preview: List<String>?) {
+        val hasPreview = collections.size == 1 && !preview.isNullOrEmpty()
+        val hasChapter = collections.isNotEmpty()
+
+        binding.previewPages.isVisible = hasPreview
+        binding.chapterHeader.isVisible = !hasPreview
+        binding.chapters.isVisible = !hasPreview && hasChapter
+        binding.noChapterHint.isVisible = !hasPreview && !hasChapter
+        if (hasChapter) binding.chapters.collections = collections
+        if (hasPreview) binding.previewPages.adapter =
+            PreviewAdapter(object : PreviewAdapter.Listener {
+                override fun onPageClick(page: Int) {
+                    navToReaderActivity(
+                        viewModel.mangaId,
+                        viewModel.provider?.id,
+                        0,
+                        0,
+                        page
+                    )
+                }
+            }).also { it.setList(preview!!) }
     }
 }
