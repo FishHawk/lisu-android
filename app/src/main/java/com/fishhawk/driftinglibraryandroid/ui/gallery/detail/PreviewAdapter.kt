@@ -3,6 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery.detail
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.fishhawk.driftinglibraryandroid.databinding.*
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 
@@ -20,9 +21,10 @@ class PreviewAdapter(
             viewBinding(GalleryPreviewPageBinding::inflate, parent)
         )
 
-        override fun bind(url: String, position: Int) {
+        override fun bind(item: String, position: Int) {
             Glide.with(itemView.context)
-                .load(url)
+                .load(item)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(binding.previewImage)
             binding.root.setOnClickListener { listener.onPageClick(position) }

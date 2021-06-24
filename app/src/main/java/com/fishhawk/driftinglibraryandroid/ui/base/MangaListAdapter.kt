@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.fishhawk.driftinglibraryandroid.databinding.*
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import java.text.SimpleDateFormat
@@ -48,6 +49,7 @@ class MangaListAdapter(
 
             Glide.with(itemView.context)
                 .load(item.cover)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(binding.cover)
 
@@ -86,6 +88,7 @@ class MangaListAdapter(
 
             Glide.with(itemView.context)
                 .load(item.cover)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(binding.cover)
 

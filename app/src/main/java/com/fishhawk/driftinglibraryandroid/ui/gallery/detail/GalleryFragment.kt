@@ -17,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.Result
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
@@ -258,13 +259,13 @@ class GalleryFragment : Fragment() {
         if (cover == null) return
         Glide.with(this)
             .load(cover)
-            .placeholder(binding.cover.drawable)
+            .transition(DrawableTransitionOptions.withCrossFade())
             .diskCacheStrategy(DiskCacheStrategy.DATA)
             .into(binding.cover)
 
         Glide.with(this)
             .load(cover)
-            .placeholder(binding.backdrop.drawable)
+            .transition(DrawableTransitionOptions.withCrossFade())
             .diskCacheStrategy(DiskCacheStrategy.DATA)
             .into(binding.backdrop)
     }
