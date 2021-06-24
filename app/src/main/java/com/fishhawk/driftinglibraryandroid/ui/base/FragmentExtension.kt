@@ -8,7 +8,10 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.TypedValue
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
@@ -177,4 +180,12 @@ fun Fragment.copyToClipboard(text: String) {
 fun Fragment.closeInputMethod() {
     inputMethodManager.hideSoftInputFromWindow(requireView().windowToken, 0)
 }
+
+@ColorInt
+fun Context.resolveAttrColor(@AttrRes attrColor: Int): Int {
+    val typedValue = TypedValue()
+    theme.resolveAttribute(attrColor, typedValue, true)
+    return typedValue.data
+}
+
 

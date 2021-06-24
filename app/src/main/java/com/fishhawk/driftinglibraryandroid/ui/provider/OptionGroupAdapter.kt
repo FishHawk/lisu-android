@@ -1,12 +1,12 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider
 
-import android.util.TypedValue
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ProviderOptionItemBinding
 import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
+import com.fishhawk.driftinglibraryandroid.ui.base.resolveAttrColor
 
 class OptionGroupAdapter(
     private val listener: Listener,
@@ -41,14 +41,12 @@ class OptionGroupAdapter(
 
         override fun bind(item: String, position: Int) {
             binding.root.text = item
-
-            val typedValue = TypedValue()
-            itemView.context.theme.resolveAttribute(
-                if (position == selectedOptionIndex) R.attr.colorAccent
-                else R.attr.colorOnPrimary, typedValue, true
+            binding.root.setTextColor(
+                itemView.context.resolveAttrColor(
+                    if (position == selectedOptionIndex) R.attr.colorAccent
+                    else R.attr.colorOnPrimary
+                )
             )
-            binding.root.setTextColor(typedValue.data)
-
             binding.root.setOnClickListener { selectOption(position) }
         }
     }

@@ -15,7 +15,10 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataDetail
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.ui.base.Event
+import com.fishhawk.driftinglibraryandroid.ui.base.Feedback
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
+import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.launch
 import okhttp3.RequestBody
 
@@ -31,87 +34,82 @@ class GalleryViewModel(
     val providerId = provider?.id
     val isFromProvider = provider != null
 
-    private val _detail: MutableLiveData<Result<MangaDetail>?> = MutableLiveData(null)
-    val detail: LiveData<Result<MangaDetail>?> = _detail
+    private val _detail: MutableLiveData<MangaDetail> = MutableLiveData()
+    val detail: LiveData<MangaDetail> = _detail
 
-    val history: LiveData<ReadingHistory> = detail.switchMap {
-        if (it is Result.Success) readingHistoryRepository.observeReadingHistory(
+    private val _refreshFinish: MutableLiveData<Event<Boolean>> = MutableLiveData()
+    val refreshFinish: LiveData<Event<Boolean>> = _refreshFinish
+
+    val history: LiveData<ReadingHistory> =
+        readingHistoryRepository.observeReadingHistory(
             GlobalPreference.selectedServer.get(),
-            it.data.id
+            mangaId
         )
-        else MutableLiveData()
-    }
 
-    private fun loadManga() {
-        _detail.value = null
+    fun refreshManga() {
         viewModelScope.launch {
-            _detail.value =
+            val detail =
                 if (providerId == null) remoteLibraryRepository.getManga(mangaId)
                 else remoteProviderRepository.getManga(providerId, mangaId)
+            detail.onSuccess {
+                _detail.value = it
+                _refreshFinish.value = Event(true)
+            }.onFailure {
+                feed(it)
+                _refreshFinish.value = Event(false)
+            }
         }
     }
 
     init {
-        loadManga()
+        refreshManga()
     }
 
     fun updateCover(requestBody: RequestBody) = viewModelScope.launch {
-        (detail.value as? Result.Success)?.let {
-            val id = it.data.id
-            val result = remoteLibraryRepository.updateMangaCover(id, requestBody)
-            resultWarp(result) {
-                _detail.value = result
-                feed(R.string.toast_manga_cover_updated)
-            }
+        val result = remoteLibraryRepository.updateMangaCover(mangaId, requestBody)
+        resultWarp(result) {
+            _detail.value = it
+            feed(R.string.toast_manga_cover_updated)
         }
     }
 
     fun updateMetadata(metadata: MetadataDetail) = viewModelScope.launch {
-        (detail.value as? Result.Success)?.let {
-            val id = it.data.id
-            val result = remoteLibraryRepository.updateMangaMetadata(id, metadata)
-            resultWarp(result) {
-                _detail.value = result
-                feed(R.string.toast_manga_metadata_updated)
-            }
+        val result = remoteLibraryRepository.updateMangaMetadata(mangaId, metadata)
+        resultWarp(result) {
+            _detail.value = it
+            feed(R.string.toast_manga_metadata_updated)
         }
     }
 
     fun syncSource() {
-        (detail.value as? Result.Success)?.let {
-            if (it.data.provider != null) return
-            viewModelScope.launch {
-                val result = remoteLibraryRepository.syncMangaSource(it.data.id)
-                resultWarp(result) { feed(R.string.successfully_create_sync_task) }
-            }
+        if (isFromProvider) return
+        viewModelScope.launch {
+            val result = remoteLibraryRepository.syncMangaSource(mangaId)
+            resultWarp(result) { feed(R.string.successfully_create_sync_task) }
         }
     }
 
     fun deleteSource() {
-        (detail.value as? Result.Success)?.let {
-            if (it.data.provider != null) return
-            viewModelScope.launch {
-                val result = remoteLibraryRepository.deleteMangaSource(it.data.id)
-                resultWarp(result) { feed(R.string.successfully_delete_source) }
-            }
+        if (isFromProvider) return
+        viewModelScope.launch {
+            val result = remoteLibraryRepository.deleteMangaSource(mangaId)
+            resultWarp(result) { feed(R.string.successfully_delete_source) }
         }
     }
 
     fun addMangaToLibrary(keepAfterCompleted: Boolean) {
-        (detail.value as? Result.Success)?.let {
-            val sourceMangaId = it.data.id
-            val targetMangaId = it.data.title
-            val providerId = it.data.provider?.id ?: return
+        val providerId = providerId ?: return
+        val sourceMangaId = mangaId
+        val targetMangaId = detail.value?.title ?: return
 
-            viewModelScope.launch {
-                val result = remoteLibraryRepository.createManga(
-                    targetMangaId,
-                    providerId,
-                    sourceMangaId,
-                    keepAfterCompleted
-                )
-                resultWarp(result) { feed(R.string.successfully_add_to_library) }
-            }
+        viewModelScope.launch {
+            val result = remoteLibraryRepository.createManga(
+                targetMangaId,
+                providerId,
+                sourceMangaId,
+                keepAfterCompleted
+            )
+            resultWarp(result) { feed(R.string.successfully_add_to_library) }
         }
     }
 }

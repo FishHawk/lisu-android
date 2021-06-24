@@ -1,6 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery.detail
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -57,7 +58,7 @@ class GalleryFragment : Fragment() {
             }
 
             override fun onSaveCover() {
-                val detail = (viewModel.detail.value as? Result.Success)?.data
+                val detail = viewModel.detail.value
                     ?: return makeToast(R.string.toast_manga_not_loaded)
                 val url = detail.cover
                     ?: return makeToast(R.string.toast_manga_no_cover)
@@ -65,7 +66,7 @@ class GalleryFragment : Fragment() {
             }
 
             override fun onShareCover() {
-                val detail = (viewModel.detail.value as? Result.Success)?.data
+                val detail = viewModel.detail.value
                     ?: return makeToast(R.string.toast_manga_not_loaded)
                 val url = detail.cover
                     ?: return makeToast(R.string.toast_manga_no_cover)
@@ -115,9 +116,20 @@ class GalleryFragment : Fragment() {
         return binding.root
     }
 
-    @SuppressLint("SimpleDateFormat")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         bindToFeedbackViewModel(viewModel)
+
+        binding.root.setColorSchemeColors(requireContext().resolveAttrColor(R.attr.colorAccent))
+        binding.root.setProgressViewOffset(
+            false,
+            binding.root.progressViewStartOffset,
+            binding.root.progressViewEndOffset
+        )
+        binding.root.isRefreshing = true
+        binding.root.setOnRefreshListener { viewModel.refreshManga() }
+        viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver {
+            binding.root.isRefreshing = false
+        })
 
         setupCover(viewModel.outline.cover)
         setupTitle(viewModel.outline.title)
@@ -154,8 +166,7 @@ class GalleryFragment : Fragment() {
         }
 
         binding.readButton.setOnClickListener {
-            (viewModel.detail.value as? Result.Success)?.let { result ->
-                val detail = result.data
+            viewModel.detail.value?.let { detail ->
                 viewModel.history.value?.let { history ->
                     navToReaderActivity(
                         detail.id,
@@ -220,27 +231,20 @@ class GalleryFragment : Fragment() {
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
-        viewModel.detail.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Success -> {
-                    binding.multiStateView.viewState = ViewState.Content
+        viewModel.detail.observe(viewLifecycleOwner) {
+            if (it == null) return@observe
+            binding.contentView.isVisible = true
 
-                    val detail = result.data
-                    setupCover(detail.cover)
-                    setupTitle(detail.title)
-                    setupAuthors(detail.metadata.authors)
-                    setupStatus(detail.metadata.status)
-                    setupProvider(detail.provider)
+            setupCover(it.cover)
+            setupTitle(it.title)
+            setupAuthors(it.metadata.authors)
+            setupStatus(it.metadata.status)
+            setupProvider(it.provider)
 
-                    setupSource(detail.source)
-                    setupDescription(detail.metadata.description)
-                    setupTags(detail.metadata.tags)
-                    setupCollections(detail.collections, detail.preview)
-                }
-                is Result.Error ->
-                    binding.multiStateView.viewState = ViewState.Error(result.exception)
-                null -> binding.multiStateView.viewState = ViewState.Loading
-            }
+            setupSource(it.source)
+            setupDescription(it.metadata.description)
+            setupTags(it.metadata.tags)
+            setupCollections(it.collections, it.preview)
         }
 
         viewModel.history.observe(viewLifecycleOwner) { history ->

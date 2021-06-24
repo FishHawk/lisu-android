@@ -43,7 +43,7 @@ class GalleryEditFragment : Fragment() {
 
         bindToFeedbackViewModel(viewModel)
 
-        val detail = (viewModel.detail.value as Result.Success).data
+        val detail = viewModel.detail.value!!
 
         // edit title
         binding.title.setText(detail.title)
