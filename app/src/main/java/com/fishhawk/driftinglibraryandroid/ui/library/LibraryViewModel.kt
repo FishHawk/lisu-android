@@ -1,13 +1,15 @@
 package com.fishhawk.driftinglibraryandroid.ui.library
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.paging.*
+import com.fishhawk.driftinglibraryandroid.data.Result
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
-import com.fishhawk.driftinglibraryandroid.ui.base.remotePagingList
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class LibraryViewModel(
@@ -15,21 +17,42 @@ class LibraryViewModel(
     argKeywords: String?
 ) : FeedbackViewModel() {
 
-    val keywords = MutableLiveData(argKeywords ?: "")
+    val keywords = MutableStateFlow(argKeywords ?: "")
 
-    val outlines = remotePagingList<Long, MangaOutline> { key ->
-        repository.listManga(
-            lastTime = key ?: Long.MAX_VALUE,
-            keywords = keywords.value ?: "",
-            limit = 20
-        ).map { Pair(it.lastOrNull()?.updateTime, it) }
-    }.apply {
-        data.addSource(keywords) { reload() }
-        data.addSource(GlobalPreference.selectedServer.asFlow().asLiveData()) { reload() }
+    private var source: LibraryMangaSource? = null
+
+    val mangas = Pager(PagingConfig(pageSize = 20)) {
+        LibraryMangaSource().also { source = it }
+    }.flow.cachedIn(viewModelScope)
+
+    init {
+        listOf(
+            GlobalPreference.selectedServer.asFlow(),
+            keywords
+        ).forEach { it.onEach { source?.invalidate() }.launchIn(viewModelScope) }
     }
 
     fun deleteManga(id: String) = viewModelScope.launch {
         val result = repository.deleteManga(id)
-        resultWarp(result) { outlines.reload() }
+        resultWarp(result) { source?.invalidate() }
+    }
+
+    inner class LibraryMangaSource : PagingSource<Long, MangaOutline>() {
+        override suspend fun load(params: LoadParams<Long>): LoadResult<Long, MangaOutline> {
+            val result = repository.listManga(
+                params.key ?: Long.MAX_VALUE,
+                keywords.value
+            )
+            return when (result) {
+                is Result.Success -> LoadResult.Page(
+                    data = result.data,
+                    prevKey = null,
+                    nextKey = result.data.lastOrNull()?.updateTime
+                )
+                is Result.Error -> LoadResult.Error(result.exception)
+            }
+        }
+
+        override fun getRefreshKey(state: PagingState<Long, MangaOutline>): Long? = null
     }
 }

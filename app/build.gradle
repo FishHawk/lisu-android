@@ -68,13 +68,24 @@ android {
 
 dependencies {
     implementation("androidx.compose.ui:ui:1.0.0-rc01")
-    implementation("androidx.compose.ui:ui-tooling:1.0.0-rc01")
+    implementation("androidx.compose.ui:ui-tooling:1.0.0-beta09")
     implementation("androidx.compose.foundation:foundation:1.0.0-rc01")
     implementation("androidx.compose.material:material:1.0.0-rc01")
     implementation("androidx.compose.material:material-icons-core:1.0.0-rc01")
     implementation("androidx.compose.material:material-icons-extended:1.0.0-rc01")
     implementation("androidx.compose.runtime:runtime-livedata:1.0.0-rc01")
     implementation("androidx.compose.runtime:runtime-rxjava2:1.0.0-rc01")
+
+    implementation("androidx.paging:paging-runtime-ktx:3.0.0")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha11")
+
+    implementation("com.google.accompanist:accompanist-coil:0.13.0")
+    implementation("com.google.accompanist:accompanist-insets:0.13.0")
+    implementation("com.google.accompanist:accompanist-insets-ui:0.13.0")
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.13.0")
+
+    implementation("io.coil-kt:coil:1.2.2")
+
 
     // UI Tests
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.0-rc01")

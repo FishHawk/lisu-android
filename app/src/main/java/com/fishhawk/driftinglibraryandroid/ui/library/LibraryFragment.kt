@@ -1,112 +1,116 @@
 package com.fishhawk.driftinglibraryandroid.ui.library
 
 import android.os.Bundle
-import android.view.*
-import android.widget.ImageView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.SearchView
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.LibraryFragmentBinding
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
-import com.fishhawk.driftinglibraryandroid.ui.base.*
-import com.fishhawk.driftinglibraryandroid.util.setNext
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import com.fishhawk.driftinglibraryandroid.ui.base.MangaDisplayModeButton
+import com.fishhawk.driftinglibraryandroid.ui.base.MangaList
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.google.accompanist.insets.ui.TopAppBar
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 class LibraryFragment : Fragment() {
-    private lateinit var binding: LibraryFragmentBinding
     private val viewModel: LibraryViewModel by viewModels {
         MainViewModelFactory(this)
     }
-
-    val adapter = MangaListAdapter(object : MangaListAdapter.Listener {
-        override fun onCardClick(outline: MangaOutline) {
-            findNavController().navigate(
-                R.id.action_to_gallery,
-                bundleOf("outline" to outline)
-            )
-        }
-
-        override fun onCardLongClick(outline: MangaOutline) {
-            AlertDialog.Builder(requireActivity())
-                .setTitle("Confirm to delete manga?")
-                .setPositiveButton("OK") { _, _ -> viewModel.deleteManga(outline.id) }
-                .setNegativeButton("cancel") { _, _ -> }
-                .show()
-        }
-    })
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = LibraryFragmentBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setupMenu(binding.toolbar.menu)
-        binding.toolbar.setOnMenuItemClickListener(this::onMenuItemSelected)
-
-        binding.recyclerView.adapter = adapter
-
-        GlobalPreference.displayMode.asFlow()
-            .onEach { binding.recyclerView.changeMangaListDisplayMode(adapter) }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
-
-        binding.multiStateView.onRetry = { viewModel.outlines.reload() }
-
-        viewModel.outlines.data.observe(viewLifecycleOwner) {
-            adapter.setList(it)
-        }
-        viewModel.outlines.state.observe(viewLifecycleOwner) {
-            binding.multiStateView.viewState = it
-        }
-        bindToRemotePagingList(binding.refreshLayout, viewModel.outlines)
-    }
-
-    private fun setupMenu(menu: Menu) {
-        with(menu.findItem(R.id.action_search).actionView as SearchView) {
-            queryHint = getString(R.string.menu_search_hint)
-            maxWidth = Int.MAX_VALUE
-            setQuery(viewModel.keywords.value, false)
-            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String): Boolean {
-                    viewModel.keywords.value = query
-                    closeInputMethod()
-                    return true
+        val view = ComposeView(requireContext())
+        view.setContent {
+            ApplicationTheme {
+                ProvideWindowInsets {
+                    Scaffold(
+                        topBar = { ToolBar() },
+                        content = { Content() }
+                    )
                 }
-
-                override fun onQueryTextChange(query: String?): Boolean = false
-            })
-            val closeButton: ImageView = findViewById(R.id.search_close_btn)
-            closeButton.setOnClickListener {
-                setQuery(null, false)
-                isIconified = true
-                viewModel.keywords.value = ""
             }
         }
-        with(menu.findItem(R.id.action_display_mode)) {
-            setIcon(getDisplayModeIcon())
-        }
+        return view
     }
 
-    private fun onMenuItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_display_mode -> {
-                GlobalPreference.run { displayMode.setNext() }
-                item.setIcon(getDisplayModeIcon())
-                true
+    @Composable
+    private fun ToolBar() {
+        TopAppBar(
+            contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
+            title = { Text("Library") },
+            actions = {
+                MangaDisplayModeButton()
+                IconButton(onClick = { }) {
+                    Icon(Icons.Filled.Search, contentDescription = "search")
+                }
             }
-            else -> false
+        )
+    }
+
+    @Composable
+    private fun Content() {
+        val mangas = viewModel.mangas.collectAsLazyPagingItems()
+        val isRefreshing = mangas.loadState.refresh is LoadState.Loading
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(isRefreshing),
+            onRefresh = { mangas.refresh() },
+        ) {
+            MangaList(
+                mangas,
+                onCardClick = {
+                    findNavController().navigate(
+                        R.id.action_to_gallery,
+                        bundleOf("outline" to it)
+                    )
+                },
+                onCardLongClick = {
+                    AlertDialog.Builder(requireActivity())
+                        .setTitle("Confirm to delete manga?")
+                        .setPositiveButton("OK") { _, _ -> viewModel.deleteManga(it.id) }
+                        .setNegativeButton("cancel") { _, _ -> }
+                        .show()
+                }
+            )
         }
     }
+//            queryHint = getString(R.string.menu_search_hint)
+//            maxWidth = Int.MAX_VALUE
+//            setQuery(viewModel.keywords.value, false)
+//            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+//                override fun onQueryTextSubmit(query: String): Boolean {
+//                    viewModel.keywords.value = query
+//                    closeInputMethod()
+//                    return true
+//                }
+//
+//                override fun onQueryTextChange(query: String?): Boolean = false
+//            })
+//            val closeButton: ImageView = findViewById(R.id.search_close_btn)
+//            closeButton.setOnClickListener {
+//                setQuery(null, false)
+//                isIconified = true
+//                viewModel.keywords.value = ""
+//            }
 }

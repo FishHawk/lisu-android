@@ -19,6 +19,12 @@ abstract class RemotePagingList<KEY, ITEM>(private val scope: CoroutineScope) {
     val state: MediatorLiveData<ViewState> = MediatorLiveData()
     val data: MediatorLiveData<List<ITEM>> = MediatorLiveData()
 
+    private val _isRefreshing: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isRefreshing: LiveData<Boolean> = _isRefreshing
+
+    private val _isLoadMore: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isLoadMore: LiveData<Boolean> = _isLoadMore
+
     private val _refreshFinish: MutableLiveData<Event<Feedback>> = MutableLiveData()
     val refreshFinish: LiveData<Event<Feedback>> = _refreshFinish
 
@@ -55,6 +61,7 @@ abstract class RemotePagingList<KEY, ITEM>(private val scope: CoroutineScope) {
 
     fun refresh() {
         scope.launch {
+            _isRefreshing.value = true
             load(null).onSuccess { (key, it) ->
                 nextKey = key
                 isFinished = it.isEmpty()
@@ -64,11 +71,13 @@ abstract class RemotePagingList<KEY, ITEM>(private val scope: CoroutineScope) {
                     else ViewState.Content
                 data.value = it
 
+                _isRefreshing.value = false
                 _refreshFinish.value = Event(
                     if (it.isEmpty()) Feedback.Hint(R.string.error_hint_empty_refresh_result)
                     else Feedback.Silent
                 )
             }.onFailure {
+                _isRefreshing.value = false
                 _refreshFinish.value = Event(Feedback.Failure(it))
             }
         }
@@ -82,6 +91,7 @@ abstract class RemotePagingList<KEY, ITEM>(private val scope: CoroutineScope) {
             _fetchMoreFinish.value =
                 Event(Feedback.Hint(R.string.error_hint_empty_fetch_more_result))
 
+        _isLoadMore.value = true
         scope.launch {
             load(nextKey).onSuccess { (key, it) ->
                 nextKey = key
@@ -91,11 +101,13 @@ abstract class RemotePagingList<KEY, ITEM>(private val scope: CoroutineScope) {
                     (data.value?.toMutableList() ?: mutableListOf())
                         .apply { addAll(it) }
 
+                _isLoadMore.value = false
                 _fetchMoreFinish.value = Event(
                     if (it.isEmpty()) Feedback.Hint(R.string.error_hint_empty_fetch_more_result)
                     else Feedback.Silent
                 )
             }.onFailure {
+                _isLoadMore.value = false
                 _fetchMoreFinish.value = Event(Feedback.Failure(it))
             }
         }

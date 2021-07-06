@@ -7,8 +7,7 @@
 
     <fragment
         android:id="@+id/nav_library"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.library.LibraryFragment"
-        tools:layout="@layout/library_fragment">
+        android:name="com.fishhawk.driftinglibraryandroid.ui.library.LibraryFragment">
 
         <action
             android:id="@+id/action_to_gallery"
