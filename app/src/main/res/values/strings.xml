@@ -21,10 +21,7 @@
 
 
     <!-- history fragment -->
-    <string name="history_thumbnail_seen">Seen:</string>
-    <string name="history_thumbnail_date">Date:</string>
-    <string name="history_thumbnail_provider">Provider:</string>
-
+    <string name="history_card_page">Page%1$d</string>
 
     <!-- explore fragment -->
     <string name="explore_card_browse">Browse</string>

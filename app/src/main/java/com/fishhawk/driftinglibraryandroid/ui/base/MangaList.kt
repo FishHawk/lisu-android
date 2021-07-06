@@ -76,9 +76,7 @@ fun MangaListLinear(
     onCardLongClick: (outline: MangaOutline) -> Unit = {}
 ) {
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .clickable { },
+        modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {

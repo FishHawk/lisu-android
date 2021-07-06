@@ -4,7 +4,6 @@ import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import kotlinx.coroutines.launch
 
 class HistoryViewModel(
@@ -17,11 +16,6 @@ class HistoryViewModel(
 
     private val _filteredHistoryList: MediatorLiveData<List<ReadingHistory>> = MediatorLiveData()
     val filteredHistoryList: LiveData<List<ReadingHistory>> = _filteredHistoryList
-
-    val viewState = _filteredHistoryList.map {
-        if (it.isEmpty()) ViewState.Empty
-        else ViewState.Content
-    }
 
     init {
         _filteredHistoryList.addSource(historyList) { list ->

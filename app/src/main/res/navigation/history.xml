@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_history"
     app:startDestination="@+id/nav_history">
 
     <fragment
         android:id="@+id/nav_history"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.history.HistoryFragment"
-        tools:layout="@layout/history_fragment">
+        android:name="com.fishhawk.driftinglibraryandroid.ui.history.HistoryFragment">
 
         <action
             android:id="@+id/action_to_gallery_detail"
