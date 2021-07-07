@@ -231,7 +231,7 @@ val outlineExample =
         MetadataOutline("title", listOf("author"), null), true
     )
 
-@ExperimentalFoundationApi
+@OptIn(ExperimentalFoundationApi::class)
 @Preview(widthDp = 120)
 @Composable
 fun MangaCardGrid(

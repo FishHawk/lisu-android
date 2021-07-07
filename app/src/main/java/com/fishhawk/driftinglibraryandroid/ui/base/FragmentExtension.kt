@@ -30,23 +30,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-fun RecyclerView.changeMangaListDisplayMode(adapter: MangaListAdapter) {
-    val displayMode = GlobalPreference.displayMode.get()
-    if (displayMode == GlobalPreference.DisplayMode.GRID &&
-        (adapter.viewMode != MangaListAdapter.ViewMode.GRID || layoutManager == null)
-    ) {
-        adapter.viewMode = MangaListAdapter.ViewMode.GRID
-        layoutManager = GridLayoutManager(context, 3)
-        this.adapter = adapter
-    } else if (displayMode == GlobalPreference.DisplayMode.LINEAR &&
-        (adapter.viewMode != MangaListAdapter.ViewMode.LINEAR || layoutManager == null)
-    ) {
-        adapter.viewMode = MangaListAdapter.ViewMode.LINEAR
-        layoutManager = LinearLayoutManager(context)
-        this.adapter = adapter
-    }
-}
-
 fun getDisplayModeIcon(): Int {
     return when (GlobalPreference.displayMode.get()) {
         GlobalPreference.DisplayMode.GRID -> R.drawable.ic_baseline_view_module_24

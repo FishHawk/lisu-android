@@ -3,8 +3,14 @@ package com.fishhawk.driftinglibraryandroid.ui.globalsearch
 import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.data.Result
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import kotlinx.coroutines.launch
+
+data class SearchGroup(
+    val provider: ProviderInfo,
+    var result: Result<List<MangaOutline>>?
+)
 
 class GlobalSearchViewModel(
     private val remoteLibraryRepository: RemoteProviderRepository,

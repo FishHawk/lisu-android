@@ -59,8 +59,7 @@
     <fragment
         android:id="@+id/nav_global_search"
         android:name="com.fishhawk.driftinglibraryandroid.ui.globalsearch.GlobalSearchFragment"
-        android:label="@string/label_global_search"
-        tools:layout="@layout/global_search_fragment">
+        android:label="@string/label_global_search">
 
         <action
             android:id="@+id/action_to_gallery_detail"
