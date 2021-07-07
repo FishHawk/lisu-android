@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.fishhawk.driftinglibraryandroid.data.remote.model.Collection
+import com.fishhawk.driftinglibraryandroid.data.remote.model.ChapterCollection
 
 class ContentView @JvmOverloads constructor(
     context: Context,
@@ -74,7 +74,7 @@ class ContentView @JvmOverloads constructor(
         } ?: adapter?.unmarkChapter()
     }
 
-    var collections: List<Collection>? = null
+    var collections: List<ChapterCollection>? = null
         set(value) {
             field = value
             adapter = adapter

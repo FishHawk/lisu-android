@@ -15,142 +15,23 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <FrameLayout
+            <androidx.compose.ui.platform.ComposeView
+                android:id="@+id/compose"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content" />
 
-                <ImageView
-                    android:id="@+id/backdrop"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:alpha="0.2"
-                    android:scaleType="centerCrop"
-                    tools:ignore="ContentDescription"
-                    tools:src="@tools:sample/avatars" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="220dp"
-                    android:background="@android:color/transparent"
-                    android:fitsSystemWindows="true">
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/cover_card"
-                        style="@style/Theme.Widget.CardView"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_margin="16dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintDimensionRatio="H,4:3"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <ImageView
-                            android:id="@+id/cover"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:contentDescription="@null"
-                            android:scaleType="centerCrop"
-                            tools:src="@tools:sample/avatars" />
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_margin="16dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/cover_card">
-
-                        <TextView
-                            android:id="@+id/title"
-                            style="@style/Theme.TextAppearance.Title"
-                            android:layout_width="0dp"
-                            android:layout_height="60sp"
-                            android:ellipsize="end"
-                            android:gravity="bottom"
-                            android:maxLines="3"
-                            android:textIsSelectable="false"
-                            app:autoSizeMaxTextSize="20sp"
-                            app:autoSizeMinTextSize="12sp"
-                            app:autoSizeStepGranularity="2sp"
-                            app:autoSizeTextType="uniform"
-                            app:layout_constraintBottom_toTopOf="@+id/author"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            tools:text="Sample title" />
-
-                        <TextView
-                            android:id="@+id/author"
-                            style="@style/Theme.TextAppearance.Body2"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:textIsSelectable="false"
-                            app:layout_constraintBottom_toTopOf="@+id/author_bottom"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            tools:text="Sample author" />
-
-                        <androidx.constraintlayout.widget.Barrier
-                            android:id="@+id/author_bottom"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:barrierDirection="top"
-                            app:constraint_referenced_ids="status,provider" />
-
-                        <TextView
-                            android:id="@+id/status"
-                            style="@style/Theme.TextAppearance.Body2"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:textIsSelectable="false"
-                            app:layout_constraintBottom_toTopOf="@+id/read_button"
-                            app:layout_constraintStart_toStartOf="parent"
-                            tools:text="Completed" />
-
-                        <TextView
-                            android:id="@+id/provider"
-                            style="@style/Theme.TextAppearance.Body2"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginTop="4dp"
-                            android:ellipsize="end"
-                            android:maxLines="1"
-                            android:textIsSelectable="false"
-                            app:layout_constraintBottom_toTopOf="@+id/read_button"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/status"
-                            tools:text="Provider" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/read_button"
-                            style="@style/Theme.Widget.Button.Icon"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:insetBottom="0dp"
-                            android:text="@string/gallery_read_button_hint"
-                            app:icon="@drawable/ic_baseline_play_arrow_24"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/library_add_button"
-                            style="@style/Theme.Widget.Button.Icon.Textless"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:insetBottom="0dp"
-                            app:icon="@drawable/ic_baseline_library_add_24"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toEndOf="@id/read_button" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </androidx.constraintlayout.widget.ConstraintLayout>
-            </FrameLayout>
+            <!--        android:id="@+id/title"-->
+            <!--        style="@style/Theme.TextAppearance.Title"-->
+            <!--        android:layout_width="0dp"-->
+            <!--        android:layout_height="60sp"-->
+            <!--        android:ellipsize="end"-->
+            <!--        android:gravity="bottom"-->
+            <!--        android:maxLines="3"-->
+            <!--        android:textIsSelectable="false"-->
+            <!--        app:autoSizeMaxTextSize="20sp"-->
+            <!--        app:autoSizeMinTextSize="12sp"-->
+            <!--        app:autoSizeStepGranularity="2sp"-->
+            <!--        app:autoSizeTextType="uniform"-->
 
             <LinearLayout
                 android:id="@+id/content_view"
@@ -161,58 +42,6 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="8dp"
                 android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/source"
-                    style="@style/Theme.TextAppearance.Body2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    tools:text="Provider - 10000" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp">
-
-                    <TextView
-                        android:id="@+id/description"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:ellipsize="end"
-                        android:focusable="true"
-                        android:maxLines="3"
-                        android:textIsSelectable="false"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:text="Sample description line 1\nSample description line 2" />
-
-                    <TextView
-                        android:id="@+id/description_ellipsize_hint"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:background="?android:attr/colorBackground"
-                        android:elevation="0dp"
-                        android:paddingHorizontal="8dp"
-                        android:text="More"
-                        android:textColor="?attr/colorAccent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
-
-                    <View
-                        android:id="@+id/description_ellipsize_hint_scrim"
-                        android:layout_width="20dp"
-                        android:layout_height="0dp"
-                        android:background="@drawable/description_ellipsize_hint_gradient"
-                        android:backgroundTint="?android:attr/colorBackground"
-                        app:layout_constraintBottom_toBottomOf="@+id/description_ellipsize_hint"
-                        app:layout_constraintEnd_toStartOf="@+id/description_ellipsize_hint"
-                        app:layout_constraintTop_toTopOf="@+id/description_ellipsize_hint" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/tags"

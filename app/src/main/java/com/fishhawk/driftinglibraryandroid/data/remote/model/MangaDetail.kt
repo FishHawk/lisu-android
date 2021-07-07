@@ -11,7 +11,7 @@ data class Chapter(
 ) : Parcelable
 
 @Parcelize
-data class Collection(
+data class ChapterCollection(
     val id: String,
     val chapters: List<Chapter>
 ) : Parcelable
@@ -39,7 +39,7 @@ data class MangaDetail(
     val updateTime: Long?,
     val source: Source?,
     val metadata: MetadataDetail,
-    val collections: List<Collection>,
+    val collections: List<ChapterCollection>,
     var preview: List<String>?
 ) : Parcelable {
     val title

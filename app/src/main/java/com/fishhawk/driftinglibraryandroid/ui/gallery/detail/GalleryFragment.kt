@@ -4,28 +4,45 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LibraryAdd
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
-import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.Result
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.model.*
-import com.fishhawk.driftinglibraryandroid.data.remote.model.Collection
 import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
+import com.fishhawk.driftinglibraryandroid.ui.theme.MaterialColors
 import com.fishhawk.driftinglibraryandroid.util.setNext
+import com.google.accompanist.coil.rememberCoilPainter
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -73,28 +90,6 @@ class GalleryFragment : Fragment() {
         })
     }
 
-    private val tagAdapter = TagGroupListAdapter(object : TagGroupListAdapter.Listener {
-        override fun onTagClick(key: String, value: String) {
-            val keywords = if (key.isBlank()) value else "${key}:$value"
-            if (viewModel.isFromProvider) findNavController().navigate(
-                R.id.action_to_provider_search,
-                bundleOf(
-                    "keywords" to keywords,
-                    "provider" to viewModel.provider!!
-                )
-            ) else findNavController().navigate(
-                R.id.action_to_library,
-                bundleOf("keywords" to keywords)
-            )
-        }
-
-        override fun onTagLongClick(key: String, value: String) {
-            val keywords = if (key.isBlank()) value else "${key}:$value"
-            copyToClipboard(keywords)
-            makeToast(R.string.toast_manga_tag_saved)
-        }
-    })
-
     private val pickPictureLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             val content =
@@ -111,7 +106,259 @@ class GalleryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = GalleryFragmentBinding.inflate(inflater, container, false)
+        binding.compose.apply {
+            setContent {
+                ApplicationTheme {
+                    ProvideWindowInsets {
+                        val detail by viewModel.detail.observeAsState()
+                        Column {
+                            Header(detail)
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                detail?.source?.let { MangaSource(it) }
+                                detail?.metadata?.description?.let { MangaDescription(it) }
+                                detail?.metadata?.tags?.let { MangaTags(it) }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return binding.root
+    }
+
+    @Composable
+    private fun Header(detail: MangaDetail?) {
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(220.dp)
+        ) {
+            val request = ImageRequest.Builder(LocalContext.current)
+                .data(detail?.cover)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .build()
+            Image(
+                painter = rememberCoilPainter(request, fadeIn = true),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                alpha = 0.2f
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .statusBarsPadding(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(4.dp),
+                    elevation = 4.dp
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .aspectRatio(0.75f)
+                            .clickable { coverSheet.show() },
+                        painter = rememberCoilPainter(request, fadeIn = true),
+                        contentDescription = "Cover",
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                MangaInfo(detail)
+            }
+        }
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Composable
+    private fun MangaInfo(detail: MangaDetail?) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            (detail?.title ?: viewModel.outline.title).let {
+                Text(
+                    modifier = Modifier
+                        .weight(1f, fill = true)
+                        .combinedClickable(
+                            onClick = {
+                                findNavController().navigate(
+                                    R.id.action_to_global_search,
+                                    bundleOf("keywords" to it)
+                                )
+                            },
+                            onLongClick = {
+                                copyToClipboard(it)
+                                makeToast(R.string.toast_manga_title_copied)
+                            }
+                        ),
+                    text = it
+                )
+            }
+            (detail?.metadata?.authors ?: viewModel.outline.metadata.authors)
+                ?.joinToString(separator = ";")?.let {
+                    Text(
+                        modifier = Modifier.combinedClickable(
+                            onClick = {
+                                findNavController().navigate(
+                                    R.id.action_to_global_search,
+                                    bundleOf("keywords" to it)
+                                )
+                            },
+                            onLongClick = {
+                                copyToClipboard(it)
+                                makeToast(R.string.toast_manga_author_copied)
+                            }
+                        ),
+                        text = it,
+                        style = MaterialTheme.typography.body2,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                (detail?.metadata?.status ?: viewModel.outline.metadata.status)?.let {
+                    Text(
+                        text = it.toString(),
+                        style = MaterialTheme.typography.body2
+                    )
+                }
+                viewModel.provider?.title?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.body2,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+            Row {
+                TextButton(
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colors.onSurface
+                    ),
+                    border = BorderStroke(1.dp, MaterialTheme.colors.onSurface),
+                    onClick = {
+                        viewModel.detail.value?.let { detail ->
+                            viewModel.history.value?.let { history ->
+                                navToReaderActivity(
+                                    detail.id,
+                                    detail.provider?.id,
+                                    history.collectionIndex,
+                                    history.chapterIndex,
+                                    history.pageIndex
+                                )
+                            } ?: navToReaderActivity(detail.id, detail.provider?.id)
+                        }
+                    }
+                ) {
+                    Row {
+                        Icon(Icons.Filled.PlayArrow, "Read")
+                        Text("Read")
+                    }
+                }
+                if (viewModel.isFromProvider) {
+                    TextButton(
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colors.onSurface
+                        ),
+                        onClick = { viewModel.addMangaToLibrary(false) }
+                    ) {
+                        Icon(Icons.Filled.LibraryAdd, "Add")
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun MangaSource(source: Source) {
+        Text(
+            text = "From ${source.providerId} - ${source.mangaId} ${source.state}",
+            color = when (source.state) {
+                SourceState.DOWNLOADING -> MaterialColors.Blue400
+                SourceState.WAITING -> MaterialColors.Green400
+                SourceState.ERROR -> MaterialTheme.colors.error
+                SourceState.UPDATED -> MaterialTheme.colors.onSurface
+            }
+        )
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Composable
+    private fun MangaDescription(description: String) {
+        Text(
+            text = description,
+            style = MaterialTheme.typography.body2,
+            modifier = Modifier.combinedClickable(
+                onClick = {},
+                onLongClick = {
+                    copyToClipboard(description)
+                    makeToast(R.string.toast_manga_description_copied)
+                }
+            )
+        )
+    }
+
+    @Composable
+    private fun MangaTags(tags: List<TagGroup>) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            tags.map { TagGroup(it) }
+        }
+    }
+
+    @Composable
+    private fun TagGroup(group: TagGroup) {
+        Row {
+//            if (group.key.isNotBlank()) Tag(group.key)
+            FlowRow(
+                modifier = Modifier.padding(bottom = 8.dp),
+                mainAxisSpacing = 4.dp,
+                crossAxisSpacing = 4.dp
+            ) {
+                group.value.map { Tag(group.key, it) }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Composable
+    private fun Tag(key: String, value: String) {
+        Surface(
+            modifier = Modifier,
+            shape = RoundedCornerShape(16.dp),
+            color = androidx.compose.ui.graphics.Color.LightGray
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(2.dp)
+                    .combinedClickable(
+                        onClick = {
+                            val keywords = if (key.isBlank()) value else "${key}:$value"
+                            if (viewModel.isFromProvider) findNavController().navigate(
+                                R.id.action_to_provider_search,
+                                bundleOf(
+                                    "keywords" to keywords,
+                                    "provider" to viewModel.provider!!
+                                )
+                            ) else findNavController().navigate(
+                                R.id.action_to_library,
+                                bundleOf("keywords" to keywords)
+                            )
+                        },
+                        onLongClick = {
+                            val keywords = if (key.isBlank()) value else "${key}:$value"
+                            copyToClipboard(keywords)
+                            makeToast(R.string.toast_manga_tag_saved)
+                        }
+                    ),
+                text = value,
+                style = MaterialTheme.typography.body2.copy(fontSize = 12.sp)
+            )
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -129,76 +376,7 @@ class GalleryFragment : Fragment() {
             binding.root.isRefreshing = false
         })
 
-        setupCover(viewModel.outline.cover)
-        setupTitle(viewModel.outline.title)
-        setupAuthors(viewModel.outline.metadata.authors)
-        setupStatus(viewModel.outline.metadata.status)
-        setupProvider(viewModel.provider)
-
-        binding.provider.isVisible = viewModel.isFromProvider
-        binding.libraryAddButton.isVisible = viewModel.isFromProvider
         coverSheet.isFromProvider = viewModel.isFromProvider
-
-        binding.title.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_to_global_search,
-                bundleOf("keywords" to binding.title.text)
-            )
-        }
-        binding.title.setOnLongClickListener {
-            copyToClipboard(binding.title.text as String)
-            makeToast(R.string.toast_manga_title_copied)
-            true
-        }
-
-        binding.author.setOnClickListener {
-            findNavController().navigate(
-                R.id.action_to_global_search,
-                bundleOf("keywords" to binding.author.text)
-            )
-        }
-        binding.author.setOnLongClickListener {
-            copyToClipboard(binding.author.text as String)
-            makeToast(R.string.toast_manga_author_copied)
-            true
-        }
-
-        binding.readButton.setOnClickListener {
-            viewModel.detail.value?.let { detail ->
-                viewModel.history.value?.let { history ->
-                    navToReaderActivity(
-                        detail.id,
-                        detail.provider?.id,
-                        history.collectionIndex,
-                        history.chapterIndex,
-                        history.pageIndex
-                    )
-                } ?: navToReaderActivity(detail.id, detail.provider?.id)
-            }
-        }
-
-        binding.libraryAddButton.setOnClickListener {
-            viewModel.addMangaToLibrary(false)
-        }
-        binding.libraryAddButton.setOnLongClickListener {
-            viewModel.addMangaToLibrary(true)
-            true
-        }
-
-        binding.coverCard.setOnClickListener { coverSheet.show() }
-
-        binding.description.setOnClickListener {
-            binding.description.maxLines =
-                if (binding.description.maxLines < Int.MAX_VALUE) Int.MAX_VALUE else 3
-            updateDescriptionHint()
-        }
-        binding.description.setOnLongClickListener {
-            copyToClipboard(binding.description.text as String)
-            makeToast(R.string.toast_manga_description_copied)
-            true
-        }
-
-        binding.tags.adapter = tagAdapter
 
         val contentAdapter = ContentAdapter(this, viewModel.mangaId, viewModel.providerId)
         binding.chapters.adapter = contentAdapter
@@ -232,16 +410,6 @@ class GalleryFragment : Fragment() {
         viewModel.detail.observe(viewLifecycleOwner) {
             if (it == null) return@observe
             binding.contentView.isVisible = true
-
-            setupCover(it.cover)
-            setupTitle(it.title)
-            setupAuthors(it.metadata.authors)
-            setupStatus(it.metadata.status)
-            setupProvider(it.provider)
-
-            setupSource(it.source)
-            setupDescription(it.metadata.description)
-            setupTags(it.metadata.tags)
             setupCollections(it.collections, it.preview)
         }
 
@@ -252,87 +420,7 @@ class GalleryFragment : Fragment() {
         }
     }
 
-    private fun setupCover(cover: String?) {
-        if (cover == null) return
-        Glide.with(this)
-            .load(cover)
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .diskCacheStrategy(DiskCacheStrategy.DATA)
-            .into(binding.cover)
-
-        Glide.with(this)
-            .load(cover)
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .diskCacheStrategy(DiskCacheStrategy.DATA)
-            .into(binding.backdrop)
-    }
-
-    private fun setupTitle(title: String) {
-        binding.title.text = title
-    }
-
-    private fun setupAuthors(authors: List<String>?) {
-        authors?.let {
-            if (it.isEmpty()) null
-            else it.joinToString(separator = ";")
-        }.let {
-            binding.author.isVisible = (it != null)
-            binding.author.text = it
-        }
-    }
-
-    private fun setupStatus(status: MangaStatus?) {
-        binding.status.isVisible = (status != null)
-        binding.status.text = status.toString()
-    }
-
-    private fun setupProvider(provider: ProviderInfo?) {
-        binding.provider.text = provider?.title
-    }
-
-    private fun updateDescriptionHint() = binding.description.doOnLayout {
-        fun TextView.hasEllipsize() = layout.text.toString() != text
-        val visibility =
-            if (binding.description.hasEllipsize()) View.VISIBLE
-            else View.INVISIBLE
-        binding.descriptionEllipsizeHint.visibility = visibility
-        binding.descriptionEllipsizeHintScrim.visibility = visibility
-    }
-
-    private fun setupDescription(description: String?) {
-        val hasDescription = !description.isNullOrBlank()
-        binding.description.isVisible = hasDescription
-        binding.descriptionEllipsizeHint.isVisible = hasDescription
-        binding.descriptionEllipsizeHintScrim.isVisible = hasDescription
-
-        binding.description.text = description
-        if (hasDescription) updateDescriptionHint()
-    }
-
-    private fun setupSource(source: Source?) {
-        binding.source.isVisible = source != null
-        coverSheet.hasSource = source != null
-        if (source == null) return
-
-        binding.source.text = "From ${source.providerId} - ${source.mangaId} ${source.state}"
-
-        when (source.state) {
-            SourceState.DOWNLOADING -> binding.source.setTextColor(resources.getColor(R.color.blue_400))
-            SourceState.WAITING -> binding.source.setTextColor(resources.getColor(R.color.green_400))
-            SourceState.ERROR -> binding.source.setTextColor(resources.getColor(R.color.red_400))
-        }
-    }
-
-    private fun setupTags(tags: List<TagGroup>?) {
-        if (!tags.isNullOrEmpty()) {
-            binding.tags.isVisible = true
-            tagAdapter.setList(tags)
-        } else {
-            binding.tags.isVisible = false
-        }
-    }
-
-    private fun setupCollections(collections: List<Collection>, preview: List<String>?) {
+    private fun setupCollections(collections: List<ChapterCollection>, preview: List<String>?) {
         val hasPreview = collections.size == 1 && !preview.isNullOrEmpty()
         val hasChapter = collections.isNotEmpty()
 
