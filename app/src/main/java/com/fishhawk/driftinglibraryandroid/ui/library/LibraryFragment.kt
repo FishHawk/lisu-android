@@ -58,10 +58,10 @@ class LibraryFragment : Fragment() {
             contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
             title = { Text("Library") },
             actions = {
-                MangaDisplayModeButton()
                 IconButton(onClick = { }) {
                     Icon(Icons.Filled.Search, contentDescription = "search")
                 }
+                MangaDisplayModeButton()
             }
         )
     }
@@ -86,7 +86,6 @@ class LibraryFragment : Fragment() {
         )
     }
 //            queryHint = getString(R.string.menu_search_hint)
-//            maxWidth = Int.MAX_VALUE
 //            setQuery(viewModel.keywords.value, false)
 //            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 //                override fun onQueryTextSubmit(query: String): Boolean {
