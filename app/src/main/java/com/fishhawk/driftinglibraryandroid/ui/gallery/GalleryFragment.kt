@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.gallery.detail
+package com.fishhawk.driftinglibraryandroid.ui.gallery
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -17,39 +17,33 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
+import androidx.paging.LoadState
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.model.*
-import com.fishhawk.driftinglibraryandroid.databinding.GalleryFragmentBinding
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.*
-import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryViewModel
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
 import com.fishhawk.driftinglibraryandroid.ui.theme.MaterialColors
-import com.fishhawk.driftinglibraryandroid.util.setNext
 import com.google.accompanist.coil.rememberCoilPainter
-import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.statusBarsPadding
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.hippo.refreshlayout.RefreshLayout
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class GalleryFragment : Fragment() {
-    private lateinit var binding: GalleryFragmentBinding
     private val viewModel: GalleryViewModel by navGraphViewModels(R.id.nav_graph_gallery_internal) {
         MainViewModelFactory(this)
     }
@@ -105,32 +99,49 @@ class GalleryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = GalleryFragmentBinding.inflate(inflater, container, false)
-        binding.compose.apply {
-            setContent {
-                ApplicationTheme {
-                    ProvideWindowInsets {
-                        val detail by viewModel.detail.observeAsState()
-                        Column {
-                            Header(detail)
-                            Column(
-                                modifier = Modifier.padding(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                detail?.source?.let { MangaSource(it) }
-                                detail?.metadata?.description?.let { MangaDescription(it) }
-                                detail?.metadata?.tags?.let { MangaTags(it) }
-                            }
-                        }
+        val view = ComposeView(requireContext())
+        view.setContent {
+            ApplicationTheme {
+                ProvideWindowInsets {
+                    val detail by viewModel.detail.observeAsState()
+                    val isRefreshing by viewModel.isRefreshing.observeAsState(true)
+                    SwipeRefresh(
+                        state = rememberSwipeRefreshState(isRefreshing),
+                        // TODO : not good
+                        indicatorPadding = PaddingValues(40.dp),
+                        onRefresh = { viewModel.refreshManga() },
+                    ) {
+                        MangaDetail(detail)
                     }
                 }
             }
         }
-        return binding.root
+        return view
     }
 
     @Composable
-    private fun Header(detail: MangaDetail?) {
+    private fun MangaDetail(detail: MangaDetail?) {
+        Column {
+            MangaHeader(detail)
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                detail?.source?.let { MangaSource(it) }
+                detail?.metadata?.description?.let { MangaDescription(it) }
+                detail?.metadata?.tags?.let { tags ->
+                    MangaTagGroups(tags,
+                        onTagClick = { search(it) },
+                        onTagLongClick = { copy(it, R.string.toast_manga_tag_saved) }
+                    )
+                }
+                detail?.let { MangaContent(it) }
+            }
+        }
+    }
+
+    @Composable
+    private fun MangaHeader(detail: MangaDetail?) {
         Box(
             Modifier
                 .fillMaxWidth()
@@ -184,16 +195,8 @@ class GalleryFragment : Fragment() {
                     modifier = Modifier
                         .weight(1f, fill = true)
                         .combinedClickable(
-                            onClick = {
-                                findNavController().navigate(
-                                    R.id.action_to_global_search,
-                                    bundleOf("keywords" to it)
-                                )
-                            },
-                            onLongClick = {
-                                copyToClipboard(it)
-                                makeToast(R.string.toast_manga_title_copied)
-                            }
+                            onClick = { globalSearch(it) },
+                            onLongClick = { copy(it, R.string.toast_manga_title_copied) }
                         ),
                     text = it
                 )
@@ -202,16 +205,8 @@ class GalleryFragment : Fragment() {
                 ?.joinToString(separator = ";")?.let {
                     Text(
                         modifier = Modifier.combinedClickable(
-                            onClick = {
-                                findNavController().navigate(
-                                    R.id.action_to_global_search,
-                                    bundleOf("keywords" to it)
-                                )
-                            },
-                            onLongClick = {
-                                copyToClipboard(it)
-                                makeToast(R.string.toast_manga_author_copied)
-                            }
+                            onClick = { globalSearch(it) },
+                            onLongClick = { copy(it, R.string.toast_manga_author_copied) }
                         ),
                         text = it,
                         style = MaterialTheme.typography.body2,
@@ -295,151 +290,80 @@ class GalleryFragment : Fragment() {
             style = MaterialTheme.typography.body2,
             modifier = Modifier.combinedClickable(
                 onClick = {},
-                onLongClick = {
-                    copyToClipboard(description)
-                    makeToast(R.string.toast_manga_description_copied)
-                }
+                onLongClick = { copy(description, R.string.toast_manga_description_copied) }
             )
         )
     }
 
     @Composable
-    private fun MangaTags(tags: List<TagGroup>) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            tags.map { TagGroup(it) }
-        }
-    }
-
-    @Composable
-    private fun TagGroup(group: TagGroup) {
-        Row {
-//            if (group.key.isNotBlank()) Tag(group.key)
-            FlowRow(
-                modifier = Modifier.padding(bottom = 8.dp),
-                mainAxisSpacing = 4.dp,
-                crossAxisSpacing = 4.dp
-            ) {
-                group.value.map { Tag(group.key, it) }
-            }
-        }
-    }
-
-    @OptIn(ExperimentalFoundationApi::class)
-    @Composable
-    private fun Tag(key: String, value: String) {
-        Surface(
-            modifier = Modifier,
-            shape = RoundedCornerShape(16.dp),
-            color = androidx.compose.ui.graphics.Color.LightGray
-        ) {
-            Text(
-                modifier = Modifier
-                    .padding(2.dp)
-                    .combinedClickable(
-                        onClick = {
-                            val keywords = if (key.isBlank()) value else "${key}:$value"
-                            if (viewModel.isFromProvider) findNavController().navigate(
-                                R.id.action_to_provider_search,
-                                bundleOf(
-                                    "keywords" to keywords,
-                                    "provider" to viewModel.provider!!
-                                )
-                            ) else findNavController().navigate(
-                                R.id.action_to_library,
-                                bundleOf("keywords" to keywords)
-                            )
-                        },
-                        onLongClick = {
-                            val keywords = if (key.isBlank()) value else "${key}:$value"
-                            copyToClipboard(keywords)
-                            makeToast(R.string.toast_manga_tag_saved)
-                        }
-                    ),
-                text = value,
-                style = MaterialTheme.typography.body2.copy(fontSize = 12.sp)
-            )
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        bindToFeedbackViewModel(viewModel)
-
-        binding.root.setColorSchemeColors(requireContext().resolveAttrColor(R.attr.colorAccent))
-        binding.root.setProgressViewOffset(
-            false,
-            binding.root.progressViewStartOffset,
-            binding.root.progressViewEndOffset
-        )
-        binding.root.isRefreshing = true
-        binding.root.setOnRefreshListener { viewModel.refreshManga() }
-        viewModel.refreshFinish.observe(viewLifecycleOwner, EventObserver {
-            binding.root.isRefreshing = false
-        })
-
-        coverSheet.isFromProvider = viewModel.isFromProvider
-
-        val contentAdapter = ContentAdapter(this, viewModel.mangaId, viewModel.providerId)
-        binding.chapters.adapter = contentAdapter
-
-        binding.displayModeButton.setOnClickListener {
-            GlobalPreference.chapterDisplayMode.setNext()
-        }
-        binding.displayOrderButton.setOnClickListener {
-            GlobalPreference.chapterDisplayOrder.setNext()
-        }
-
-        GlobalPreference.chapterDisplayMode.asFlow()
-            .onEach {
-                binding.displayModeButton.setIconResource(getChapterDisplayModeIcon())
-                binding.chapters.viewMode = when (it) {
-                    GlobalPreference.ChapterDisplayMode.GRID -> ContentView.ViewMode.GRID
-                    GlobalPreference.ChapterDisplayMode.LINEAR -> ContentView.ViewMode.LINEAR
-                }
-            }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
-
-        GlobalPreference.chapterDisplayOrder.asFlow()
-            .onEach {
-                binding.chapters.viewOrder = when (it) {
-                    GlobalPreference.ChapterDisplayOrder.ASCEND -> ContentView.ViewOrder.ASCEND
-                    GlobalPreference.ChapterDisplayOrder.DESCEND -> ContentView.ViewOrder.DESCEND
-                }
-            }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
-
-        viewModel.detail.observe(viewLifecycleOwner) {
-            if (it == null) return@observe
-            binding.contentView.isVisible = true
-            setupCollections(it.collections, it.preview)
-        }
-
-        viewModel.history.observe(viewLifecycleOwner) { history ->
-            binding.chapters.markedPosition = history?.let {
-                MarkedPosition(it.collectionIndex, it.chapterIndex, it.pageIndex)
-            }
-        }
-    }
-
-    private fun setupCollections(collections: List<ChapterCollection>, preview: List<String>?) {
-        val hasPreview = collections.size == 1 && !preview.isNullOrEmpty()
-        val hasChapter = collections.isNotEmpty()
-
-        binding.previewPages.isVisible = hasPreview
-        binding.chapterHeader.isVisible = !hasPreview && hasChapter
-        binding.chapters.isVisible = !hasPreview && hasChapter
-        binding.noChapterHint.isVisible = !hasPreview && !hasChapter
-        if (hasChapter) binding.chapters.collections = collections
-        if (hasPreview) binding.previewPages.adapter =
-            PreviewAdapter(object : PreviewAdapter.Listener {
-                override fun onPageClick(page: Int) {
+    private fun MangaContent(detail: MangaDetail) {
+        val hasPreview = detail.collections.size == 1 && !detail.preview.isNullOrEmpty()
+        val hasChapter = detail.collections.isNotEmpty()
+        when {
+            hasPreview -> MangaContentPreview(
+                preview = detail.preview!!,
+                onPageClick = {
                     navToReaderActivity(
                         viewModel.mangaId,
                         viewModel.provider?.id,
                         0,
                         0,
-                        page
+                        it
                     )
-                }
-            }).also { it.setList(preview!!) }
+                })
+            hasChapter -> {
+                val history by viewModel.history.observeAsState()
+                MangaContentChapter(
+                    collections = detail.collections,
+                    chapterMark = history?.let {
+                        ChapterMark(it.collectionIndex, it.chapterIndex, it.pageIndex)
+                    },
+                    onChapterClick = { collectionIndex, chapterIndex, pageIndex ->
+                        navToReaderActivity(
+                            detail.id,
+                            viewModel.providerId,
+                            collectionIndex,
+                            chapterIndex,
+                            pageIndex
+                        )
+                    }
+                )
+            }
+            else -> MangaNoChapter()
+        }
+    }
+
+    private fun globalSearch(keywords: String) {
+        findNavController().navigate(
+            R.id.action_to_global_search,
+            bundleOf("keywords" to keywords)
+        )
+    }
+
+    private fun search(keywords: String) {
+        if (viewModel.isFromProvider) findNavController().navigate(
+            R.id.action_to_provider_search,
+            bundleOf(
+                "keywords" to keywords,
+                "provider" to viewModel.provider!!
+            )
+        ) else findNavController().navigate(
+            R.id.action_to_library,
+            bundleOf("keywords" to keywords)
+        )
+    }
+
+    private fun copy(text: String, hintResId: Int) {
+        copy(text)
+        makeToast(hintResId)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        bindToFeedbackViewModel(viewModel)
+//        binding.root.setProgressViewOffset(
+//            false,
+//            binding.root.progressViewStartOffset,
+//            binding.root.progressViewEndOffset
+//        )
     }
 }

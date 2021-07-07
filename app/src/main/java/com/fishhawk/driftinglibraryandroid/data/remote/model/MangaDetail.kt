@@ -13,7 +13,7 @@ data class Chapter(
 @Parcelize
 data class ChapterCollection(
     val id: String,
-    val chapters: List<Chapter>
+    var chapters: List<Chapter>
 ) : Parcelable
 
 @Parcelize

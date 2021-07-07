@@ -155,7 +155,7 @@ val Fragment.inputMethodManager
     get() = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
 
 
-fun Fragment.copyToClipboard(text: String) {
+fun Fragment.copy(text: String) {
     val clip = ClipData.newPlainText("simple text", text)
     clipboardManager.setPrimaryClip(clip)
 }

@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.ui.gallery.detail
+package com.fishhawk.driftinglibraryandroid.ui.gallery
 
 import android.content.Context
 import android.view.LayoutInflater

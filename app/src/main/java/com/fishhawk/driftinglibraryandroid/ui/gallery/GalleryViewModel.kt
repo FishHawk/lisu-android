@@ -13,7 +13,6 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataDetail
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
-import com.fishhawk.driftinglibraryandroid.ui.base.Event
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import kotlinx.coroutines.launch
 import okhttp3.RequestBody
@@ -33,8 +32,8 @@ class GalleryViewModel(
     private val _detail: MutableLiveData<MangaDetail> = MutableLiveData()
     val detail: LiveData<MangaDetail> = _detail
 
-    private val _refreshFinish: MutableLiveData<Event<Boolean>> = MutableLiveData()
-    val refreshFinish: LiveData<Event<Boolean>> = _refreshFinish
+    private val _isRefreshing: MutableLiveData<Boolean> = MutableLiveData()
+    val isRefreshing: LiveData<Boolean> = _isRefreshing
 
     val history: LiveData<ReadingHistory> =
         readingHistoryRepository.observeReadingHistory(
@@ -44,15 +43,15 @@ class GalleryViewModel(
 
     fun refreshManga() {
         viewModelScope.launch {
+            _isRefreshing.value = true
             val detail =
                 if (providerId == null) remoteLibraryRepository.getManga(mangaId)
                 else remoteProviderRepository.getManga(providerId, mangaId)
+            _isRefreshing.value = false
             detail.onSuccess {
                 _detail.value = it
-                _refreshFinish.value = Event(true)
             }.onFailure {
                 feed(it)
-                _refreshFinish.value = Event(false)
             }
         }
     }
