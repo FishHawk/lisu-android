@@ -85,10 +85,7 @@ fun ChapterListLinear(
             if (order == GlobalPreference.ChapterDisplayOrder.DESCEND) it.asReversed() else it
         }
     }
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(32.dp)
-    ) {
+    LazyColumn(modifier = Modifier.fillMaxWidth()) {
         items(chapters) { (collectionIndex, chapterIndex, chapter) ->
             if (chapterMark != null &&
                 chapterMark.collectionIndex == collectionIndex &&
@@ -119,11 +116,16 @@ fun ChapterLinear(
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
+            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
             text = chapter.name,
             style = MaterialTheme.typography.subtitle2,
             color = if (isMarked) MaterialTheme.colors.secondary else MaterialTheme.colors.onSurface
         )
-        Text(chapter.title, style = MaterialTheme.typography.body1)
+        Text(
+            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
+            text = chapter.title,
+            style = MaterialTheme.typography.body1
+        )
     }
 }
 
@@ -136,7 +138,6 @@ fun ChapterListGrid(
     val nColumns = 4
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         collections.mapIndexed { collectionIndex, it ->

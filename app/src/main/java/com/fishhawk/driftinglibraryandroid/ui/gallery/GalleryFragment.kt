@@ -104,15 +104,7 @@ class GalleryFragment : Fragment() {
             ApplicationTheme {
                 ProvideWindowInsets {
                     val detail by viewModel.detail.observeAsState()
-                    val isRefreshing by viewModel.isRefreshing.observeAsState(true)
-                    SwipeRefresh(
-                        state = rememberSwipeRefreshState(isRefreshing),
-                        // TODO : not good
-                        indicatorPadding = PaddingValues(40.dp),
-                        onRefresh = { viewModel.refreshManga() },
-                    ) {
-                        MangaDetail(detail)
-                    }
+                    MangaDetail(detail)
                 }
             }
         }
@@ -123,19 +115,25 @@ class GalleryFragment : Fragment() {
     private fun MangaDetail(detail: MangaDetail?) {
         Column {
             MangaHeader(detail)
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            val isRefreshing by viewModel.isRefreshing.observeAsState(true)
+            SwipeRefresh(
+                state = rememberSwipeRefreshState(isRefreshing),
+                onRefresh = { viewModel.refreshManga() },
             ) {
-                detail?.source?.let { MangaSource(it) }
-                detail?.metadata?.description?.let { MangaDescription(it) }
-                detail?.metadata?.tags?.let { tags ->
-                    MangaTagGroups(tags,
-                        onTagClick = { search(it) },
-                        onTagLongClick = { copy(it, R.string.toast_manga_tag_saved) }
-                    )
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    detail?.source?.let { MangaSource(it) }
+                    detail?.metadata?.description?.let { MangaDescription(it) }
+                    detail?.metadata?.tags?.let { tags ->
+                        MangaTagGroups(tags,
+                            onTagClick = { search(it) },
+                            onTagLongClick = { copy(it, R.string.toast_manga_tag_saved) }
+                        )
+                    }
+                    detail?.let { MangaContent(it) }
                 }
-                detail?.let { MangaContent(it) }
             }
         }
     }
