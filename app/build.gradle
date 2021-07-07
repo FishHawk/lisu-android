@@ -80,6 +80,7 @@ dependencies {
     implementation("androidx.paging:paging-compose:1.0.0-alpha11")
 
     implementation("com.google.accompanist:accompanist-coil:0.13.0")
+    implementation("com.google.accompanist:accompanist-flowlayout:0.13.0")
     implementation("com.google.accompanist:accompanist-insets:0.13.0")
     implementation("com.google.accompanist:accompanist-insets-ui:0.13.0")
     implementation("com.google.accompanist:accompanist-swiperefresh:0.13.0")

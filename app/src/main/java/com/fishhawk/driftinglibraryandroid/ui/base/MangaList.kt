@@ -24,15 +24,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.os.bundleOf
 import androidx.lifecycle.asLiveData
+import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
+import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataOutline
+import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActionSheet
 import com.fishhawk.driftinglibraryandroid.util.setNext
 import com.google.accompanist.coil.rememberCoilPainter
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -48,6 +55,20 @@ fun MangaDisplayModeButton() {
         }
         Icon(icon, contentDescription = "Display mode")
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun RefreshableMangaList(
+    mangaList: LazyPagingItems<MangaOutline>,
+    onCardClick: (outline: MangaOutline) -> Unit = {},
+    onCardLongClick: (outline: MangaOutline) -> Unit = {}
+) {
+    val isRefreshing = mangaList.loadState.refresh is LoadState.Loading
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing),
+        onRefresh = { mangaList.refresh() },
+    ) { MangaList(mangaList, onCardClick, onCardLongClick) }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
