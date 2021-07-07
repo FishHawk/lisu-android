@@ -17,9 +17,6 @@ import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
@@ -29,20 +26,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-
-fun getDisplayModeIcon(): Int {
-    return when (GlobalPreference.displayMode.get()) {
-        GlobalPreference.DisplayMode.GRID -> R.drawable.ic_baseline_view_module_24
-        GlobalPreference.DisplayMode.LINEAR -> R.drawable.ic_baseline_view_list_24
-    }
-}
-
-fun getChapterDisplayModeIcon(): Int {
-    return when (GlobalPreference.chapterDisplayMode.get()) {
-        GlobalPreference.ChapterDisplayMode.GRID -> R.drawable.ic_baseline_view_module_24
-        GlobalPreference.ChapterDisplayMode.LINEAR -> R.drawable.ic_baseline_view_list_24
-    }
-}
 
 fun Fragment.navToReaderActivity(
     id: String,
@@ -162,13 +145,6 @@ fun Fragment.copy(text: String) {
 
 fun Fragment.closeInputMethod() {
     inputMethodManager.hideSoftInputFromWindow(requireView().windowToken, 0)
-}
-
-@ColorInt
-fun Context.resolveAttrColor(@AttrRes attrColor: Int): Int {
-    val typedValue = TypedValue()
-    theme.resolveAttribute(attrColor, typedValue, true)
-    return typedValue.data
 }
 
 

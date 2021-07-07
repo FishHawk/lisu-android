@@ -7,14 +7,11 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.ProviderPagerFragmentBinding
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.preference.ProviderBrowseHistory
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.databinding.ProviderPagerFragmentBinding
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
-import com.fishhawk.driftinglibraryandroid.ui.base.getDisplayModeIcon
 import com.fishhawk.driftinglibraryandroid.util.setNext
 
 class ProviderPagerFragment : Fragment() {
@@ -99,5 +96,12 @@ class ProviderPagerFragment : Fragment() {
             }
             else -> false
         }
+    }
+}
+
+fun getDisplayModeIcon(): Int {
+    return when (GlobalPreference.displayMode.get()) {
+        GlobalPreference.DisplayMode.GRID -> R.drawable.ic_baseline_view_module_24
+        GlobalPreference.DisplayMode.LINEAR -> R.drawable.ic_baseline_view_list_24
     }
 }
