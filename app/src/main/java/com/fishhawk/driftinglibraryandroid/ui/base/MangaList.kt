@@ -1,6 +1,9 @@
 package com.fishhawk.driftinglibraryandroid.ui.base
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Card
@@ -11,7 +14,9 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ViewList
 import androidx.compose.material.icons.filled.ViewModule
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,22 +25,20 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.lifecycle.asLiveData
-import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
-import com.fishhawk.driftinglibraryandroid.R
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataOutline
-import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActionSheet
 import com.fishhawk.driftinglibraryandroid.util.setNext
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -133,8 +136,13 @@ fun MangaCardLinear(
     ) {
         Row {
             Box(Modifier.aspectRatio(0.75f)) {
+                val request = ImageRequest.Builder(LocalContext.current)
+                    .data(outline?.cover)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .build()
                 Image(
-                    painter = rememberCoilPainter(outline?.cover, fadeIn = true),
+                    painter = rememberCoilPainter(request, fadeIn = true),
                     contentDescription = outline?.id,
                     contentScale = ContentScale.Crop
                 )
@@ -242,8 +250,13 @@ fun MangaCardGrid(
             contentAlignment = Alignment.BottomStart
         ) {
             if (outline?.cover != null) {
+                val request = ImageRequest.Builder(LocalContext.current)
+                    .data(outline.cover)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .build()
                 Image(
-                    painter = rememberCoilPainter(outline.cover, fadeIn = true),
+                    painter = rememberCoilPainter(request, fadeIn = true),
                     contentDescription = outline.id,
                     contentScale = ContentScale.Crop
                 )
