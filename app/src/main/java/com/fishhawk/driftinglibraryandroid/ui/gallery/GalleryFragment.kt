@@ -250,10 +250,8 @@ class GalleryFragment : Fragment() {
                         }
                     }
                 ) {
-                    Row {
-                        Icon(Icons.Filled.PlayArrow, "Read")
-                        Text("Read")
-                    }
+                    Icon(Icons.Filled.PlayArrow, "Read")
+                    Text("Read")
                 }
                 if (viewModel.isFromProvider) {
                     TextButton(

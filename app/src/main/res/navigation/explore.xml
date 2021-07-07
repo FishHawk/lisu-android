@@ -7,8 +7,7 @@
 
     <fragment
         android:id="@+id/nav_explore"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.explore.ExploreFragment"
-        tools:layout="@layout/explore_fragment">
+        android:name="com.fishhawk.driftinglibraryandroid.ui.explore.ExploreFragment">
 
         <action
             android:id="@+id/action_explore_to_global_search"
