@@ -121,7 +121,9 @@ class GalleryFragment : Fragment() {
                 onRefresh = { viewModel.refreshManga() },
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     detail?.source?.let { MangaSource(it) }

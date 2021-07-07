@@ -85,8 +85,8 @@ fun ChapterListLinear(
             if (order == GlobalPreference.ChapterDisplayOrder.DESCEND) it.asReversed() else it
         }
     }
-    LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        items(chapters) { (collectionIndex, chapterIndex, chapter) ->
+    Column(modifier = Modifier.fillMaxWidth()) {
+        chapters.map { (collectionIndex, chapterIndex, chapter) ->
             if (chapterMark != null &&
                 chapterMark.collectionIndex == collectionIndex &&
                 chapterMark.chapterIndex == chapterIndex
@@ -136,26 +136,24 @@ fun ChapterListGrid(
     onChapterClick: OnChapterClickListener
 ) {
     val nColumns = 4
-    LazyColumn(
+    Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         collections.mapIndexed { collectionIndex, it ->
             if (it.chapters.isEmpty()) return@mapIndexed
             if (it.id.isNotBlank()) {
-                item {
-                    Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(2.dp),
-                        text = it.id,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(2.dp),
+                    text = it.id,
+                    textAlign = TextAlign.Center
+                )
             }
 
             val rows = (it.chapters.size + nColumns - 1) / nColumns
-            items(rows) { rowIndex ->
+            (0..rows).map { rowIndex ->
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
