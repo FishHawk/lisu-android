@@ -6,7 +6,6 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.Result
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
@@ -30,14 +29,13 @@ class ProviderMangaSource(
 ) : PagingSource<Int, MangaOutline>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MangaOutline> {
         val page = params.key ?: 1
-        return when (val result = loadFunction(page, option)) {
-            is Result.Success -> LoadResult.Page(
-                data = result.data,
+        return loadFunction(page, option).fold({
+            LoadResult.Page(
+                data = it,
                 prevKey = null,
-                nextKey = if (result.data.isEmpty()) null else page.plus(1)
+                nextKey = if (it.isEmpty()) null else page.plus(1)
             )
-            is Result.Error -> LoadResult.Error(result.exception)
-        }
+        }, { LoadResult.Error(it) })
     }
 
     override fun getRefreshKey(state: PagingState<Int, MangaOutline>): Int = 1
@@ -83,13 +81,13 @@ class ProviderViewModel(
     }
 
     val popularOptionModel = detail.map {
-        if (it is Result.Success) it.data.optionModels.popular else mapOf()
+        it?.getOrNull()?.optionModels?.popular ?: mapOf()
     }
     val latestOptionModel = detail.map {
-        if (it is Result.Success) it.data.optionModels.latest else mapOf()
+        it?.getOrNull()?.optionModels?.latest ?: mapOf()
     }
     val categoryOptionModel = detail.map {
-        if (it is Result.Success) it.data.optionModels.category else mapOf()
+        it?.getOrNull()?.optionModels?.category ?: mapOf()
     }
 
     val popularMangaList = ProviderMangaList(viewModelScope) { page, option ->

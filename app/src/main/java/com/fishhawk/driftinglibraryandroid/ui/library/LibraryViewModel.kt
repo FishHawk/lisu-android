@@ -2,7 +2,6 @@ package com.fishhawk.driftinglibraryandroid.ui.library
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
-import com.fishhawk.driftinglibraryandroid.data.Result
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
@@ -39,18 +38,16 @@ class LibraryViewModel(
 
     inner class LibraryMangaSource : PagingSource<Long, MangaOutline>() {
         override suspend fun load(params: LoadParams<Long>): LoadResult<Long, MangaOutline> {
-            val result = repository.listManga(
+            return repository.listManga(
                 params.key ?: Long.MAX_VALUE,
                 keywords.value
-            )
-            return when (result) {
-                is Result.Success -> LoadResult.Page(
-                    data = result.data,
+            ).fold({
+                LoadResult.Page(
+                    data = it,
                     prevKey = null,
-                    nextKey = result.data.lastOrNull()?.updateTime
+                    nextKey = it.lastOrNull()?.updateTime
                 )
-                is Result.Error -> LoadResult.Error(result.exception)
-            }
+            }, { LoadResult.Error(it) })
         }
 
         override fun getRefreshKey(state: PagingState<Long, MangaOutline>): Long? = null

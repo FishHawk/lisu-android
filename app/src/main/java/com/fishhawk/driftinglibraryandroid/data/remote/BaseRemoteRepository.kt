@@ -1,7 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.data.remote
 
-import com.fishhawk.driftinglibraryandroid.data.Result
-
 open class BaseRemoteRepository<Service> {
     var url: String? = null
     var service: Service? = null
@@ -9,10 +7,10 @@ open class BaseRemoteRepository<Service> {
     protected inline fun <T> resultWrap(func: (Service) -> T): Result<T> {
         return service?.let {
             try {
-                Result.Success(func(service!!))
+                Result.success(func(service!!))
             } catch (e: Exception) {
-                Result.Error(e)
+                Result.failure(e)
             }
-        } ?: Result.Error(IllegalAccessError())
+        } ?: Result.failure(IllegalAccessError())
     }
 }

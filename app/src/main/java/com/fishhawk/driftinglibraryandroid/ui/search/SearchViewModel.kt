@@ -3,7 +3,6 @@ package com.fishhawk.driftinglibraryandroid.ui.search
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.Result
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
@@ -50,19 +49,17 @@ class SearchViewModel(
     inner class ProviderSearchMangaSource : PagingSource<Int, MangaOutline>() {
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MangaOutline> {
             val page = params.key ?: 1
-            val result = remoteProviderRepository.listManga(
+            return remoteProviderRepository.listManga(
                 provider.id,
                 keywords.value,
                 page
-            )
-            return when (result) {
-                is Result.Success -> LoadResult.Page(
-                    data = result.data,
+            ).fold({
+                LoadResult.Page(
+                    data = it,
                     prevKey = null,
                     nextKey = page.plus(1)
                 )
-                is Result.Error -> LoadResult.Error(result.exception)
-            }
+            }, { LoadResult.Error(it) })
         }
 
         override fun getRefreshKey(state: PagingState<Int, MangaOutline>): Int = 0

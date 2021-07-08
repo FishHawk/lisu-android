@@ -4,7 +4,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.fishhawk.driftinglibraryandroid.data.Result
 
 open class FeedbackViewModel : ViewModel() {
     private val _feedback: MutableLiveData<Event<Feedback>> = MutableLiveData()
@@ -19,10 +18,7 @@ open class FeedbackViewModel : ViewModel() {
     }
 
     protected fun <T> resultWarp(result: Result<T>, runIfSuccess: (T) -> Unit) {
-        when (result) {
-            is Result.Success -> runIfSuccess(result.data)
-            is Result.Error -> feed(result.exception)
-        }
+        result.onSuccess { runIfSuccess(it) }.onFailure { feed(it) }
     }
 }
 

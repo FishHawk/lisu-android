@@ -1,7 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.globalsearch
 
 import androidx.lifecycle.*
-import com.fishhawk.driftinglibraryandroid.data.Result
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
@@ -34,14 +33,13 @@ class GlobalSearchViewModel(
     private fun search() =
         viewModelScope.launch {
             val keywords = keywords.value ?: return@launch
-            val providerList = (providerList.value as? Result.Success)?.data ?: return@launch
-
-            searchGroupList.value = providerList.map { info ->
-                SearchGroup(info, null)
-            }
-
-            searchGroupList.value = providerList.map { info ->
-                SearchGroup(info, remoteLibraryRepository.listManga(info.id, keywords, 1))
+            providerList.value?.onSuccess {
+                searchGroupList.value = it.map { info ->
+                    SearchGroup(info, null)
+                }
+                searchGroupList.value = it.map { info ->
+                    SearchGroup(info, remoteLibraryRepository.listManga(info.id, keywords, 1))
+                }
             }
         }
 }

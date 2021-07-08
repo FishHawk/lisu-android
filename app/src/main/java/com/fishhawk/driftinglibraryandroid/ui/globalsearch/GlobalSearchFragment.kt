@@ -26,10 +26,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.Result
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.ErrorItem
-import com.fishhawk.driftinglibraryandroid.ui.base.LoadingItem
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaCardGrid
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
 import com.google.accompanist.insets.LocalWindowInsets
@@ -106,36 +104,32 @@ class GlobalSearchFragment : Fragment() {
                         }
                     }
                     val provider = it.provider
-                    when (val result = it.result) {
-                        is Result.Success -> LazyRow(
-                            modifier = Modifier.height(140.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            items(result.data) {
-                                Box(
-                                    modifier = Modifier.weight(1f, fill = true),
-                                    propagateMinConstraints = true
-                                ) {
-                                    MangaCardGrid(it,
-                                        onCardClick = {
-                                            findNavController().navigate(
-                                                R.id.action_to_gallery_detail,
-                                                bundleOf(
-                                                    "outline" to it,
-                                                    "provider" to provider
+                    it.result?.fold(
+                        {
+                            LazyRow(
+                                modifier = Modifier.height(140.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                items(it) {
+                                    Box(
+                                        modifier = Modifier.weight(1f, fill = true),
+                                        propagateMinConstraints = true
+                                    ) {
+                                        MangaCardGrid(it,
+                                            onCardClick = {
+                                                findNavController().navigate(
+                                                    R.id.action_to_gallery_detail,
+                                                    bundleOf(
+                                                        "outline" to it,
+                                                        "provider" to provider
+                                                    )
                                                 )
-                                            )
-                                        })
+                                            })
+                                    }
                                 }
                             }
-
-                        }
-                        is Result.Error -> ErrorItem(
-                            message = result.exception.message ?: "",
-                            onClickRetry = {}
-                        )
-                        null -> LoadingItem()
-                    }
+                        }, { ErrorItem(message = it.message ?: "", onClickRetry = {}) }
+                    )
                 }
             }
         }
