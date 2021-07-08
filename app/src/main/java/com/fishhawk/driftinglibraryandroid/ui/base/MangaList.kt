@@ -55,7 +55,6 @@ fun MangaDisplayModeButton() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RefreshableMangaList(
     mangaList: LazyPagingItems<MangaOutline>,
@@ -69,7 +68,6 @@ fun RefreshableMangaList(
     ) { MangaList(mangaList, onCardClick, onCardLongClick) }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MangaList(
     mangaList: LazyPagingItems<MangaOutline>,
@@ -101,7 +99,6 @@ fun MangaList(
     }
 }
 
-@ExperimentalFoundationApi
 @Composable
 fun MangaListLinear(
     mangaList: LazyPagingItems<MangaOutline>,
@@ -126,7 +123,7 @@ fun MangaListLinear(
     }
 }
 
-@ExperimentalFoundationApi
+@OptIn(ExperimentalFoundationApi::class)
 @Preview(widthDp = 300)
 @Composable
 fun MangaCardLinear(
@@ -179,7 +176,6 @@ fun MangaCardLinear(
     }
 }
 
-@ExperimentalFoundationApi
 @Composable
 fun MangaListGrid(
     mangaList: LazyPagingItems<MangaOutline>,
@@ -203,7 +199,13 @@ fun MangaListGrid(
                         Box(
                             modifier = Modifier.weight(1f, fill = true),
                             propagateMinConstraints = true
-                        ) { MangaCardGrid(mangaList.peek(itemIndex), onCardClick, onCardLongClick) }
+                        ) {
+                            MangaCardGrid(
+                                mangaList.getAsState(itemIndex).value,
+                                onCardClick,
+                                onCardLongClick
+                            )
+                        }
                     } else {
                         Spacer(Modifier.weight(1f, fill = true))
                     }

@@ -34,13 +34,13 @@ class ProviderMangaSource(
             is Result.Success -> LoadResult.Page(
                 data = result.data,
                 prevKey = null,
-                nextKey = page.plus(1)
+                nextKey = if (result.data.isEmpty()) null else page.plus(1)
             )
             is Result.Error -> LoadResult.Error(result.exception)
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, MangaOutline>): Int = 0
+    override fun getRefreshKey(state: PagingState<Int, MangaOutline>): Int = 1
 }
 
 class ProviderMangaList(
@@ -77,7 +77,7 @@ class ProviderViewModel(
     val provider: ProviderInfo
 ) : FeedbackViewModel() {
 
-    val detail: LiveData<Result<ProviderDetail>?> = liveData {
+    private val detail: LiveData<Result<ProviderDetail>?> = liveData {
         emit(null)
         emit(remoteProviderRepository.getProvider(provider.id))
     }
