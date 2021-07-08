@@ -30,9 +30,7 @@
 
     <fragment
         android:id="@+id/nav_provider_pager"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.provider.ProviderPagerFragment"
-        android:label=""
-        tools:layout="@layout/provider_pager_fragment">
+        android:name="com.fishhawk.driftinglibraryandroid.ui.provider.ProviderPagerFragment">
 
         <action
             android:id="@+id/action_to_search"
