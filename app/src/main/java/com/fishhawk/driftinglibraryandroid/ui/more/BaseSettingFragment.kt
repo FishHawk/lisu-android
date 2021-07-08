@@ -4,13 +4,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NavigateBefore
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceFragmentCompat
-import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.SettingFragmentBinding
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.google.accompanist.insets.ui.TopAppBar
 
 abstract class BaseSettingFragment : PreferenceFragmentCompat() {
-    protected lateinit var binding: SettingFragmentBinding
     protected abstract val titleResId: Int
 
     override fun onCreateView(
@@ -18,12 +31,33 @@ abstract class BaseSettingFragment : PreferenceFragmentCompat() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = super.onCreateView(inflater, container, savedInstanceState)
-        binding = SettingFragmentBinding.inflate(inflater, container, false)
-        binding.preference.addView(view)
-        binding.toolbar.title = getString(titleResId)
-        binding.toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
-        binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
-        return binding.root
+        val contentView = super.onCreateView(inflater, container, savedInstanceState)!!
+        val view = ComposeView(requireContext())
+        view.setContent {
+            ApplicationTheme {
+                ProvideWindowInsets {
+                    Scaffold(
+                        topBar = {
+                            TopAppBar(
+                                contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
+                                title = { Text(stringResource(titleResId)) },
+                                navigationIcon = {
+                                    IconButton(onClick = { findNavController().navigateUp() }) {
+                                        Icon(Icons.Filled.NavigateBefore, "back")
+                                    }
+                                }
+                            )
+                        },
+                        content = {
+                            AndroidView(
+                                modifier = Modifier.fillMaxSize(),
+                                factory = { contentView }
+                            )
+                        }
+                    )
+                }
+            }
+        }
+        return view
     }
 }

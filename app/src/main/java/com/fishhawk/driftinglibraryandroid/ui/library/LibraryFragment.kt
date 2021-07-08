@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -56,7 +57,7 @@ class LibraryFragment : Fragment() {
     private fun ToolBar() {
         TopAppBar(
             contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
-            title = { Text("Library") },
+            title = { Text(stringResource(R.string.label_library)) },
             actions = {
                 IconButton(onClick = { }) {
                     Icon(Icons.Filled.Search, contentDescription = "search")

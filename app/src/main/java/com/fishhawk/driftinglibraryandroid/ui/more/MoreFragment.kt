@@ -4,15 +4,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.databinding.MoreFragmentBinding
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.google.accompanist.insets.ui.TopAppBar
 
 class MoreFragment : PreferenceFragmentCompat() {
-    private lateinit var binding: MoreFragmentBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -30,10 +40,29 @@ class MoreFragment : PreferenceFragmentCompat() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view = super.onCreateView(inflater, container, savedInstanceState)
-        binding = MoreFragmentBinding.inflate(inflater, container, false)
-        binding.preference.addView(view)
-        return binding.root
+        val contentView = super.onCreateView(inflater, container, savedInstanceState)!!
+        val view = ComposeView(requireContext())
+        view.setContent {
+            ApplicationTheme {
+                ProvideWindowInsets {
+                    Scaffold(
+                        topBar = {
+                            TopAppBar(
+                                contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
+                                title = { Text(stringResource(R.string.label_more)) }
+                            )
+                        },
+                        content = {
+                            AndroidView(
+                                modifier = Modifier.fillMaxSize(),
+                                factory = { contentView }
+                            )
+                        }
+                    )
+                }
+            }
+        }
+        return view
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
