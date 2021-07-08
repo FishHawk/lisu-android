@@ -77,13 +77,27 @@ fun MangaList(
     onCardLongClick: (outline: MangaOutline) -> Unit = {}
 ) {
     val mode by GlobalPreference.displayMode.asFlow().asLiveData().observeAsState()
-    when (mode) {
-        GlobalPreference.DisplayMode.GRID -> MangaListGrid(
-            mangaList, onCardClick, onCardLongClick
-        )
-        GlobalPreference.DisplayMode.LINEAR -> MangaListLinear(
-            mangaList, onCardClick, onCardLongClick
-        )
+    Box(modifier = Modifier.fillMaxSize()) {
+        when (val state = mangaList.loadState.refresh) {
+            is LoadState.Loading -> LoadingView()
+            is LoadState.Error -> ErrorView(
+                message = state.error.localizedMessage!!,
+                onClickRetry = { mangaList.retry() }
+            )
+            is LoadState.NotLoading -> {
+                if (mangaList.itemCount == 0) EmptyView()
+                else {
+                    when (mode) {
+                        GlobalPreference.DisplayMode.GRID -> MangaListGrid(
+                            mangaList, onCardClick, onCardLongClick
+                        )
+                        GlobalPreference.DisplayMode.LINEAR -> MangaListLinear(
+                            mangaList, onCardClick, onCardLongClick
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
