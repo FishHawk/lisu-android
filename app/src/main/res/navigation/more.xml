@@ -31,8 +31,7 @@
     <fragment
         android:id="@+id/nav_server"
         android:name="com.fishhawk.driftinglibraryandroid.ui.server.ServerFragment"
-        android:label="@string/label_server"
-        tools:layout="@layout/server_fragment" />
+        android:label="@string/label_server" />
 
     <fragment
         android:id="@+id/nav_setting_general"

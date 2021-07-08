@@ -20,14 +20,6 @@ class ServerViewModel(
         serverInfoList.value = serverInfoRepository.listAllServerInfo()
     }
 
-    fun saveServerListOrder() = viewModelScope.launch {
-        serverInfoList.value?.forEachIndexed { position, serverInfo ->
-            serverInfo.position = position
-            serverInfoRepository.updateServerInfo(serverInfo)
-        }
-        loadServerList()
-    }
-
     fun addServer(serverInfo: ServerInfo) = viewModelScope.launch {
         val maxPosition = serverInfoList.value?.map { it.position }?.maxOrNull()
         serverInfo.position = maxPosition?.plus(1) ?: 0

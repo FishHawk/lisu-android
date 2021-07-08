@@ -1,35 +1,85 @@
 package com.fishhawk.driftinglibraryandroid.ui.server
 
-import android.view.LayoutInflater
-import androidx.appcompat.app.AlertDialog
-import com.fishhawk.driftinglibraryandroid.databinding.ServerInfoDialogBinding
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
 
-fun ServerFragment.createServerInfoDialog(
+@Composable
+fun ServerEditDialog(
+    isOpen: MutableState<Boolean>,
     serverInfo: ServerInfo? = null,
     onAccept: (name: String, address: String) -> Unit
 ) {
-    val dialogBinding =
-        ServerInfoDialogBinding.inflate(
-            LayoutInflater.from(context), null, false
+    var name by remember { mutableStateOf(TextFieldValue(serverInfo?.name ?: "")) }
+    var address by remember { mutableStateOf(TextFieldValue(serverInfo?.address ?: "")) }
+
+    if (isOpen.value) {
+        AlertDialog(
+            modifier = Modifier.fillMaxWidth(0.8f),
+            onDismissRequest = { isOpen.value = false },
+            title = { Text(text = if (serverInfo == null) "Add server" else "Edit server") },
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    TextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        maxLines = 1,
+                        label = { Text("Name") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.Transparent,
+                            cursorColor = MaterialTheme.colors.secondary,
+                            focusedLabelColor = MaterialTheme.colors.secondary,
+                            focusedIndicatorColor = MaterialTheme.colors.secondary,
+                        )
+                    )
+                    TextField(
+                        value = address,
+                        onValueChange = { address = it },
+                        maxLines = 1,
+                        label = { Text("Address") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.Transparent,
+                            cursorColor = MaterialTheme.colors.secondary,
+                            focusedLabelColor = MaterialTheme.colors.secondary,
+                            focusedIndicatorColor = MaterialTheme.colors.secondary,
+                        )
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colors.secondary
+                    ),
+                    onClick = {
+                        onAccept(name.text, address.text)
+                        isOpen.value = false
+                    }) {
+                    Text("ok")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colors.secondary
+                    ),
+                    onClick = { isOpen.value = false }) {
+                    Text("cancel")
+                }
+            }
         )
-
-    val title = if (serverInfo == null) "Add server" else "Edit server"
-
-    if (serverInfo != null) {
-        dialogBinding.name.setText(serverInfo.name)
-        dialogBinding.address.setText(serverInfo.address)
     }
-
-    AlertDialog.Builder(requireActivity())
-        .setTitle(title)
-        .setView(dialogBinding.root)
-        .setPositiveButton("OK") { _, _ ->
-            onAccept(
-                dialogBinding.name.text.toString(),
-                dialogBinding.address.text.toString()
-            )
-        }
-        .setNegativeButton("Cancel") { _, _ -> }
-        .show()
 }
