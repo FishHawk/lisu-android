@@ -71,6 +71,7 @@ class HistoryFragment : Fragment() {
     @Composable
     private fun ToolBar() {
         TopAppBar(
+            backgroundColor = MaterialTheme.colors.secondary,
             contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
             title = { Text(stringResource(R.string.label_history)) },
             actions = {
@@ -186,9 +187,6 @@ class HistoryFragment : Fragment() {
                 title = { Text(text = stringResource(R.string.dialog_clear_history)) },
                 confirmButton = {
                     TextButton(
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colors.secondary
-                        ),
                         onClick = {
                             viewModel.clearReadingHistory()
                             isOpen.value = false
@@ -213,7 +211,7 @@ class HistoryFragment : Fragment() {
                         GlobalPreference.historyFilter.get()
                     )
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         enumValues<GlobalPreference.HistoryFilter>().forEachIndexed { index, it ->
                             Row(
@@ -223,7 +221,10 @@ class HistoryFragment : Fragment() {
                             ) {
                                 RadioButton(
                                     selected = (it == selectedOption),
-                                    onClick = { GlobalPreference.historyFilter.set(it) }
+                                    onClick = { GlobalPreference.historyFilter.set(it) },
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = MaterialTheme.colors.primary
+                                    )
                                 )
                                 Text(
                                     text = optionEntries[index],

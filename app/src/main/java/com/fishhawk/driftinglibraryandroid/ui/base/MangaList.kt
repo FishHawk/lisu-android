@@ -287,8 +287,7 @@ fun MangaCover(cover: String?) {
         )
         when (painter.loadState) {
             is ImageLoadState.Loading -> CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center),
-                color = MaterialTheme.colors.secondary
+                modifier = Modifier.align(Alignment.Center)
             )
 //            is ImageLoadState.Error ->
 //            ImageLoadState.Empty ->

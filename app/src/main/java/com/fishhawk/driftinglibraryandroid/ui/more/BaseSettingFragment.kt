@@ -5,10 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NavigateBefore
 import androidx.compose.ui.Modifier
@@ -39,6 +36,7 @@ abstract class BaseSettingFragment : PreferenceFragmentCompat() {
                     Scaffold(
                         topBar = {
                             TopAppBar(
+                                backgroundColor = MaterialTheme.colors.secondary,
                                 contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
                                 title = { Text(stringResource(titleResId)) },
                                 navigationIcon = {

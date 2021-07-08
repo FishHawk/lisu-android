@@ -129,7 +129,7 @@ abstract class ProviderBaseFragment : Fragment() {
                         style = TextStyle(fontSize = 12.sp).merge(),
                         text = option,
                         color = if (index != selectedIndex) MaterialTheme.colors.onSurface
-                        else MaterialTheme.colors.secondary
+                        else MaterialTheme.colors.primary
                     )
                 }
             }

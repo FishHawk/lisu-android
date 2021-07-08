@@ -4,14 +4,13 @@ import androidx.compose.material.lightColors
 import androidx.compose.ui.graphics.Color
 
 val ColorsLight = lightColors(
-    primary = MaterialColors.White,
-    primaryVariant = MaterialColors.White,
-    secondary = MaterialColors.BlueA400,
-    secondaryVariant = MaterialColors.BlueA400,
+    primary = MaterialColors.BlueA400,
+    primaryVariant = MaterialColors.BlueA400,
+    secondary = MaterialColors.White,
+    secondaryVariant = MaterialColors.White,
     background = MaterialColors.Gray50,
-//    surface = Color.Material.White,
-    onPrimary = MaterialColors.Black,
-    onSecondary = MaterialColors.White,
+    onPrimary = MaterialColors.White,
+    onSecondary = MaterialColors.Black,
     onBackground = Color(0xDE000000),
     onSurface = Color(0xDE000000),
 )

@@ -83,7 +83,7 @@ fun MangaNoChapter() {
     ) {
         Text(
             text = stringResource(R.string.gallery_no_chapters_hint),
-            color = MaterialTheme.colors.secondary
+            color = MaterialTheme.colors.primary
         )
     }
 }

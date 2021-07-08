@@ -67,6 +67,7 @@ class ExploreFragment : Fragment() {
     @Composable
     private fun ToolBar() {
         TopAppBar(
+            backgroundColor = MaterialTheme.colors.secondary,
             contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
             title = { Text(stringResource(R.string.label_explore)) },
             actions = {
@@ -130,9 +131,6 @@ class ExploreFragment : Fragment() {
                     overflow = TextOverflow.Ellipsis,
                 )
                 TextButton(
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colors.secondary
-                    ),
                     onClick = { openProvider(provider) }) {
                     Text(text = stringResource(R.string.explore_card_browse))
                 }

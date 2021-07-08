@@ -60,6 +60,7 @@ class ServerFragment : Fragment() {
     @Composable
     private fun ToolBar() {
         TopAppBar(
+            backgroundColor = MaterialTheme.colors.secondary,
             contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
             title = { Text(stringResource(R.string.label_server)) },
             actions = {
@@ -112,7 +113,7 @@ class ServerFragment : Fragment() {
                         .width(8.dp)
                         .fillMaxHeight()
                         .background(
-                            if (selected) MaterialTheme.colors.secondary
+                            if (selected) MaterialTheme.colors.primary
                             else Color.LightGray
                         )
                 )

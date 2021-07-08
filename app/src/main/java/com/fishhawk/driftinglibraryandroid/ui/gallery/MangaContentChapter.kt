@@ -119,7 +119,7 @@ fun ChapterLinear(
             modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
             text = chapter.name,
             style = MaterialTheme.typography.subtitle2,
-            color = if (isMarked) MaterialTheme.colors.secondary else MaterialTheme.colors.onSurface
+            color = if (isMarked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
         )
         Text(
             modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
@@ -200,8 +200,8 @@ fun ChapterGrid(
 ) {
     Surface(
         shape = RoundedCornerShape(2.dp),
-        border = BorderStroke(1.dp, if (isMarked) MaterialTheme.colors.secondary else Color.Gray),
-        color = if (isMarked) MaterialTheme.colors.secondary else Color.Transparent
+        border = BorderStroke(1.dp, if (isMarked) MaterialTheme.colors.primary else Color.Gray),
+        color = if (isMarked) MaterialTheme.colors.primary else Color.Transparent
     ) {
         Text(
             modifier = Modifier

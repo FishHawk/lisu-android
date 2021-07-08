@@ -2,10 +2,7 @@ package com.fishhawk.driftinglibraryandroid.ui.search
 
 import android.os.Bundle
 import android.view.*
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
@@ -64,6 +61,7 @@ class SearchFragment : Fragment() {
     @Composable
     private fun ToolBar() {
         TopAppBar(
+            backgroundColor = MaterialTheme.colors.secondary,
             contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
             title = { Text(stringResource(R.string.label_search)) },
             actions = {

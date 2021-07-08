@@ -22,10 +22,7 @@ fun EmptyView() {
 @Composable
 fun LoadingView() {
     Box(modifier = Modifier.fillMaxSize()) {
-        CircularProgressIndicator(
-            modifier = Modifier.align(Alignment.Center),
-            color = colors.secondary
-        )
+        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
     }
 }
 
@@ -36,10 +33,7 @@ fun LoadingItem(modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        CircularProgressIndicator(
-            modifier = Modifier.align(Alignment.Center),
-            color = colors.secondary
-        )
+        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
     }
 }
 
@@ -62,12 +56,7 @@ fun ErrorView(
             style = typography.h6,
             color = colors.error
         )
-        OutlinedButton(
-            colors = ButtonDefaults.textButtonColors(
-                contentColor = colors.secondary
-            ),
-            onClick = onClickRetry
-        ) {
+        OutlinedButton(onClick = onClickRetry) {
             Text(text = "Try again")
         }
     }
@@ -91,12 +80,7 @@ fun ErrorItem(
             style = typography.h6,
             color = colors.error
         )
-        OutlinedButton(
-            colors = ButtonDefaults.textButtonColors(
-                contentColor = colors.secondary
-            ),
-            onClick = onClickRetry
-        ) {
+        OutlinedButton(onClick = onClickRetry) {
             Text(text = "Try again")
         }
     }

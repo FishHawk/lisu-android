@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -48,6 +49,7 @@ class MoreFragment : PreferenceFragmentCompat() {
                     Scaffold(
                         topBar = {
                             TopAppBar(
+                                backgroundColor = MaterialTheme.colors.secondary,
                                 contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
                                 title = { Text(stringResource(R.string.label_more)) }
                             )

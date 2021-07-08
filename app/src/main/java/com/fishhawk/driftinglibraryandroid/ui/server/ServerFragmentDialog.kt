@@ -39,9 +39,6 @@ fun ServerEditDialog(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         colors = TextFieldDefaults.textFieldColors(
                             backgroundColor = Color.Transparent,
-                            cursorColor = MaterialTheme.colors.secondary,
-                            focusedLabelColor = MaterialTheme.colors.secondary,
-                            focusedIndicatorColor = MaterialTheme.colors.secondary,
                         )
                     )
                     TextField(
@@ -52,18 +49,12 @@ fun ServerEditDialog(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
                         colors = TextFieldDefaults.textFieldColors(
                             backgroundColor = Color.Transparent,
-                            cursorColor = MaterialTheme.colors.secondary,
-                            focusedLabelColor = MaterialTheme.colors.secondary,
-                            focusedIndicatorColor = MaterialTheme.colors.secondary,
                         )
                     )
                 }
             },
             confirmButton = {
                 TextButton(
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colors.secondary
-                    ),
                     onClick = {
                         onAccept(name.text, address.text)
                         isOpen.value = false
@@ -72,11 +63,7 @@ fun ServerEditDialog(
                 }
             },
             dismissButton = {
-                TextButton(
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colors.secondary
-                    ),
-                    onClick = { isOpen.value = false }) {
+                TextButton(onClick = { isOpen.value = false }) {
                     Text("cancel")
                 }
             }
