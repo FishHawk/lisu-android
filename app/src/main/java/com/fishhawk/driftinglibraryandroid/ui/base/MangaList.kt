@@ -6,11 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
+import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ViewList
 import androidx.compose.material.icons.filled.ViewModule
@@ -25,7 +22,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,13 +30,12 @@ import androidx.lifecycle.asLiveData
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
-import coil.request.CachePolicy
-import coil.request.ImageRequest
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataOutline
 import com.fishhawk.driftinglibraryandroid.util.setNext
 import com.google.accompanist.coil.rememberCoilPainter
+import com.google.accompanist.imageloading.ImageLoadState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import java.text.SimpleDateFormat
@@ -135,18 +130,7 @@ fun MangaCardLinear(
             )
     ) {
         Row {
-            Box(Modifier.aspectRatio(0.75f)) {
-                val request = ImageRequest.Builder(LocalContext.current)
-                    .data(outline?.cover)
-                    .memoryCachePolicy(CachePolicy.ENABLED)
-                    .diskCachePolicy(CachePolicy.ENABLED)
-                    .build()
-                Image(
-                    painter = rememberCoilPainter(request, fadeIn = true),
-                    contentDescription = outline?.id,
-                    contentScale = ContentScale.Crop
-                )
-            }
+            MangaCover(cover = outline?.cover)
             Column(
                 Modifier.padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -245,25 +229,11 @@ fun MangaCardGrid(
             onLongClick = { outline?.let { onCardLongClick(it) } }
         )
     ) {
-        Box(
-            modifier = Modifier.aspectRatio(0.75f),
-            contentAlignment = Alignment.BottomStart
-        ) {
-            if (outline?.cover != null) {
-                val request = ImageRequest.Builder(LocalContext.current)
-                    .data(outline.cover)
-                    .memoryCachePolicy(CachePolicy.ENABLED)
-                    .diskCachePolicy(CachePolicy.ENABLED)
-                    .build()
-                Image(
-                    painter = rememberCoilPainter(request, fadeIn = true),
-                    contentDescription = outline.id,
-                    contentScale = ContentScale.Crop
-                )
-            }
+        Box {
+            MangaCover(cover = outline?.cover)
             Box(
-                Modifier
-                    .fillMaxSize()
+                modifier = Modifier
+                    .matchParentSize()
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
@@ -272,18 +242,41 @@ fun MangaCardGrid(
                                 Color(0xaa000000)
                             ),
                         )
-                    )
+                    ),
+                contentAlignment = Alignment.BottomStart
+            ) {
+                Text(
+                    modifier = Modifier.padding(8.dp),
+                    text = outline?.title ?: "",
+                    style = typography.subtitle2.copy(
+                        shadow = Shadow(Color.White, Offset.Zero, 2f)
+                    ),
+                    color = Color.White,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun MangaCover(cover: String?) {
+    Box(Modifier.aspectRatio(0.75f)) {
+        val painter = rememberCoilPainter(cover, fadeIn = true)
+        Image(
+            painter = painter,
+            contentDescription = "cover",
+            contentScale = ContentScale.Crop
+        )
+        when (painter.loadState) {
+            is ImageLoadState.Loading -> CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = MaterialTheme.colors.secondary
             )
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text = outline?.title ?: "",
-                style = typography.subtitle2.copy(
-                    shadow = Shadow(Color.White, Offset.Zero, 2f)
-                ),
-                color = Color.White,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
+//            is ImageLoadState.Error ->
+//            ImageLoadState.Empty ->
+            else -> Unit
         }
     }
 }

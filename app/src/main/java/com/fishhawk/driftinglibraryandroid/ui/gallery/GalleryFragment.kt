@@ -149,8 +149,6 @@ class GalleryFragment : Fragment() {
         ) {
             val request = ImageRequest.Builder(LocalContext.current)
                 .data(detail?.cover)
-                .memoryCachePolicy(CachePolicy.ENABLED)
-                .diskCachePolicy(CachePolicy.ENABLED)
                 .build()
             Image(
                 painter = rememberCoilPainter(request, fadeIn = true),
@@ -166,13 +164,13 @@ class GalleryFragment : Fragment() {
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Surface(
+                    modifier = Modifier
+                        .aspectRatio(0.75f)
+                        .clickable { coverSheet.show() },
                     shape = RoundedCornerShape(4.dp),
                     elevation = 4.dp
                 ) {
                     Image(
-                        modifier = Modifier
-                            .aspectRatio(0.75f)
-                            .clickable { coverSheet.show() },
                         painter = rememberCoilPainter(request, fadeIn = true),
                         contentDescription = "Cover",
                         contentScale = ContentScale.Crop
