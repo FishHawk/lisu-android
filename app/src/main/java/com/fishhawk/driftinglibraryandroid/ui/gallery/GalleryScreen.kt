@@ -10,11 +10,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LibraryAdd
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +25,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.*
 import com.fishhawk.driftinglibraryandroid.ui.base.copyToClipboard
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.base.shareImage
 import com.fishhawk.driftinglibraryandroid.ui.base.toast
 import com.fishhawk.driftinglibraryandroid.ui.theme.MaterialColors
 import com.google.accompanist.coil.rememberCoilPainter
@@ -127,6 +125,7 @@ private fun MangaHeader(navController: NavHostController, detail: MangaDetail?) 
                     viewModel.updateCover(content.toRequestBody(type))
             }
 
+            val scope = rememberCoroutineScope()
             Surface(
                 modifier = Modifier
                     .aspectRatio(0.75f)
@@ -149,19 +148,19 @@ private fun MangaHeader(navController: NavHostController, detail: MangaDetail?) 
                             }
 
                             override fun onSaveCover() {
-                                val detail = viewModel.detail.value
-                                    ?: return context.toast(R.string.toast_manga_not_loaded)
+                                if (detail == null)
+                                    return context.toast(R.string.toast_manga_not_loaded)
                                 val url = detail.cover
                                     ?: return context.toast(R.string.toast_manga_no_cover)
 //                                saveImage(url, "${detail.id}-cover")
                             }
 
                             override fun onShareCover() {
-                                val detail = viewModel.detail.value
-                                    ?: return context.toast(R.string.toast_manga_not_loaded)
+                                if (detail == null)
+                                    return context.toast(R.string.toast_manga_not_loaded)
                                 val url = detail.cover
                                     ?: return context.toast(R.string.toast_manga_no_cover)
-//                                shareImage(url, "${detail.id}-cover")
+                                scope.shareImage(context, url, "${detail.id}-cover")
                             }
                         }).show()
                     },

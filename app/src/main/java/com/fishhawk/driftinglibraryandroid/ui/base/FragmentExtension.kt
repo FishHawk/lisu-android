@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -97,6 +98,30 @@ fun Fragment.saveImage(url: String, filename: String) {
         }
     }
 }
+
+fun CoroutineScope.shareImage(context: Context, url: String, filename: String) =
+    launch(Dispatchers.IO) {
+        try {
+            val srcFile = Glide.with(context).asFile().load(url).submit().get()
+            val dir = File(context.cacheDir, "shared_image")
+            dir.mkdirs()
+            val destFile = File(dir, "$filename.${srcFile.extension}")
+            srcFile.copyTo(destFile, overwrite = true)
+
+            val uri = FileProvider.getUriForFile(
+                context, "${context.packageName}.fileprovider", destFile
+            )
+
+            val shareIntent = Intent().apply {
+                action = Intent.ACTION_SEND
+                type = "image/*"
+                putExtra(Intent.EXTRA_STREAM, uri)
+            }
+            context.startActivity(Intent.createChooser(shareIntent, "Share image via"))
+        } catch (e: Throwable) {
+            context.toast(e)
+        }
+    }
 
 fun Fragment.shareImage(url: String, filename: String) {
     lifecycleScope.launch(Dispatchers.IO) {
