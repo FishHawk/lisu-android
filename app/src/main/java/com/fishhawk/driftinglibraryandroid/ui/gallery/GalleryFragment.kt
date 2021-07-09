@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,11 +26,11 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
-import androidx.paging.LoadState
-import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.remote.model.*
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Source
+import com.fishhawk.driftinglibraryandroid.data.remote.model.SourceState
 import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
@@ -39,7 +40,6 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.hippo.refreshlayout.RefreshLayout
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 
@@ -117,6 +117,7 @@ class GalleryFragment : Fragment() {
             MangaHeader(detail)
             val isRefreshing by viewModel.isRefreshing.observeAsState(true)
             SwipeRefresh(
+                modifier = Modifier.fillMaxSize(),
                 state = rememberSwipeRefreshState(isRefreshing),
                 onRefresh = { viewModel.refreshManga() },
             ) {
@@ -129,12 +130,15 @@ class GalleryFragment : Fragment() {
                     detail?.source?.let { MangaSource(it) }
                     detail?.metadata?.description?.let { MangaDescription(it) }
                     detail?.metadata?.tags?.let { tags ->
+                        val context = LocalContext.current
                         MangaTagGroups(tags,
                             onTagClick = { search(it) },
-                            onTagLongClick = { copy(it, R.string.toast_manga_tag_saved) }
+                            onTagLongClick = {
+                                context.copyToClipboard(it, R.string.toast_manga_tag_saved)
+                            }
                         )
                     }
-                    detail?.let { MangaContent(it) }
+                    detail?.let { MangaContent(viewModel, it) }
                 }
             }
         }
@@ -188,13 +192,16 @@ class GalleryFragment : Fragment() {
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
+            val context = LocalContext.current
             (detail?.title ?: viewModel.outline.title).let {
                 Text(
                     modifier = Modifier
                         .weight(1f, fill = true)
                         .combinedClickable(
                             onClick = { globalSearch(it) },
-                            onLongClick = { copy(it, R.string.toast_manga_title_copied) }
+                            onLongClick = {
+                                context.copyToClipboard(it, R.string.toast_manga_title_copied)
+                            }
                         ),
                     text = it
                 )
@@ -204,7 +211,9 @@ class GalleryFragment : Fragment() {
                     Text(
                         modifier = Modifier.combinedClickable(
                             onClick = { globalSearch(it) },
-                            onLongClick = { copy(it, R.string.toast_manga_author_copied) }
+                            onLongClick = {
+                                context.copyToClipboard(it, R.string.toast_manga_author_copied)
+                            }
                         ),
                         text = it,
                         style = MaterialTheme.typography.body2,
@@ -278,57 +287,6 @@ class GalleryFragment : Fragment() {
         )
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
-    @Composable
-    private fun MangaDescription(description: String) {
-        Text(
-            text = description,
-            style = MaterialTheme.typography.body2,
-            modifier = Modifier.combinedClickable(
-                onClick = {},
-                onLongClick = { copy(description, R.string.toast_manga_description_copied) }
-            )
-        )
-    }
-
-    @Composable
-    private fun MangaContent(detail: MangaDetail) {
-        val hasPreview = detail.collections.size == 1 && !detail.preview.isNullOrEmpty()
-        val hasChapter = detail.collections.isNotEmpty()
-        when {
-            hasPreview -> MangaContentPreview(
-                preview = detail.preview!!,
-                onPageClick = {
-                    navToReaderActivity(
-                        viewModel.mangaId,
-                        viewModel.provider?.id,
-                        0,
-                        0,
-                        it
-                    )
-                })
-            hasChapter -> {
-                val history by viewModel.history.observeAsState()
-                MangaContentChapter(
-                    collections = detail.collections,
-                    chapterMark = history?.let {
-                        ChapterMark(it.collectionIndex, it.chapterIndex, it.pageIndex)
-                    },
-                    onChapterClick = { collectionIndex, chapterIndex, pageIndex ->
-                        navToReaderActivity(
-                            detail.id,
-                            viewModel.providerId,
-                            collectionIndex,
-                            chapterIndex,
-                            pageIndex
-                        )
-                    }
-                )
-            }
-            else -> MangaNoChapter()
-        }
-    }
-
     private fun globalSearch(keywords: String) {
         findNavController().navigate(
             R.id.action_to_global_search,
@@ -349,17 +307,60 @@ class GalleryFragment : Fragment() {
         )
     }
 
-    private fun copy(text: String, hintResId: Int) {
-        copy(text)
-        makeToast(hintResId)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         bindToFeedbackViewModel(viewModel)
-//        binding.root.setProgressViewOffset(
-//            false,
-//            binding.root.progressViewStartOffset,
-//            binding.root.progressViewEndOffset
-//        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun MangaDescription(description: String) {
+    val context = LocalContext.current
+    Text(
+        text = description,
+        style = MaterialTheme.typography.body2,
+        modifier = Modifier.combinedClickable(
+            onClick = {},
+            onLongClick = {
+                context.copyToClipboard(description, R.string.toast_manga_description_copied)
+            }
+        )
+    )
+}
+
+@Composable
+private fun MangaContent(viewModel: GalleryViewModel, detail: MangaDetail) {
+    val context = LocalContext.current
+    val hasPreview = detail.collections.size == 1 && !detail.preview.isNullOrEmpty()
+    val hasChapter = detail.collections.isNotEmpty()
+    when {
+        hasPreview -> MangaContentPreview(
+            preview = detail.preview!!,
+            onPageClick = {
+                context.navToReaderActivity(
+                    viewModel.mangaId,
+                    viewModel.provider?.id,
+                    0, 0, it
+                )
+            })
+        hasChapter -> {
+            val history by viewModel.history.observeAsState()
+            MangaContentChapter(
+                collections = detail.collections,
+                chapterMark = history?.let {
+                    ChapterMark(it.collectionIndex, it.chapterIndex, it.pageIndex)
+                },
+                onChapterClick = { collectionIndex, chapterIndex, pageIndex ->
+                    context.navToReaderActivity(
+                        detail.id,
+                        viewModel.providerId,
+                        collectionIndex,
+                        chapterIndex,
+                        pageIndex
+                    )
+                }
+            )
+        }
+        else -> MangaNoChapter()
     }
 }

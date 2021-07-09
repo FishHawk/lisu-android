@@ -2,16 +2,12 @@ package com.fishhawk.driftinglibraryandroid.ui.base
 
 import android.content.*
 import android.content.Context.CLIPBOARD_SERVICE
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.TypedValue
-import android.view.inputmethod.InputMethodManager
-import androidx.annotation.AttrRes
-import androidx.annotation.ColorInt
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
@@ -19,13 +15,32 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+
+fun Context.navToReaderActivity(
+    id: String,
+    providerId: String?,
+    collectionIndex: Int = 0,
+    chapterIndex: Int = 0,
+    pageIndex: Int = 0
+) {
+    val bundle = bundleOf(
+        "id" to id,
+        "providerId" to providerId,
+        "collectionIndex" to collectionIndex,
+        "chapterIndex" to chapterIndex,
+        "pageIndex" to pageIndex
+    )
+
+    val intent = Intent(this, ReaderActivity::class.java)
+    intent.putExtras(bundle)
+    startActivity(intent)
+}
 
 fun Fragment.navToReaderActivity(
     id: String,
@@ -131,20 +146,30 @@ fun Fragment.shareImage(url: String, filename: String) {
     }
 }
 
-val Fragment.clipboardManager
-    get() = requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+private fun Context.toast(message: String) {
+    Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+}
 
-val Fragment.inputMethodManager
-    get() = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+fun Context.toast(resId: Int) = toast(getString(resId))
 
+fun Context.toast(throwable: Throwable) =
+    throwable.message?.let { toast(it) }
+        ?: toast(R.string.toast_unknown_error)
 
-fun Fragment.copy(text: String) {
+val Context.clipboardManager
+    get() = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+
+fun Context.copyToClipboard(text: String, hintResId: Int? = null) {
     val clip = ClipData.newPlainText("simple text", text)
     clipboardManager.setPrimaryClip(clip)
+    hintResId?.let { toast(it) }
 }
 
-fun Fragment.closeInputMethod() {
-    inputMethodManager.hideSoftInputFromWindow(requireView().windowToken, 0)
-}
+//val Fragment.inputMethodManager
+//    get() = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+//
+//fun Fragment.closeInputMethod() {
+//    inputMethodManager.hideSoftInputFromWindow(requireView().windowToken, 0)
+//}
 
 

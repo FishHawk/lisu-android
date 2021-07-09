@@ -205,9 +205,9 @@ fun ChapterGrid(
     ) {
         Text(
             modifier = Modifier
+                .clickable { onChapterClick() }
                 .padding(top = 8.dp, bottom = 8.dp, start = 2.dp, end = 2.dp)
-                .fillMaxWidth()
-                .clickable { onChapterClick() },
+                .fillMaxWidth(),
             text = chapter.name,
             style = MaterialTheme.typography.body1.copy(fontSize = 12.sp),
             color = if (isMarked) Color.White else MaterialTheme.colors.onSurface,
