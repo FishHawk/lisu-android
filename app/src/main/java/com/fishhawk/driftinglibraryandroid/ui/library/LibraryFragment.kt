@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.fragment.findNavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.driftinglibraryandroid.R
@@ -25,12 +26,10 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.TopAppBar
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LibraryFragment : Fragment() {
-    private val viewModel: LibraryViewModel by viewModels {
-        MainViewModelFactory(this)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,65 +39,59 @@ class LibraryFragment : Fragment() {
         view.setContent {
             ApplicationTheme {
                 ProvideWindowInsets {
-                    Scaffold(
-                        topBar = { ToolBar() },
-                        content = { Content() }
-                    )
+                    LibraryScreen()
                 }
             }
         }
         return view
     }
 
-    @Composable
-    private fun ToolBar() {
-        TopAppBar(
-            backgroundColor = MaterialTheme.colors.secondary,
-            contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
-            title = { Text(stringResource(R.string.label_library)) },
-            actions = {
-                IconButton(onClick = { }) {
-                    Icon(Icons.Filled.Search, contentDescription = "search")
-                }
-                MangaDisplayModeButton()
-            }
-        )
-    }
+}
 
-    @Composable
-    private fun Content() {
-        RefreshableMangaList(
-            mangaList = viewModel.mangas.collectAsLazyPagingItems(),
-            onCardClick = {
-                findNavController().navigate(
-                    R.id.action_to_gallery,
-                    bundleOf("outline" to it)
-                )
-            },
-            onCardLongClick = {
-                AlertDialog.Builder(requireActivity())
-                    .setTitle("Confirm to delete manga?")
-                    .setPositiveButton("OK") { _, _ -> viewModel.deleteManga(it.id) }
-                    .setNegativeButton("cancel") { _, _ -> }
-                    .show()
+@Composable
+fun LibraryScreen() {
+    // TODO : search
+    //  queryHint = getString(R.string.menu_search_hint)
+    //  setQuery(viewModel.keywords.value, false)
+
+    val viewModel: LibraryViewModel = viewModel()
+    Scaffold(
+        topBar = { ToolBar() },
+        content = { Content(viewModel) }
+    )
+}
+
+@Composable
+private fun ToolBar() {
+    TopAppBar(
+        backgroundColor = MaterialTheme.colors.secondary,
+        contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
+        title = { Text(stringResource(R.string.label_library)) },
+        actions = {
+            IconButton(onClick = { }) {
+                Icon(Icons.Filled.Search, contentDescription = "search")
             }
-        )
-    }
-//            queryHint = getString(R.string.menu_search_hint)
-//            setQuery(viewModel.keywords.value, false)
-//            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-//                override fun onQueryTextSubmit(query: String): Boolean {
-//                    viewModel.keywords.value = query
-//                    closeInputMethod()
-//                    return true
-//                }
-//
-//                override fun onQueryTextChange(query: String?): Boolean = false
-//            })
-//            val closeButton: ImageView = findViewById(R.id.search_close_btn)
-//            closeButton.setOnClickListener {
-//                setQuery(null, false)
-//                isIconified = true
-//                viewModel.keywords.value = ""
-//            }
+            MangaDisplayModeButton()
+        }
+    )
+}
+
+@Composable
+private fun Content(viewModel: LibraryViewModel) {
+    RefreshableMangaList(
+        mangaList = viewModel.mangas.collectAsLazyPagingItems(),
+        onCardClick = {
+//            findNavController().navigate(
+//                R.id.action_to_gallery,
+//                bundleOf("outline" to it)
+//            )
+        },
+        onCardLongClick = {
+//            AlertDialog.Builder(requireActivity())
+//                .setTitle("Confirm to delete manga?")
+//                .setPositiveButton("OK") { _, _ -> viewModel.deleteManga(it.id) }
+//                .setNegativeButton("cancel") { _, _ -> }
+//                .show()
+        }
+    )
 }

@@ -4,9 +4,12 @@ import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HistoryViewModel(
+@HiltViewModel
+class HistoryViewModel @Inject constructor(
     private val readingHistoryRepository: ReadingHistoryRepository
 ) : ViewModel() {
     private val historyList: LiveData<List<ReadingHistory>> =

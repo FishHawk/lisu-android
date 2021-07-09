@@ -22,18 +22,6 @@ class MainViewModelFactory constructor(fragment: Fragment) : ViewModelProvider.F
 
     override fun <T : ViewModel> create(modelClass: Class<T>) = with(modelClass) {
         when {
-            isAssignableFrom(LibraryViewModel::class.java) ->
-                LibraryViewModel(
-                    application.remoteLibraryRepository,
-                    arguments?.getString("keywords")
-                )
-
-            isAssignableFrom(HistoryViewModel::class.java) ->
-                HistoryViewModel(application.readingHistoryRepository)
-
-            isAssignableFrom(ExploreViewModel::class.java) ->
-                ExploreViewModel(application.remoteProviderRepository)
-
             isAssignableFrom(GlobalSearchViewModel::class.java) ->
                 GlobalSearchViewModel(
                     application.remoteProviderRepository,
