@@ -1,12 +1,17 @@
 package com.fishhawk.driftinglibraryandroid.ui.server
 
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.database.ServerInfoRepository
 import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ServerViewModel(
+@HiltViewModel
+class ServerViewModel @Inject constructor(
     private val readingHistoryRepository: ReadingHistoryRepository,
     private val serverInfoRepository: ServerInfoRepository
 ) : ViewModel() {

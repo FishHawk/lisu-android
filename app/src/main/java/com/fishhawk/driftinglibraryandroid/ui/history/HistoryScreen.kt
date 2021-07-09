@@ -1,9 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.ui.history
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,59 +13,34 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
-import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
-import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.TopAppBar
-import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
-
-@AndroidEntryPoint
-class HistoryFragment : Fragment() {
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val view = ComposeView(requireContext())
-        view.setContent {
-            ApplicationTheme {
-                ProvideWindowInsets {
-                    HistoryScreen()
-                }
-            }
-        }
-        return view
-    }
-}
+import androidx.hilt.navigation.compose.hiltViewModel as hiltViewModel1
 
 @Composable
-fun HistoryScreen() {
+fun HistoryScreen(navController: NavHostController) {
     Scaffold(
         topBar = { ToolBar() },
-        content = { Content() }
+        content = { Content(navController) }
     )
 }
 
@@ -96,31 +67,32 @@ private fun ToolBar() {
 }
 
 @Composable
-private fun Content() {
-    val viewModel: HistoryViewModel = viewModel()
+private fun Content(navController: NavHostController) {
+    val viewModel = hiltViewModel1<HistoryViewModel>()
     val historyList by viewModel.filteredHistoryList.observeAsState(listOf())
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(historyList) { HistoryCard(it) }
+        items(historyList) { HistoryCard(navController, it) }
         if (historyList.isEmpty()) item { EmptyView() }
     }
 }
 
 @Composable
-private fun HistoryCard(history: ReadingHistory) {
+private fun HistoryCard(navController: NavHostController, history: ReadingHistory) {
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(120.dp)
             .clickable {
                 with(history) {
-//                    navToReaderActivity(
-//                        mangaId, providerId,
-//                        collectionIndex, chapterIndex, pageIndex
-//                    )
+                    context.navToReaderActivity(
+                        mangaId, providerId,
+                        collectionIndex, chapterIndex, pageIndex
+                    )
                 }
             }
     ) {
@@ -130,19 +102,18 @@ private fun HistoryCard(history: ReadingHistory) {
                     .aspectRatio(0.75f)
                     .clickable {
                         with(history) {
-//                            findNavController().navigate(
-//                                R.id.action_to_gallery_detail,
-//                                bundleOf(
-//                                    "outline" to MangaOutline(
-//                                        mangaId, cover, null, null,
-//                                        MetadataOutline(title, null, null),
-//                                        null
-//                                    ),
-//                                    "provider" to providerId?.let {
-//                                        ProviderInfo(it, it, "", "")
-//                                    }
-//                                )
-//                            )
+                            navController.currentBackStackEntry?.arguments =
+                                bundleOf(
+                                    "outline" to MangaOutline(
+                                        mangaId, cover, null, null,
+                                        MetadataOutline(title, null, null),
+                                        null
+                                    ),
+                                    "provider" to providerId?.let {
+                                        ProviderInfo(it, it, "", "")
+                                    }
+                                )
+                            navController.navigate("gallery/${mangaId}")
                         }
                     }) {
                 Image(
@@ -186,7 +157,7 @@ private fun HistoryCard(history: ReadingHistory) {
 
 @Composable
 private fun ClearHistoryDialog(isOpen: MutableState<Boolean>) {
-    val viewModel: HistoryViewModel = viewModel()
+    val viewModel = hiltViewModel1<HistoryViewModel>()
     if (isOpen.value) {
         AlertDialog(
             modifier = Modifier.fillMaxWidth(0.8f),

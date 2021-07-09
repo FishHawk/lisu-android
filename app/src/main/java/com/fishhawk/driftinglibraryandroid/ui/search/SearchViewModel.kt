@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.search
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.fishhawk.driftinglibraryandroid.R
@@ -9,19 +10,22 @@ import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchViewModel(
+@HiltViewModel
+class SearchViewModel @Inject constructor(
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
-    val provider: ProviderInfo,
-    argKeywords: String
+    savedStateHandle: SavedStateHandle,
 ) : FeedbackViewModel() {
 
-    val keywords = MutableStateFlow(argKeywords)
+    val provider: ProviderInfo = savedStateHandle.get("provider")!!
+    val keywords = MutableStateFlow(savedStateHandle.get<String>("keywords")!!)
 
     private var source: ProviderSearchMangaSource? = null
 

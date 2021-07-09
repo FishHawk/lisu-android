@@ -4,19 +4,22 @@ import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class SearchGroup(
     val provider: ProviderInfo,
     var result: Result<List<MangaOutline>>?
 )
 
-class GlobalSearchViewModel(
+@HiltViewModel
+class GlobalSearchViewModel @Inject constructor(
     private val remoteLibraryRepository: RemoteProviderRepository,
-    argKeywords: String
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val keywords = MutableLiveData(argKeywords)
+    val keywords = MutableLiveData(savedStateHandle.get<String>("keywords"))
 
     private val providerList: LiveData<Result<List<ProviderInfo>>?> = liveData {
         emit(null)
@@ -38,7 +41,9 @@ class GlobalSearchViewModel(
                     SearchGroup(info, null)
                 }
                 searchGroupList.value = it.map { info ->
-                    SearchGroup(info, remoteLibraryRepository.listManga(info.id, keywords, 1))
+                    val result = remoteLibraryRepository.listManga(info.id, keywords, 1)
+                    // Hack, see https://youtrack.jetbrains.com/issue/KT-46477#focus=Comments-27-4952485.0-0
+                    SearchGroup(info, result.fold({ Result.success(it) }, { Result.failure(it) }))
                 }
             }
         }

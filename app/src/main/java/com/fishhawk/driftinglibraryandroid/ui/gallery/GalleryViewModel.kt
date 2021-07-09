@@ -2,6 +2,7 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
@@ -14,16 +15,20 @@ import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import okhttp3.RequestBody
+import javax.inject.Inject
 
-class GalleryViewModel(
+@HiltViewModel
+class GalleryViewModel @Inject constructor(
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
     private val readingHistoryRepository: ReadingHistoryRepository,
-    val outline: MangaOutline,
-    val provider: ProviderInfo?
+    savedStateHandle: SavedStateHandle
 ) : FeedbackViewModel() {
+    val outline: MangaOutline = savedStateHandle.get("outline")!!
+    val provider: ProviderInfo? = savedStateHandle.get("provider")
 
     val mangaId = outline.id
     val providerId = provider?.id

@@ -1,9 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.liveData
-import androidx.lifecycle.map
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.paging.*
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
@@ -12,8 +9,11 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
+import dagger.assisted.Assisted
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.collections.List
 import kotlin.collections.MutableMap
 import kotlin.collections.filterKeys
@@ -69,11 +69,14 @@ class ProviderMangaList(
     }
 }
 
-class ProviderViewModel(
+@HiltViewModel
+class ProviderViewModel @Inject constructor(
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
-    val provider: ProviderInfo
+    savedStateHandle: SavedStateHandle
 ) : FeedbackViewModel() {
+
+    val provider: ProviderInfo = savedStateHandle.get("provider")!!
 
     private val detail: LiveData<Result<ProviderDetail>?> = liveData {
         emit(null)

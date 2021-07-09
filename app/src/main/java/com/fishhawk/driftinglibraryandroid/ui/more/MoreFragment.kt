@@ -46,21 +46,7 @@ class MoreFragment : PreferenceFragmentCompat() {
         view.setContent {
             ApplicationTheme {
                 ProvideWindowInsets {
-                    Scaffold(
-                        topBar = {
-                            TopAppBar(
-                                backgroundColor = MaterialTheme.colors.secondary,
-                                contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
-                                title = { Text(stringResource(R.string.label_more)) }
-                            )
-                        },
-                        content = {
-                            AndroidView(
-                                modifier = Modifier.fillMaxSize(),
-                                factory = { contentView }
-                            )
-                        }
-                    )
+                    MoreScreen(contentView)
                 }
             }
         }
@@ -79,4 +65,23 @@ class MoreFragment : PreferenceFragmentCompat() {
             }
         }
     }
+}
+
+@Composable
+private fun MoreScreen(contentView: View) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                backgroundColor = MaterialTheme.colors.secondary,
+                contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
+                title = { Text(stringResource(R.string.label_more)) }
+            )
+        },
+        content = {
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = { contentView }
+            )
+        }
+    )
 }

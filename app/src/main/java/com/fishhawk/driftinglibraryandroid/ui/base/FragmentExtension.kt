@@ -42,26 +42,6 @@ fun Context.navToReaderActivity(
     startActivity(intent)
 }
 
-fun Fragment.navToReaderActivity(
-    id: String,
-    providerId: String?,
-    collectionIndex: Int = 0,
-    chapterIndex: Int = 0,
-    pageIndex: Int = 0
-) {
-    val bundle = bundleOf(
-        "id" to id,
-        "providerId" to providerId,
-        "collectionIndex" to collectionIndex,
-        "chapterIndex" to chapterIndex,
-        "pageIndex" to pageIndex
-    )
-
-    val intent = Intent(requireActivity(), ReaderActivity::class.java)
-    intent.putExtras(bundle)
-    startActivity(intent)
-}
-
 fun Fragment.checkPermission(permission: String): Boolean {
     return ContextCompat.checkSelfPermission(
         requireContext(),

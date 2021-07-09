@@ -278,9 +278,10 @@ fun MangaCardGrid(
 
 @Composable
 fun MangaCover(cover: String?) {
-    Box(Modifier.aspectRatio(0.75f)) {
+    Box(modifier = Modifier.aspectRatio(0.75f)) {
         val painter = rememberCoilPainter(cover, fadeIn = true)
         Image(
+            modifier = Modifier.matchParentSize(),
             painter = painter,
             contentDescription = "cover",
             contentScale = ContentScale.Crop

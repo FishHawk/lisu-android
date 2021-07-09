@@ -1,9 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.ui.explore
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,55 +13,29 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.fragment.findNavController
-import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.navArgument
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
-import com.fishhawk.driftinglibraryandroid.ui.MainViewModelFactory
-import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.TopAppBar
-import dagger.hilt.android.AndroidEntryPoint
-
-@AndroidEntryPoint
-class ExploreFragment : Fragment() {
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val view = ComposeView(requireContext())
-        view.setContent {
-            ApplicationTheme {
-                ProvideWindowInsets {
-                    ExploreScreen()
-                }
-            }
-        }
-        return view
-    }
-}
 
 @Composable
-private fun ExploreScreen() {
+fun ExploreScreen(navHostController: NavHostController) {
     Scaffold(
         topBar = { ToolBar() },
-        content = { Content() }
+        content = { Content(navHostController) }
     )
 }
 
@@ -89,8 +59,8 @@ private fun ToolBar() {
 }
 
 @Composable
-private fun Content() {
-    val viewModel: ExploreViewModel = viewModel()
+private fun Content(navHostController: NavHostController) {
+    val viewModel = hiltViewModel<ExploreViewModel>()
     val providers by viewModel.providerList.observeAsState(listOf())
     val lastUsedProvider by GlobalPreference.lastUsedProvider.asFlow().collectAsState(null)
 
@@ -100,23 +70,28 @@ private fun Content() {
     ) {
         providers.find { it.id == lastUsedProvider }?.let {
             Text(text = "Last used", style = MaterialTheme.typography.subtitle1)
-            ProviderCard(it)
+            ProviderCard(navHostController, it)
         }
         val providerMap = providers.groupBy { it.lang }
         providerMap.map { (lang, list) ->
             Text(text = lang, style = MaterialTheme.typography.subtitle1)
             Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                list.map { ProviderCard(it) }
+                list.map { ProviderCard(navHostController, it) }
             }
         }
     }
 }
 
 @Composable
-private fun ProviderCard(provider: ProviderInfo) {
-    Card {
+private fun ProviderCard(navController: NavHostController, provider: ProviderInfo) {
+    Card(
+        modifier = Modifier.clickable {
+            navController.currentBackStackEntry?.arguments =
+                bundleOf("provider" to provider)
+            navController.navigate("provider/${provider.id}")
+        },
+    ) {
         Row(
-            modifier = Modifier.clickable { openProvider(provider) },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -141,10 +116,6 @@ private fun ProviderCard(provider: ProviderInfo) {
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            TextButton(
-                onClick = { openProvider(provider) }) {
-                Text(text = stringResource(R.string.explore_card_browse))
-            }
         }
     }
 }
