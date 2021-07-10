@@ -31,6 +31,7 @@ import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryScreen
 import com.fishhawk.driftinglibraryandroid.ui.globalsearch.GlobalSearchScreen
 import com.fishhawk.driftinglibraryandroid.ui.history.HistoryScreen
 import com.fishhawk.driftinglibraryandroid.ui.library.LibraryScreen
+import com.fishhawk.driftinglibraryandroid.ui.more.MoreScreen
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderScreen
 import com.fishhawk.driftinglibraryandroid.ui.search.SearchScreen
 import com.fishhawk.driftinglibraryandroid.ui.server.ServerScreen
@@ -55,67 +56,70 @@ sealed class Screen(val route: String, val labelResId: Int, val icon: ImageVecto
 class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            val navController = rememberNavController()
-            ApplicationTheme {
-                ProvideWindowInsets {
-                    Scaffold(
-                        bottomBar = { BottomNavigationBar(navController) }
-                    ) { innerPadding ->
-                        val startScreen = when (GlobalPreference.startScreen.get()) {
-                            GlobalPreference.StartScreen.LIBRARY -> Screen.Library
-                            GlobalPreference.StartScreen.HISTORY -> Screen.History
-                            GlobalPreference.StartScreen.EXPLORE -> Screen.Explore
-                        }
-                        NavHost(
-                            navController = navController,
-                            startDestination = startScreen.route,
-                            modifier = Modifier.padding(innerPadding)
-                        ) {
-                            composable(Screen.Library.route) { LibraryScreen(navController) }
-                            composable(Screen.History.route) { HistoryScreen(navController) }
-                            composable(Screen.Explore.route) { ExploreScreen(navController) }
-                            composable(Screen.More.route) { }
+        setContent { MainContent() }
+    }
+}
 
-                            composable("provider/{providerId}") { ProviderScreen(navController) }
-                            composable("gallery/{mangaId}") { GalleryScreen(navController) }
+@Composable
+private fun MainContent() {
+    val navController = rememberNavController()
+    ApplicationTheme {
+        ProvideWindowInsets {
+            Scaffold(
+                bottomBar = { BottomNavigationBar(navController) }
+            ) { innerPadding ->
+                val startScreen = when (GlobalPreference.startScreen.get()) {
+                    GlobalPreference.StartScreen.LIBRARY -> Screen.Library
+                    GlobalPreference.StartScreen.HISTORY -> Screen.History
+                    GlobalPreference.StartScreen.EXPLORE -> Screen.Explore
+                }
+                NavHost(
+                    navController = navController,
+                    startDestination = startScreen.route,
+                    modifier = Modifier.padding(innerPadding)
+                ) {
+                    composable(Screen.Library.route) { LibraryScreen(navController) }
+                    composable(Screen.History.route) { HistoryScreen(navController) }
+                    composable(Screen.Explore.route) { ExploreScreen(navController) }
+                    composable(Screen.More.route) { MoreScreen(navController) }
 
-                            composable("library-search") { LibraryScreen(navController) }
-                            composable("search/{providerId}") { SearchScreen(navController) }
-                            composable("global-search") { GlobalSearchScreen(navController) }
-                            composable("server") { ServerScreen(navController) }
-                        }
-                    }
+                    composable("provider/{providerId}") { ProviderScreen(navController) }
+                    composable("gallery/{mangaId}") { GalleryScreen(navController) }
+
+                    composable("library-search") { LibraryScreen(navController) }
+                    composable("search/{providerId}") { SearchScreen(navController) }
+                    composable("global-search") { GlobalSearchScreen(navController) }
+                    composable("server") { ServerScreen(navController) }
                 }
             }
         }
     }
+}
 
-    @Composable
-    private fun BottomNavigationBar(navController: NavHostController) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
-        if (Screen.items.none { it.route == currentDestination?.route }) return
+@Composable
+private fun BottomNavigationBar(navController: NavHostController) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    if (Screen.items.none { it.route == currentDestination?.route }) return
 
-        BottomNavigation(
-            backgroundColor = MaterialTheme.colors.secondary
-        ) {
-            Screen.items.forEach { screen ->
-                BottomNavigationItem(
-                    icon = { Icon(screen.icon, contentDescription = screen.route) },
-                    label = { Text(stringResource(screen.labelResId)) },
-                    selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                    onClick = {
-                        navController.navigate(screen.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
+    BottomNavigation(
+        backgroundColor = MaterialTheme.colors.secondary
+    ) {
+        Screen.items.forEach { screen ->
+            BottomNavigationItem(
+                icon = { Icon(screen.icon, contentDescription = screen.route) },
+                label = { Text(stringResource(screen.labelResId)) },
+                selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                onClick = {
+                    navController.navigate(screen.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
                         }
+                        launchSingleTop = true
+                        restoreState = true
                     }
-                )
-            }
+                }
+            )
         }
     }
 }
