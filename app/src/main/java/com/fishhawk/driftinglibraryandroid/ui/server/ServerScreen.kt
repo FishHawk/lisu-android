@@ -41,7 +41,7 @@ fun ServerScreen(navController: NavHostController) {
 private fun ToolBar(navController: NavHostController) {
     val viewModel = hiltViewModel<ServerViewModel>()
     TopAppBar(
-        backgroundColor = MaterialTheme.colors.secondary,
+        backgroundColor = MaterialTheme.colors.surface,
         contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
         title = { Text(stringResource(R.string.label_server)) },
         actions = {

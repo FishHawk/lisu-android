@@ -36,7 +36,7 @@ abstract class BaseSettingFragment : PreferenceFragmentCompat() {
                     Scaffold(
                         topBar = {
                             TopAppBar(
-                                backgroundColor = MaterialTheme.colors.secondary,
+                                backgroundColor = MaterialTheme.colors.surface,
                                 contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
                                 title = { Text(stringResource(titleResId)) },
                                 navigationIcon = {

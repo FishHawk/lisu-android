@@ -81,7 +81,7 @@ private fun MoreScreenX(contentView: View) {
     Scaffold(
         topBar = {
             TopAppBar(
-                backgroundColor = MaterialTheme.colors.secondary,
+                backgroundColor = MaterialTheme.colors.surface,
                 contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
                 title = { Text(stringResource(R.string.label_more)) }
             )
@@ -100,7 +100,7 @@ fun MoreScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                backgroundColor = MaterialTheme.colors.secondary,
+                backgroundColor = MaterialTheme.colors.surface,
                 contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
                 title = { Text(stringResource(R.string.label_more)) }
             )

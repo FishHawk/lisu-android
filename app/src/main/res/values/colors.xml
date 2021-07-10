@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="loading_indicator_red">@color/red_600</color>
-    <color name="loading_indicator_purple">@color/purple_700</color>
-    <color name="loading_indicator_blue">@color/blue_600</color>
-    <color name="loading_indicator_cyan">@color/cyan_600</color>
-    <color name="loading_indicator_green">@color/light_green_600</color>
-    <color name="loading_indicator_yellow">@color/yellow_800</color>
-    <color name="loading_indicator_orange">@color/deep_orange_400</color>
-
     <!-- Light Theme -->
     <color name="colorAccentLight">@color/blue_A400</color>
     <color name="textColorPrimaryLight">@color/md_black_1000_87</color>

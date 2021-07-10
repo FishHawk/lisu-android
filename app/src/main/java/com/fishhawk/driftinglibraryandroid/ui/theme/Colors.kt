@@ -1,13 +1,13 @@
 package com.fishhawk.driftinglibraryandroid.ui.theme
 
+import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.ui.graphics.Color
 
 val ColorsLight = lightColors(
     primary = MaterialColors.BlueA400,
     primaryVariant = MaterialColors.BlueA400,
-    secondary = MaterialColors.White,
-    secondaryVariant = MaterialColors.White,
+    surface = Color.White,
     background = MaterialColors.Gray50,
     onPrimary = MaterialColors.White,
     onSecondary = MaterialColors.Black,
@@ -15,7 +15,16 @@ val ColorsLight = lightColors(
     onSurface = Color(0xDE000000),
 )
 
-val ColorsDark = ColorsLight
+val ColorsDark = darkColors(
+    primary = Color(0xFF3399FF),
+    primaryVariant = Color(0xFF3399FF),
+    surface = Color(0xFF121212),
+    background = Color(0xFF121212),
+    onPrimary = MaterialColors.White,
+    onSecondary = MaterialColors.White,
+    onBackground = MaterialColors.White,
+    onSurface = MaterialColors.White,
+)
 
 @Suppress("unused")
 object MaterialColors {

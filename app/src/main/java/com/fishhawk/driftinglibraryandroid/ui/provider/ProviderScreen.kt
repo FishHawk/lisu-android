@@ -31,10 +31,7 @@ import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.TopAppBar
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.*
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -88,13 +85,15 @@ fun ProviderScreen(navController: NavHostController) {
 private fun ToolBar(pagerState: PagerState) {
     val viewModel = hiltViewModel<ProviderViewModel>()
 
-    Column {
-        TopAppBar(
-            backgroundColor = MaterialTheme.colors.secondary,
-            contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
-            title = { Text(viewModel.provider.title) },
-            actions = {
-                IconButton(onClick = {
+    Surface(elevation = AppBarDefaults.TopAppBarElevation) {
+        Column {
+            TopAppBar(
+                elevation = 0.dp,
+                backgroundColor = MaterialTheme.colors.surface,
+                contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
+                title = { Text(viewModel.provider.title) },
+                actions = {
+                    IconButton(onClick = {
 //            queryHint = getString(R.string.menu_search_hint)
 //                    findNavController().navigate(
 //                        R.id.action_to_search,
@@ -103,24 +102,30 @@ private fun ToolBar(pagerState: PagerState) {
 //                            "keywords" to query
 //                        )
 //                    )
-                }) {
-                    Icon(Icons.Filled.Search, contentDescription = "search")
+                    }) {
+                        Icon(Icons.Filled.Search, contentDescription = "search")
+                    }
+                    MangaDisplayModeButton()
                 }
-                MangaDisplayModeButton()
-            }
-        )
+            )
 
-        TabRow(
-            modifier = Modifier.zIndex(2f),
-            selectedTabIndex = pagerState.currentPage,
-            backgroundColor = MaterialTheme.colors.secondary
-        ) {
-            listOf("Popular", "Latest", "Category").forEachIndexed { index, title ->
-                Tab(
-                    text = { Text(title) },
-                    selected = pagerState.currentPage == index,
-                    onClick = { },
-                )
+            TabRow(
+                modifier = Modifier.zIndex(2f),
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+                    )
+                },
+                selectedTabIndex = pagerState.currentPage,
+                backgroundColor = MaterialTheme.colors.surface
+            ) {
+                listOf("Popular", "Latest", "Category").forEachIndexed { index, title ->
+                    Tab(
+                        text = { Text(title) },
+                        selected = pagerState.currentPage == index,
+                        onClick = { },
+                    )
+                }
             }
         }
     }

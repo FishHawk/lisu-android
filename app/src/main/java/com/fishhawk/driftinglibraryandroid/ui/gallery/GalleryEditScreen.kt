@@ -33,7 +33,7 @@ fun GalleryEditScreen(navController: NavHostController) {
 @Composable
 private fun ToolBar(navController: NavHostController) {
     TopAppBar(
-        backgroundColor = MaterialTheme.colors.secondary,
+        backgroundColor = MaterialTheme.colors.surface,
         contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
         title = { Text(stringResource(R.string.label_gallery_edit)) },
         actions = {

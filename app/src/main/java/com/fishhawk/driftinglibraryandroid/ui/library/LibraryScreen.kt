@@ -35,7 +35,7 @@ fun LibraryScreen(navController: NavHostController) {
 @Composable
 private fun ToolBar() {
     TopAppBar(
-        backgroundColor = MaterialTheme.colors.secondary,
+        backgroundColor = MaterialTheme.colors.surface,
         contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
         title = { Text(stringResource(R.string.label_library)) },
         actions = {
