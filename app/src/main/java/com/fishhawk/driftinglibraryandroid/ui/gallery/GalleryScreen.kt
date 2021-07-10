@@ -250,13 +250,12 @@ private fun MangaInfo(navController: NavHostController, detail: MangaDetail?) {
                     viewModel.detail.value?.let { detail ->
                         viewModel.history.value?.let { history ->
                             context.navToReaderActivity(
-                                detail.id,
-                                detail.provider?.id,
+                                detail,
                                 history.collectionIndex,
                                 history.chapterIndex,
                                 history.pageIndex
                             )
-                        } ?: context.navToReaderActivity(detail.id, detail.provider?.id)
+                        } ?: context.navToReaderActivity(detail)
                     }
                 }
             ) {
@@ -315,11 +314,7 @@ private fun MangaContent(viewModel: GalleryViewModel, detail: MangaDetail) {
         hasPreview -> MangaContentPreview(
             preview = detail.preview!!,
             onPageClick = {
-                context.navToReaderActivity(
-                    viewModel.mangaId,
-                    viewModel.provider?.id,
-                    0, 0, it
-                )
+                context.navToReaderActivity(detail, 0, 0, it)
             })
         hasChapter -> {
             val history by viewModel.history.observeAsState()
@@ -329,13 +324,7 @@ private fun MangaContent(viewModel: GalleryViewModel, detail: MangaDetail) {
                     ChapterMark(it.collectionIndex, it.chapterIndex, it.pageIndex)
                 },
                 onChapterClick = { collectionIndex, chapterIndex, pageIndex ->
-                    context.navToReaderActivity(
-                        detail.id,
-                        viewModel.providerId,
-                        collectionIndex,
-                        chapterIndex,
-                        pageIndex
-                    )
+                    context.navToReaderActivity(detail, collectionIndex, chapterIndex, pageIndex)
                 }
             )
         }

@@ -42,8 +42,15 @@ class ReaderViewModel @Inject constructor(
     private val readingHistoryRepository: ReadingHistoryRepository,
     savedStateHandle: SavedStateHandle
 ) : FeedbackViewModel() {
-    private val id = savedStateHandle.get<String>("id")!!
-    private val providerId = savedStateHandle.get<String>("providerId")
+
+    private val id =
+        savedStateHandle.get<MangaDetail>("detail")?.id
+            ?: savedStateHandle.get<String>("id")!!
+
+    private val providerId =
+        savedStateHandle.get<MangaDetail>("detail")?.provider?.id
+            ?: savedStateHandle.get<String>("providerId")
+
     private val collectionIndex = savedStateHandle.get<Int>("collectionIndex") ?: 0
     private val chapterIndex = savedStateHandle.get<Int>("chapterIndex") ?: 0
     private val pageIndex = savedStateHandle.get<Int>("pageIndex") ?: 0
@@ -53,7 +60,7 @@ class ReaderViewModel @Inject constructor(
 
     val isMenuOpened: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    private lateinit var mangaDetail: MangaDetail
+    private var mangaDetail: MangaDetail? = savedStateHandle.get<MangaDetail>("detail")
 
     private val _isOnlyOneChapter: MutableLiveData<Boolean> = MutableLiveData()
     val isOnlyOneChapter: LiveData<Boolean> = _isOnlyOneChapter
@@ -71,6 +78,7 @@ class ReaderViewModel @Inject constructor(
     val chapterPosition: MutableLiveData<Int> = MutableLiveData(0)
 
     init {
+//        savedStateHandle.get<MangaDetail>("detail")?.let { mangaDetail = it }
         initReader()
     }
 
@@ -82,23 +90,25 @@ class ReaderViewModel @Inject constructor(
         else initReader()
     }
 
-    fun initReader() {
+    private fun initReader() {
         _readerState.value = ViewState.Loading
 
         viewModelScope.launch {
             // load manga
-            val result =
-                if (providerId == null) remoteLibraryRepository.getManga(id)
-                else remoteProviderRepository.getManga(providerId, id)
+            if (mangaDetail == null) {
+                val result =
+                    if (providerId == null) remoteLibraryRepository.getManga(id)
+                    else remoteProviderRepository.getManga(providerId, id)
 
-            result.onSuccess {
-                mangaDetail = it
-            }.onFailure {
-                _readerState.value = ViewState.Error(it)
+                result.onSuccess {
+                    mangaDetail = it
+                }.onFailure {
+                    _readerState.value = ViewState.Error(it)
+                }
             }
 
             // load chapter
-            result.onSuccess {
+            mangaDetail?.let {
                 try {
                     val collection = it.collections[collectionIndex]
                     collectionId = collection.id
@@ -143,14 +153,12 @@ class ReaderViewModel @Inject constructor(
 
         if (chapter.state is ViewState.Content) return
 
-        val providerId = mangaDetail.provider?.id
-        val mangaId = mangaDetail.id
         val chapterId = chapter.id
 
         val result =
             if (providerId == null)
-                remoteLibraryRepository.getChapterContent(mangaId, collectionId, chapterId)
-            else remoteProviderRepository.getChapterContent(providerId, mangaId, chapterId)
+                remoteLibraryRepository.getChapterContent(id, collectionId, chapterId)
+            else remoteProviderRepository.getChapterContent(providerId, id, chapterId)
 
         result.onSuccess {
             chapter.state = ViewState.Content
@@ -206,11 +214,11 @@ class ReaderViewModel @Inject constructor(
         chapterPointer.value?.let {
             val readingHistory =
                 ReadingHistory(
-                    mangaDetail.id,
+                    id,
                     GlobalPreference.selectedServer.get(),
-                    mangaDetail.title,
-                    mangaDetail.cover ?: "",
-                    mangaDetail.provider?.id,
+                    mangaDetail!!.title,
+                    mangaDetail!!.cover ?: "",
+                    providerId,
                     Calendar.getInstance().time.time,
                     collectionId,
                     collectionIndex,
@@ -224,7 +232,7 @@ class ReaderViewModel @Inject constructor(
 
     fun makeImageFilenamePrefix(): String? {
         val pointer = chapterPointer.value ?: return null
-        return "${mangaDetail.title}-$collectionId-${pointer.currChapter.title}"
+        return "${mangaDetail?.title}-$collectionId-${pointer.currChapter.title}"
     }
 }
 

@@ -8,10 +8,7 @@ import android.widget.FrameLayout
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -30,6 +27,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.base.EventObserver
 import com.fishhawk.driftinglibraryandroid.ui.base.feedback
@@ -53,6 +51,16 @@ class ReaderActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        println(intent?.extras)
+        println("iter=====")
+        intent?.extras?.let { b ->
+            b.keySet()?.forEach {
+                println("$it:")
+                println(b.get(it))
+            }
+        }
+
 
         GlobalPreference.screenOrientation.asFlow()
             .onEach {
@@ -330,40 +338,39 @@ class ReaderActivity : BaseActivity() {
                         IconButton(onClick = { viewModel.openPrevChapter() }) {
                             Icon(Icons.Filled.SkipPrevious, "prev", tint = Color.White)
                         }
+
+                    var sliderPosition by remember {
+                        mutableStateOf(position.toFloat() / size.minus(1))
+                    }
+
+                    fun sliderPositionToPage() =
+                        (sliderPosition * size).toInt().coerceIn(0, size - 1)
+
                     if (size != 0) Text(
-                        text = position.plus(1).toString(),
+                        modifier = Modifier.width(24.dp),
+                        text = sliderPositionToPage().plus(1).toString(),
                         color = Color.White,
                         textAlign = TextAlign.Center
                     )
-
-                    LinearProgressIndicator(
+                    Slider(
                         modifier = Modifier
                             .weight(1f, fill = true)
-                            .padding(start = 8.dp, end = 8.dp)
+                            .padding(start = 8.dp, end = 8.dp),
+                        value = sliderPosition,
+                        onValueChange = { sliderPosition = it },
+                        onValueChangeFinished = { reader.setPage(sliderPositionToPage()) }
                     )
-//                    binding.chapterProgress.isEnabled = size > 1
-//                    binding.chapterProgress.max = size - 1
-//                    binding.chapterProgress.progress = position
-
-//                binding.chapterProgress.setOnSeekBarChangeListener(object :
-//                    SeekBar.OnSeekBarChangeListener {
-//                    override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}
-//                    override fun onStartTrackingTouch(seek: SeekBar) {}
-//                    override fun onStopTrackingTouch(seek: SeekBar) {
-//                        reader.setPage(seek.progress)
-//                    }
-//                })
-
                     if (size != 0) Text(
+                        modifier = Modifier.width(24.dp),
                         text = size.toString(),
                         color = Color.White,
                         textAlign = TextAlign.Center
                     )
+
                     if (!isOnlyOneChapter)
                         IconButton(onClick = { viewModel.openNextChapter() }) {
                             Icon(Icons.Filled.SkipNext, "next", tint = Color.White)
                         }
-
                 }
             }
         }

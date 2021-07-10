@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActivity
 import kotlinx.coroutines.CoroutineScope
@@ -40,6 +41,25 @@ fun Context.navToReaderActivity(
 
     val intent = Intent(this, ReaderActivity::class.java)
     intent.putExtras(bundle)
+    startActivity(intent)
+}
+
+fun Context.navToReaderActivity(
+    detail: MangaDetail,
+    collectionIndex: Int = 0,
+    chapterIndex: Int = 0,
+    pageIndex: Int = 0
+) {
+    val bundle = bundleOf(
+        "detail" to detail,
+        "collectionIndex" to collectionIndex,
+        "chapterIndex" to chapterIndex,
+        "pageIndex" to pageIndex
+    )
+
+    val intent = Intent(this, ReaderActivity::class.java)
+    intent.putExtras(bundle)
+    println(intent.extras?.getParcelable<MangaDetail>("detail"))
     startActivity(intent)
 }
 
