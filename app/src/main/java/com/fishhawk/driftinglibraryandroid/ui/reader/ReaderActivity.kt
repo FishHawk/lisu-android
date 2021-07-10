@@ -4,6 +4,7 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+import android.widget.FrameLayout
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
@@ -29,7 +30,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.databinding.ActivityReaderBinding
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.base.EventObserver
 import com.fishhawk.driftinglibraryandroid.ui.base.feedback
@@ -48,8 +48,8 @@ import kotlinx.coroutines.runBlocking
 class ReaderActivity : BaseActivity() {
     val viewModel: ReaderViewModel by viewModels()
 
-    lateinit var binding: ActivityReaderBinding
     lateinit var reader: ReaderView
+    lateinit var readerContainer: FrameLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,15 +80,13 @@ class ReaderActivity : BaseActivity() {
             window.attributes = window.attributes.apply { screenBrightness = attrBrightness }
         }.launchIn(lifecycleScope)
 
-        binding = ActivityReaderBinding.inflate(layoutInflater)
+        readerContainer = FrameLayout(this)
         setContent {
             ApplicationTheme {
                 Box(modifier = Modifier.fillMaxSize()) {
                     AndroidView(
                         modifier = Modifier.fillMaxSize(),
-                        factory = {
-                            binding.root
-                        }
+                        factory = { readerContainer }
                     )
 
                     val name by viewModel.chapterName.observeAsState("")
@@ -174,7 +172,7 @@ class ReaderActivity : BaseActivity() {
     }
 
     private fun initializeReader() {
-        binding.readerContainer.removeAllViews()
+        readerContainer.removeAllViews()
 
         reader = when (GlobalPreference.readingDirection.get()) {
             GlobalPreference.ReadingDirection.LTR,
@@ -201,7 +199,7 @@ class ReaderActivity : BaseActivity() {
         reader.useVolumeKey = GlobalPreference.useVolumeKey.get()
         reader.invertVolumeKey = GlobalPreference.invertVolumeKey.get()
 
-        binding.readerContainer.addView(reader)
+        readerContainer.addView(reader)
         reader.isFocusable = true
         reader.isFocusableInTouchMode = true
         reader.requestFocus()
