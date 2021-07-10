@@ -18,10 +18,10 @@
         android:layout_gravity="bottom|end"
         android:background="#AA000000"
         android:gravity="end"
-        android:paddingStart="@dimen/baseline_8dp"
-        android:paddingTop="@dimen/baseline_4dp"
-        android:paddingEnd="@dimen/baseline_8dp"
-        android:paddingBottom="@dimen/baseline_4dp"
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="4dp"
         android:textColor="#ffffff" />
 
     <com.fishhawk.driftinglibraryandroid.ui.reader.ReaderColorFilterView
