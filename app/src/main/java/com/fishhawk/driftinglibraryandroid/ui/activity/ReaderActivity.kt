@@ -5,12 +5,15 @@ import android.os.Bundle
 import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
 import androidx.lifecycle.lifecycleScope
-import com.fishhawk.driftinglibraryandroid.databinding.ActivityReaderBinding
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.databinding.ActivityReaderBinding
+import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderFragment
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+@AndroidEntryPoint
 class ReaderActivity : BaseActivity() {
     lateinit var binding: ActivityReaderBinding
 
@@ -18,6 +21,7 @@ class ReaderActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         binding = ActivityReaderBinding.inflate(layoutInflater)
+        binding.main.getFragment<ReaderFragment>()?.arguments = intent.extras
         setContentView(binding.root)
 
         GlobalPreference.screenOrientation.asFlow()

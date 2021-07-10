@@ -13,11 +13,8 @@ import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -41,10 +38,8 @@ import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderScreen
 import com.fishhawk.driftinglibraryandroid.ui.search.SearchScreen
 import com.fishhawk.driftinglibraryandroid.ui.server.ServerScreen
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
-import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.ui.BottomNavigation
 import com.google.accompanist.insets.ui.Scaffold
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 
 sealed class Screen(val route: String, val labelResId: Int, val icon: ImageVector) {
@@ -68,48 +63,38 @@ class MainActivity : BaseActivity() {
 
 @Composable
 private fun MainContent() {
-    val theme = GlobalPreference.theme.asFlow().collectAsState(GlobalPreference.theme.get())
+    ApplicationTheme {
+        val navController = rememberNavController()
 
-    val navController = rememberNavController()
-    ApplicationTheme(theme.value) {
-        val systemUiController = rememberSystemUiController()
-        val useDarkIcons = MaterialTheme.colors.isLight
-        SideEffect {
-            systemUiController.setSystemBarsColor(Color.Transparent, useDarkIcons)
-            systemUiController.setNavigationBarColor(Color.Transparent, useDarkIcons)
-        }
+        Scaffold(
+            bottomBar = { BottomNavigationBar(navController) }
+        ) { innerPadding ->
+            val startScreen = when (GlobalPreference.startScreen.get()) {
+                GlobalPreference.StartScreen.LIBRARY -> Screen.Library
+                GlobalPreference.StartScreen.HISTORY -> Screen.History
+                GlobalPreference.StartScreen.EXPLORE -> Screen.Explore
+            }
+            NavHost(
+                navController = navController,
+                startDestination = startScreen.route,
+                modifier = Modifier.padding(innerPadding)
+            ) {
+                composable(Screen.Library.route) { LibraryScreen(navController) }
+                composable(Screen.History.route) { HistoryScreen(navController) }
+                composable(Screen.Explore.route) { ExploreScreen(navController) }
+                composable(Screen.More.route) { MoreScreen(navController) }
 
-        ProvideWindowInsets {
-            Scaffold(
-                bottomBar = { BottomNavigationBar(navController) }
-            ) { innerPadding ->
-                val startScreen = when (GlobalPreference.startScreen.get()) {
-                    GlobalPreference.StartScreen.LIBRARY -> Screen.Library
-                    GlobalPreference.StartScreen.HISTORY -> Screen.History
-                    GlobalPreference.StartScreen.EXPLORE -> Screen.Explore
-                }
-                NavHost(
-                    navController = navController,
-                    startDestination = startScreen.route,
-                    modifier = Modifier.padding(innerPadding)
-                ) {
-                    composable(Screen.Library.route) { LibraryScreen(navController) }
-                    composable(Screen.History.route) { HistoryScreen(navController) }
-                    composable(Screen.Explore.route) { ExploreScreen(navController) }
-                    composable(Screen.More.route) { MoreScreen(navController) }
+                composable("library-search") { LibraryScreen(navController) }
 
-                    composable("library-search") { LibraryScreen(navController) }
+                composable("global-search") { GlobalSearchScreen(navController) }
+                composable("provider/{providerId}") { ProviderScreen(navController) }
+                composable("search/{providerId}") { SearchScreen(navController) }
 
-                    composable("global-search") { GlobalSearchScreen(navController) }
-                    composable("provider/{providerId}") { ProviderScreen(navController) }
-                    composable("search/{providerId}") { SearchScreen(navController) }
+                composable("server") { ServerScreen(navController) }
 
-                    composable("server") { ServerScreen(navController) }
-
-                    navigation(startDestination = "detail", route = "gallery/{mangaId}") {
-                        composable("detail") { GalleryScreen(navController) }
-                        composable("edit") { GalleryEditScreen(navController) }
-                    }
+                navigation(startDestination = "detail", route = "gallery/{mangaId}") {
+                    composable("detail") { GalleryScreen(navController) }
+                    composable("edit") { GalleryEditScreen(navController) }
                 }
             }
         }

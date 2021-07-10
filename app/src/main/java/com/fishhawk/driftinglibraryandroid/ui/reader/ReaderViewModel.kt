@@ -1,9 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
@@ -15,8 +12,10 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.ui.base.Event
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
 class ReaderChapter(val index: Int, chapter: Chapter) {
     val id = chapter.id
@@ -36,16 +35,18 @@ class ReaderChapterPointer(
     val prevChapter get() = list.getOrNull(index - 1)
 }
 
-class ReaderViewModel(
-    private val id: String,
-    private val providerId: String?,
-    private val collectionIndex: Int,
-    private val chapterIndex: Int,
-    private val pageIndex: Int,
+@HiltViewModel
+class ReaderViewModel @Inject constructor(
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
-    private val readingHistoryRepository: ReadingHistoryRepository
+    private val readingHistoryRepository: ReadingHistoryRepository,
+    savedStateHandle: SavedStateHandle
 ) : FeedbackViewModel() {
+    private val id = savedStateHandle.get<String>("id")!!
+    private val providerId = savedStateHandle.get<String>("providerId")
+    private val collectionIndex = savedStateHandle.get<Int>("collectionIndex") ?: 0
+    private val chapterIndex = savedStateHandle.get<Int>("chapterIndex") ?: 0
+    private val pageIndex = savedStateHandle.get<Int>("pageIndex") ?: 0
 
     private val _readerState: MutableLiveData<ViewState> = MutableLiveData(ViewState.Loading)
     val readerState: LiveData<ViewState> = _readerState

@@ -14,39 +14,23 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
-import com.fishhawk.driftinglibraryandroid.MainApplication
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderFragmentBinding
-import com.fishhawk.driftinglibraryandroid.ui.ReaderViewModelFactory
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.*
 import com.fishhawk.driftinglibraryandroid.widget.SimpleAnimationListener
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
 
+@AndroidEntryPoint
 class ReaderFragment : Fragment() {
-    val viewModel: ReaderViewModel by viewModels {
-        val arguments = requireActivity().intent.extras!!
+    val viewModel: ReaderViewModel by viewModels()
 
-        val id = arguments.getString("id")!!
-        val providerId = arguments.getString("providerId")
-        val collectionIndex = arguments.getInt("collectionIndex")
-        val chapterIndex = arguments.getInt("chapterIndex")
-        val pageIndex = arguments.getInt("pageIndex")
-        val application = requireActivity().application as MainApplication
-        ReaderViewModelFactory(
-            id,
-            providerId,
-            collectionIndex,
-            chapterIndex,
-            pageIndex,
-            application
-        )
-    }
     lateinit var binding: ReaderFragmentBinding
     lateinit var reader: ReaderView
 
