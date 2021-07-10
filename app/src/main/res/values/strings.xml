@@ -23,10 +23,6 @@
     <!-- history fragment -->
     <string name="history_card_page">Page%1$d</string>
 
-    <!-- explore fragment -->
-    <string name="explore_card_browse">Browse</string>
-
-
     <!-- more fragment -->
     <string name="more_server">Manage server</string>
     <string name="more_setting_general">Setting general</string>
@@ -122,10 +118,6 @@
     <string name="menu_display_mode">Display mode</string>
     <string name="menu_filter">Filter</string>
     <string name="menu_history_clear">Clear history</string>
-    <string name="menu_enable_all">Enable all</string>
-    <string name="menu_disable_all">Disable all</string>
-    <string name="menu_pause_all">Pause all</string>
-    <string name="menu_start_all">Start all</string>
     <string name="menu_add">Add</string>
 
 

@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.ProviderBrowseHistory
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.OptionModel
@@ -119,9 +121,13 @@ private fun ToolBar(pagerState: PagerState) {
                 selectedTabIndex = pagerState.currentPage,
                 backgroundColor = MaterialTheme.colors.surface
             ) {
-                listOf("Popular", "Latest", "Category").forEachIndexed { index, title ->
+                listOf(
+                    R.string.label_popular,
+                    R.string.label_latest,
+                    R.string.label_category
+                ).forEachIndexed { index, title ->
                     Tab(
-                        text = { Text(title) },
+                        text = { Text(stringResource(title)) },
                         selected = pagerState.currentPage == index,
                         onClick = { },
                     )
