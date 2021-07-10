@@ -51,6 +51,8 @@ class ReaderViewModel @Inject constructor(
     private val _readerState: MutableLiveData<ViewState> = MutableLiveData(ViewState.Loading)
     val readerState: LiveData<ViewState> = _readerState
 
+    val isMenuOpened: MutableLiveData<Boolean> = MutableLiveData(false)
+
     private lateinit var mangaDetail: MangaDetail
 
     private val _isOnlyOneChapter: MutableLiveData<Boolean> = MutableLiveData()

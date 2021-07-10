@@ -1,18 +1,31 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
-import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
-import android.graphics.Color
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
-import android.widget.SeekBar
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.core.view.isVisible
-import androidx.lifecycle.asFlow
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
@@ -22,8 +35,9 @@ import com.fishhawk.driftinglibraryandroid.ui.base.EventObserver
 import com.fishhawk.driftinglibraryandroid.ui.base.feedback
 import com.fishhawk.driftinglibraryandroid.ui.base.toast
 import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.*
-import com.fishhawk.driftinglibraryandroid.widget.SimpleAnimationListener
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
+import com.google.accompanist.insets.statusBarsPadding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -33,14 +47,12 @@ import kotlinx.coroutines.runBlocking
 @AndroidEntryPoint
 class ReaderActivity : BaseActivity() {
     val viewModel: ReaderViewModel by viewModels()
+
     lateinit var binding: ActivityReaderBinding
     lateinit var reader: ReaderView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivityReaderBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         GlobalPreference.screenOrientation.asFlow()
             .onEach {
@@ -68,6 +80,38 @@ class ReaderActivity : BaseActivity() {
             window.attributes = window.attributes.apply { screenBrightness = attrBrightness }
         }.launchIn(lifecycleScope)
 
+        binding = ActivityReaderBinding.inflate(layoutInflater)
+        setContent {
+            ApplicationTheme {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    AndroidView(
+                        modifier = Modifier.fillMaxSize(),
+                        factory = {
+                            binding.root
+                        }
+                    )
+
+                    val name by viewModel.chapterName.observeAsState("")
+                    val title by viewModel.chapterTitle.observeAsState("")
+                    val position by viewModel.chapterPosition.observeAsState(0)
+                    val size by viewModel.chapterSize.observeAsState(0)
+
+                    val isMenuOpened by viewModel.isMenuOpened.observeAsState(false)
+
+                    val showInfoBar by GlobalPreference.showInfoBar.asFlow().collectAsState(
+                        GlobalPreference.showInfoBar.get()
+                    )
+                    if (showInfoBar && !isMenuOpened) InfoBar(
+                        Modifier.align(Alignment.BottomEnd),
+                        name, title, position, size
+                    )
+
+                    ColorFilterOverlay()
+
+                    if (isMenuOpened) ReaderMenu(name, title, position, size)
+                }
+            }
+        }
 
         viewModel.feedback.observe(this, EventObserver { feedback(it) })
 
@@ -105,10 +149,6 @@ class ReaderActivity : BaseActivity() {
         viewModel.nextChapterStateChanged.observe(this, EventObserver {
             reader.setNextChapterState(it)
         })
-        viewModel.isOnlyOneChapter.observe(this) {
-            binding.buttonPrevChapter.isVisible = !it
-            binding.buttonNextChapter.isVisible = !it
-        }
 
         combine(
             GlobalPreference.readingDirection.asFlow(),
@@ -124,9 +164,6 @@ class ReaderActivity : BaseActivity() {
         GlobalPreference.invertVolumeKey.asFlow()
             .onEach { reader.invertVolumeKey = it }
             .launchIn(this.lifecycleScope)
-
-        initializeOverlay()
-        initializeMenu()
     }
 
     override fun onPause() {
@@ -171,10 +208,10 @@ class ReaderActivity : BaseActivity() {
 
         reader.onRequestPrevChapter = { viewModel.moveToPrevChapter() }
         reader.onRequestNextChapter = { viewModel.moveToNextChapter() }
-        reader.onRequestMenuVisibility = { binding.menuLayout.isVisible }
+        reader.onRequestMenuVisibility = { viewModel.isMenuOpened.value ?: false }
         reader.onRequestMenu = {
             if (viewModel.readerState.value is ViewState.Content)
-                setMenuLayoutVisibility(it)
+                viewModel.isMenuOpened.value = it
         }
         reader.onPageChanged = { viewModel.chapterPosition.value = it }
         reader.onPageLongClicked = { position, url ->
@@ -204,126 +241,148 @@ class ReaderActivity : BaseActivity() {
         viewModel.chapterPointer.value = viewModel.chapterPointer.value
     }
 
-    private fun initializeOverlay() {
-        val colorFilterValue = combine(
-            GlobalPreference.colorFilterH.asFlow(),
-            GlobalPreference.colorFilterS.asFlow(),
-            GlobalPreference.colorFilterL.asFlow(),
-            GlobalPreference.colorFilterA.asFlow()
-        ) { h, s, l, a ->
-            Color.HSVToColor(
-                a.coerceIn(0, 255),
-                floatArrayOf(
-                    h.coerceIn(0, 360).toFloat(),
-                    s.coerceIn(0, 100).toFloat() / 100f,
-                    l.coerceIn(0, 100).toFloat() / 100f
+//        if (isVisible) {
+//            binding.menuLayout.isVisible = true
+////            binding.infoBar.isVisible = false
+//
+//            val topAnim =
+//                AnimationUtils.loadAnimation(this, R.anim.enter_from_top)
+//            val bottomAnim =
+//                AnimationUtils.loadAnimation(this, R.anim.enter_from_bottom)
+//            binding.menuTopLayout.startAnimation(topAnim)
+//            binding.menuBottomLayout.startAnimation(bottomAnim)
+//        } else {
+////            if (GlobalPreference.showInfoBar.get()) binding.infoBar.isVisible = true
+//
+//            val topAnim =
+//                AnimationUtils.loadAnimation(this, R.anim.exit_to_top)
+//            val bottomAnim =
+//                AnimationUtils.loadAnimation(this, R.anim.exit_to_bottom)
+//            topAnim.setAnimationListener(
+//                object : SimpleAnimationListener() {
+//                    override fun onAnimationEnd(animation: Animation) {
+//                        binding.menuLayout.isVisible = false
+//                    }
+//                }
+//            )
+//            binding.menuTopLayout.startAnimation(topAnim)
+//            binding.menuBottomLayout.startAnimation(bottomAnim)
+//        }
+
+    @Composable
+    private fun ReaderMenu(name: String, title: String, position: Int, size: Int) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .background(Color(0xAA000000))
+                    .padding(4.dp)
+                    .statusBarsPadding(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val context = LocalContext.current
+                val scope = rememberCoroutineScope()
+
+                IconButton(onClick = { finish() }) {
+                    Icon(Icons.Filled.NavigateBefore, "back", tint = Color.White)
+                }
+                Text(
+                    modifier = Modifier
+                        .weight(1f, fill = true)
+                        .padding(8.dp),
+                    text = "$name $title",
+                    style = MaterialTheme.typography.subtitle1,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color.White
                 )
-            )
-        }
-
-        combine(
-            GlobalPreference.colorFilter.asFlow(),
-            GlobalPreference.colorFilterMode.asFlow(),
-            colorFilterValue
-        ) { isEnabled, mode, color ->
-            if (isEnabled) {
-                binding.colorOverlay.setFilterColor(color, mode)
-                binding.colorOverlay.isVisible = true
-            } else {
-                binding.colorOverlay.isVisible = false
-            }
-        }.launchIn(lifecycleScope)
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun initializeMenu() {
-        GlobalPreference.showInfoBar.asFlow()
-            .onEach { if (!binding.menuLayout.isVisible) binding.infoBar.isVisible = it }
-            .launchIn(lifecycleScope)
-
-        combine(
-            viewModel.chapterName.asFlow(),
-            viewModel.chapterTitle.asFlow(),
-            viewModel.chapterPosition.asFlow(),
-            viewModel.chapterSize.asFlow()
-        ) { name, title, position, size ->
-            binding.infoBar.text =
-                if (size != 0) "$name $title ${position + 1}/$size"
-                else "$name $title"
-            binding.title.text = "$name $title"
-
-            binding.chapterPositionLabel.isVisible = size != 0
-            binding.chapterPositionLabel.text = (position + 1).toString()
-
-            binding.chapterSizeLabel.isVisible = size != 0
-            binding.chapterSizeLabel.text = size.toString()
-
-            binding.chapterProgress.isEnabled = size > 1
-            binding.chapterProgress.max = size - 1
-            binding.chapterProgress.progress = position
-        }.launchIn(lifecycleScope)
-
-        binding.backButton.setOnClickListener { finish() }
-        binding.settingButton.setOnClickListener { ReaderSettingsSheet(this).show() }
-        binding.overlayButton.setOnClickListener {
-            ReaderOverlaySheet(this, lifecycleScope)
-                .apply {
-                    setOnDismissListener { setMenuLayoutVisibility(true) }
-                    setMenuLayoutVisibility(false)
-                    window?.setDimAmount(0f)
+                IconButton(onClick = {
+                    ReaderOverlaySheet(context, scope)
+                        .apply {
+                            setOnDismissListener { viewModel.isMenuOpened.value = true }
+                            viewModel.isMenuOpened.value = false
+                            window?.setDimAmount(0f)
+                        }
+                        .show()
+                }) {
+                    Icon(Icons.Filled.BrightnessMedium, "color-filter", tint = Color.White)
                 }
-                .show()
-        }
-
-        binding.chapterProgress.setOnSeekBarChangeListener(object :
-            SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}
-            override fun onStartTrackingTouch(seek: SeekBar) {}
-            override fun onStopTrackingTouch(seek: SeekBar) {
-                reader.setPage(seek.progress)
-            }
-        })
-
-        binding.buttonPrevChapter.setOnClickListener { viewModel.openPrevChapter() }
-        binding.buttonNextChapter.setOnClickListener { viewModel.openNextChapter() }
-
-
-        GlobalPreference.readingDirection.asFlow()
-            .onEach {
-                binding.menuBottomLayout.layoutDirection =
-                    if (it == GlobalPreference.ReadingDirection.RTL) View.LAYOUT_DIRECTION_RTL
-                    else View.LAYOUT_DIRECTION_LTR
-            }
-            .launchIn(lifecycleScope)
-    }
-
-    private fun setMenuLayoutVisibility(isVisible: Boolean) {
-        if (isVisible) {
-            binding.menuLayout.isVisible = true
-            binding.infoBar.isVisible = false
-
-            val topAnim =
-                AnimationUtils.loadAnimation(this, R.anim.enter_from_top)
-            val bottomAnim =
-                AnimationUtils.loadAnimation(this, R.anim.enter_from_bottom)
-            binding.menuTopLayout.startAnimation(topAnim)
-            binding.menuBottomLayout.startAnimation(bottomAnim)
-        } else {
-            if (GlobalPreference.showInfoBar.get()) binding.infoBar.isVisible = true
-
-            val topAnim =
-                AnimationUtils.loadAnimation(this, R.anim.exit_to_top)
-            val bottomAnim =
-                AnimationUtils.loadAnimation(this, R.anim.exit_to_bottom)
-            topAnim.setAnimationListener(
-                object : SimpleAnimationListener() {
-                    override fun onAnimationEnd(animation: Animation) {
-                        binding.menuLayout.isVisible = false
-                    }
+                IconButton(onClick = { ReaderSettingsSheet(context).show() }) {
+                    Icon(Icons.Filled.Settings, "setting", tint = Color.White)
                 }
-            )
-            binding.menuTopLayout.startAnimation(topAnim)
-            binding.menuBottomLayout.startAnimation(bottomAnim)
+            }
+
+            val readingDirection = when (GlobalPreference.readingDirection.let {
+                it.asFlow().collectAsState(it.get())
+            }.value) {
+                GlobalPreference.ReadingDirection.RTL -> LayoutDirection.Rtl
+                else -> LayoutDirection.Ltr
+            }
+
+            CompositionLocalProvider(LocalLayoutDirection provides readingDirection) {
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .background(Color(0xAA000000))
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val isOnlyOneChapter by viewModel.isOnlyOneChapter.observeAsState(true)
+                    if (!isOnlyOneChapter)
+                        IconButton(onClick = { viewModel.openPrevChapter() }) {
+                            Icon(Icons.Filled.SkipPrevious, "prev", tint = Color.White)
+                        }
+                    if (size != 0) Text(
+                        text = position.plus(1).toString(),
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
+
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .weight(1f, fill = true)
+                            .padding(start = 8.dp, end = 8.dp)
+                    )
+//                    binding.chapterProgress.isEnabled = size > 1
+//                    binding.chapterProgress.max = size - 1
+//                    binding.chapterProgress.progress = position
+
+//                binding.chapterProgress.setOnSeekBarChangeListener(object :
+//                    SeekBar.OnSeekBarChangeListener {
+//                    override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {}
+//                    override fun onStartTrackingTouch(seek: SeekBar) {}
+//                    override fun onStopTrackingTouch(seek: SeekBar) {
+//                        reader.setPage(seek.progress)
+//                    }
+//                })
+
+                    if (size != 0) Text(
+                        text = size.toString(),
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
+                    if (!isOnlyOneChapter)
+                        IconButton(onClick = { viewModel.openNextChapter() }) {
+                            Icon(Icons.Filled.SkipNext, "next", tint = Color.White)
+                        }
+
+                }
+            }
         }
+    }
+}
+
+@Composable
+private fun InfoBar(modifier: Modifier, name: String, title: String, position: Int, size: Int) {
+    val infoBarText =
+        if (size != 0) "$name $title ${position + 1}/$size"
+        else "$name $title"
+
+    Box(
+        modifier = modifier
+            .background(Color(0xAA000000))
+            .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
+    ) {
+        Text(text = infoBarText, color = Color.White)
     }
 }
