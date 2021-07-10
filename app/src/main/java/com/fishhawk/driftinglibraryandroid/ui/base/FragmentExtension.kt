@@ -16,7 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
-import com.fishhawk.driftinglibraryandroid.ui.activity.ReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -82,7 +82,7 @@ fun Fragment.saveImage(url: String, filename: String) {
                 insert(
                     MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues
                 )
-            } ?: return@launch makeToast(R.string.toast_image_already_exist)
+            } ?: return@launch requireContext().toast(R.string.toast_image_already_exist)
 
             withContext(Dispatchers.IO) {
                 val outputStream = resolver.openOutputStream(uri)!!
@@ -92,9 +92,9 @@ fun Fragment.saveImage(url: String, filename: String) {
                 outputStream.close()
             }
 
-            makeToast(R.string.toast_image_saved)
+            requireContext().toast(R.string.toast_image_saved)
         } catch (e: Throwable) {
-            makeToast(e)
+            requireContext().toast(e)
         }
     }
 }
@@ -122,34 +122,6 @@ fun CoroutineScope.shareImage(context: Context, url: String, filename: String) =
             context.toast(e)
         }
     }
-
-fun Fragment.shareImage(url: String, filename: String) {
-    lifecycleScope.launch(Dispatchers.IO) {
-        try {
-            val srcFile = Glide.with(requireContext()).asFile().load(url).submit().get()
-
-            val dir = File(requireContext().cacheDir, "shared_image")
-            dir.mkdirs()
-            val destFile = File(dir, "$filename.${srcFile.extension}")
-            srcFile.copyTo(destFile, overwrite = true)
-
-            val uri = FileProvider.getUriForFile(
-                requireContext(),
-                "${requireActivity().packageName}.fileprovider",
-                destFile
-            )
-
-            val shareIntent = Intent().apply {
-                action = Intent.ACTION_SEND
-                type = "image/*"
-                putExtra(Intent.EXTRA_STREAM, uri)
-            }
-            startActivity(Intent.createChooser(shareIntent, "Share image via"))
-        } catch (e: Throwable) {
-            makeToast(e)
-        }
-    }
-}
 
 private fun Context.toast(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()

@@ -1,9 +1,21 @@
 package com.fishhawk.driftinglibraryandroid.ui.base
 
-import androidx.fragment.app.Fragment
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+
+sealed class Feedback {
+    class Hint(val resId: Int) : Feedback()
+    class Failure(val exception: Throwable) : Feedback()
+}
+
+fun Context.feedback(feedback: Feedback) {
+    when (feedback) {
+        is Feedback.Hint -> toast(feedback.resId)
+        is Feedback.Failure -> toast(feedback.exception)
+    }
+}
 
 open class FeedbackViewModel : ViewModel() {
     private val _feedback: MutableLiveData<Event<Feedback>> = MutableLiveData()
@@ -20,10 +32,4 @@ open class FeedbackViewModel : ViewModel() {
     protected fun <T> resultWarp(result: Result<T>, runIfSuccess: (T) -> Unit) {
         result.onSuccess { runIfSuccess(it) }.onFailure { feed(it) }
     }
-}
-
-fun Fragment.bindToFeedbackViewModel(viewModel: FeedbackViewModel) {
-    viewModel.feedback.observe(viewLifecycleOwner, EventObserver {
-        processFeedback(it)
-    })
 }

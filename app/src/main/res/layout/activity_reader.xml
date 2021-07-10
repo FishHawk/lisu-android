@@ -1,11 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/main"
-        android:name="com.fishhawk.driftinglibraryandroid.ui.reader.ReaderFragment"
+    <FrameLayout
+        android:id="@+id/reader_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/info_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:background="#AA000000"
+        android:gravity="end"
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="4dp"
+        android:textColor="#ffffff" />
+
+    <com.fishhawk.driftinglibraryandroid.ui.reader.ReaderColorFilterView
+        android:id="@+id/color_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <FrameLayout
+        android:id="@+id/menu_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/menu_top_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="#AA000000"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingTop="28dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="4dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/back_button"
+                style="@style/Theme.Widget.Button.Icon.Textless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                app:icon="@drawable/ic_baseline_keyboard_arrow_left_24"
+                app:iconTint="@android:color/white" />
+
+            <TextView
+                android:id="@+id/title"
+                style="@style/Theme.TextAppearance.Subtitle1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@android:color/white"
+                android:textIsSelectable="false"
+                tools:text="Title" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/overlay_button"
+                style="@style/Theme.Widget.Button.Icon.Textless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                app:icon="@drawable/ic_baseline_brightness_medium_24"
+                app:iconTint="@color/white" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/setting_button"
+                style="@style/Theme.Widget.Button.Icon.Textless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                app:icon="@drawable/ic_settings_black_24dp"
+                app:iconTint="@color/white" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/menu_bottom_layout"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_gravity="bottom"
+            android:background="#AA000000"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_prev_chapter"
+                style="@style/Theme.Widget.Button.Icon.Textless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_baseline_skip_previous_24"
+                app:iconTint="@color/white" />
+
+            <TextView
+                android:id="@+id/chapter_position_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:minEms="2"
+                android:textColor="@color/white"
+                tools:text="54" />
+
+            <SeekBar
+                android:id="@+id/chapter_progress"
+                android:layout_width="0dp"
+                android:layout_height="28dp"
+                android:layout_weight="1"
+                android:tint="?attr/colorSecondary" />
+
+            <TextView
+                android:id="@+id/chapter_size_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:minEms="2"
+                android:textColor="@color/white"
+                tools:text="124" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_next_chapter"
+                style="@style/Theme.Widget.Button.Icon.Textless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_baseline_skip_next_24"
+                app:iconTint="@color/white" />
+        </LinearLayout>
+    </FrameLayout>
 </FrameLayout>
