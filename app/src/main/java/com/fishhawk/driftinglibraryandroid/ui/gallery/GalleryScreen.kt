@@ -140,7 +140,8 @@ private fun MangaHeader(navController: NavHostController, detail: MangaDetail?) 
                             }
 
                             override fun onEditMetadata() {
-//                                findNavController().navigate(R.id.action_to_gallery_edit)
+                                if (viewModel.detail.value != null)
+                                    navController.navigate("edit")
                             }
 
                             override fun onEditCover() {

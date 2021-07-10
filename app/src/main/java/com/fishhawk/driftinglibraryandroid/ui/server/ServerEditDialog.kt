@@ -37,9 +37,7 @@ fun ServerEditDialog(
                         maxLines = 1,
                         label = { Text("Name") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                        colors = TextFieldDefaults.textFieldColors(
-                            backgroundColor = Color.Transparent,
-                        )
+                        colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
                     )
                     TextField(
                         value = address,
@@ -47,9 +45,7 @@ fun ServerEditDialog(
                         maxLines = 1,
                         label = { Text("Address") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-                        colors = TextFieldDefaults.textFieldColors(
-                            backgroundColor = Color.Transparent,
-                        )
+                        colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
                     )
                 }
             },

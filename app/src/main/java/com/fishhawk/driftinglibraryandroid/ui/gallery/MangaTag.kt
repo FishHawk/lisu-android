@@ -28,12 +28,12 @@ fun MangaTagGroups(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        tagGroups.map { TagGroup(it, onTagClick, onTagLongClick, onTagClose) }
+        tagGroups.map { MangaTagGroup(it, onTagClick, onTagLongClick, onTagClose) }
     }
 }
 
 @Composable
-private fun TagGroup(
+fun MangaTagGroup(
     group: TagGroup,
     onTagClick: (String) -> Unit = {},
     onTagLongClick: (String) -> Unit = {},

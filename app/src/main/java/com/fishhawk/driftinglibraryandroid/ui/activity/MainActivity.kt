@@ -24,9 +24,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.explore.ExploreScreen
+import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryEditScreen
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryScreen
 import com.fishhawk.driftinglibraryandroid.ui.globalsearch.GlobalSearchScreen
 import com.fishhawk.driftinglibraryandroid.ui.history.HistoryScreen
@@ -83,13 +85,18 @@ private fun MainContent() {
                     composable(Screen.Explore.route) { ExploreScreen(navController) }
                     composable(Screen.More.route) { MoreScreen(navController) }
 
-                    composable("provider/{providerId}") { ProviderScreen(navController) }
-                    composable("gallery/{mangaId}") { GalleryScreen(navController) }
-
                     composable("library-search") { LibraryScreen(navController) }
-                    composable("search/{providerId}") { SearchScreen(navController) }
+
                     composable("global-search") { GlobalSearchScreen(navController) }
+                    composable("provider/{providerId}") { ProviderScreen(navController) }
+                    composable("search/{providerId}") { SearchScreen(navController) }
+
                     composable("server") { ServerScreen(navController) }
+
+                    navigation(startDestination = "detail", route = "gallery/{mangaId}") {
+                        composable("detail") { GalleryScreen(navController) }
+                        composable("edit") { GalleryEditScreen(navController) }
+                    }
                 }
             }
         }
