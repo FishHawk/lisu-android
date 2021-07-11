@@ -3,7 +3,6 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -24,12 +23,12 @@ fun MangaContentPreview(
     onPageClick: (Int) -> Unit = {}
 ) {
     val nColumns = 3
-    LazyColumn(
+    Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         val rows = (preview.size + nColumns - 1) / nColumns
-        items(rows) { rowIndex ->
+        (0..rows).map { rowIndex ->
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
