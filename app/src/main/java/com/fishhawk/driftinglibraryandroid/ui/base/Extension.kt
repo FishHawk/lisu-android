@@ -59,7 +59,6 @@ fun Context.navToReaderActivity(
 
     val intent = Intent(this, ReaderActivity::class.java)
     intent.putExtras(bundle)
-    println(intent.extras?.getParcelable<MangaDetail>("detail"))
     startActivity(intent)
 }
 

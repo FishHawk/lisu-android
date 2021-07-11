@@ -52,16 +52,6 @@ class ReaderActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        println(intent?.extras)
-        println("iter=====")
-        intent?.extras?.let { b ->
-            b.keySet()?.forEach {
-                println("$it:")
-                println(b.get(it))
-            }
-        }
-
-
         GlobalPreference.screenOrientation.asFlow()
             .onEach {
                 val newOrientation = when (it) {
