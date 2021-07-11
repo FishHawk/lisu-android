@@ -4,12 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.view.GestureDetector
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -23,7 +22,6 @@ import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderEmptyPageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderPageTransitionNextBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderPageTransitionPrevBinding
-import com.fishhawk.driftinglibraryandroid.ui.base.BaseAdapter
 import com.fishhawk.driftinglibraryandroid.util.glide.OnProgressChangeListener
 import com.fishhawk.driftinglibraryandroid.util.glide.ProgressInterceptor
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
@@ -64,7 +62,26 @@ sealed class Page {
     ) : Page()
 }
 
-class ReaderViewAdapter(private val context: Context) : BaseAdapter<Page>() {
+class ReaderViewAdapter(private val context: Context) :
+    RecyclerView.Adapter<ReaderViewAdapter.ViewHolder>() {
+    val list: MutableList<Page> = mutableListOf()
+
+    private fun setList(newList: List<Page>) {
+        list.clear()
+        list.addAll(newList)
+        notifyDataSetChanged()
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(list[position], position)
+    }
+
+    override fun getItemCount() = list.size
+
+    abstract class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        open fun bind(item: Page, position: Int) {}
+    }
+
 
     var onItemLongPress: ((position: Int, url: String) -> Unit) = { _, _ -> }
     var onItemSingleTapConfirmed: ((event: MotionEvent) -> Unit) = {}
@@ -81,7 +98,7 @@ class ReaderViewAdapter(private val context: Context) : BaseAdapter<Page>() {
         NEXT_TRANSITION(3),
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder<Page> {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
             ViewType.CONTENT.value -> ContentPageViewHolder(parent)
             ViewType.EMPTY.value -> EmptyPageViewHolder(parent)
@@ -165,7 +182,7 @@ class ReaderViewAdapter(private val context: Context) : BaseAdapter<Page>() {
 
 
     inner class EmptyPageViewHolder(private val binding: ReaderEmptyPageBinding) :
-        BaseAdapter.ViewHolder<Page>(binding) {
+        ViewHolder(binding.root) {
 
         constructor(parent: ViewGroup) : this(
             viewBinding(ReaderEmptyPageBinding::inflate, parent)
@@ -186,7 +203,7 @@ class ReaderViewAdapter(private val context: Context) : BaseAdapter<Page>() {
     }
 
     inner class PrevTransitionPageViewHolder(private val binding: ReaderPageTransitionPrevBinding) :
-        BaseAdapter.ViewHolder<Page>(binding) {
+        ViewHolder(binding.root) {
 
         constructor(parent: ViewGroup) : this(
             viewBinding(ReaderPageTransitionPrevBinding::inflate, parent)
@@ -213,7 +230,7 @@ class ReaderViewAdapter(private val context: Context) : BaseAdapter<Page>() {
     }
 
     inner class NextTransitionPageViewHolder(private val binding: ReaderPageTransitionNextBinding) :
-        BaseAdapter.ViewHolder<Page>(binding) {
+        ViewHolder(binding.root) {
 
         constructor(parent: ViewGroup) : this(
             viewBinding(ReaderPageTransitionNextBinding::inflate, parent)
@@ -240,8 +257,7 @@ class ReaderViewAdapter(private val context: Context) : BaseAdapter<Page>() {
     }
 
     inner class ContentPageViewHolder(private val binding: ReaderChapterImageBinding) :
-        BaseAdapter.ViewHolder<Page>(binding) {
-
+        ViewHolder(binding.root) {
 
         constructor(parent: ViewGroup) : this(
             viewBinding(ReaderChapterImageBinding::inflate, parent)
@@ -384,4 +400,11 @@ class ReaderViewAdapter(private val context: Context) : BaseAdapter<Page>() {
                 })
         }
     }
+}
+
+private fun <VB : ViewBinding> viewBinding(
+    factory: (LayoutInflater, ViewGroup, Boolean) -> VB,
+    parent: ViewGroup
+): VB {
+    return factory(LayoutInflater.from(parent.context), parent, false)
 }
