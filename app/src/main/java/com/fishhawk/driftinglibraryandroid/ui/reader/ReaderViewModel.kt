@@ -78,7 +78,6 @@ class ReaderViewModel @Inject constructor(
     val chapterPosition: MutableLiveData<Int> = MutableLiveData(0)
 
     init {
-//        savedStateHandle.get<MangaDetail>("detail")?.let { mangaDetail = it }
         initReader()
     }
 

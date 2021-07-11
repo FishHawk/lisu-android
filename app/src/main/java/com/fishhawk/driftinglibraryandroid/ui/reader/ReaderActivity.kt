@@ -27,11 +27,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
-import com.fishhawk.driftinglibraryandroid.ui.base.EventObserver
-import com.fishhawk.driftinglibraryandroid.ui.base.feedback
-import com.fishhawk.driftinglibraryandroid.ui.base.toast
+import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.*
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
@@ -81,39 +78,23 @@ class ReaderActivity : BaseActivity() {
         readerContainer = FrameLayout(this)
         setContent {
             ApplicationTheme {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    AndroidView(
-                        modifier = Modifier.fillMaxSize(),
-                        factory = { readerContainer }
-                    )
-
-                    val name by viewModel.chapterName.observeAsState("")
-                    val title by viewModel.chapterTitle.observeAsState("")
-                    val position by viewModel.chapterPosition.observeAsState(0)
-                    val size by viewModel.chapterSize.observeAsState(0)
-
-                    val isMenuOpened by viewModel.isMenuOpened.observeAsState(false)
-
-                    val showInfoBar by GlobalPreference.showInfoBar.asFlow().collectAsState(
-                        GlobalPreference.showInfoBar.get()
-                    )
-                    if (showInfoBar && !isMenuOpened) InfoBar(
-                        Modifier.align(Alignment.BottomEnd),
-                        name, title, position, size
-                    )
-
-                    ColorFilterOverlay()
-
-                    if (isMenuOpened) ReaderMenu(name, title, position, size)
+                val readerState by viewModel.readerState.observeAsState(ViewState.Loading)
+                when (readerState) {
+                    is ViewState.Error -> ErrorView(message = "Manga error") { viewModel.refreshReader() }
+                    ViewState.Loading -> LoadingView()
+                    else -> {
+                        val pointer by viewModel.chapterPointer.observeAsState()
+                        when (pointer?.currChapter?.state) {
+                            is ViewState.Error -> ErrorView(message = "Chapter error") { viewModel.refreshReader() }
+                            ViewState.Content -> ReaderContent()
+                            else -> LoadingView()
+                        }
+                    }
                 }
             }
         }
 
         viewModel.feedback.observe(this, EventObserver { feedback(it) })
-
-        viewModel.readerState.observe(this) {
-            if (it is ViewState.Error) reader.viewState = it
-        }
 
         viewModel.chapterPointer.observe(this) { pointer ->
             if (pointer != null) {
@@ -128,7 +109,6 @@ class ReaderActivity : BaseActivity() {
                     }
                 )
                 reader.adapter.setReaderContent(chapterContent)
-                reader.viewState = pointer.currChapter.state
 
                 if (pointer.currChapter.state == ViewState.Content) {
                     reader.setPage(
@@ -230,7 +210,6 @@ class ReaderActivity : BaseActivity() {
                     }
                 }).show()
         }
-        reader.onRetry = { viewModel.refreshReader() }
         viewModel.chapterPointer.value?.let {
             it.startPage = viewModel.chapterPosition.value ?: it.startPage
         }
@@ -264,6 +243,36 @@ class ReaderActivity : BaseActivity() {
 //            binding.menuTopLayout.startAnimation(topAnim)
 //            binding.menuBottomLayout.startAnimation(bottomAnim)
 //        }
+
+
+    @Composable
+    private fun ReaderContent() {
+        Box(modifier = Modifier.fillMaxSize()) {
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = { readerContainer }
+            )
+
+            val name by viewModel.chapterName.observeAsState("")
+            val title by viewModel.chapterTitle.observeAsState("")
+            val position by viewModel.chapterPosition.observeAsState(0)
+            val size by viewModel.chapterSize.observeAsState(0)
+
+            val isMenuOpened by viewModel.isMenuOpened.observeAsState(false)
+
+            val showInfoBar by GlobalPreference.showInfoBar.asFlow().collectAsState(
+                GlobalPreference.showInfoBar.get()
+            )
+            if (showInfoBar && !isMenuOpened) InfoBar(
+                Modifier.align(Alignment.BottomEnd),
+                name, title, position, size
+            )
+
+            ColorFilterOverlay()
+
+            if (isMenuOpened) ReaderMenu(name, title, position, size)
+        }
+    }
 
     @Composable
     private fun ReaderMenu(name: String, title: String, position: Int, size: Int) {
