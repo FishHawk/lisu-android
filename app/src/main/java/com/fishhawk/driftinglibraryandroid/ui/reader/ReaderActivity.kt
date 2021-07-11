@@ -285,7 +285,11 @@ class ReaderActivity : BaseActivity() {
                 val isOnlyOneChapter by viewModel.isOnlyOneChapter.observeAsState(true)
                 if (!isOnlyOneChapter)
                     IconButton(onClick = { viewModel.openPrevChapter() }) {
-                        Icon(Icons.Filled.SkipPrevious, "prev", tint = Color.White)
+                        Icon(
+                            if (LocalLayoutDirection.current == LayoutDirection.Ltr)
+                                Icons.Filled.SkipPrevious else Icons.Filled.SkipNext,
+                            "prev", tint = Color.White
+                        )
                     }
 
                 if (size > 1) {
@@ -323,7 +327,11 @@ class ReaderActivity : BaseActivity() {
 
                 if (!isOnlyOneChapter)
                     IconButton(onClick = { viewModel.openNextChapter() }) {
-                        Icon(Icons.Filled.SkipNext, "next", tint = Color.White)
+                        Icon(
+                            if (LocalLayoutDirection.current == LayoutDirection.Ltr)
+                                Icons.Filled.SkipNext else Icons.Filled.SkipPrevious,
+                            "next", tint = Color.White
+                        )
                     }
             }
         }
