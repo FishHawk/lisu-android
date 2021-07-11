@@ -7,6 +7,10 @@ import android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
 import android.widget.FrameLayout
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -216,35 +220,7 @@ class ReaderActivity : BaseActivity() {
         viewModel.chapterPointer.value = viewModel.chapterPointer.value
     }
 
-//        if (isVisible) {
-//            binding.menuLayout.isVisible = true
-////            binding.infoBar.isVisible = false
-//
-//            val topAnim =
-//                AnimationUtils.loadAnimation(this, R.anim.enter_from_top)
-//            val bottomAnim =
-//                AnimationUtils.loadAnimation(this, R.anim.enter_from_bottom)
-//            binding.menuTopLayout.startAnimation(topAnim)
-//            binding.menuBottomLayout.startAnimation(bottomAnim)
-//        } else {
-////            if (GlobalPreference.showInfoBar.get()) binding.infoBar.isVisible = true
-//
-//            val topAnim =
-//                AnimationUtils.loadAnimation(this, R.anim.exit_to_top)
-//            val bottomAnim =
-//                AnimationUtils.loadAnimation(this, R.anim.exit_to_bottom)
-//            topAnim.setAnimationListener(
-//                object : SimpleAnimationListener() {
-//                    override fun onAnimationEnd(animation: Animation) {
-//                        binding.menuLayout.isVisible = false
-//                    }
-//                }
-//            )
-//            binding.menuTopLayout.startAnimation(topAnim)
-//            binding.menuBottomLayout.startAnimation(bottomAnim)
-//        }
-
-
+    @OptIn(ExperimentalAnimationApi::class)
     @Composable
     private fun ReaderContent() {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -270,74 +246,49 @@ class ReaderActivity : BaseActivity() {
 
             ColorFilterOverlay()
 
-            if (isMenuOpened) ReaderMenu(name, title, position, size)
+            AnimatedVisibility(
+                modifier = Modifier.align(Alignment.TopCenter),
+                visible = isMenuOpened,
+                enter = slideInVertically(initialOffsetY = { -it }),
+                exit = slideOutVertically(targetOffsetY = { -it })
+            ) {
+                ReaderMenuTop(name, title)
+            }
+
+            AnimatedVisibility(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                visible = isMenuOpened,
+                enter = slideInVertically(initialOffsetY = { it }),
+                exit = slideOutVertically(targetOffsetY = { it })
+            ) {
+                ReaderMenuBottom(size, position)
+            }
         }
     }
 
     @Composable
-    private fun ReaderMenu(name: String, title: String, position: Int, size: Int) {
-        Box(modifier = Modifier.fillMaxSize()) {
+    private fun ReaderMenuBottom(size: Int, position: Int) {
+        val readingDirection = when (GlobalPreference.readingDirection.let {
+            it.asFlow().collectAsState(it.get())
+        }.value) {
+            GlobalPreference.ReadingDirection.RTL -> LayoutDirection.Rtl
+            else -> LayoutDirection.Ltr
+        }
+
+        CompositionLocalProvider(LocalLayoutDirection provides readingDirection) {
             Row(
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
                     .background(Color(0xAA000000))
-                    .padding(4.dp)
-                    .statusBarsPadding(),
+                    .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val context = LocalContext.current
-                val scope = rememberCoroutineScope()
+                val isOnlyOneChapter by viewModel.isOnlyOneChapter.observeAsState(true)
+                if (!isOnlyOneChapter)
+                    IconButton(onClick = { viewModel.openPrevChapter() }) {
+                        Icon(Icons.Filled.SkipPrevious, "prev", tint = Color.White)
+                    }
 
-                IconButton(onClick = { finish() }) {
-                    Icon(Icons.Filled.NavigateBefore, "back", tint = Color.White)
-                }
-                Text(
-                    modifier = Modifier
-                        .weight(1f, fill = true)
-                        .padding(8.dp),
-                    text = "$name $title",
-                    style = MaterialTheme.typography.subtitle1,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.White
-                )
-                IconButton(onClick = {
-                    ReaderOverlaySheet(context, scope)
-                        .apply {
-                            setOnDismissListener { viewModel.isMenuOpened.value = true }
-                            viewModel.isMenuOpened.value = false
-                            window?.setDimAmount(0f)
-                        }
-                        .show()
-                }) {
-                    Icon(Icons.Filled.BrightnessMedium, "color-filter", tint = Color.White)
-                }
-                IconButton(onClick = { ReaderSettingsSheet(context).show() }) {
-                    Icon(Icons.Filled.Settings, "setting", tint = Color.White)
-                }
-            }
-
-            val readingDirection = when (GlobalPreference.readingDirection.let {
-                it.asFlow().collectAsState(it.get())
-            }.value) {
-                GlobalPreference.ReadingDirection.RTL -> LayoutDirection.Rtl
-                else -> LayoutDirection.Ltr
-            }
-
-            CompositionLocalProvider(LocalLayoutDirection provides readingDirection) {
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .background(Color(0xAA000000))
-                        .padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val isOnlyOneChapter by viewModel.isOnlyOneChapter.observeAsState(true)
-                    if (!isOnlyOneChapter)
-                        IconButton(onClick = { viewModel.openPrevChapter() }) {
-                            Icon(Icons.Filled.SkipPrevious, "prev", tint = Color.White)
-                        }
-
+                if (size > 1) {
                     var sliderPosition by remember {
                         mutableStateOf(position.toFloat() / size.minus(1))
                     }
@@ -345,7 +296,7 @@ class ReaderActivity : BaseActivity() {
                     fun sliderPositionToPage() =
                         (sliderPosition * size).toInt().coerceIn(0, size - 1)
 
-                    if (size != 0) Text(
+                    Text(
                         modifier = Modifier.width(24.dp),
                         text = sliderPositionToPage().plus(1).toString(),
                         color = Color.White,
@@ -353,24 +304,69 @@ class ReaderActivity : BaseActivity() {
                     )
                     Slider(
                         modifier = Modifier
-                            .weight(1f, fill = true)
+                            .weight(1f)
                             .padding(start = 8.dp, end = 8.dp),
                         value = sliderPosition,
                         onValueChange = { sliderPosition = it },
                         onValueChangeFinished = { reader.setPage(sliderPositionToPage()) }
                     )
-                    if (size != 0) Text(
+
+                    Text(
                         modifier = Modifier.width(24.dp),
                         text = size.toString(),
                         color = Color.White,
                         textAlign = TextAlign.Center
                     )
-
-                    if (!isOnlyOneChapter)
-                        IconButton(onClick = { viewModel.openNextChapter() }) {
-                            Icon(Icons.Filled.SkipNext, "next", tint = Color.White)
-                        }
+                } else {
+                    Spacer(modifier = Modifier.weight(1f))
                 }
+
+                if (!isOnlyOneChapter)
+                    IconButton(onClick = { viewModel.openNextChapter() }) {
+                        Icon(Icons.Filled.SkipNext, "next", tint = Color.White)
+                    }
+            }
+        }
+    }
+
+    @Composable
+    private fun ReaderMenuTop(name: String, title: String) {
+        Row(
+            modifier = Modifier
+                .background(Color(0xAA000000))
+                .padding(4.dp)
+                .statusBarsPadding(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val context = LocalContext.current
+            val scope = rememberCoroutineScope()
+
+            IconButton(onClick = { finish() }) {
+                Icon(Icons.Filled.NavigateBefore, "back", tint = Color.White)
+            }
+            Text(
+                modifier = Modifier
+                    .weight(1f, fill = true)
+                    .padding(8.dp),
+                text = "$name $title",
+                style = MaterialTheme.typography.subtitle1,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = Color.White
+            )
+            IconButton(onClick = {
+                ReaderOverlaySheet(context, scope)
+                    .apply {
+                        setOnDismissListener { viewModel.isMenuOpened.value = true }
+                        viewModel.isMenuOpened.value = false
+                        window?.setDimAmount(0f)
+                    }
+                    .show()
+            }) {
+                Icon(Icons.Filled.BrightnessMedium, "color-filter", tint = Color.White)
+            }
+            IconButton(onClick = { ReaderSettingsSheet(context).show() }) {
+                Icon(Icons.Filled.Settings, "setting", tint = Color.White)
             }
         }
     }
