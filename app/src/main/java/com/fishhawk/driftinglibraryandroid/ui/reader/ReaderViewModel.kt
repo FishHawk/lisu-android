@@ -145,7 +145,9 @@ class ReaderViewModel @Inject constructor(
                 when (chapter.index - pointer.index) {
                     -1 -> prevChapterStateChanged.value = Event(chapter.state)
                     1 -> nextChapterStateChanged.value = Event(chapter.state)
-                    0 -> chapterPointer.value = pointer
+                    0 -> chapterPointer.value = ReaderChapterPointer(
+                        chapters, pointer.startPage, pointer.index
+                    )
                 }
             }
         }
