@@ -2,6 +2,7 @@ package com.fishhawk.driftinglibraryandroid.ui.search
 
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NavigateBefore
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -32,17 +33,22 @@ fun SearchScreen(navController: NavHostController) {
     }
 
     Scaffold(
-        topBar = { ToolBar() },
+        topBar = { ToolBar(navController) },
         content = { ApplicationTransition { Content(navController) } }
     )
 }
 
 @Composable
-private fun ToolBar() {
+private fun ToolBar(navController: NavHostController) {
     TopAppBar(
         backgroundColor = MaterialTheme.colors.surface,
         contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
         title = { Text(stringResource(R.string.label_search)) },
+        navigationIcon = {
+            IconButton(onClick = { navController.navigateUp() }) {
+                Icon(Icons.Filled.NavigateBefore, "back")
+            }
+        },
         actions = {
             // queryHint = getString(R.string.menu_search_hint)
             // setQuery(viewModel.keywords.value, false)

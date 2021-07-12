@@ -45,6 +45,11 @@ private fun ToolBar(navController: NavHostController) {
         backgroundColor = MaterialTheme.colors.surface,
         contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
         title = { Text(stringResource(R.string.label_server)) },
+        navigationIcon = {
+            IconButton(onClick = { navController.navigateUp() }) {
+                Icon(Icons.Filled.NavigateBefore, "back")
+            }
+        },
         actions = {
             val isOpen = remember { mutableStateOf(false) }
             IconButton(onClick = { isOpen.value = true }) {
@@ -52,11 +57,6 @@ private fun ToolBar(navController: NavHostController) {
                 ServerEditDialog(isOpen, null) { name, address ->
                     viewModel.addServer(ServerInfo(name, address))
                 }
-            }
-        },
-        navigationIcon = {
-            IconButton(onClick = { navController.navigateUp() }) {
-                Icon(Icons.Filled.NavigateBefore, "back")
             }
         }
     )

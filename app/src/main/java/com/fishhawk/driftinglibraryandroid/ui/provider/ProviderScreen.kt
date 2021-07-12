@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NavigateBefore
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,7 +56,7 @@ fun ProviderScreen(navController: NavHostController) {
         pagerState.currentPage
     )
     Scaffold(
-        topBar = { ToolBar(pagerState) },
+        topBar = { ToolBar(pagerState, navController) },
         content = {
             ApplicationTransition {
                 Content(pagerState, navController)
@@ -98,7 +99,7 @@ private fun Content(
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun ToolBar(pagerState: PagerState) {
+private fun ToolBar(pagerState: PagerState, navController: NavHostController) {
     val viewModel = hiltViewModel<ProviderViewModel>()
 
     Surface(elevation = AppBarDefaults.TopAppBarElevation) {
@@ -108,6 +109,11 @@ private fun ToolBar(pagerState: PagerState) {
                 backgroundColor = MaterialTheme.colors.surface,
                 contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
                 title = { Text(viewModel.provider.title) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(Icons.Filled.NavigateBefore, "back")
+                    }
+                },
                 actions = {
                     IconButton(onClick = {
 //            queryHint = getString(R.string.menu_search_hint)

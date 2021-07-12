@@ -45,16 +45,16 @@ private fun ToolBar(navController: NavHostController) {
         backgroundColor = MaterialTheme.colors.surface,
         contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
         title = { Text(stringResource(R.string.label_global_search)) },
+        navigationIcon = {
+            IconButton(onClick = { navController.navigateUp() }) {
+                Icon(Icons.Filled.NavigateBefore, "back")
+            }
+        },
         actions = {
             // queryHint = getString(R.string.menu_search_global_hint)
             // setQuery(viewModel.keywords.value, false)
             IconButton(onClick = { }) {
                 Icon(Icons.Filled.Search, contentDescription = "search")
-            }
-        },
-        navigationIcon = {
-            IconButton(onClick = { navController.navigateUp() }) {
-                Icon(Icons.Filled.NavigateBefore, "back")
             }
         }
     )

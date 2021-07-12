@@ -37,14 +37,14 @@ private fun ToolBar(navController: NavHostController) {
         backgroundColor = MaterialTheme.colors.surface,
         contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
         title = { Text(stringResource(R.string.label_gallery_edit)) },
-        actions = {
-            IconButton(onClick = { /*viewModel.updateMetadata(metadata)*/ }) {
-                Icon(Icons.Filled.Publish, contentDescription = "publish")
-            }
-        },
         navigationIcon = {
             IconButton(onClick = { navController.navigateUp() }) {
                 Icon(Icons.Filled.NavigateBefore, "back")
+            }
+        },
+        actions = {
+            IconButton(onClick = { /*viewModel.updateMetadata(metadata)*/ }) {
+                Icon(Icons.Filled.Publish, contentDescription = "publish")
             }
         }
     )
