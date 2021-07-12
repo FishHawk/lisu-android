@@ -3,14 +3,14 @@ package com.fishhawk.driftinglibraryandroid.ui.activity
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-open class BaseActivity : AppCompatActivity() {
+open class BaseActivity : ComponentActivity() {
     private val requestPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()

@@ -1,45 +1,4 @@
 <resources>
-    <!--=======================-->
-    <!--Widgets.TextInputLayout-->
-    <!--=======================-->
-
-    <style name="Theme.TextInputLayout.FilledBox" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.TextInputEditText.FilledBox</item>
-        <item name="boxBackgroundColor">@android:color/transparent</item>
-        <item name="boxStrokeColor">?attr/colorSecondary</item>
-        <item name="hintTextColor">?attr/colorSecondary</item>
-    </style>
-
-    <style name="ThemeOverlay.TextInputEditText.FilledBox" parent="ThemeOverlay.MaterialComponents.TextInputEditText.FilledBox">
-        <item name="colorControlActivated">?attr/colorSecondary</item>
-    </style>
-
-
-    <!--===========-->
-    <!--AlertDialog-->
-    <!--===========-->
-
-    <style name="Theme.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="android:background">?attr/colorPrimary</item>
-        <item name="title">?attr/colorPrimary</item>
-        <item name="buttonBarPositiveButtonStyle">@style/Theme.Widget.Button.TextButton</item>
-        <item name="buttonBarNegativeButtonStyle">@style/Theme.Widget.Button.TextButton</item>
-        <item name="buttonBarNeutralButtonStyle">@style/Theme.Widget.Button.TextButton</item>
-        <item name="materialAlertDialogTitleTextStyle">@style/Theme.AlertDialog.Title.Text</item>
-        <item name="colorAccent">?colorSecondary</item>
-    </style>
-
-    <style name="Theme.AlertDialog.Title.Text" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
-        <item name="android:textAppearance">@style/Theme.AlertDialog.Title.TextAppearance</item>
-    </style>
-
-    <style name="Theme.AlertDialog.Title.TextAppearance" parent="TextAppearance.MaterialComponents.Subtitle1">
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">18sp</item>
-    </style>
-
-
     <!--===============-->
     <!--Text Appearance-->
     <!--===============-->
@@ -83,15 +42,5 @@
         <item name="iconTint">?colorOnPrimary</item>
         <item name="rippleColor">?colorOnPrimary</item>
         <item name="iconPadding">16dp</item>
-    </style>
-
-
-    <!--=================-->
-    <!--Widgets.AppBarLayout-->
-    <!--=================-->
-
-    <style name="Theme.Widget.AppBarLayout" parent="Widget.Design.AppBarLayout">
-        <item name="android:fitsSystemWindows">true</item>
-        <item name="statusBarForeground">?attr/colorPrimary</item>
     </style>
 </resources>
