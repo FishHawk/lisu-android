@@ -17,6 +17,7 @@ import com.fishhawk.driftinglibraryandroid.ui.base.MangaDisplayModeButton
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableMangaList
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActionSheet
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.TopAppBar
@@ -32,7 +33,7 @@ fun SearchScreen(navController: NavHostController) {
 
     Scaffold(
         topBar = { ToolBar() },
-        content = { Content(navController) }
+        content = { ApplicationTransition { Content(navController) } }
     )
 }
 

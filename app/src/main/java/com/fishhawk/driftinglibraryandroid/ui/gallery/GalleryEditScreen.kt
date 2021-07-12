@@ -18,6 +18,7 @@ import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaStatus
 import com.fishhawk.driftinglibraryandroid.data.remote.model.TagGroup
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.TopAppBar
@@ -26,7 +27,7 @@ import com.google.accompanist.insets.ui.TopAppBar
 fun GalleryEditScreen(navController: NavHostController) {
     Scaffold(
         topBar = { ToolBar(navController) },
-        content = { Content(navController) }
+        content = { ApplicationTransition { Content(navController) } }
     )
 }
 

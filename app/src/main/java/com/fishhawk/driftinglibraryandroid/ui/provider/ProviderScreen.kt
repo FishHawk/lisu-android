@@ -29,6 +29,7 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaDisplayModeButton
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableMangaList
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
@@ -56,30 +57,43 @@ fun ProviderScreen(navController: NavHostController) {
     Scaffold(
         topBar = { ToolBar(pagerState) },
         content = {
-            HorizontalPager(state = pagerState) { page ->
-                when (page) {
-                    0 -> ProviderPanel(
-                        navController,
-                        0,
-                        viewModel.popularMangaList,
-                        viewModel.popularOptionModel
-                    )
-                    1 -> ProviderPanel(
-                        navController,
-                        1,
-                        viewModel.latestMangaList,
-                        viewModel.latestOptionModel
-                    )
-                    2 -> ProviderPanel(
-                        navController,
-                        2,
-                        viewModel.categoryMangaList,
-                        viewModel.categoryOptionModel
-                    )
-                }
+            ApplicationTransition {
+                Content(pagerState, navController)
             }
         }
     )
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun Content(
+    pagerState: PagerState,
+    navController: NavHostController
+) {
+    val viewModel = hiltViewModel<ProviderViewModel>()
+
+    HorizontalPager(state = pagerState) { page ->
+        when (page) {
+            0 -> ProviderPanel(
+                navController,
+                0,
+                viewModel.popularMangaList,
+                viewModel.popularOptionModel
+            )
+            1 -> ProviderPanel(
+                navController,
+                1,
+                viewModel.latestMangaList,
+                viewModel.latestOptionModel
+            )
+            2 -> ProviderPanel(
+                navController,
+                2,
+                viewModel.categoryMangaList,
+                viewModel.categoryOptionModel
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalPagerApi::class)

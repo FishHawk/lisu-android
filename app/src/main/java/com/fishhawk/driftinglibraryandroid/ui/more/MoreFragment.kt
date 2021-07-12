@@ -26,6 +26,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.fishhawk.driftinglibraryandroid.util.setNext
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
@@ -105,23 +106,26 @@ fun MoreScreen(navController: NavHostController) {
                 title = { Text(stringResource(R.string.label_more)) }
             )
         },
-        content = {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(32.dp)
-                ) {
-                    Button(onClick = { navController.navigate("server") }) {
-                        Text(text = "Server")
-                    }
-                    Button(onClick = { GlobalPreference.theme.setNext() }) {
-                        Text(text = "Theme")
-                    }
-                }
+        content = { ApplicationTransition { Content(navController) } }
+    )
+}
+
+@Composable
+private fun Content(navController: NavHostController) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(32.dp)
+        ) {
+            Button(onClick = { navController.navigate("server") }) {
+                Text(text = "Server")
+            }
+            Button(onClick = { GlobalPreference.theme.setNext() }) {
+                Text(text = "Theme")
             }
         }
-    )
+    }
 }

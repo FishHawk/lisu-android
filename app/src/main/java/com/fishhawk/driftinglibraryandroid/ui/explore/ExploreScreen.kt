@@ -20,12 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.navArgument
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
@@ -35,7 +35,7 @@ import com.google.accompanist.insets.ui.TopAppBar
 fun ExploreScreen(navHostController: NavHostController) {
     Scaffold(
         topBar = { ToolBar() },
-        content = { Content(navHostController) }
+        content = { ApplicationTransition { Content(navHostController) } }
     )
 }
 

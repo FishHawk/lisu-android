@@ -27,6 +27,7 @@ import com.fishhawk.driftinglibraryandroid.ui.base.copyToClipboard
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.base.shareImage
 import com.fishhawk.driftinglibraryandroid.ui.base.toast
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.fishhawk.driftinglibraryandroid.ui.theme.MaterialColors
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.statusBarsPadding
@@ -57,32 +58,34 @@ fun GalleryScreen(navController: NavHostController) {
         else navController.navigate("library-search")
     }
 
-    Column {
-        MangaHeader(navController, detail)
-        val isRefreshing by viewModel.isRefreshing.observeAsState(true)
-        SwipeRefresh(
-            modifier = Modifier.fillMaxSize(),
-            state = rememberSwipeRefreshState(isRefreshing),
-            onRefresh = { viewModel.refreshManga() },
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+    ApplicationTransition {
+        Column {
+            MangaHeader(navController, detail)
+            val isRefreshing by viewModel.isRefreshing.observeAsState(true)
+            SwipeRefresh(
+                modifier = Modifier.fillMaxSize(),
+                state = rememberSwipeRefreshState(isRefreshing),
+                onRefresh = { viewModel.refreshManga() },
             ) {
-                detail?.source?.let { MangaSource(it) }
-                detail?.metadata?.description?.let { MangaDescription(it) }
-                detail?.metadata?.tags?.let { tags ->
-                    val context = LocalContext.current
-                    MangaTagGroups(tags,
-                        onTagClick = { search(it) },
-                        onTagLongClick = {
-                            context.copyToClipboard(it, R.string.toast_manga_tag_saved)
-                        }
-                    )
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    detail?.source?.let { MangaSource(it) }
+                    detail?.metadata?.description?.let { MangaDescription(it) }
+                    detail?.metadata?.tags?.let { tags ->
+                        val context = LocalContext.current
+                        MangaTagGroups(tags,
+                            onTagClick = { search(it) },
+                            onTagLongClick = {
+                                context.copyToClipboard(it, R.string.toast_manga_tag_saved)
+                            }
+                        )
+                    }
+                    detail?.let { MangaContent(viewModel, it) }
                 }
-                detail?.let { MangaContent(viewModel, it) }
             }
         }
     }

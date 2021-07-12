@@ -25,6 +25,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.TopAppBar
@@ -33,7 +34,7 @@ import com.google.accompanist.insets.ui.TopAppBar
 fun ServerScreen(navController: NavHostController) {
     Scaffold(
         topBar = { ToolBar(navController) },
-        content = { Content() }
+        content = { ApplicationTransition { Content() } }
     )
 }
 

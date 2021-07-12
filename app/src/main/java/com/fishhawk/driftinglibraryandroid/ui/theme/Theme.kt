@@ -1,10 +1,10 @@
 package com.fishhawk.driftinglibraryandroid.ui.theme
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.spring
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.google.accompanist.insets.ProvideWindowInsets
@@ -33,3 +33,16 @@ fun ApplicationTheme(content: @Composable () -> Unit) {
         }
     }
 }
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun ApplicationTransition(
+    content: @Composable AnimatedVisibilityScope.() -> Unit
+) = AnimatedVisibility(
+    visibleState = remember {
+        MutableTransitionState(false)
+    }.apply { targetState = true },
+    enter = fadeIn(animationSpec = spring(stiffness = 100f)),
+    exit = fadeOut(),
+    content = content
+)
