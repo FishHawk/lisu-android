@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.NavigateBefore
 import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
@@ -22,10 +24,8 @@ import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.ui.base.ErrorItem
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaCardGrid
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
-import com.google.accompanist.insets.ui.TopAppBar
 
 @Composable
 fun GlobalSearchScreen(navController: NavHostController) {
@@ -41,23 +41,13 @@ fun GlobalSearchScreen(navController: NavHostController) {
 
 @Composable
 private fun ToolBar(navController: NavHostController) {
-    TopAppBar(
-        backgroundColor = MaterialTheme.colors.surface,
-        contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
-        title = { Text(stringResource(R.string.label_global_search)) },
-        navigationIcon = {
-            IconButton(onClick = { navController.navigateUp() }) {
-                Icon(Icons.Filled.NavigateBefore, "back")
-            }
-        },
-        actions = {
-            // queryHint = getString(R.string.menu_search_global_hint)
-            // setQuery(viewModel.keywords.value, false)
-            IconButton(onClick = { }) {
-                Icon(Icons.Filled.Search, contentDescription = "search")
-            }
+    ApplicationToolBar(stringResource(R.string.label_global_search), navController) {
+        // queryHint = getString(R.string.menu_search_global_hint)
+        // setQuery(viewModel.keywords.value, false)
+        IconButton(onClick = { }) {
+            Icon(Icons.Filled.Search, contentDescription = "search")
         }
-    )
+    }
 }
 
 @Composable

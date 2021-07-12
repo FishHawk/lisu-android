@@ -28,11 +28,9 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.coil.rememberCoilPainter
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
-import com.google.accompanist.insets.ui.TopAppBar
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.hilt.navigation.compose.hiltViewModel as hiltViewModel1
@@ -47,24 +45,19 @@ fun HistoryScreen(navController: NavHostController) {
 
 @Composable
 private fun ToolBar() {
-    TopAppBar(
-        backgroundColor = MaterialTheme.colors.surface,
-        contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
-        title = { Text(stringResource(R.string.label_history)) },
-        actions = {
-            val isOpen1 = remember { mutableStateOf(false) }
-            IconButton(onClick = { isOpen1.value = true }) {
-                Icon(Icons.Filled.FilterList, stringResource(R.string.menu_filter))
-            }
-            FilterSwitchDialog(isOpen1)
-
-            val isOpen2 = remember { mutableStateOf(false) }
-            IconButton(onClick = { isOpen2.value = true }) {
-                Icon(Icons.Filled.ClearAll, stringResource(R.string.menu_history_clear))
-            }
-            ClearHistoryDialog(isOpen2)
+    ApplicationToolBar(stringResource(R.string.label_history)) {
+        val isOpen1 = remember { mutableStateOf(false) }
+        IconButton(onClick = { isOpen1.value = true }) {
+            Icon(Icons.Filled.FilterList, stringResource(R.string.menu_filter))
         }
-    )
+        FilterSwitchDialog(isOpen1)
+
+        val isOpen2 = remember { mutableStateOf(false) }
+        IconButton(onClick = { isOpen2.value = true }) {
+            Icon(Icons.Filled.ClearAll, stringResource(R.string.menu_history_clear))
+        }
+        ClearHistoryDialog(isOpen2)
+    }
 }
 
 @Composable

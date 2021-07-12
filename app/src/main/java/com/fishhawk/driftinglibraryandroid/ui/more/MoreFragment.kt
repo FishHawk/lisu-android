@@ -26,6 +26,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.fishhawk.driftinglibraryandroid.util.setNext
 import com.google.accompanist.insets.LocalWindowInsets
@@ -99,13 +100,7 @@ private fun MoreScreenX(contentView: View) {
 @Composable
 fun MoreScreen(navController: NavHostController) {
     Scaffold(
-        topBar = {
-            TopAppBar(
-                backgroundColor = MaterialTheme.colors.surface,
-                contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
-                title = { Text(stringResource(R.string.label_more)) }
-            )
-        },
+        topBar = { ApplicationToolBar(stringResource(R.string.label_more)) },
         content = { ApplicationTransition { Content(navController) } }
     )
 }

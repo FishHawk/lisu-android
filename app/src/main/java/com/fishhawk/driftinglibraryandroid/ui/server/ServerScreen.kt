@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.NavigateBefore
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -25,10 +24,8 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
-import com.google.accompanist.insets.ui.TopAppBar
 
 @Composable
 fun ServerScreen(navController: NavHostController) {
@@ -41,25 +38,16 @@ fun ServerScreen(navController: NavHostController) {
 @Composable
 private fun ToolBar(navController: NavHostController) {
     val viewModel = hiltViewModel<ServerViewModel>()
-    TopAppBar(
-        backgroundColor = MaterialTheme.colors.surface,
-        contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
-        title = { Text(stringResource(R.string.label_server)) },
-        navigationIcon = {
-            IconButton(onClick = { navController.navigateUp() }) {
-                Icon(Icons.Filled.NavigateBefore, "back")
-            }
-        },
-        actions = {
-            val isOpen = remember { mutableStateOf(false) }
-            IconButton(onClick = { isOpen.value = true }) {
-                Icon(Icons.Filled.Add, contentDescription = "Add")
-                ServerEditDialog(isOpen, null) { name, address ->
-                    viewModel.addServer(ServerInfo(name, address))
-                }
+
+    ApplicationToolBar(stringResource(R.string.label_server), navController) {
+        val isOpen = remember { mutableStateOf(false) }
+        IconButton(onClick = { isOpen.value = true }) {
+            Icon(Icons.Filled.Add, contentDescription = "Add")
+            ServerEditDialog(isOpen, null) { name, address ->
+                viewModel.addServer(ServerInfo(name, address))
             }
         }
-    )
+    }
 }
 
 @Composable

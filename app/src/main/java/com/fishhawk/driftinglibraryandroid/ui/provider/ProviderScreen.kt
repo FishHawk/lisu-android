@@ -5,11 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.NavigateBefore
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -30,12 +30,11 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaDisplayModeButton
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableMangaList
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.flowlayout.FlowRow
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
-import com.google.accompanist.insets.ui.TopAppBar
 import com.google.accompanist.pager.*
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -104,18 +103,8 @@ private fun ToolBar(pagerState: PagerState, navController: NavHostController) {
 
     Surface(elevation = AppBarDefaults.TopAppBarElevation) {
         Column {
-            TopAppBar(
-                elevation = 0.dp,
-                backgroundColor = MaterialTheme.colors.surface,
-                contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
-                title = { Text(viewModel.provider.title) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.Filled.NavigateBefore, "back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {
+            ApplicationToolBar(viewModel.provider.title, navController, 0.dp) {
+                IconButton(onClick = {
 //            queryHint = getString(R.string.menu_search_hint)
 //                    findNavController().navigate(
 //                        R.id.action_to_search,
@@ -124,13 +113,11 @@ private fun ToolBar(pagerState: PagerState, navController: NavHostController) {
 //                            "keywords" to query
 //                        )
 //                    )
-                    }) {
-                        Icon(Icons.Filled.Search, contentDescription = "search")
-                    }
-                    MangaDisplayModeButton()
-                }
-            )
+                }) { Icon(Icons.Filled.Search, contentDescription = "search") }
+                MangaDisplayModeButton()
+            }
 
+            val scope = rememberCoroutineScope()
             TabRow(
                 modifier = Modifier.zIndex(2f),
                 indicator = { tabPositions ->
@@ -149,7 +136,7 @@ private fun ToolBar(pagerState: PagerState, navController: NavHostController) {
                     Tab(
                         text = { Text(stringResource(title)) },
                         selected = pagerState.currentPage == index,
-                        onClick = { },
+                        onClick = { scope.launch { pagerState.scrollToPage(index) } },
                     )
                 }
             }

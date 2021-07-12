@@ -17,10 +17,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaDisplayModeButton
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableMangaList
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
-import com.google.accompanist.insets.ui.TopAppBar
 
 @Composable
 fun LibraryScreen(navController: NavHostController) {
@@ -35,17 +33,12 @@ fun LibraryScreen(navController: NavHostController) {
 
 @Composable
 private fun ToolBar() {
-    TopAppBar(
-        backgroundColor = MaterialTheme.colors.surface,
-        contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
-        title = { Text(stringResource(R.string.label_library)) },
-        actions = {
-            IconButton(onClick = { }) {
-                Icon(Icons.Filled.Search, contentDescription = "search")
-            }
-            MangaDisplayModeButton()
+    ApplicationToolBar(stringResource(R.string.label_library)) {
+        IconButton(onClick = { }) {
+            Icon(Icons.Filled.Search, contentDescription = "search")
         }
-    )
+        MangaDisplayModeButton()
+    }
 }
 
 @Composable

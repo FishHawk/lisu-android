@@ -25,11 +25,9 @@ import coil.request.ImageRequest
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.coil.rememberCoilPainter
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
-import com.google.accompanist.insets.ui.TopAppBar
 
 @Composable
 fun ExploreScreen(navHostController: NavHostController) {
@@ -41,21 +39,16 @@ fun ExploreScreen(navHostController: NavHostController) {
 
 @Composable
 private fun ToolBar() {
-    TopAppBar(
-        backgroundColor = MaterialTheme.colors.surface,
-        contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
-        title = { Text(stringResource(R.string.label_explore)) },
-        actions = {
-            //  queryHint = getString(R.string.menu_search_global_hint)
-            //  binding.root.findNavController().navigate(
-            //      R.id.action_explore_to_global_search,
-            //      bundleOf("keywords" to query)
-            //  )
-            IconButton(onClick = { }) {
-                Icon(Icons.Filled.Search, contentDescription = "search")
-            }
+    ApplicationToolBar(stringResource(R.string.label_explore)) {
+        //  queryHint = getString(R.string.menu_search_global_hint)
+        //  binding.root.findNavController().navigate(
+        //      R.id.action_explore_to_global_search,
+        //      bundleOf("keywords" to query)
+        //  )
+        IconButton(onClick = { }) {
+            Icon(Icons.Filled.Search, contentDescription = "search")
         }
-    )
+    }
 }
 
 @Composable
