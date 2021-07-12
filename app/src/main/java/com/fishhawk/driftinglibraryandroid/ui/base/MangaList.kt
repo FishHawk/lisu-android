@@ -255,7 +255,7 @@ fun MangaCardGrid(
                             colors = listOf(
                                 Color.Transparent,
                                 Color.Transparent,
-                                Color(0xaa000000)
+                                Color(0xAA000000)
                             ),
                         )
                     ),

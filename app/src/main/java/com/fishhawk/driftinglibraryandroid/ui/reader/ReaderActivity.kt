@@ -301,7 +301,7 @@ class ReaderActivity : BaseActivity() {
                         (sliderPosition * size).toInt().coerceIn(0, size - 1)
 
                     Text(
-                        modifier = Modifier.width(24.dp),
+                        modifier = Modifier.width(32.dp),
                         text = sliderPositionToPage().plus(1).toString(),
                         color = Color.White,
                         textAlign = TextAlign.Center
@@ -314,9 +314,8 @@ class ReaderActivity : BaseActivity() {
                         onValueChange = { sliderPosition = it },
                         onValueChangeFinished = { reader.setPage(sliderPositionToPage()) }
                     )
-
                     Text(
-                        modifier = Modifier.width(24.dp),
+                        modifier = Modifier.width(32.dp),
                         text = size.toString(),
                         color = Color.White,
                         textAlign = TextAlign.Center
