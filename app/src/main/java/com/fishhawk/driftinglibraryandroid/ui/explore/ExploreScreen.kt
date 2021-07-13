@@ -61,19 +61,19 @@ private fun ToolBar() {
 @Composable
 private fun Content(navHostController: NavHostController) {
     val viewModel = hiltViewModel<ExploreViewModel>()
-    val providerList by viewModel.providerList.collectAsState()
+    val providerList by viewModel.providerList.flow.collectAsState()
 
     providerList
         ?.onSuccess { providers ->
-            val isRefreshing by viewModel.handler.isRefreshing.collectAsState()
+            val isRefreshing by viewModel.providerList.isRefreshing.collectAsState()
             SwipeRefresh(
                 state = rememberSwipeRefreshState(isRefreshing),
-                onRefresh = { viewModel.handler.refresh() },
+                onRefresh = { viewModel.providerList.refresh() },
             ) {
                 if (providers.isEmpty()) EmptyView()
                 else ProviderList(providers, navHostController)
             }
-        }?.onFailure { ErrorView(message = it.message ?: "") { viewModel.handler.reload() } }
+        }?.onFailure { ErrorView(message = it.message ?: "") { viewModel.providerList.reload() } }
         ?: LoadingView()
 }
 
@@ -108,6 +108,7 @@ private fun ProviderList(
 private fun ProviderCard(navController: NavHostController, provider: ProviderInfo) {
     Card(
         modifier = Modifier.clickable {
+            P.lastUsedProvider.set(provider.id)
             navController.currentBackStackEntry?.arguments =
                 bundleOf("provider" to provider)
             navController.navigate("provider/${provider.id}")
@@ -140,12 +141,4 @@ private fun ProviderCard(navController: NavHostController, provider: ProviderInf
             )
         }
     }
-}
-
-private fun openProvider(provider: ProviderInfo) {
-//    findNavController().navigate(
-//        R.id.action_explore_to_provider_pager,
-//        bundleOf("provider" to provider)
-//    )
-    P.lastUsedProvider.set(provider.id)
 }

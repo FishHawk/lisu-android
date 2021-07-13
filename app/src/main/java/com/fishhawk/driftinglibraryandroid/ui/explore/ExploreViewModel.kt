@@ -12,7 +12,10 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class RefreshHandle(private val scope: CoroutineScope) {
+class RefreshHandle<T>(
+    private val scope: CoroutineScope,
+    flow: Flow<suspend () -> Result<T>>
+) {
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
@@ -23,22 +26,20 @@ class RefreshHandle(private val scope: CoroutineScope) {
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun <T> attach(flow: Flow<suspend () -> Result<T>>): Flow<Result<T>?> {
-        return combine(
-            channel.receiveAsFlow(),
-            flow.onEach { _isRefreshing.value = false }
-        ) { type, loader -> Pair(type, loader) }
-            .flatMapLatest {
-                if (_isRefreshing.value) flow {
-                    val result = it.second()
-                    _isRefreshing.value = false
-                    if (result.isSuccess) emit(result)
-                } else flow {
-                    emit(null)
-                    emit(it.second())
-                }
+    val flow = combine(
+        channel.receiveAsFlow(),
+        flow.onEach { _isRefreshing.value = false })
+    { _, loader -> loader }
+        .flatMapLatest {
+            if (_isRefreshing.value) flow {
+                val result = it()
+                _isRefreshing.value = false
+                if (result.isSuccess) emit(result)
+            } else flow {
+                emit(null)
+                emit(it())
             }
-    }
+        }.stateIn(scope, SharingStarted.WhileSubscribed(), null)
 
     fun refresh() = scope.launch {
         if (_isRefreshing.value) return@launch
@@ -56,9 +57,8 @@ class RefreshHandle(private val scope: CoroutineScope) {
 class ExploreViewModel @Inject constructor(
     private val remoteProviderRepository: RemoteProviderRepository
 ) : ViewModel() {
-    val handler = RefreshHandle(viewModelScope)
-
-    val providerList = handler.attach(
+    val providerList = RefreshHandle(
+        viewModelScope,
         P.selectedServer.asFlow().map { suspend { remoteProviderRepository.listProvider() } }
-    ).stateIn(viewModelScope, SharingStarted.Eagerly, null)
+    )
 }
