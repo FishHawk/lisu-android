@@ -1,10 +1,10 @@
 package com.fishhawk.driftinglibraryandroid.ui.history
 
-import androidx.compose.foundation.Image
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ClearAll
@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -27,11 +26,13 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
+import com.fishhawk.driftinglibraryandroid.ui.base.MangaCover
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
-import com.google.accompanist.coil.rememberCoilPainter
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDate
 import java.util.*
 import androidx.hilt.navigation.compose.hiltViewModel as hiltViewModel1
 
@@ -69,7 +70,30 @@ private fun Content(navController: NavHostController) {
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(historyList) { HistoryCard(navController, it) }
+        val calendar = GregorianCalendar.getInstance()
+        historyList.forEach {
+            val other = GregorianCalendar.getInstance()
+            other.time = Date(it.date)
+
+            if (
+                calendar.get(Calendar.ERA) != other.get(Calendar.ERA) ||
+                calendar.get(Calendar.YEAR) != other.get(Calendar.YEAR) ||
+                calendar.get(Calendar.DAY_OF_YEAR) != other.get(Calendar.DAY_OF_YEAR)
+            ) {
+                calendar.time = other.time
+                val dateFormat = SimpleDateFormat("yyyy年MM月dd日", Locale.getDefault())
+                item {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                        Text(
+                            text = dateFormat.format(calendar.time),
+                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+                            style = MaterialTheme.typography.subtitle2
+                        )
+                    }
+                }
+            }
+            item { HistoryCard(navController, it) }
+        }
         if (historyList.isEmpty()) item { EmptyView() }
     }
 }
@@ -77,47 +101,45 @@ private fun Content(navController: NavHostController) {
 @Composable
 private fun HistoryCard(navController: NavHostController, history: ReadingHistory) {
     val context = LocalContext.current
+    fun navToReader() {
+        with(history) {
+            context.navToReaderActivity(
+                mangaId, providerId,
+                collectionIndex, chapterIndex, pageIndex
+            )
+        }
+    }
+
+    fun navToGallery() {
+        with(history) {
+            navController.currentBackStackEntry?.arguments =
+                bundleOf(
+                    "outline" to MangaOutline(
+                        mangaId, cover, null, null,
+                        MetadataOutline(title, null, null),
+                        null
+                    ),
+                    "provider" to providerId?.let {
+                        ProviderInfo(it, it, "", "")
+                    }
+                )
+            navController.navigate("gallery/${mangaId}")
+        }
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp)
-            .clickable {
-                with(history) {
-                    context.navToReaderActivity(
-                        mangaId, providerId,
-                        collectionIndex, chapterIndex, pageIndex
-                    )
-                }
-            }
+            .height(88.dp)
+            .clickable { navToReader() }
     ) {
         Row {
-            Box(
-                Modifier
-                    .aspectRatio(0.75f)
-                    .clickable {
-                        with(history) {
-                            navController.currentBackStackEntry?.arguments =
-                                bundleOf(
-                                    "outline" to MangaOutline(
-                                        mangaId, cover, null, null,
-                                        MetadataOutline(title, null, null),
-                                        null
-                                    ),
-                                    "provider" to providerId?.let {
-                                        ProviderInfo(it, it, "", "")
-                                    }
-                                )
-                            navController.navigate("gallery/${mangaId}")
-                        }
-                    }) {
-                Image(
-                    painter = rememberCoilPainter(history.cover, fadeIn = true),
-                    contentDescription = history.mangaId,
-                    contentScale = ContentScale.Crop
-                )
-            }
+            MangaCover(
+                modifier = Modifier.clickable { navToGallery() },
+                cover = history.cover
+            )
             Column(
-                Modifier.padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
+                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
@@ -135,13 +157,13 @@ private fun HistoryCard(navController: NavHostController, history: ReadingHistor
                     ).filter { it.isNotBlank() }.joinToString(" ")
                     Text(text = seen, style = MaterialTheme.typography.body2)
 
-                    val dateFormat =
-                        SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault())
-                    val date = dateFormat.format(Date(history.date))
-                    Text(text = date, style = MaterialTheme.typography.body2)
-
-                    history.providerId?.let {
-                        Text(text = it, style = MaterialTheme.typography.body2)
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                        val date = dateFormat.format(Date(history.date))
+                        Text(text = date, style = MaterialTheme.typography.body2)
+                        history.providerId?.let {
+                            Text(text = it, style = MaterialTheme.typography.body2)
+                        }
                     }
                 }
             }

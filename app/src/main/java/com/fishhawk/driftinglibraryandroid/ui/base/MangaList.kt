@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme.typography
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -121,38 +121,39 @@ fun MangaListCard(
     ) {
         Box {
             MangaCover(cover = outline?.cover)
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                Color.Transparent,
-                                Color(0xAA000000)
-                            ),
-                        )
-                    ),
-                contentAlignment = Alignment.BottomStart
-            ) {
-                Text(
-                    modifier = Modifier.padding(8.dp),
-                    text = outline?.title ?: "",
-                    style = typography.subtitle2.copy(
-                        shadow = Shadow(Color.White, Offset.Zero, 2f)
-                    ),
-                    color = Color.White,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+            Box(modifier = Modifier.matchParentSize()) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.4f)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, Color(0xAA000000)),
+                            )
+                        ),
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .align(Alignment.BottomStart),
+                        text = outline?.title ?: "",
+                        style = MaterialTheme.typography.subtitle2.copy(
+                            shadow = Shadow(Color.White, Offset.Zero, 2f)
+                        ),
+                        color = Color.White,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun MangaCover(cover: String?) {
-    Box(modifier = Modifier.aspectRatio(0.75f)) {
+fun MangaCover(modifier: Modifier = Modifier, cover: String?) {
+    Box(modifier = modifier.aspectRatio(0.75f)) {
         val painter = rememberCoilPainter(cover, fadeIn = true)
         Image(
             modifier = Modifier.matchParentSize(),
