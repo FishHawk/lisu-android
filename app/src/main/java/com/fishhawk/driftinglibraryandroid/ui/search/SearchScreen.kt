@@ -15,7 +15,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
-import com.fishhawk.driftinglibraryandroid.ui.base.MangaDisplayModeButton
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableMangaList
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActionSheet
@@ -45,7 +44,6 @@ private fun ToolBar(navController: NavHostController) {
         IconButton(onClick = { }) {
             Icon(Icons.Filled.Search, contentDescription = "search")
         }
-        MangaDisplayModeButton()
     }
 }
 

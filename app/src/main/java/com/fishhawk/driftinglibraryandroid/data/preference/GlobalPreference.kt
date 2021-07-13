@@ -43,10 +43,6 @@ object GlobalPreference {
 
     val theme by get("theme", Theme.LIGHT)
 
-    enum class DisplayMode { GRID, LINEAR }
-
-    val displayMode by get("display_mode", DisplayMode.GRID)
-
     enum class HistoryFilter { ALL, FROM_LIBRARY, FROM_SOURCES }
 
     val historyFilter by get("history_filter", HistoryFilter.FROM_LIBRARY)

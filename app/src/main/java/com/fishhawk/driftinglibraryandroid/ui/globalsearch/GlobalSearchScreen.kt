@@ -23,7 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.ui.base.ErrorItem
-import com.fishhawk.driftinglibraryandroid.ui.base.MangaCardGrid
+import com.fishhawk.driftinglibraryandroid.ui.base.MangaListCard
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 
@@ -84,7 +84,7 @@ private fun Content(navController: NavHostController) {
                                 modifier = Modifier.weight(1f, fill = true),
                                 propagateMinConstraints = true
                             ) {
-                                MangaCardGrid(it, onCardClick = {
+                                MangaListCard(it, onCardClick = {
                                     navController.currentBackStackEntry?.arguments =
                                         bundleOf(
                                             "outline" to it,
