@@ -34,24 +34,20 @@ fun RefreshableMangaList(
     onCardClick: (outline: MangaOutline) -> Unit = {},
     onCardLongClick: (outline: MangaOutline) -> Unit = {}
 ) {
-    val isRefreshing = mangaList.loadState.refresh is LoadState.Loading
-    SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing),
-        onRefresh = { mangaList.refresh() },
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            when (val state = mangaList.loadState.refresh) {
-                is LoadState.Loading -> LoadingView()
-                is LoadState.Error -> ErrorView(
-                    message = state.error.localizedMessage!!,
-                    onClickRetry = { mangaList.retry() }
-                )
-                is LoadState.NotLoading -> {
-                    if (mangaList.itemCount == 0) EmptyView()
-                    else MangaList(
-                        mangaList, onCardClick, onCardLongClick
-                    )
-                }
+    when (val state = mangaList.loadState.refresh) {
+        is LoadState.Loading -> LoadingView()
+        is LoadState.Error -> ErrorView(
+            message = state.error.localizedMessage!!,
+            onClickRetry = { mangaList.retry() }
+        )
+        is LoadState.NotLoading -> {
+            val isRefreshing = mangaList.loadState.refresh is LoadState.Loading
+            SwipeRefresh(
+                state = rememberSwipeRefreshState(isRefreshing),
+                onRefresh = { mangaList.refresh() },
+            ) {
+                if (mangaList.itemCount == 0) EmptyView()
+                else MangaList(mangaList, onCardClick, onCardLongClick)
             }
         }
     }

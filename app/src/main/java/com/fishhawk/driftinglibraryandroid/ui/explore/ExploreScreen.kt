@@ -3,6 +3,8 @@ package com.fishhawk.driftinglibraryandroid.ui.explore
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -23,12 +25,16 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.P
+import com.fishhawk.driftinglibraryandroid.data.preference.collectAsState
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
 import com.fishhawk.driftinglibraryandroid.ui.base.ErrorView
 import com.fishhawk.driftinglibraryandroid.ui.base.LoadingView
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.coil.rememberCoilPainter
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun ExploreScreen(navHostController: NavHostController) {
@@ -56,28 +62,46 @@ private fun ToolBar() {
 private fun Content(navHostController: NavHostController) {
     val viewModel = hiltViewModel<ExploreViewModel>()
     val providerList by viewModel.providerList.collectAsState()
-    val lastUsedProvider by P.lastUsedProvider.asFlow().collectAsState(null)
 
     providerList
         ?.onSuccess { providers ->
-            Column(
-                modifier = Modifier.padding(8.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            val isRefreshing by viewModel.handler.isRefreshing.collectAsState()
+            SwipeRefresh(
+                state = rememberSwipeRefreshState(isRefreshing),
+                onRefresh = { viewModel.handler.refresh() },
             ) {
-                providers.find { it.id == lastUsedProvider }?.let {
-                    Text(text = "Last used", style = MaterialTheme.typography.subtitle1)
-                    ProviderCard(navHostController, it)
-                }
-                val providerMap = providers.groupBy { it.lang }
-                providerMap.map { (lang, list) ->
-                    Text(text = lang, style = MaterialTheme.typography.subtitle1)
-                    Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                        list.map { ProviderCard(navHostController, it) }
-                    }
-                }
+                if (providers.isEmpty()) EmptyView()
+                else ProviderList(providers, navHostController)
             }
-        }?.onFailure { ErrorView(message = it.message ?: "") { } }
+        }?.onFailure { ErrorView(message = it.message ?: "") { viewModel.handler.reload() } }
         ?: LoadingView()
+}
+
+@Composable
+private fun ProviderList(
+    providers: List<ProviderInfo>,
+    navHostController: NavHostController
+) {
+    val lastUsedProvider by P.lastUsedProvider.collectAsState()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        providers.find { it.id == lastUsedProvider }?.let {
+            Text(text = "Last used", style = MaterialTheme.typography.subtitle1)
+            ProviderCard(navHostController, it)
+        }
+        val providerMap = providers.groupBy { it.lang }
+        providerMap.map { (lang, list) ->
+            Text(text = lang, style = MaterialTheme.typography.subtitle1)
+            Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                list.map { ProviderCard(navHostController, it) }
+            }
+        }
+    }
 }
 
 @Composable
