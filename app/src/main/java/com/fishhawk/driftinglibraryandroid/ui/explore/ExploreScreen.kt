@@ -9,7 +9,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -25,6 +24,8 @@ import coil.request.ImageRequest
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.ui.base.ErrorView
+import com.fishhawk.driftinglibraryandroid.ui.base.LoadingView
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.coil.rememberCoilPainter
@@ -54,25 +55,29 @@ private fun ToolBar() {
 @Composable
 private fun Content(navHostController: NavHostController) {
     val viewModel = hiltViewModel<ExploreViewModel>()
-    val providers by viewModel.providerList.observeAsState(listOf())
+    val providerList by viewModel.providerList.collectAsState()
     val lastUsedProvider by P.lastUsedProvider.asFlow().collectAsState(null)
 
-    Column(
-        modifier = Modifier.padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        providers.find { it.id == lastUsedProvider }?.let {
-            Text(text = "Last used", style = MaterialTheme.typography.subtitle1)
-            ProviderCard(navHostController, it)
-        }
-        val providerMap = providers.groupBy { it.lang }
-        providerMap.map { (lang, list) ->
-            Text(text = lang, style = MaterialTheme.typography.subtitle1)
-            Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                list.map { ProviderCard(navHostController, it) }
+    providerList
+        ?.onSuccess { providers ->
+            Column(
+                modifier = Modifier.padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                providers.find { it.id == lastUsedProvider }?.let {
+                    Text(text = "Last used", style = MaterialTheme.typography.subtitle1)
+                    ProviderCard(navHostController, it)
+                }
+                val providerMap = providers.groupBy { it.lang }
+                providerMap.map { (lang, list) ->
+                    Text(text = lang, style = MaterialTheme.typography.subtitle1)
+                    Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                        list.map { ProviderCard(navHostController, it) }
+                    }
+                }
             }
-        }
-    }
+        }?.onFailure { ErrorView(message = it.message ?: "") { } }
+        ?: LoadingView()
 }
 
 @Composable
