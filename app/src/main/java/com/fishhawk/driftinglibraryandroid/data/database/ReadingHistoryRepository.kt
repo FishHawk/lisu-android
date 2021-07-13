@@ -12,19 +12,18 @@ class ReadingHistoryRepository(
 ) {
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
-    fun observeReadingHistory(serverId: Int, mangaId: String): LiveData<ReadingHistory> =
+    fun observe(serverId: Int, mangaId: String): LiveData<ReadingHistory> =
         dao.observe(serverId, mangaId)
 
-    fun observeAllReadingHistoryOfServer(serverId: Int): LiveData<List<ReadingHistory>> =
-        dao.observeAllOfServer(serverId)
+    fun getAll(serverId: Int) = dao.getAll(serverId)
 
-    suspend fun updateReadingHistory(readingHistory: ReadingHistory) =
+    suspend fun update(readingHistory: ReadingHistory) =
         withContext(ioDispatcher) {
             dao.insert(readingHistory)
         }
 
-    suspend fun clearReadingHistoryOfServer(serverId: Int) =
+    suspend fun clear(serverId: Int) =
         withContext(ioDispatcher) {
-            dao.deleteAllOfServer(serverId)
+            dao.deleteAll(serverId)
         }
 }

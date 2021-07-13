@@ -3,6 +3,7 @@ package com.fishhawk.driftinglibraryandroid.data.database.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ReadingHistoryDao {
@@ -12,6 +13,9 @@ interface ReadingHistoryDao {
     @Query("SELECT * FROM ReadingHistory WHERE serverId = :serverId ORDER BY date DESC")
     fun observeAllOfServer(serverId: Int): LiveData<List<ReadingHistory>>
 
+    @Query("SELECT * FROM ReadingHistory WHERE serverId = :serverId ORDER BY date DESC")
+    fun getAll(serverId: Int): Flow<List<ReadingHistory>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(history: ReadingHistory)
 
@@ -19,6 +23,6 @@ interface ReadingHistoryDao {
     fun update(history: ReadingHistory)
 
     @Query("DELETE FROM ReadingHistory WHERE serverId = :id")
-    fun deleteAllOfServer(id: Int)
+    fun deleteAll(id: Int)
 }
 

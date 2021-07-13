@@ -6,7 +6,7 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.P
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -28,7 +28,7 @@ open class BaseActivity : ComponentActivity() {
     }
 
     private fun setupSecureModule() {
-        GlobalPreference.secureMode.asFlow()
+        P.secureMode.asFlow()
             .onEach { setFlag(WindowManager.LayoutParams.FLAG_SECURE, it) }
             .launchIn(lifecycleScope)
     }

@@ -3,8 +3,6 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -22,7 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.asLiveData
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Chapter
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ChapterCollection
 import com.fishhawk.driftinglibraryandroid.util.setNext
@@ -41,31 +39,31 @@ fun MangaContentChapter(
     chapterMark: ChapterMark? = null,
     onChapterClick: OnChapterClickListener
 ) {
-    val mode by GlobalPreference.chapterDisplayMode.asFlow().asLiveData().observeAsState(
-        GlobalPreference.chapterDisplayMode.get()
+    val mode by P.chapterDisplayMode.asFlow().asLiveData().observeAsState(
+        P.chapterDisplayMode.get()
     )
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text("Chapters:", style = MaterialTheme.typography.subtitle1)
         Spacer(modifier = Modifier.weight(1f, fill = true))
-        IconButton(onClick = { GlobalPreference.run { chapterDisplayOrder.setNext() } }) {
+        IconButton(onClick = { P.run { chapterDisplayOrder.setNext() } }) {
             Icon(Icons.Filled.Sort, contentDescription = "Order")
         }
 
-        IconButton(onClick = { GlobalPreference.run { chapterDisplayMode.setNext() } }) {
+        IconButton(onClick = { P.run { chapterDisplayMode.setNext() } }) {
             val icon = when (mode) {
-                GlobalPreference.ChapterDisplayMode.GRID -> Icons.Filled.ViewModule
-                GlobalPreference.ChapterDisplayMode.LINEAR -> Icons.Filled.ViewList
+                P.ChapterDisplayMode.GRID -> Icons.Filled.ViewModule
+                P.ChapterDisplayMode.LINEAR -> Icons.Filled.ViewList
             }
             Icon(icon, contentDescription = "Display mode")
         }
     }
 
     when (mode) {
-        GlobalPreference.ChapterDisplayMode.GRID -> ChapterListGrid(
+        P.ChapterDisplayMode.GRID -> ChapterListGrid(
             collections, chapterMark, onChapterClick
         )
-        GlobalPreference.ChapterDisplayMode.LINEAR -> ChapterListLinear(
+        P.ChapterDisplayMode.LINEAR -> ChapterListLinear(
             collections, chapterMark, onChapterClick
         )
     }
@@ -77,12 +75,12 @@ fun ChapterListLinear(
     chapterMark: ChapterMark? = null,
     onChapterClick: OnChapterClickListener
 ) {
-    val order by GlobalPreference.chapterDisplayOrder.asFlow().asLiveData().observeAsState()
+    val order by P.chapterDisplayOrder.asFlow().asLiveData().observeAsState()
     val chapters = collections.flatMapIndexed { collectionIndex, collection ->
         collection.chapters.mapIndexed { chapterIndex, chapter ->
             Triple(collectionIndex, chapterIndex, chapter)
         }.let {
-            if (order == GlobalPreference.ChapterDisplayOrder.DESCEND) it.asReversed() else it
+            if (order == P.ChapterDisplayOrder.DESCEND) it.asReversed() else it
         }
     }
     Column(modifier = Modifier.fillMaxWidth()) {

@@ -11,7 +11,7 @@ import com.fishhawk.driftinglibraryandroid.data.database.ApplicationDatabase
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.database.ServerInfoRepository
 import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import dagger.Module
@@ -35,16 +35,16 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        GlobalPreference.initialize(this)
+        P.initialize(this)
 
         runBlocking {
             val selectedServerInfoValue = serverInfoRepository.selectServerInfo(
-                GlobalPreference.selectedServer.get()
+                P.selectedServer.get()
             )
             AppModule.selectServer(selectedServerInfoValue)
         }
 
-        selectedServerInfo = GlobalPreference.selectedServer.asFlow().asLiveData().switchMap {
+        selectedServerInfo = P.selectedServer.asFlow().asLiveData().switchMap {
             serverInfoRepository.observeServerInfo(it)
         }
 

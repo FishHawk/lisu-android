@@ -11,7 +11,7 @@ import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataDetail
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
@@ -41,8 +41,8 @@ class GalleryViewModel @Inject constructor(
     val isRefreshing: LiveData<Boolean> = _isRefreshing
 
     val history: LiveData<ReadingHistory> =
-        readingHistoryRepository.observeReadingHistory(
-            GlobalPreference.selectedServer.get(),
+        readingHistoryRepository.observe(
+            P.selectedServer.get(),
             mangaId
         )
 

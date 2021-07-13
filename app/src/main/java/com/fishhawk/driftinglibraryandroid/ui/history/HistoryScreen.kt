@@ -1,7 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.ui.history
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
@@ -21,7 +18,8 @@ import androidx.core.os.bundleOf
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.P
+import com.fishhawk.driftinglibraryandroid.data.preference.collectAsState
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
@@ -31,8 +29,6 @@ import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.time.LocalDate
 import java.util.*
 import androidx.hilt.navigation.compose.hiltViewModel as hiltViewModel1
 
@@ -64,7 +60,7 @@ private fun ToolBar() {
 @Composable
 private fun Content(navController: NavHostController) {
     val viewModel = hiltViewModel1<HistoryViewModel>()
-    val historyList by viewModel.filteredHistoryList.observeAsState(listOf())
+    val historyList by viewModel.historyList.collectAsState()
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(8.dp),
@@ -201,21 +197,17 @@ private fun FilterSwitchDialog(isOpen: MutableState<Boolean>) {
             title = { Text(text = stringResource(R.string.dialog_filter_history)) },
             text = {
                 val optionEntries = stringArrayResource(R.array.settings_history_filter_entries)
-                val selectedOption by GlobalPreference.historyFilter.asFlow().collectAsState(
-                    GlobalPreference.historyFilter.get()
-                )
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    enumValues<GlobalPreference.HistoryFilter>().forEachIndexed { index, it ->
+                val selectedOption by P.historyFilter.collectAsState()
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    enumValues<P.HistoryFilter>().forEachIndexed { index, it ->
                         Row(
-                            Modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { GlobalPreference.historyFilter.set(it) }
+                                .clickable { P.historyFilter.set(it) }
                         ) {
                             RadioButton(
                                 selected = (it == selectedOption),
-                                onClick = { GlobalPreference.historyFilter.set(it) },
+                                onClick = { P.historyFilter.set(it) },
                                 colors = RadioButtonDefaults.colors(
                                     selectedColor = MaterialTheme.colors.primary
                                 )

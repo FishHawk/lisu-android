@@ -11,7 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
@@ -20,12 +20,12 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun ApplicationTheme(content: @Composable () -> Unit) {
-    val theme by GlobalPreference.theme.asFlow().collectAsState(GlobalPreference.theme.get())
+    val theme by P.theme.asFlow().collectAsState(P.theme.get())
 
     MaterialTheme(
         colors = when (theme) {
-            GlobalPreference.Theme.LIGHT -> ColorsLight
-            GlobalPreference.Theme.DARK -> ColorsDark
+            P.Theme.LIGHT -> ColorsLight
+            P.Theme.DARK -> ColorsDark
         },
         typography = Typography
     ) {

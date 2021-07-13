@@ -1,12 +1,22 @@
 package com.fishhawk.driftinglibraryandroid.data.preference
 
 import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.produceState
 import androidx.preference.PreferenceManager
 import com.tfcporciuncula.flow.FlowSharedPreferences
+import com.tfcporciuncula.flow.Preference
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
-object GlobalPreference {
+object P {
     private lateinit var flowPrefs: FlowSharedPreferences
 
     fun initialize(context: Context) {
@@ -85,3 +95,6 @@ object GlobalPreference {
     // Settings advanced
     val secureMode by get("secure_mode", false)
 }
+
+@Composable
+fun <T : R, R> Preference<T>.collectAsState(): State<R> = asFlow().collectAsState(initial = get())

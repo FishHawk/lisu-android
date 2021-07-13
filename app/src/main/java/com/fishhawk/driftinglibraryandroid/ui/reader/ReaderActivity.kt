@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.*
@@ -53,25 +53,25 @@ class ReaderActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        GlobalPreference.screenOrientation.asFlow()
+        P.screenOrientation.asFlow()
             .onEach {
                 val newOrientation = when (it) {
-                    GlobalPreference.ScreenOrientation.DEFAULT -> ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                    GlobalPreference.ScreenOrientation.LOCK -> ActivityInfo.SCREEN_ORIENTATION_LOCKED
-                    GlobalPreference.ScreenOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    GlobalPreference.ScreenOrientation.LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    P.ScreenOrientation.DEFAULT -> ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                    P.ScreenOrientation.LOCK -> ActivityInfo.SCREEN_ORIENTATION_LOCKED
+                    P.ScreenOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    P.ScreenOrientation.LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                 }
                 if (newOrientation != requestedOrientation) requestedOrientation = newOrientation
             }
             .launchIn(lifecycleScope)
 
-        GlobalPreference.keepScreenOn.asFlow()
+        P.keepScreenOn.asFlow()
             .onEach { setFlag(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, it) }
             .launchIn(lifecycleScope)
 
         combine(
-            GlobalPreference.customBrightness.asFlow(),
-            GlobalPreference.customBrightnessValue.asFlow()
+            P.customBrightness.asFlow(),
+            P.customBrightnessValue.asFlow()
         ) { isEnabled, brightness ->
             val attrBrightness =
                 if (isEnabled) brightness.coerceIn(0, 100) / 100f
@@ -131,17 +131,17 @@ class ReaderActivity : BaseActivity() {
         })
 
         combine(
-            GlobalPreference.readingDirection.asFlow(),
-            GlobalPreference.isPageIntervalEnabled.asFlow(),
-            GlobalPreference.isAreaInterpolationEnabled.asFlow()
+            P.readingDirection.asFlow(),
+            P.isPageIntervalEnabled.asFlow(),
+            P.isAreaInterpolationEnabled.asFlow()
         ) { _, _, _ -> initializeReader() }
             .launchIn(this.lifecycleScope)
 
-        GlobalPreference.useVolumeKey.asFlow()
+        P.useVolumeKey.asFlow()
             .onEach { reader.useVolumeKey = it }
             .launchIn(this.lifecycleScope)
 
-        GlobalPreference.invertVolumeKey.asFlow()
+        P.invertVolumeKey.asFlow()
             .onEach { reader.invertVolumeKey = it }
             .launchIn(this.lifecycleScope)
     }
@@ -156,30 +156,30 @@ class ReaderActivity : BaseActivity() {
     private fun initializeReader() {
         readerContainer.removeAllViews()
 
-        reader = when (GlobalPreference.readingDirection.get()) {
-            GlobalPreference.ReadingDirection.LTR,
-            GlobalPreference.ReadingDirection.RTL,
-            GlobalPreference.ReadingDirection.VERTICAL -> ReaderViewPager(this)
-            GlobalPreference.ReadingDirection.CONTINUOUS -> ReaderViewContinuous(this)
+        reader = when (P.readingDirection.get()) {
+            P.ReadingDirection.LTR,
+            P.ReadingDirection.RTL,
+            P.ReadingDirection.VERTICAL -> ReaderViewPager(this)
+            P.ReadingDirection.CONTINUOUS -> ReaderViewContinuous(this)
         }
 
-        reader.readingOrientation = when (GlobalPreference.readingDirection.get()) {
-            GlobalPreference.ReadingDirection.LTR,
-            GlobalPreference.ReadingDirection.RTL -> ReaderView.ReadingOrientation.HORIZONTAL
-            GlobalPreference.ReadingDirection.VERTICAL,
-            GlobalPreference.ReadingDirection.CONTINUOUS -> ReaderView.ReadingOrientation.VERTICAL
+        reader.readingOrientation = when (P.readingDirection.get()) {
+            P.ReadingDirection.LTR,
+            P.ReadingDirection.RTL -> ReaderView.ReadingOrientation.HORIZONTAL
+            P.ReadingDirection.VERTICAL,
+            P.ReadingDirection.CONTINUOUS -> ReaderView.ReadingOrientation.VERTICAL
         }
 
-        reader.readingDirection = when (GlobalPreference.readingDirection.get()) {
-            GlobalPreference.ReadingDirection.RTL -> ReaderView.ReadingDirection.RTL
+        reader.readingDirection = when (P.readingDirection.get()) {
+            P.ReadingDirection.RTL -> ReaderView.ReadingDirection.RTL
             else -> ReaderView.ReadingDirection.LTR
         }
 
         reader.adapter.isAreaInterpolationEnabled =
-            GlobalPreference.isAreaInterpolationEnabled.get()
-        reader.isPageIntervalEnabled = GlobalPreference.isPageIntervalEnabled.get()
-        reader.useVolumeKey = GlobalPreference.useVolumeKey.get()
-        reader.invertVolumeKey = GlobalPreference.invertVolumeKey.get()
+            P.isAreaInterpolationEnabled.get()
+        reader.isPageIntervalEnabled = P.isPageIntervalEnabled.get()
+        reader.useVolumeKey = P.useVolumeKey.get()
+        reader.invertVolumeKey = P.invertVolumeKey.get()
 
         readerContainer.addView(reader)
         reader.isFocusable = true
@@ -195,7 +195,7 @@ class ReaderActivity : BaseActivity() {
         }
         reader.onPageChanged = { viewModel.chapterPosition.value = it }
         reader.onPageLongClicked = { position, url ->
-            if (GlobalPreference.isLongTapDialogEnabled.get())
+            if (P.isLongTapDialogEnabled.get())
                 ReaderPageSheet(this, object : ReaderPageSheet.Listener {
                     override fun onRefresh() {
                         reader.refreshPage(position)
@@ -236,8 +236,8 @@ class ReaderActivity : BaseActivity() {
 
             val isMenuOpened by viewModel.isMenuOpened.observeAsState(false)
 
-            val showInfoBar by GlobalPreference.showInfoBar.asFlow().collectAsState(
-                GlobalPreference.showInfoBar.get()
+            val showInfoBar by P.showInfoBar.asFlow().collectAsState(
+                P.showInfoBar.get()
             )
             if (showInfoBar && !isMenuOpened) InfoBar(
                 Modifier.align(Alignment.BottomEnd),
@@ -268,10 +268,10 @@ class ReaderActivity : BaseActivity() {
 
     @Composable
     private fun ReaderMenuBottom(size: Int, position: Int) {
-        val readingDirection = when (GlobalPreference.readingDirection.let {
+        val readingDirection = when (P.readingDirection.let {
             it.asFlow().collectAsState(it.get())
         }.value) {
-            GlobalPreference.ReadingDirection.RTL -> LayoutDirection.Rtl
+            P.ReadingDirection.RTL -> LayoutDirection.Rtl
             else -> LayoutDirection.Ltr
         }
 

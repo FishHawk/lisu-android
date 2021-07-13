@@ -22,7 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
@@ -54,10 +54,10 @@ private fun ToolBar(navController: NavHostController) {
 private fun Content() {
     val viewModel = hiltViewModel<ServerViewModel>()
     val serverList by viewModel.serverInfoList.observeAsState(listOf())
-    if (serverList.size == 1) GlobalPreference.selectedServer.set(serverList.first().id)
+    if (serverList.size == 1) P.selectedServer.set(serverList.first().id)
 
-    val selectedServer by GlobalPreference.selectedServer.asFlow().collectAsState(
-        GlobalPreference.selectedServer.get()
+    val selectedServer by P.selectedServer.asFlow().collectAsState(
+        P.selectedServer.get()
     )
 
     LazyColumn(
@@ -76,7 +76,7 @@ private fun ServerInfoCard(info: ServerInfo, selected: Boolean) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { GlobalPreference.selectedServer.set(info.id) }
+            .clickable { P.selectedServer.set(info.id) }
     ) {
         Row(
             modifier = Modifier.height(IntrinsicSize.Min),

@@ -3,7 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.library
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
@@ -30,7 +30,7 @@ class LibraryViewModel @Inject constructor(
 
     init {
         listOf(
-            GlobalPreference.selectedServer.asFlow(),
+            P.selectedServer.asFlow(),
             keywords
         ).forEach { it.onEach { source?.invalidate() }.launchIn(viewModelScope) }
     }

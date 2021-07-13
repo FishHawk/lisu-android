@@ -35,7 +35,7 @@ class ServerViewModel @Inject constructor(
     fun deleteServer(serverInfo: ServerInfo) = viewModelScope.launch {
         serverInfoRepository.deleteServerInfo(serverInfo)
         loadServerList()
-        readingHistoryRepository.clearReadingHistoryOfServer(serverInfo.id)
+        readingHistoryRepository.clear(serverInfo.id)
     }
 
     fun updateServer(serverInfo: ServerInfo) = viewModelScope.launch {

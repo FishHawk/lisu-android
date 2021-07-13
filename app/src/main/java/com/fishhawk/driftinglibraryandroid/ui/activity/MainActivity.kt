@@ -27,7 +27,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.fishhawk.driftinglibraryandroid.ui.explore.ExploreScreen
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryEditScreen
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryScreen
@@ -70,10 +70,10 @@ private fun MainContent() {
         Scaffold(
             bottomBar = { BottomNavigationBar(navController) }
         ) { innerPadding ->
-            val startScreen = when (GlobalPreference.startScreen.get()) {
-                GlobalPreference.StartScreen.LIBRARY -> Screen.Library
-                GlobalPreference.StartScreen.HISTORY -> Screen.History
-                GlobalPreference.StartScreen.EXPLORE -> Screen.Explore
+            val startScreen = when (P.startScreen.get()) {
+                P.StartScreen.LIBRARY -> Screen.Library
+                P.StartScreen.HISTORY -> Screen.History
+                P.StartScreen.EXPLORE -> Screen.Explore
             }
             NavHost(
                 navController = navController,

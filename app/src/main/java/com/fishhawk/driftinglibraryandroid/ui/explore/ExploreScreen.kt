@@ -23,7 +23,7 @@ import androidx.navigation.NavHostController
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
@@ -55,7 +55,7 @@ private fun ToolBar() {
 private fun Content(navHostController: NavHostController) {
     val viewModel = hiltViewModel<ExploreViewModel>()
     val providers by viewModel.providerList.observeAsState(listOf())
-    val lastUsedProvider by GlobalPreference.lastUsedProvider.asFlow().collectAsState(null)
+    val lastUsedProvider by P.lastUsedProvider.asFlow().collectAsState(null)
 
     Column(
         modifier = Modifier.padding(8.dp),
@@ -118,5 +118,5 @@ private fun openProvider(provider: ProviderInfo) {
 //        R.id.action_explore_to_provider_pager,
 //        bundleOf("provider" to provider)
 //    )
-    GlobalPreference.lastUsedProvider.set(provider.id)
+    P.lastUsedProvider.set(provider.id)
 }

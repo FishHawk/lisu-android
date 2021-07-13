@@ -4,7 +4,7 @@ import androidx.lifecycle.*
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Chapter
@@ -216,7 +216,7 @@ class ReaderViewModel @Inject constructor(
             val readingHistory =
                 ReadingHistory(
                     id,
-                    GlobalPreference.selectedServer.get(),
+                    P.selectedServer.get(),
                     mangaDetail!!.title,
                     mangaDetail!!.cover ?: "",
                     providerId,
@@ -227,7 +227,7 @@ class ReaderViewModel @Inject constructor(
                     it.currChapter.index,
                     chapterPosition.value ?: 0
                 )
-            readingHistoryRepository.updateReadingHistory(readingHistory)
+            readingHistoryRepository.update(readingHistory)
         }
     }
 

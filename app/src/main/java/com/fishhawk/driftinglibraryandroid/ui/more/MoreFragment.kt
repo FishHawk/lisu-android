@@ -24,7 +24,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.preference.GlobalPreference
+import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
@@ -118,7 +118,7 @@ private fun Content(navController: NavHostController) {
             Button(onClick = { navController.navigate("server") }) {
                 Text(text = "Server")
             }
-            Button(onClick = { GlobalPreference.theme.setNext() }) {
+            Button(onClick = { P.theme.setNext() }) {
                 Text(text = "Theme")
             }
         }
