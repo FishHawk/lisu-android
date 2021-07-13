@@ -45,7 +45,7 @@ private fun Content(navController: NavHostController) {
     val isOpen = remember { mutableStateOf(false) }
     val id = remember { mutableStateOf("") }
     RefreshableMangaList(
-        mangaList = viewModel.mangas.collectAsLazyPagingItems(),
+        mangaList = viewModel.mangaList.collectAsLazyPagingItems(),
         onCardClick = {
             navController.currentBackStackEntry?.arguments =
                 bundleOf("outline" to it)
