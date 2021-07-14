@@ -14,21 +14,21 @@ class RemoteProviderRepository : BaseRemoteRepository<RemoteProviderService>() {
         this.service = builder?.create(RemoteProviderService::class.java)
     }
 
-    suspend fun listProvider(): Result<List<ProviderInfo>> =
+    suspend fun listProvider(): ResultX<List<ProviderInfo>> =
         resultWrap {
             it.listProvider().onEach { info ->
                 info.icon = "${url}providers/${info.id}/icon"
             }
         }
 
-    suspend fun getProvider(providerId: String): Result<ProviderDetail> =
+    suspend fun getProvider(providerId: String): ResultX<ProviderDetail> =
         resultWrap { it.getProvider(providerId) }
 
     suspend fun listPopularManga(
         providerId: String,
         page: Int,
         option: Map<String, Int>
-    ): Result<List<MangaOutline>> =
+    ): ResultX<List<MangaOutline>> =
         resultWrap {
             it.listPopularManga(providerId, page, option)
                 .map { outline -> processMangaOutline(providerId, outline) }
@@ -38,7 +38,7 @@ class RemoteProviderRepository : BaseRemoteRepository<RemoteProviderService>() {
         providerId: String,
         page: Int,
         option: Map<String, Int>
-    ): Result<List<MangaOutline>> =
+    ): ResultX<List<MangaOutline>> =
         resultWrap {
             it.listLatestManga(providerId, page, option)
                 .map { outline -> processMangaOutline(providerId, outline) }
@@ -48,7 +48,7 @@ class RemoteProviderRepository : BaseRemoteRepository<RemoteProviderService>() {
         providerId: String,
         page: Int,
         option: Map<String, Int>
-    ): Result<List<MangaOutline>> =
+    ): ResultX<List<MangaOutline>> =
         resultWrap {
             it.listCategoryManga(providerId, page, option)
                 .map { outline -> processMangaOutline(providerId, outline) }
@@ -58,13 +58,13 @@ class RemoteProviderRepository : BaseRemoteRepository<RemoteProviderService>() {
         providerId: String,
         keywords: String,
         page: Int
-    ): Result<List<MangaOutline>> =
+    ): ResultX<List<MangaOutline>> =
         resultWrap {
             it.listManga(providerId, keywords, page)
                 .map { outline -> processMangaOutline(providerId, outline) }
         }
 
-    suspend fun getManga(providerId: String, mangaId: String): Result<MangaDetail> =
+    suspend fun getManga(providerId: String, mangaId: String): ResultX<MangaDetail> =
         resultWrap { service ->
             service.getManga(providerId, mangaId)
                 .apply { cover = cover?.let { processImageUrl(providerId, it) } }
@@ -74,7 +74,7 @@ class RemoteProviderRepository : BaseRemoteRepository<RemoteProviderService>() {
         providerId: String,
         mangaId: String,
         chapterId: String
-    ): Result<List<String>> =
+    ): ResultX<List<String>> =
         resultWrap { service ->
             service.getChapter(providerId, mangaId, chapterId)
                 .map { processImageUrl(providerId, it) }

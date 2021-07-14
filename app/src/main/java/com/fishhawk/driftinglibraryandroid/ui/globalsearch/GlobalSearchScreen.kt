@@ -74,7 +74,7 @@ private fun Content(navController: NavHostController) {
                     }) { Icon(Icons.Filled.NavigateNext, "Forward") }
                 }
                 val provider = it.provider
-                it.result?.fold({
+                it.result?.getOrNull()?.let {
                     LazyRow(
                         modifier = Modifier.height(140.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -95,8 +95,10 @@ private fun Content(navController: NavHostController) {
                             }
                         }
                     }
-                }, { ErrorItem(message = it.message ?: "", onClickRetry = {}) }
-                )
+                }
+                it.result?.exceptionOrNull()?.let {
+                    ErrorItem(message = it.message ?: "", onClickRetry = {})
+                }
             }
         }
     }

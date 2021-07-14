@@ -17,7 +17,7 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
         lastTime: Long,
         keywords: String,
         limit: Int = 20
-    ): Result<List<MangaOutline>> =
+    ): ResultX<List<MangaOutline>> =
         resultWrap {
             it.listManga(lastTime, keywords, limit).onEach { outline ->
                 outline.cover = "${url}library/mangas/${outline.id}/cover"
@@ -40,7 +40,7 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
         )
     }
 
-    suspend fun getManga(mangaId: String): Result<MangaDetail> =
+    suspend fun getManga(mangaId: String): ResultX<MangaDetail> =
         resultWrap {
             it.getManga(mangaId).apply {
                 val collectionId = collections.firstOrNull()?.id
@@ -52,13 +52,13 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
             }
         }
 
-    suspend fun deleteManga(mangaId: String): Result<String> =
+    suspend fun deleteManga(mangaId: String): ResultX<String> =
         resultWrap { it.deleteManga(mangaId) }
 
     suspend fun updateMangaMetadata(
         mangaId: String,
         metadata: MetadataDetail
-    ): Result<MangaDetail> =
+    ): ResultX<MangaDetail> =
         resultWrap {
             it.updateMangaMetadata(mangaId, metadata).apply {
                 cover = "${url}library/mangas/${mangaId}/cover"
@@ -92,7 +92,7 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
     suspend fun updateMangaCover(
         mangaId: String,
         requestBody: RequestBody
-    ): Result<MangaDetail> =
+    ): ResultX<MangaDetail> =
         resultWrap {
             it.updateMangaCover(mangaId, requestBody).apply {
                 cover = "${url}library/mangas/${mangaId}/cover"
@@ -103,7 +103,7 @@ class RemoteLibraryRepository : BaseRemoteRepository<RemoteLibraryService>() {
         mangaId: String,
         collectionId: String,
         chapterId: String
-    ): Result<List<String>> =
+    ): ResultX<List<String>> =
         resultWrap { service ->
             val content =
                 if (collectionId.isBlank())

@@ -37,7 +37,7 @@ fun RefreshableMangaList(
     when (val state = mangaList.loadState.refresh) {
         is LoadState.Loading -> LoadingView()
         is LoadState.Error -> ErrorView(
-            message = state.error.localizedMessage!!,
+            message = state.error.localizedMessage ?: "",
             onClickRetry = { mangaList.retry() }
         )
         is LoadState.NotLoading -> {

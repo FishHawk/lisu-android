@@ -63,18 +63,20 @@ private fun Content(navHostController: NavHostController) {
     val viewModel = hiltViewModel<ExploreViewModel>()
     val providerList by viewModel.providerList.flow.collectAsState()
 
-    providerList
-        ?.onSuccess { providers ->
-            val isRefreshing by viewModel.providerList.isRefreshing.collectAsState()
-            SwipeRefresh(
-                state = rememberSwipeRefreshState(isRefreshing),
-                onRefresh = { viewModel.providerList.refresh() },
-            ) {
-                if (providers.isEmpty()) EmptyView()
-                else ProviderList(providers, navHostController)
-            }
-        }?.onFailure { ErrorView(message = it.message ?: "") { viewModel.providerList.reload() } }
-        ?: LoadingView()
+    providerList?.getOrNull()?.let {
+        val isRefreshing by viewModel.providerList.isRefreshing.collectAsState()
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(isRefreshing),
+            onRefresh = { viewModel.providerList.refresh() },
+        ) {
+            if (it.isEmpty()) EmptyView()
+            else ProviderList(it, navHostController)
+        }
+    }
+    providerList?.exceptionOrNull()?.let {
+        ErrorView(message = it.message ?: "") { viewModel.providerList.reload() }
+    }
+    providerList ?: LoadingView()
 }
 
 @Composable

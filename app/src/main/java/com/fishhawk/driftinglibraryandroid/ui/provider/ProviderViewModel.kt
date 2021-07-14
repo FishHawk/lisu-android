@@ -5,6 +5,7 @@ import androidx.paging.*
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
@@ -29,7 +30,7 @@ typealias Option = MutableMap<String, Int>
 
 class ProviderMangaSource(
     private val option: Option,
-    private val loadFunction: suspend (key: Int, option: Option) -> Result<List<MangaOutline>>
+    private val loadFunction: suspend (key: Int, option: Option) -> ResultX<List<MangaOutline>>
 ) : PagingSource<Int, MangaOutline>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MangaOutline> {
         val page = params.key ?: 1
@@ -47,7 +48,7 @@ class ProviderMangaSource(
 
 class ProviderMangaList(
     scope: CoroutineScope,
-    private val loadFunction: suspend (key: Int, option: Option) -> Result<List<MangaOutline>>
+    private val loadFunction: suspend (key: Int, option: Option) -> ResultX<List<MangaOutline>>
 ) {
     private var option: Option = mutableMapOf()
     private var source: ProviderMangaSource? = null

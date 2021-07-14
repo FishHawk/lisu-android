@@ -11,10 +11,11 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 
 class RefreshHandle<T>(
     private val scope: CoroutineScope,
-    flow: Flow<suspend () -> Result<T>>
+    flow: Flow<suspend () -> ResultX<T>>
 ) {
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()

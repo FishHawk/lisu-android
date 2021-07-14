@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 
 sealed class Feedback {
     class Hint(val resId: Int) : Feedback()
@@ -29,7 +30,7 @@ open class FeedbackViewModel : ViewModel() {
         _feedback.value = Event(Feedback.Failure(throwable))
     }
 
-    protected fun <T> resultWarp(result: Result<T>, runIfSuccess: (T) -> Unit) {
+    protected fun <T> resultWarp(result: ResultX<T>, runIfSuccess: (T) -> Unit) {
         result.onSuccess { runIfSuccess(it) }.onFailure { feed(it) }
     }
 }
