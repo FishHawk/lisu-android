@@ -12,6 +12,10 @@ import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import dagger.assisted.Assisted
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.collections.List
@@ -78,20 +82,21 @@ class ProviderViewModel @Inject constructor(
 
     val provider: ProviderInfo = savedStateHandle.get("provider")!!
 
-    private val detail: LiveData<Result<ProviderDetail>?> = liveData {
-        emit(null)
+    private val detail = flow {
         emit(remoteProviderRepository.getProvider(provider.id))
     }
 
     val popularOptionModel = detail.map {
-        it?.getOrNull()?.optionModels?.popular ?: mapOf()
-    }
+        it.getOrNull()?.optionModels?.popular ?: mapOf()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), mapOf())
+
     val latestOptionModel = detail.map {
-        it?.getOrNull()?.optionModels?.latest ?: mapOf()
-    }
+        it.getOrNull()?.optionModels?.latest ?: mapOf()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), mapOf())
+
     val categoryOptionModel = detail.map {
-        it?.getOrNull()?.optionModels?.category ?: mapOf()
-    }
+        it.getOrNull()?.optionModels?.category ?: mapOf()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), mapOf())
 
     val popularMangaList = ProviderMangaList(viewModelScope) { page, option ->
         remoteProviderRepository.listPopularManga(provider.id, page, option)

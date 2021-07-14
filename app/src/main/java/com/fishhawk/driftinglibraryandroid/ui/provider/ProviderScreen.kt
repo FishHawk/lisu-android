@@ -7,6 +7,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -33,6 +34,7 @@ import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.pager.*
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class)
@@ -148,11 +150,11 @@ private fun ProviderPanel(
     navController: NavHostController,
     page: Int,
     mangaList: ProviderMangaList,
-    optionModelLiveData: LiveData<OptionModel>
+    optionModelLiveData: StateFlow<OptionModel>
 ) {
     val viewModel = hiltViewModel<ProviderViewModel>()
+    val optionModel by optionModelLiveData.collectAsState()
 
-    val optionModel by optionModelLiveData.observeAsState(mapOf())
     Column {
         OptionGroupList(
             page = page,
