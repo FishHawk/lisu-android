@@ -16,6 +16,8 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import okhttp3.RequestBody
 import javax.inject.Inject
@@ -40,11 +42,9 @@ class GalleryViewModel @Inject constructor(
     private val _isRefreshing: MutableLiveData<Boolean> = MutableLiveData()
     val isRefreshing: LiveData<Boolean> = _isRefreshing
 
-    val history: LiveData<ReadingHistory> =
-        readingHistoryRepository.observe(
-            P.selectedServer.get(),
-            mangaId
-        )
+    val history = readingHistoryRepository
+        .select(P.selectedServer.get(), mangaId)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     fun refreshManga() {
         viewModelScope.launch {

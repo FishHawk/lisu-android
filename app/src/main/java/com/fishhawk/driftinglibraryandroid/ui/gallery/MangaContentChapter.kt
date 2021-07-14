@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.ViewList
 import androidx.compose.material.icons.filled.ViewModule
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,8 +18,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.asLiveData
 import com.fishhawk.driftinglibraryandroid.data.preference.P
+import com.fishhawk.driftinglibraryandroid.data.preference.collectAsState
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Chapter
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ChapterCollection
 import com.fishhawk.driftinglibraryandroid.util.setNext
@@ -39,9 +38,7 @@ fun MangaContentChapter(
     chapterMark: ChapterMark? = null,
     onChapterClick: OnChapterClickListener
 ) {
-    val mode by P.chapterDisplayMode.asFlow().asLiveData().observeAsState(
-        P.chapterDisplayMode.get()
-    )
+    val mode by P.chapterDisplayMode.collectAsState()
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text("Chapters:", style = MaterialTheme.typography.subtitle1)
@@ -75,7 +72,7 @@ fun ChapterListLinear(
     chapterMark: ChapterMark? = null,
     onChapterClick: OnChapterClickListener
 ) {
-    val order by P.chapterDisplayOrder.asFlow().asLiveData().observeAsState()
+    val order by P.chapterDisplayOrder.collectAsState()
     val chapters = collections.flatMapIndexed { collectionIndex, collection ->
         collection.chapters.mapIndexed { chapterIndex, chapter ->
             Triple(collectionIndex, chapterIndex, chapter)

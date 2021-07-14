@@ -3,9 +3,6 @@ package com.fishhawk.driftinglibraryandroid
 import android.app.Application
 import android.content.Context
 import android.webkit.URLUtil
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.switchMap
 import androidx.room.Room
 import com.fishhawk.driftinglibraryandroid.data.database.ApplicationDatabase
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
@@ -20,7 +17,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
@@ -28,29 +28,16 @@ import javax.inject.Singleton
 
 @HiltAndroidApp
 class MainApplication : Application() {
-    private lateinit var selectedServerInfo: LiveData<ServerInfo>
-
     @Inject
     lateinit var serverInfoRepository: ServerInfoRepository
 
     override fun onCreate() {
         super.onCreate()
         P.initialize(this)
-
-        runBlocking {
-            val selectedServerInfoValue = serverInfoRepository.selectServerInfo(
-                P.selectedServer.get()
-            )
-            AppModule.selectServer(selectedServerInfoValue)
-        }
-
-        selectedServerInfo = P.selectedServer.asFlow().asLiveData().switchMap {
-            serverInfoRepository.observeServerInfo(it)
-        }
-
-        selectedServerInfo.observeForever { serverInfo ->
-            AppModule.selectServer(serverInfo)
-        }
+        P.selectedServer.asFlow()
+            .flatMapLatest { serverInfoRepository.select(it) }
+            .onEach { AppModule.selectServer(it) }
+            .launchIn(CoroutineScope(SupervisorJob() + Dispatchers.Main))
     }
 }
 

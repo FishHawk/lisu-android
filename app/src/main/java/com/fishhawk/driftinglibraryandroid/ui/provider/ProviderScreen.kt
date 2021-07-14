@@ -9,7 +9,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -20,7 +19,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.LiveData
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.driftinglibraryandroid.R
@@ -150,10 +148,10 @@ private fun ProviderPanel(
     navController: NavHostController,
     page: Int,
     mangaList: ProviderMangaList,
-    optionModelLiveData: StateFlow<OptionModel>
+    optionModelFlow: StateFlow<OptionModel>
 ) {
     val viewModel = hiltViewModel<ProviderViewModel>()
-    val optionModel by optionModelLiveData.collectAsState()
+    val optionModel by optionModelFlow.collectAsState()
 
     Column {
         OptionGroupList(

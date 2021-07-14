@@ -320,7 +320,7 @@ private fun MangaContent(viewModel: GalleryViewModel, detail: MangaDetail) {
                 context.navToReaderActivity(detail, 0, 0, it)
             })
         hasChapter -> {
-            val history by viewModel.history.observeAsState()
+            val history by viewModel.history.collectAsState()
             MangaContentChapter(
                 collections = detail.collections,
                 chapterMark = history?.let {

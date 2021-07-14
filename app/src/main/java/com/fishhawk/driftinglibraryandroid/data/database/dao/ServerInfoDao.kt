@@ -1,30 +1,24 @@
 package com.fishhawk.driftinglibraryandroid.data.database.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ServerInfoDao {
-    @Query("SELECT * FROM ServerInfo")
-    fun observeAll(): LiveData<List<ServerInfo>>
-
-    @Query("SELECT * FROM ServerInfo WHERE id = :id")
-    fun observe(id: Int): LiveData<ServerInfo>
-
     @Query("SELECT * FROM ServerInfo ORDER BY position ASC")
-    fun list(): List<ServerInfo>
+    fun list(): Flow<List<ServerInfo>>
 
     @Query("SELECT * FROM ServerInfo WHERE id = :id")
-    fun select(id: Int): ServerInfo?
+    fun select(id: Int): Flow<ServerInfo>
 
     @Insert
-    fun insert(serverInfo: ServerInfo)
+    suspend fun insert(serverInfo: ServerInfo)
 
     @Update
-    fun update(serverInfo: ServerInfo)
+    suspend fun update(serverInfo: ServerInfo)
 
     @Delete
-    fun delete(serverInfo: ServerInfo)
+    suspend fun delete(serverInfo: ServerInfo)
 }
 

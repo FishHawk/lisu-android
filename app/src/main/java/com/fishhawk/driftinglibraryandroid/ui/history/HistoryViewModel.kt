@@ -17,7 +17,7 @@ class HistoryViewModel @Inject constructor(
     val historyList =
         combine(
             P.historyFilter.asFlow(),
-            P.selectedServer.asFlow().flatMapLatest { repository.getAll(it) }
+            P.selectedServer.asFlow().flatMapLatest { repository.list(it) }
         ) { mode, list ->
             when (mode) {
                 P.HistoryFilter.ALL -> list

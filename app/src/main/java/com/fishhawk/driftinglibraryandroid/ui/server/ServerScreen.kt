@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +22,7 @@ import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
 import com.fishhawk.driftinglibraryandroid.data.preference.P
+import com.fishhawk.driftinglibraryandroid.data.preference.collectAsState
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
@@ -53,12 +53,10 @@ private fun ToolBar(navController: NavHostController) {
 @Composable
 private fun Content() {
     val viewModel = hiltViewModel<ServerViewModel>()
-    val serverList by viewModel.serverInfoList.observeAsState(listOf())
+    val serverList by viewModel.serverList.collectAsState()
     if (serverList.size == 1) P.selectedServer.set(serverList.first().id)
 
-    val selectedServer by P.selectedServer.asFlow().collectAsState(
-        P.selectedServer.get()
-    )
+    val selectedServer by P.selectedServer.collectAsState()
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
