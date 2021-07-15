@@ -3,8 +3,8 @@ package com.fishhawk.driftinglibraryandroid.ui.explore
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -82,23 +82,31 @@ private fun ProviderList(
     navHostController: NavHostController
 ) {
     val lastUsedProvider by P.lastUsedProvider.collectAsState()
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(8.dp)
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(start = 8.dp, end = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
         providers.find { it.id == lastUsedProvider }?.let {
-            Text(text = "Last used", style = MaterialTheme.typography.subtitle1)
-            ProviderCard(navHostController, it)
+            item {
+                Text(
+                    modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
+                    text = "Last used",
+                    style = MaterialTheme.typography.subtitle1
+                )
+            }
+            item { ProviderCard(navHostController, it) }
         }
         val providerMap = providers.groupBy { it.lang }
         providerMap.map { (lang, list) ->
-            Text(text = lang, style = MaterialTheme.typography.subtitle1)
-            Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                list.map { ProviderCard(navHostController, it) }
+            item {
+                Text(
+                    modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
+                    text = lang,
+                    style = MaterialTheme.typography.subtitle1
+                )
             }
+            items(list) { ProviderCard(navHostController, it) }
         }
     }
 }

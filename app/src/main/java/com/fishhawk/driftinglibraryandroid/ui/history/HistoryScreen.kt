@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
@@ -30,7 +31,6 @@ import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.hilt.navigation.compose.hiltViewModel as hiltViewModel1
 
 @Composable
 fun HistoryScreen(navController: NavHostController) {
@@ -59,7 +59,7 @@ private fun ToolBar() {
 
 @Composable
 private fun Content(navController: NavHostController) {
-    val viewModel = hiltViewModel1<HistoryViewModel>()
+    val viewModel = hiltViewModel<HistoryViewModel>()
     val historyList by viewModel.historyList.collectAsState()
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -169,7 +169,7 @@ private fun HistoryCard(navController: NavHostController, history: ReadingHistor
 
 @Composable
 private fun ClearHistoryDialog(isOpen: MutableState<Boolean>) {
-    val viewModel = hiltViewModel1<HistoryViewModel>()
+    val viewModel = hiltViewModel<HistoryViewModel>()
     if (isOpen.value) {
         AlertDialog(
             modifier = Modifier.fillMaxWidth(0.8f),
