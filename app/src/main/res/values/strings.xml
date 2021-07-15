@@ -21,6 +21,11 @@
 
 
     <!-- history fragment -->
+    <string name="history_today">Today</string>
+    <string name="history_yesterday">Yesterday</string>
+    <string name="history_n_days_ago">$1 days ago</string>
+    <string name="history_date_format">MMM d,yyyy</string>
+
     <string name="history_card_page">Page%1$d</string>
 
     <!-- more fragment -->

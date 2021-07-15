@@ -3,6 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.history
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ClearAll
@@ -30,6 +31,10 @@ import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 @Composable
@@ -64,32 +69,30 @@ private fun Content(navController: NavHostController) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        val calendar = GregorianCalendar.getInstance()
-        historyList.forEach {
-            val other = GregorianCalendar.getInstance()
-            other.time = Date(it.date)
-
-            if (
-                calendar.get(Calendar.ERA) != other.get(Calendar.ERA) ||
-                calendar.get(Calendar.YEAR) != other.get(Calendar.YEAR) ||
-                calendar.get(Calendar.DAY_OF_YEAR) != other.get(Calendar.DAY_OF_YEAR)
-            ) {
-                calendar.time = other.time
-                val dateFormat = SimpleDateFormat("yyyy年MM月dd日", Locale.getDefault())
+        val now = LocalDate.now()
+        historyList
+            .groupBy { Date(it.date).toInstant().atZone(ZoneId.systemDefault()).toLocalDate() }
+            .forEach { (then, list) ->
                 item {
+                    val days = ChronoUnit.DAYS.between(then, now)
+                    val dateString = when {
+                        days == 0L -> stringResource(R.string.history_today)
+                        days == 1L -> stringResource(R.string.history_yesterday)
+                        days <= 5L -> stringResource(R.string.history_n_days_ago).format(days)
+                        else -> then.format(DateTimeFormatter.ofPattern(stringResource(R.string.history_date_format)))
+                    }
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         Text(
-                            text = dateFormat.format(calendar.time),
+                            text = dateString,
                             modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
                             style = MaterialTheme.typography.subtitle2
                         )
                     }
                 }
+                items(list) { HistoryCard(navController, it) }
             }
-            item { HistoryCard(navController, it) }
-        }
         if (historyList.isEmpty()) item { EmptyView() }
     }
 }
