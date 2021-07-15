@@ -3,12 +3,11 @@ package com.fishhawk.driftinglibraryandroid.ui.more
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
-import com.bumptech.glide.Glide
+import coil.imageLoader
+import coil.util.CoilUtils
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.ui.base.toast
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SettingAdvancedFragment : BaseSettingFragment() {
     override val titleResId: Int = R.string.label_settings_advanced
@@ -18,10 +17,8 @@ class SettingAdvancedFragment : BaseSettingFragment() {
         findPreference<Preference>("clear_image_cache")!!.apply {
             setOnPreferenceClickListener {
                 lifecycleScope.launch {
-                    withContext(Dispatchers.IO) {
-                        Glide.get(context).clearDiskCache()
-                    }
-                    Glide.get(context).clearMemory()
+                    context.imageLoader.memoryCache.clear()
+                    CoilUtils.createDefaultCache(context).directory.deleteRecursively()
                     requireContext().toast(R.string.toast_cache_cleared)
                 }
                 true

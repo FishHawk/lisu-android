@@ -125,7 +125,6 @@ private fun MangaHeader(navController: NavHostController, detail: MangaDetail?) 
                     viewModel.updateCover(content.toRequestBody(type))
             }
 
-            val scope = rememberCoroutineScope()
             Surface(
                 modifier = Modifier
                     .aspectRatio(0.75f)
@@ -153,7 +152,7 @@ private fun MangaHeader(navController: NavHostController, detail: MangaDetail?) 
                                     return context.toast(R.string.toast_manga_not_loaded)
                                 val url = detail.cover
                                     ?: return context.toast(R.string.toast_manga_no_cover)
-//                                saveImage(url, "${detail.id}-cover")
+                                context.saveImage(url, "${detail.id}-cover")
                             }
 
                             override fun onShareCover() {
@@ -161,7 +160,7 @@ private fun MangaHeader(navController: NavHostController, detail: MangaDetail?) 
                                     return context.toast(R.string.toast_manga_not_loaded)
                                 val url = detail.cover
                                     ?: return context.toast(R.string.toast_manga_no_cover)
-                                scope.shareImage(context, url, "${detail.id}-cover")
+                                context.shareImage(url, "${detail.id}-cover")
                             }
                         }).show()
                     },

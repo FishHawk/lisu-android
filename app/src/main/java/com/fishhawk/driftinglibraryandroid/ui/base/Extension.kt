@@ -1,28 +1,26 @@
 package com.fishhawk.driftinglibraryandroid.ui.base
 
+import android.app.Activity
 import android.content.*
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
+import android.graphics.Bitmap.CompressFormat
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import com.bumptech.glide.Glide
+import coil.imageLoader
+import coil.request.ImageRequest
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileOutputStream
 
 fun Context.navToReaderActivity(
     id: String,
@@ -62,25 +60,36 @@ fun Context.navToReaderActivity(
     startActivity(intent)
 }
 
-fun Fragment.checkPermission(permission: String): Boolean {
-    return ContextCompat.checkSelfPermission(
-        requireContext(),
-        permission
-    ) == PackageManager.PERMISSION_GRANTED
+fun Context.findActivity(): Activity {
+    var context = this
+    while (context is ContextWrapper) {
+        if (context is Activity) return context
+        context = context.baseContext
+    }
+    throw IllegalStateException("Permissions should be called in the context of an Activity")
 }
 
-fun Fragment.ensurePermission(permission: String): Boolean {
+fun Context.checkPermission(permission: String): Boolean {
+    return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
+}
+
+fun Context.ensurePermission(permission: String): Boolean {
     return checkPermission(permission).also { isGrant ->
-        if (!isGrant) (requireActivity() as BaseActivity).requestPermission(permission)
+        if (!isGrant) (findActivity() as BaseActivity).requestPermission(permission)
     }
 }
 
-fun Fragment.saveImage(url: String, filename: String) {
-    if (!ensurePermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) return
-    lifecycleScope.launch(Dispatchers.Main) {
-        try {
-            val resolver: ContentResolver = requireContext().contentResolver
-            val uri = resolver.run {
+fun Context.saveImage(url: String, filename: String) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
+        !ensurePermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    ) return
+
+    val imageLoader = imageLoader
+    val request = ImageRequest.Builder(this)
+        .data(url)
+        .listener(onError = { _, e -> toast(e) })
+        .target(onSuccess = {
+            try {
                 val contentValues = ContentValues().apply {
                     put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
                     put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
@@ -97,50 +106,59 @@ fun Fragment.saveImage(url: String, filename: String) {
                         )
                     }
                 }
+                val uri = contentResolver.run {
+                    insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                } ?: return@target toast(R.string.toast_image_already_exist)
 
-                insert(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues
-                )
-            } ?: return@launch requireContext().toast(R.string.toast_image_already_exist)
-
-            withContext(Dispatchers.IO) {
-                val outputStream = resolver.openOutputStream(uri)!!
-                val bitmap = Glide.with(requireContext()).asBitmap().load(url).submit().get()
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                outputStream.flush()
-                outputStream.close()
+                contentResolver.openFileDescriptor(uri, "w", null).use { pfd ->
+                    val outputStream = FileOutputStream(pfd!!.fileDescriptor);
+                    it.toBitmap().compress(CompressFormat.PNG, 100, outputStream)
+                    outputStream.flush()
+                    outputStream.close()
+                    toast(R.string.toast_image_saved)
+                }
+            } catch (e: Throwable) {
+                toast(e)
             }
-
-            requireContext().toast(R.string.toast_image_saved)
-        } catch (e: Throwable) {
-            requireContext().toast(e)
-        }
-    }
+        })
+        .build()
+    imageLoader.enqueue(request)
 }
 
-fun CoroutineScope.shareImage(context: Context, url: String, filename: String) =
-    launch(Dispatchers.IO) {
-        try {
-            val srcFile = Glide.with(context).asFile().load(url).submit().get()
-            val dir = File(context.cacheDir, "shared_image")
-            dir.mkdirs()
-            val destFile = File(dir, "$filename.${srcFile.extension}")
-            srcFile.copyTo(destFile, overwrite = true)
+fun Context.shareImage(url: String, filename: String) {
+    val imageLoader = imageLoader
+    val request = ImageRequest.Builder(this)
+        .data(url)
+        .listener(onError = { _, e -> toast(e) })
+        .target(onSuccess = {
+            try {
+                val dir = File(cacheDir, "shared_image")
+                dir.mkdirs()
 
-            val uri = FileProvider.getUriForFile(
-                context, "${context.packageName}.fileprovider", destFile
-            )
+                val bitmap = it.toBitmap()
+                val outputFile = File(dir, "$filename.png")
+                val outPutStream = FileOutputStream(outputFile)
+                bitmap.compress(CompressFormat.PNG, 100, outPutStream)
+                outPutStream.flush()
+                outPutStream.close()
 
-            val shareIntent = Intent().apply {
-                action = Intent.ACTION_SEND
-                type = "image/*"
-                putExtra(Intent.EXTRA_STREAM, uri)
+                val uri = FileProvider.getUriForFile(
+                    this, "${packageName}.fileprovider", outputFile
+                )
+
+                val shareIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    type = "image/*"
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                }
+                startActivity(Intent.createChooser(shareIntent, "Share image via"))
+            } catch (e: Throwable) {
+                toast(e)
             }
-            context.startActivity(Intent.createChooser(shareIntent, "Share image via"))
-        } catch (e: Throwable) {
-            context.toast(e)
-        }
-    }
+        })
+        .build()
+    imageLoader.enqueue(request)
+}
 
 private fun Context.toast(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
