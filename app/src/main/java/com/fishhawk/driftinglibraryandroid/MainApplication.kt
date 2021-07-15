@@ -4,6 +4,9 @@ import android.app.Application
 import android.content.Context
 import android.webkit.URLUtil
 import androidx.room.Room
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.util.CoilUtils
 import com.fishhawk.driftinglibraryandroid.data.database.ApplicationDatabase
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.database.ServerInfoRepository
@@ -11,6 +14,7 @@ import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
 import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.util.interceptor.ProgressInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,13 +25,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @HiltAndroidApp
-class MainApplication : Application() {
+class MainApplication : Application() , ImageLoaderFactory {
     @Inject
     lateinit var serverInfoRepository: ServerInfoRepository
 
@@ -38,6 +43,17 @@ class MainApplication : Application() {
             .flatMapLatest { serverInfoRepository.select(it) }
             .onEach { AppModule.selectServer(it) }
             .launchIn(CoroutineScope(SupervisorJob() + Dispatchers.Main))
+    }
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(applicationContext)
+            .okHttpClient {
+                OkHttpClient.Builder()
+                    .cache(CoilUtils.createDefaultCache(applicationContext))
+                    .addInterceptor(ProgressInterceptor())
+                    .build()
+            }
+            .build()
     }
 }
 

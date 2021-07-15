@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderViewContinuousBinding
-import com.fishhawk.driftinglibraryandroid.util.dpToPx
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
 
 class ReaderViewContinuous constructor(
@@ -41,7 +40,7 @@ class ReaderViewContinuous constructor(
             state: RecyclerView.State
         ) {
             if (parent.getChildAdapterPosition(view) == 0) return
-            val offset = context.dpToPx(16)
+            val offset = (16 * resources.displayMetrics.density + 0.5f).toInt()
             when (readingOrientation) {
                 ReadingOrientation.HORIZONTAL -> outRect.left = offset
                 ReadingOrientation.VERTICAL -> outRect.top = offset

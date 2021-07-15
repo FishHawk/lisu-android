@@ -1,4 +1,4 @@
-package com.fishhawk.driftinglibraryandroid.util.glide
+package com.fishhawk.driftinglibraryandroid.util.interceptor
 
 import okhttp3.ResponseBody
 import okio.Buffer

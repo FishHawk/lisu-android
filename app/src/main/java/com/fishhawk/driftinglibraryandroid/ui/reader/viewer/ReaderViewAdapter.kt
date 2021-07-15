@@ -2,28 +2,19 @@ package com.fishhawk.driftinglibraryandroid.ui.reader.viewer
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.view.*
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.request.transition.Transition
+import coil.load
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderChapterImageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderEmptyPageBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderPageTransitionNextBinding
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderPageTransitionPrevBinding
-import com.fishhawk.driftinglibraryandroid.util.glide.OnProgressChangeListener
-import com.fishhawk.driftinglibraryandroid.util.glide.ProgressInterceptor
+import com.fishhawk.driftinglibraryandroid.util.interceptor.OnProgressChangeListener
+import com.fishhawk.driftinglibraryandroid.util.interceptor.ProgressInterceptor
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import com.fishhawk.driftinglibraryandroid.widget.comicimageview.OnTapListener
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -350,54 +341,21 @@ class ReaderViewAdapter(private val context: Context) :
                     }
                 })
 
-            Glide.with(context)
-                .asBitmap()
-                .timeout(20000)
-                .load(page.url)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
-                .listener(object : RequestListener<Bitmap> {
-                    override fun onResourceReady(
-                        resource: Bitmap?,
-                        model: Any?,
-                        target: Target<Bitmap>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
+            binding.content.load(page.url) {
+                listener(
+                    onError = { _, e ->
+                        ProgressInterceptor.removeListener(page.url)
+                        e.message?.let { binding.errorHint.text = it }
+                            ?: binding.errorHint.setText(R.string.image_unknown_error_hint)
+                        setError()
+                    },
+                    onSuccess = { it, _ ->
                         ProgressInterceptor.removeListener(page.url)
                         setContent()
-                        return false
                     }
-
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Bitmap>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        ProgressInterceptor.removeListener(page.url)
-                        setError()
-                        if (e != null) binding.errorHint.text = e.message
-                        else binding.errorHint.setText(R.string.image_unknown_error_hint)
-                        return false
-                    }
-                })
-                .into(object : CustomTarget<Bitmap>() {
-                    override fun onResourceReady(
-                        resource: Bitmap,
-                        transition: Transition<in Bitmap>?
-                    ) {
-                        if (isContinuous) {
-                            binding.content.requestLayout()
-                            binding.content.layoutParams.height =
-                                resource.height * binding.content.width / resource.width
-                        }
-                        binding.content.setImageBitmap(resource)
-                    }
-
-                    override fun onLoadCleared(placeholder: Drawable?) {
-                    }
-                })
+                )
+                target(onSuccess = { binding.content.setImageDrawable(it) })
+            }
         }
     }
 }

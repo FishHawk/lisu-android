@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderViewPagerBinding
-import com.fishhawk.driftinglibraryandroid.util.dpToPx
 import com.fishhawk.driftinglibraryandroid.widget.ViewState
 
 class ReaderViewPager constructor(
@@ -32,7 +31,9 @@ class ReaderViewPager constructor(
 
     override var isPageIntervalEnabled: Boolean = false
         set(value) {
-            val transformer = if (value) MarginPageTransformer(context.dpToPx(16)) else null
+            val transformer = if (value) MarginPageTransformer(
+                (16 * resources.displayMetrics.density + 0.5f).toInt()
+            ) else null
             binding.content.setPageTransformer(transformer)
             field = value
         }
