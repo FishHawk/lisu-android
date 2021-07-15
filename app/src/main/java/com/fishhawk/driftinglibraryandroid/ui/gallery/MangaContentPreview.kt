@@ -9,13 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil.request.CachePolicy
-import coil.request.ImageRequest
+import coil.compose.rememberImagePainter
 import com.fishhawk.driftinglibraryandroid.R
-import com.google.accompanist.coil.rememberCoilPainter
 
 @Composable
 fun MangaContentPreview(
@@ -54,20 +51,16 @@ private fun PreviewPage(
     page: Int,
     onPageClick: (Int) -> Unit = {}
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        val request = ImageRequest.Builder(LocalContext.current)
-            .data(url)
-            .memoryCachePolicy(CachePolicy.ENABLED)
-            .diskCachePolicy(CachePolicy.ENABLED)
-            .build()
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Image(
             modifier = Modifier
                 .aspectRatio(0.75f)
                 .clickable { onPageClick(page) },
-            painter = rememberCoilPainter(request, fadeIn = true),
-            contentDescription = "Page",
+            painter = rememberImagePainter(url) {
+                crossfade(true)
+                crossfade(500)
+            },
+            contentDescription = null,
             contentScale = ContentScale.Crop
         )
         Text(text = page.toString())

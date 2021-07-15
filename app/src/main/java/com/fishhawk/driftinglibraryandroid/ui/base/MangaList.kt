@@ -22,9 +22,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import coil.compose.ImagePainter
+import coil.compose.rememberImagePainter
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
-import com.google.accompanist.coil.rememberCoilPainter
-import com.google.accompanist.imageloading.ImageLoadState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
@@ -150,20 +150,23 @@ fun MangaListCard(
 @Composable
 fun MangaCover(modifier: Modifier = Modifier, cover: String?) {
     Box(modifier = modifier.aspectRatio(0.75f)) {
-        val painter = rememberCoilPainter(cover, fadeIn = true)
+        val painter = rememberImagePainter(cover) {
+            crossfade(true)
+            crossfade(500)
+        }
         Image(
             modifier = Modifier.matchParentSize(),
             painter = painter,
-            contentDescription = "cover",
+            contentDescription = null,
             contentScale = ContentScale.Crop
         )
-        when (painter.loadState) {
-            is ImageLoadState.Loading -> CircularProgressIndicator(
+        when (painter.state) {
+            ImagePainter.State.Empty -> Unit
+            is ImagePainter.State.Loading -> CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center)
             )
-//            is ImageLoadState.Error ->
-//            ImageLoadState.Empty ->
-            else -> Unit
+            is ImagePainter.State.Error -> Unit
+            is ImagePainter.State.Success -> Unit
         }
     }
 }

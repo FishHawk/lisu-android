@@ -14,15 +14,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.request.CachePolicy
-import coil.request.ImageRequest
+import coil.compose.rememberImagePainter
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.fishhawk.driftinglibraryandroid.data.preference.collectAsState
@@ -32,7 +30,6 @@ import com.fishhawk.driftinglibraryandroid.ui.base.ErrorView
 import com.fishhawk.driftinglibraryandroid.ui.base.LoadingView
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
-import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
@@ -120,17 +117,12 @@ private fun ProviderCard(navController: NavHostController, provider: ProviderInf
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val request = ImageRequest.Builder(LocalContext.current)
-                .data(provider.icon)
-                .memoryCachePolicy(CachePolicy.ENABLED)
-                .diskCachePolicy(CachePolicy.ENABLED)
-                .build()
             Image(
                 modifier = Modifier
                     .size(48.dp, 48.dp)
                     .padding(8.dp),
-                painter = rememberCoilPainter(request, fadeIn = true),
-                contentDescription = "icon",
+                painter = rememberImagePainter(provider.icon) { crossfade(true) },
+                contentDescription = null,
                 contentScale = ContentScale.Crop
             )
 

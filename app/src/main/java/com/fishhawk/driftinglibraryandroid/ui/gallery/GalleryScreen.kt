@@ -20,16 +20,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.request.ImageRequest
+import coil.compose.rememberImagePainter
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.*
-import com.fishhawk.driftinglibraryandroid.ui.base.copyToClipboard
-import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
-import com.fishhawk.driftinglibraryandroid.ui.base.shareImage
-import com.fishhawk.driftinglibraryandroid.ui.base.toast
+import com.fishhawk.driftinglibraryandroid.ui.base.*
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.fishhawk.driftinglibraryandroid.ui.theme.MaterialColors
-import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -100,12 +96,13 @@ private fun MangaHeader(navController: NavHostController, detail: MangaDetail?) 
             .height(220.dp)
     ) {
         val context = LocalContext.current
-        val request = ImageRequest.Builder(context)
-            .data(detail?.cover)
-            .build()
         Image(
-            painter = rememberCoilPainter(request, fadeIn = true),
+            painter = rememberImagePainter(detail?.cover) {
+                crossfade(true)
+                crossfade(500)
+            },
             contentDescription = null,
+            modifier = Modifier.matchParentSize(),
             contentScale = ContentScale.Crop,
             alpha = 0.2f
         )
@@ -172,8 +169,11 @@ private fun MangaHeader(navController: NavHostController, detail: MangaDetail?) 
                 elevation = 4.dp
             ) {
                 Image(
-                    painter = rememberCoilPainter(request, fadeIn = true),
-                    contentDescription = "Cover",
+                    painter = rememberImagePainter(detail?.cover) {
+                        crossfade(true)
+                        crossfade(500)
+                    },
+                    contentDescription = null,
                     contentScale = ContentScale.Crop
                 )
             }
