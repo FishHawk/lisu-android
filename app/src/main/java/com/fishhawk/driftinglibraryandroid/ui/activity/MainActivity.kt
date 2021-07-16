@@ -58,46 +58,56 @@ sealed class Screen(val route: String, val labelResId: Int, val icon: ImageVecto
 class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { MainContent() }
+        setContent { MainApp() }
     }
 }
 
 @Composable
-private fun MainContent() {
+private fun MainApp() {
     ApplicationTheme {
         val navController = rememberNavController()
-
         Scaffold(
             bottomBar = { BottomNavigationBar(navController) }
         ) { innerPadding ->
-            val startScreen = when (P.startScreen.get()) {
-                P.StartScreen.LIBRARY -> Screen.Library
-                P.StartScreen.HISTORY -> Screen.History
-                P.StartScreen.EXPLORE -> Screen.Explore
-            }
-            NavHost(
+            MainNavHost(
                 navController = navController,
-                startDestination = startScreen.route,
                 modifier = Modifier.padding(innerPadding)
-            ) {
-                composable(Screen.Library.route) { LibraryScreen(navController) }
-                composable(Screen.History.route) { HistoryScreen(navController) }
-                composable(Screen.Explore.route) { ExploreScreen(navController) }
-                composable(Screen.More.route) { MoreScreen(navController) }
+            )
+        }
+    }
+}
 
-                composable("library-search") { LibraryScreen(navController) }
+@Composable
+private fun MainNavHost(
+    navController: NavHostController,
+    modifier: Modifier
+) {
+    val startScreen = when (P.startScreen.get()) {
+        P.StartScreen.LIBRARY -> Screen.Library
+        P.StartScreen.HISTORY -> Screen.History
+        P.StartScreen.EXPLORE -> Screen.Explore
+    }
+    NavHost(
+        navController = navController,
+        startDestination = startScreen.route,
+        modifier = modifier
+    ) {
+        composable(Screen.Library.route) { LibraryScreen(navController) }
+        composable(Screen.History.route) { HistoryScreen(navController) }
+        composable(Screen.Explore.route) { ExploreScreen(navController) }
+        composable(Screen.More.route) { MoreScreen(navController) }
 
-                composable("global-search") { GlobalSearchScreen(navController) }
-                composable("provider/{providerId}") { ProviderScreen(navController) }
-                composable("search/{providerId}") { SearchScreen(navController) }
+        composable("library-search") { LibraryScreen(navController) }
 
-                composable("server") { ServerScreen(navController) }
+        composable("global-search") { GlobalSearchScreen(navController) }
+        composable("provider/{providerId}") { ProviderScreen(navController) }
+        composable("search/{providerId}") { SearchScreen(navController) }
 
-                navigation(startDestination = "detail", route = "gallery/{mangaId}") {
-                    composable("detail") { GalleryScreen(navController) }
-                    composable("edit") { GalleryEditScreen(navController) }
-                }
-            }
+        composable("server") { ServerScreen(navController) }
+
+        navigation(startDestination = "detail", route = "gallery/{mangaId}") {
+            composable("detail") { GalleryScreen(navController) }
+            composable("edit") { GalleryEditScreen(navController) }
         }
     }
 }

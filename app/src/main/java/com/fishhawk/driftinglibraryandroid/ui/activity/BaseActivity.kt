@@ -1,10 +1,10 @@
 package com.fishhawk.driftinglibraryandroid.ui.activity
 
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.fishhawk.driftinglibraryandroid.data.preference.P
 import kotlinx.coroutines.flow.launchIn
@@ -21,8 +21,7 @@ open class BaseActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setupFullScreen()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setupSecureModule()
     }
 
@@ -32,14 +31,7 @@ open class BaseActivity : ComponentActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun setupFullScreen() {
-        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
-    }
-
-    protected fun setFlag(flag: Int, isEnabled: Boolean) {
+    protected fun setFlag(flag: Int, isEnabled: Boolean) =
         if (isEnabled) window.addFlags(flag)
         else window.clearFlags(flag)
-    }
 }
