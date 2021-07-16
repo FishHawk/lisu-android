@@ -6,17 +6,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LibraryAdd
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -194,22 +195,35 @@ private fun MangaInfo(navController: NavHostController, detail: MangaDetail?) {
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 16.dp, bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         val context = LocalContext.current
         (detail?.title ?: viewModel.outline.title).let {
-            Text(
-                modifier = Modifier
-                    .weight(1f, fill = true)
-                    .combinedClickable(
-                        onClick = { globalSearch(it) },
-                        onLongClick = {
-                            context.copyToClipboard(it, R.string.toast_manga_title_copied)
+            Box(modifier = Modifier.weight(1f)) {
+                val defaultTextStyle = MaterialTheme.typography.subtitle1.copy(fontSize = 18.sp)
+                var textStyle by remember { mutableStateOf(defaultTextStyle) }
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .combinedClickable(
+                            onClick = { globalSearch(it) },
+                            onLongClick = {
+                                context.copyToClipboard(it, R.string.toast_manga_title_copied)
+                            }
+                        ),
+                    text = it,
+                    style = textStyle,
+                    onTextLayout = { textLayoutResult ->
+                        if (textLayoutResult.didOverflowHeight && textStyle.fontSize > 12.sp) {
+                            textStyle = textStyle.copy(fontSize = textStyle.fontSize.times(0.9))
                         }
-                    ),
-                text = it
-            )
+                    },
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
         (detail?.metadata?.authors ?: viewModel.outline.metadata.authors)
             ?.joinToString(separator = ";")?.let {
@@ -240,39 +254,6 @@ private fun MangaInfo(navController: NavHostController, detail: MangaDetail?) {
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-            }
-        }
-        Row {
-            TextButton(
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.colors.onSurface
-                ),
-                border = BorderStroke(1.dp, MaterialTheme.colors.onSurface),
-                onClick = {
-                    viewModel.detail.value?.let { detail ->
-                        viewModel.history.value?.let { history ->
-                            context.navToReaderActivity(
-                                detail,
-                                history.collectionIndex,
-                                history.chapterIndex,
-                                history.pageIndex
-                            )
-                        } ?: context.navToReaderActivity(detail)
-                    }
-                }
-            ) {
-                Icon(Icons.Filled.PlayArrow, "Read")
-                Text("Read")
-            }
-            if (viewModel.isFromProvider) {
-                TextButton(
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colors.onSurface
-                    ),
-                    onClick = { viewModel.addMangaToLibrary(false) }
-                ) {
-                    Icon(Icons.Filled.LibraryAdd, "Add")
-                }
             }
         }
     }
