@@ -6,7 +6,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.NavigateBefore
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
@@ -67,7 +67,7 @@ fun ApplicationToolBar(
     navigationIcon = navController?.let {
         {
             IconButton(onClick = { navController.navigateUp() }) {
-                Icon(Icons.Filled.NavigateBefore, "back")
+                Icon(Icons.Filled.ArrowBack, "back")
             }
         }
     },

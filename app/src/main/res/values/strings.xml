@@ -20,13 +20,15 @@
     <string name="label_search">Search</string>
 
 
-    <!-- history fragment -->
+    <!-- history screen -->
     <string name="history_today">Today</string>
     <string name="history_yesterday">Yesterday</string>
-    <string name="history_n_days_ago">$1 days ago</string>
+    <string name="history_n_days_ago">%1$d days ago</string>
     <string name="history_date_format">MMM d,yyyy</string>
-
     <string name="history_card_page">Page%1$d</string>
+
+    <!-- explore screen -->
+    <string name="explore_last_used">Last used</string>
 
     <!-- more fragment -->
     <string name="more_server">Manage server</string>
@@ -128,7 +130,7 @@
 
     <!-- dialog -->
     <string name="dialog_clear_history">Clear all history?</string>
-    <string name="dialog_clear_history_positive">Clear all</string>
+    <string name="dialog_clear_history_positive">Clear</string>
 
     <string name="page_action_refresh">Refresh image</string>
     <string name="page_action_share">Share image</string>

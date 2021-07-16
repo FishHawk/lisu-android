@@ -9,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -32,6 +33,7 @@ import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import java.util.*
 
 @Composable
 fun ExploreScreen(navHostController: NavHostController) {
@@ -88,54 +90,44 @@ private fun ProviderList(
         verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
         providers.find { it.id == lastUsedProvider }?.let {
-            item {
-                Text(
-                    modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
-                    text = "Last used",
-                    style = MaterialTheme.typography.subtitle1
-                )
-            }
+            item { ProviderListHeader(stringResource(R.string.explore_last_used)) }
             item { ProviderCard(navHostController, it) }
         }
         val providerMap = providers.groupBy { it.lang }
         providerMap.map { (lang, list) ->
-            item {
-                Text(
-                    modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
-                    text = lang,
-                    style = MaterialTheme.typography.subtitle1
-                )
-            }
+            item { ProviderListHeader(Locale(lang).displayLanguage) }
             items(list) { ProviderCard(navHostController, it) }
         }
     }
 }
 
 @Composable
+private fun ProviderListHeader(label: String) {
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        Text(
+            text = label,
+            modifier = Modifier.padding(top = 12.dp, bottom = 12.dp),
+            style = MaterialTheme.typography.subtitle2
+        )
+    }
+}
+
+@Composable
 private fun ProviderCard(navController: NavHostController, provider: ProviderInfo) {
-    Card(
-        modifier = Modifier.clickable {
-            P.lastUsedProvider.set(provider.id)
-            navController.currentBackStackEntry?.arguments =
-                bundleOf("provider" to provider)
-            navController.navigate("provider/${provider.id}")
-        },
-    ) {
+    Card(modifier = Modifier.clickable { navController.navToProvider(provider) }) {
         Row(
+            modifier = Modifier.padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Image(
-                modifier = Modifier
-                    .size(48.dp, 48.dp)
-                    .padding(8.dp),
+                modifier = Modifier.size(32.dp),
                 painter = rememberImagePainter(provider.icon) { crossfade(true) },
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
-
             Text(
-                modifier = Modifier.weight(1f, fill = true),
+                modifier = Modifier.weight(1f),
                 text = provider.name,
                 style = MaterialTheme.typography.subtitle1,
                 maxLines = 1,
@@ -143,4 +135,11 @@ private fun ProviderCard(navController: NavHostController, provider: ProviderInf
             )
         }
     }
+}
+
+private fun NavHostController.navToProvider(provider: ProviderInfo) {
+    P.lastUsedProvider.set(provider.id)
+    currentBackStackEntry?.arguments =
+        bundleOf("provider" to provider)
+    navigate("provider/${provider.id}")
 }

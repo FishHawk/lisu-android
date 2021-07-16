@@ -10,7 +10,6 @@ import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,7 +40,7 @@ import java.util.*
 fun HistoryScreen(navController: NavHostController) {
     Scaffold(
         topBar = { ToolBar() },
-        content = { ApplicationTransition { Content(navController) } }
+        content = { ApplicationTransition { HistoryList(navController) } }
     )
 }
 
@@ -63,7 +62,7 @@ private fun ToolBar() {
 }
 
 @Composable
-private fun Content(navController: NavHostController) {
+private fun HistoryList(navController: NavHostController) {
     val viewModel = hiltViewModel<HistoryViewModel>()
     val historyList by viewModel.historyList.collectAsState()
     LazyColumn(
@@ -71,70 +70,46 @@ private fun Content(navController: NavHostController) {
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        val now = LocalDate.now()
+        if (historyList.isEmpty()) item { EmptyView() }
         historyList
             .groupBy { Date(it.date).toInstant().atZone(ZoneId.systemDefault()).toLocalDate() }
             .forEach { (then, list) ->
-                item {
-                    val days = ChronoUnit.DAYS.between(then, now)
-                    val dateString = when {
-                        days == 0L -> stringResource(R.string.history_today)
-                        days == 1L -> stringResource(R.string.history_yesterday)
-                        days <= 5L -> stringResource(R.string.history_n_days_ago).format(days)
-                        else -> then.format(DateTimeFormatter.ofPattern(stringResource(R.string.history_date_format)))
-                    }
-                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                        Text(
-                            text = dateString,
-                            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
-                            style = MaterialTheme.typography.subtitle2
-                        )
-                    }
-                }
-                items(list) { HistoryCard(navController, it) }
+                item { HistoryListHeader(then) }
+                items(list, { it.mangaId }) { HistoryListCard(navController, it) }
             }
-        if (historyList.isEmpty()) item { EmptyView() }
     }
 }
 
 @Composable
-private fun HistoryCard(navController: NavHostController, history: ReadingHistory) {
-    val context = LocalContext.current
-    fun navToReader() {
-        with(history) {
-            context.navToReaderActivity(
-                mangaId, providerId,
-                collectionIndex, chapterIndex, pageIndex
-            )
-        }
+private fun HistoryListHeader(then: LocalDate) {
+    val now = LocalDate.now()
+    val days = ChronoUnit.DAYS.between(then, now)
+    val dateString = when {
+        days == 0L -> stringResource(R.string.history_today)
+        days == 1L -> stringResource(R.string.history_yesterday)
+        days <= 5L -> stringResource(R.string.history_n_days_ago).format(days)
+        else -> then.format(DateTimeFormatter.ofPattern(stringResource(R.string.history_date_format)))
     }
-
-    fun navToGallery() {
-        with(history) {
-            navController.currentBackStackEntry?.arguments =
-                bundleOf(
-                    "outline" to MangaOutline(
-                        mangaId, cover, null, null,
-                        MetadataOutline(title, null, null),
-                        null
-                    ),
-                    "provider" to providerId?.let {
-                        ProviderInfo(it, it, "", "")
-                    }
-                )
-            navController.navigate("gallery/${mangaId}")
-        }
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        Text(
+            text = dateString,
+            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+            style = MaterialTheme.typography.subtitle2
+        )
     }
+}
 
+@Composable
+private fun HistoryListCard(navController: NavHostController, history: ReadingHistory) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(88.dp)
-            .clickable { navToReader() }
+            .clickable { navController.navToReader(history) }
     ) {
         Row {
             MangaCover(
-                modifier = Modifier.clickable { navToGallery() },
+                modifier = Modifier.clickable { navController.navToGallery(history) },
                 cover = history.cover
             )
             Column(
@@ -175,7 +150,6 @@ private fun ClearHistoryDialog(isOpen: MutableState<Boolean>) {
     val viewModel = hiltViewModel<HistoryViewModel>()
     if (isOpen.value) {
         AlertDialog(
-            modifier = Modifier.fillMaxWidth(0.8f),
             onDismissRequest = { isOpen.value = false },
             title = { Text(text = stringResource(R.string.dialog_clear_history)) },
             confirmButton = {
@@ -195,7 +169,6 @@ private fun ClearHistoryDialog(isOpen: MutableState<Boolean>) {
 private fun FilterSwitchDialog(isOpen: MutableState<Boolean>) {
     if (isOpen.value) {
         AlertDialog(
-            modifier = Modifier.fillMaxWidth(0.8f),
             onDismissRequest = { isOpen.value = false },
             title = { Text(text = stringResource(R.string.dialog_filter_history)) },
             text = {
@@ -227,4 +200,26 @@ private fun FilterSwitchDialog(isOpen: MutableState<Boolean>) {
             confirmButton = { }
         )
     }
+}
+
+private fun NavHostController.navToReader(history: ReadingHistory) = with(history) {
+    context.navToReaderActivity(
+        mangaId, providerId,
+        collectionIndex, chapterIndex, pageIndex
+    )
+}
+
+private fun NavHostController.navToGallery(history: ReadingHistory) = with(history) {
+    currentBackStackEntry?.arguments =
+        bundleOf(
+            "outline" to MangaOutline(
+                mangaId, cover, null, null,
+                MetadataOutline(title, null, null),
+                null
+            ),
+            "provider" to providerId?.let {
+                ProviderInfo(it, it, "", "")
+            }
+        )
+    navigate("gallery/${mangaId}")
 }
