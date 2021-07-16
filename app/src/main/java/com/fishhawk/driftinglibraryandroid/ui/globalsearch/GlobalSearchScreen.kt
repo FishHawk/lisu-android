@@ -12,8 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -53,7 +53,8 @@ private fun ToolBar(navController: NavHostController) {
 @Composable
 private fun Content(navController: NavHostController) {
     val viewModel = hiltViewModel<GlobalSearchViewModel>()
-    val searchGroupList by viewModel.searchGroupList.observeAsState(listOf())
+    val searchGroupList by viewModel.searchGroupList.collectAsState()
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
@@ -61,20 +62,22 @@ private fun Content(navController: NavHostController) {
     ) {
         items(searchGroupList) {
             Column {
+                val searchGroup by it.collectAsState()
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(it.provider.title)
+                    Text(searchGroup.provider.title)
                     Spacer(modifier = Modifier.weight(1f, fill = true))
                     IconButton(onClick = {
                         navController.currentBackStackEntry?.arguments =
                             bundleOf(
                                 "keywords" to viewModel.keywords.value,
-                                "provider" to it.provider
+                                "provider" to searchGroup.provider
                             )
-                        navController.navigate("search/${it.provider.id}")
+                        navController.navigate("search/${searchGroup.provider.id}")
                     }) { Icon(Icons.Filled.NavigateNext, "Forward") }
                 }
-                val provider = it.provider
-                it.result?.getOrNull()?.let {
+
+                searchGroup.result?.getOrNull()?.let {
                     LazyRow(
                         modifier = Modifier.height(140.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -88,7 +91,7 @@ private fun Content(navController: NavHostController) {
                                     navController.currentBackStackEntry?.arguments =
                                         bundleOf(
                                             "outline" to it,
-                                            "provider" to provider
+                                            "provider" to searchGroup.provider
                                         )
                                     navController.navigate("gallery/${it.id}")
                                 })
@@ -96,7 +99,7 @@ private fun Content(navController: NavHostController) {
                         }
                     }
                 }
-                it.result?.exceptionOrNull()?.let {
+                searchGroup.result?.exceptionOrNull()?.let {
                     ErrorItem(message = it.message ?: "", onClickRetry = {})
                 }
             }

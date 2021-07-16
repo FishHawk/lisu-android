@@ -6,7 +6,7 @@ import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 data class SearchGroup(
@@ -20,30 +20,17 @@ class GlobalSearchViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val keywords = MutableLiveData(savedStateHandle.get<String>("keywords"))
+    val keywords = MutableStateFlow(savedStateHandle.get<String>("keywords") ?: "")
 
-    private val providerList = liveData {
-        emit(null)
-        emit(remoteLibraryRepository.listProvider())
-    }
+    private val providerList =
+        flow { emit(remoteLibraryRepository.listProvider().getOrNull()) }.filterNotNull()
 
-    val searchGroupList: MediatorLiveData<List<SearchGroup>> = MediatorLiveData()
-
-    init {
-        searchGroupList.addSource(keywords) { search() }
-        searchGroupList.addSource(providerList) { search() }
-    }
-
-    private fun search() =
-        viewModelScope.launch {
-            val keywords = keywords.value ?: return@launch
-            val it = providerList.value?.getOrNull() ?: return@launch
-
-            searchGroupList.value = it.map { info ->
-                SearchGroup(info, null)
-            }
-            searchGroupList.value = it.map { info ->
-                SearchGroup(info, remoteLibraryRepository.listManga(info.id, keywords, 1))
-            }
+    val searchGroupList = combine(keywords, providerList) { keywords, providerList ->
+        providerList.map { provider ->
+            flow {
+                val result = remoteLibraryRepository.listManga(provider.id, keywords, 1)
+                emit(SearchGroup(provider, result))
+            }.stateIn(viewModelScope, SharingStarted.Lazily, SearchGroup(provider, null))
         }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, listOf())
 }
