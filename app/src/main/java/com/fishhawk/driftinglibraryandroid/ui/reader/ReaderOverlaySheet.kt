@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.onEach
 
 @OptIn(ExperimentalGraphicsApi::class)
 @Composable
-fun ColorFilterOverlay() {
+fun ReaderColorFilterOverlay() {
     val isEnabled by P.colorFilter.let { it.asFlow().collectAsState(it.get()) }
 
     if (isEnabled) {

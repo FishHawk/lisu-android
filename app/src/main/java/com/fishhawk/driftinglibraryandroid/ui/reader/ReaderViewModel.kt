@@ -10,13 +10,10 @@ import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Chapter
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
-import com.fishhawk.driftinglibraryandroid.ui.base.Event
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
-import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import java.util.*
 import javax.inject.Inject
 
@@ -61,7 +58,7 @@ class ReaderViewModel @Inject constructor(
 
     val mangaLoadState = mangaDetail.map { detail ->
         detail?.fold({ LoadState.Loaded }, { LoadState.Failure(it) }) ?: LoadState.Loading
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), LoadState.Loaded)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), LoadState.Loading)
 
     private val chapterList = mangaDetail
         .map { it?.getOrNull() }
@@ -84,23 +81,26 @@ class ReaderViewModel @Inject constructor(
         val prevChapter get() = chapterList.value!!.getOrNull(index - 1)
     }
 
-    val chapterPointer = chapterList
-        .filterNotNull()
-        .map {
-            ReaderChapterPointer(
-                index = savedStateHandle.get<Int>("chapterIndex") ?: 0,
-                startPage = savedStateHandle.get<Int>("pageIndex") ?: 0
-            )
-        }
-        .onEach { pointer ->
-            loadChapter(pointer.currChapter)
-            pointer.prevChapter?.let { loadChapter(it) }
-            pointer.nextChapter?.let { loadChapter(it) }
-        }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+    val chapterPointer = MutableStateFlow(
+        ReaderChapterPointer(
+            index = savedStateHandle.get<Int>("chapterIndex") ?: 0,
+            startPage = savedStateHandle.get<Int>("pageIndex") ?: 0
+        )
+    )
 
     init {
         refreshReader()
+        chapterList
+            .filterNotNull()
+            .onEach { loadChapterPointer() }
+            .launchIn(viewModelScope)
+    }
+
+    private fun loadChapterPointer() = viewModelScope.launch {
+        val pointer = chapterPointer.value
+        loadChapter(pointer.currChapter)
+        pointer.prevChapter?.let { loadChapter(it) }
+        pointer.nextChapter?.let { loadChapter(it) }
     }
 
     private suspend fun loadChapter(chapter: ReaderChapter) {
@@ -114,10 +114,9 @@ class ReaderViewModel @Inject constructor(
                 remoteLibraryRepository.getChapterContent(mangaId, chapter.collectionId, chapter.id)
 
         fun refreshPointerIfNeed() {
-            chapterPointer.value?.let { pointer ->
+            chapterPointer.value.let { pointer ->
                 if (chapter.index == pointer.index) {
-                    (chapterPointer as MutableStateFlow).value =
-                        ReaderChapterPointer(pointer.index, pointer.startPage)
+                    chapterPointer.value = ReaderChapterPointer(pointer.index, pointer.startPage)
                 }
             }
         }
@@ -150,49 +149,53 @@ class ReaderViewModel @Inject constructor(
     }
 
     fun openNextChapter() {
-        val pointer = chapterPointer.value!!
+        val pointer = chapterPointer.value
         val nextChapter = pointer.nextChapter
             ?: return feed(R.string.toast_no_next_chapter)
-        (chapterPointer as MutableStateFlow).value =
+        chapterPointer.value =
             ReaderChapterPointer(nextChapter.index, 0)
+        loadChapterPointer()
     }
 
     fun openPrevChapter() {
-        val pointer = chapterPointer.value!!
+        val pointer = chapterPointer.value
         val prevChapter = pointer.prevChapter
             ?: return feed(R.string.toast_no_prev_chapter)
-        (chapterPointer as MutableStateFlow).value =
+        chapterPointer.value =
             ReaderChapterPointer(prevChapter.index, 0)
+        loadChapterPointer()
     }
 
     fun moveToNextChapter() {
-        val pointer = chapterPointer.value!!
+        val pointer = chapterPointer.value
         val nextChapter = pointer.nextChapter
             ?: return feed(R.string.toast_no_next_chapter)
 
         if (nextChapter.state is LoadState.Loaded) {
-            (chapterPointer as MutableStateFlow).value =
+            chapterPointer.value =
                 ReaderChapterPointer(nextChapter.index, 0)
+            loadChapterPointer()
         } else {
             viewModelScope.launch { loadChapter(nextChapter) }
         }
     }
 
     fun moveToPrevChapter() {
-        val pointer = chapterPointer.value!!
+        val pointer = chapterPointer.value
         val prevChapter = pointer.prevChapter
             ?: return feed(R.string.toast_no_prev_chapter)
 
         if (prevChapter.state is LoadState.Loaded) {
-            (chapterPointer as MutableStateFlow).value =
+            chapterPointer.value =
                 ReaderChapterPointer(prevChapter.index, Int.MAX_VALUE)
+            loadChapterPointer()
         } else {
             viewModelScope.launch { loadChapter(prevChapter) }
         }
     }
 
     suspend fun updateReadingHistory(page: Int) {
-        chapterPointer.value?.currChapter?.let {
+        chapterPointer.value.currChapter.let {
             val readingHistory =
                 ReadingHistory(
                     mangaId,

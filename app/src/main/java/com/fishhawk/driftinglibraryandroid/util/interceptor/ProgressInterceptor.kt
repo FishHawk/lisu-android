@@ -3,6 +3,8 @@ package com.fishhawk.driftinglibraryandroid.util.interceptor
 import okhttp3.Interceptor
 import okhttp3.Response
 
+typealias OnProgressChangeListener = (Float) -> Unit
+
 class ProgressInterceptor : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
