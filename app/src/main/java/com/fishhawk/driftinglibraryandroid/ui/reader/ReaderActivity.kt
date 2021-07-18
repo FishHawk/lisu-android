@@ -2,9 +2,9 @@ package com.fishhawk.driftinglibraryandroid.ui.reader
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
-import android.widget.FrameLayout
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
@@ -12,43 +12,48 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.lifecycleScope
-import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.preference.P
+import com.fishhawk.driftinglibraryandroid.data.preference.collectAsState
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
-import com.fishhawk.driftinglibraryandroid.ui.base.*
-import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.*
+import com.fishhawk.driftinglibraryandroid.ui.base.ErrorView
+import com.fishhawk.driftinglibraryandroid.ui.base.EventObserver
+import com.fishhawk.driftinglibraryandroid.ui.base.LoadingView
+import com.fishhawk.driftinglibraryandroid.ui.base.feedback
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
-import com.fishhawk.driftinglibraryandroid.widget.ViewState
 import com.google.accompanist.insets.statusBarsPadding
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ReaderActivity : BaseActivity() {
     val viewModel: ReaderViewModel by viewModels()
-
-    lateinit var reader: ReaderView
-    lateinit var readerContainer: FrameLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,20 +84,15 @@ class ReaderActivity : BaseActivity() {
             window.attributes = window.attributes.apply { screenBrightness = attrBrightness }
         }.launchIn(lifecycleScope)
 
-        readerContainer = FrameLayout(this)
         setContent {
             ApplicationTheme {
-                val readerState by viewModel.readerState.observeAsState(ViewState.Loading)
-                when (readerState) {
-                    is ViewState.Error -> ErrorView(message = "Manga error") { viewModel.refreshReader() }
-                    ViewState.Loading -> LoadingView()
-                    else -> {
-                        val pointer by viewModel.chapterPointer.observeAsState()
-                        when (pointer?.currChapter?.state) {
-                            is ViewState.Error -> ErrorView(message = "Chapter error") { viewModel.refreshReader() }
-                            ViewState.Content -> ReaderContent()
-                            else -> LoadingView()
-                        }
+                val mangaLoadState by viewModel.mangaLoadState.collectAsState()
+                when (mangaLoadState) {
+                    LoadState.Loading -> LoadingView()
+                    is LoadState.Failure -> ErrorView("Manga error") { viewModel.refreshReader() }
+                    LoadState.Loaded -> {
+                        val pointer by viewModel.chapterPointer.collectAsState()
+                        pointer?.let { ReaderContent(it) }
                     }
                 }
             }
@@ -100,141 +100,102 @@ class ReaderActivity : BaseActivity() {
 
         viewModel.feedback.observe(this, EventObserver { feedback(it) })
 
-        viewModel.chapterPointer.observe(this) { pointer ->
-            if (pointer != null) {
-                val chapterContent = ReaderContent(
-                    "${pointer.currChapter.name} ${pointer.currChapter.title}",
-                    pointer.currChapter.images,
-                    pointer.prevChapter?.let {
-                        AdjacentChapter("${it.name} ${it.title}", it.state)
-                    },
-                    pointer.nextChapter?.let {
-                        AdjacentChapter("${it.name} ${it.title}", it.state)
-                    }
-                )
-                reader.adapter.setReaderContent(chapterContent)
-
-                if (pointer.currChapter.state == ViewState.Content) {
-                    reader.setPage(
-                        pointer.startPage
-                            .coerceAtMost(pointer.currChapter.images.size - 1)
-                            .coerceAtLeast(0)
-                    )
-                }
-            }
-        }
-        viewModel.prevChapterStateChanged.observe(this, EventObserver {
-            reader.setPrevChapterState(it)
-        })
-        viewModel.nextChapterStateChanged.observe(this, EventObserver {
-            reader.setNextChapterState(it)
-        })
-
-        combine(
-            P.readingDirection.asFlow(),
-            P.isPageIntervalEnabled.asFlow(),
-            P.isAreaInterpolationEnabled.asFlow()
-        ) { _, _, _ -> initializeReader() }
-            .launchIn(this.lifecycleScope)
-
-        P.useVolumeKey.asFlow()
-            .onEach { reader.useVolumeKey = it }
-            .launchIn(this.lifecycleScope)
-
-        P.invertVolumeKey.asFlow()
-            .onEach { reader.invertVolumeKey = it }
-            .launchIn(this.lifecycleScope)
+//        combine(
+//            P.readingDirection.asFlow(),
+//            P.isPageIntervalEnabled.asFlow(),
+//            P.isAreaInterpolationEnabled.asFlow()
+//        ) { _, _, _ -> initializeReader() }
+//            .launchIn(this.lifecycleScope)
     }
 
-    override fun onPause() {
-        super.onPause()
-        runBlocking {
-            viewModel.updateReadingHistory()
-        }
-    }
+//    private fun initializeReader() {
+//        readerContainer.removeAllViews()
+//
+//        reader = when (P.readingDirection.get()) {
+//            P.ReadingDirection.LTR,
+//            P.ReadingDirection.RTL,
+//            P.ReadingDirection.VERTICAL -> ReaderViewPager(this)
+//            P.ReadingDirection.CONTINUOUS -> ReaderViewContinuous(this)
+//        }
+//
+//        reader.readingOrientation = when (P.readingDirection.get()) {
+//            P.ReadingDirection.LTR,
+//            P.ReadingDirection.RTL -> ReaderView.ReadingOrientation.HORIZONTAL
+//            P.ReadingDirection.VERTICAL,
+//            P.ReadingDirection.CONTINUOUS -> ReaderView.ReadingOrientation.VERTICAL
+//        }
+//
+//        reader.readingDirection = when (P.readingDirection.get()) {
+//            P.ReadingDirection.RTL -> ReaderView.ReadingDirection.RTL
+//            else -> ReaderView.ReadingDirection.LTR
+//        }
+//
+//        reader.adapter.isAreaInterpolationEnabled =
+//            P.isAreaInterpolationEnabled.get()
+//        reader.isPageIntervalEnabled = P.isPageIntervalEnabled.get()
+//        reader.useVolumeKey = P.useVolumeKey.get()
+//        reader.invertVolumeKey = P.invertVolumeKey.get()
+//
+//        readerContainer.addView(reader)
+//        reader.isFocusable = true
+//        reader.isFocusableInTouchMode = true
+//        reader.requestFocus()
+//
+//        reader.onRequestPrevChapter = { viewModel.moveToPrevChapter() }
+//        reader.onRequestNextChapter = { viewModel.moveToNextChapter() }
+//        reader.onRequestMenuVisibility = { viewModel.isMenuOpened.value ?: false }
+//        reader.onRequestMenu = {
+//            if (viewModel.readerState.value is ViewState.Content)
+//                viewModel.isMenuOpened.value = it
+//        }
+//        reader.onPageChanged = { viewModel.chapterPosition.value = it }
+//        reader.onPageLongClicked = { position, url ->
+//            if (P.isLongTapDialogEnabled.get())
+//                ReaderPageSheet(this, object : ReaderPageSheet.Listener {
+//                    override fun onRefresh() {
+//                        reader.refreshPage(position)
+//                    }
+//
+//                    override fun onSave() {
+//                        val prefix = viewModel.makeImageFilenamePrefix()
+//                            ?: return toast(R.string.toast_chapter_not_loaded)
+////                        saveImage(url, "$prefix-$position")
+//                    }
+//
+//                    override fun onShare() {
+//                        val prefix = viewModel.makeImageFilenamePrefix()
+//                            ?: return toast(R.string.toast_chapter_not_loaded)
+////                        lifecycleScope.shareImage(this, url, "$prefix-$position")
+//                    }
+//                }).show()
+//        }
+//        viewModel.chapterPointer.value?.let {
+//            it.startPage = viewModel.chapterPosition.value ?: it.startPage
+//        }
+//        viewModel.chapterPointer.value = viewModel.chapterPointer.value
+//    }
 
-    private fun initializeReader() {
-        readerContainer.removeAllViews()
-
-        reader = when (P.readingDirection.get()) {
-            P.ReadingDirection.LTR,
-            P.ReadingDirection.RTL,
-            P.ReadingDirection.VERTICAL -> ReaderViewPager(this)
-            P.ReadingDirection.CONTINUOUS -> ReaderViewContinuous(this)
-        }
-
-        reader.readingOrientation = when (P.readingDirection.get()) {
-            P.ReadingDirection.LTR,
-            P.ReadingDirection.RTL -> ReaderView.ReadingOrientation.HORIZONTAL
-            P.ReadingDirection.VERTICAL,
-            P.ReadingDirection.CONTINUOUS -> ReaderView.ReadingOrientation.VERTICAL
-        }
-
-        reader.readingDirection = when (P.readingDirection.get()) {
-            P.ReadingDirection.RTL -> ReaderView.ReadingDirection.RTL
-            else -> ReaderView.ReadingDirection.LTR
-        }
-
-        reader.adapter.isAreaInterpolationEnabled =
-            P.isAreaInterpolationEnabled.get()
-        reader.isPageIntervalEnabled = P.isPageIntervalEnabled.get()
-        reader.useVolumeKey = P.useVolumeKey.get()
-        reader.invertVolumeKey = P.invertVolumeKey.get()
-
-        readerContainer.addView(reader)
-        reader.isFocusable = true
-        reader.isFocusableInTouchMode = true
-        reader.requestFocus()
-
-        reader.onRequestPrevChapter = { viewModel.moveToPrevChapter() }
-        reader.onRequestNextChapter = { viewModel.moveToNextChapter() }
-        reader.onRequestMenuVisibility = { viewModel.isMenuOpened.value ?: false }
-        reader.onRequestMenu = {
-            if (viewModel.readerState.value is ViewState.Content)
-                viewModel.isMenuOpened.value = it
-        }
-        reader.onPageChanged = { viewModel.chapterPosition.value = it }
-        reader.onPageLongClicked = { position, url ->
-            if (P.isLongTapDialogEnabled.get())
-                ReaderPageSheet(this, object : ReaderPageSheet.Listener {
-                    override fun onRefresh() {
-                        reader.refreshPage(position)
-                    }
-
-                    override fun onSave() {
-                        val prefix = viewModel.makeImageFilenamePrefix()
-                            ?: return toast(R.string.toast_chapter_not_loaded)
-//                        saveImage(url, "$prefix-$position")
-                    }
-
-                    override fun onShare() {
-                        val prefix = viewModel.makeImageFilenamePrefix()
-                            ?: return toast(R.string.toast_chapter_not_loaded)
-//                        lifecycleScope.shareImage(this, url, "$prefix-$position")
-                    }
-                }).show()
-        }
-        viewModel.chapterPointer.value?.let {
-            it.startPage = viewModel.chapterPosition.value ?: it.startPage
-        }
-        viewModel.chapterPointer.value = viewModel.chapterPointer.value
-    }
-
-    @OptIn(ExperimentalAnimationApi::class)
+    @OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
     @Composable
-    private fun ReaderContent() {
+    private fun ReaderContent(pointer: ReaderViewModel.ReaderChapterPointer) {
         Box(modifier = Modifier.fillMaxSize()) {
-            AndroidView(
-                modifier = Modifier.fillMaxSize(),
-                factory = { readerContainer }
+            val isMenuOpened by viewModel.isMenuOpened.collectAsState()
+
+            val pagerState = rememberPagerState(
+                pageCount = pointer.currChapter.images.size,
+                initialPage = pointer.startPage
             )
 
-            val name by viewModel.chapterName.observeAsState("")
-            val title by viewModel.chapterTitle.observeAsState("")
-            val position by viewModel.chapterPosition.observeAsState(0)
-            val size by viewModel.chapterSize.observeAsState(0)
+            when (pointer.currChapter.state) {
+                LoadState.Loading -> LoadingView()
+                is LoadState.Failure -> ErrorView(message = "Chapter error") { }
+                LoadState.Loaded -> ReaderContainer(pagerState, pointer)
+            }
 
-            val isMenuOpened by viewModel.isMenuOpened.observeAsState(false)
+            val name = pointer.currChapter.name
+            val title = pointer.currChapter.title
+            val size = pointer.currChapter.images.size
+            val position = pagerState.currentPage
 
             val showInfoBar by P.showInfoBar.asFlow().collectAsState(
                 P.showInfoBar.get()
@@ -261,13 +222,95 @@ class ReaderActivity : BaseActivity() {
                 enter = slideInVertically(initialOffsetY = { it }),
                 exit = slideOutVertically(targetOffsetY = { it })
             ) {
-                ReaderMenuBottom(size, position)
+                ReaderMenuBottom(size, pagerState)
             }
         }
     }
 
+    @OptIn(ExperimentalPagerApi::class, ExperimentalComposeUiApi::class)
     @Composable
-    private fun ReaderMenuBottom(size: Int, position: Int) {
+    private fun ReaderContainer(
+        pagerState: PagerState,
+        pointer: ReaderViewModel.ReaderChapterPointer
+    ) {
+        val scope = rememberCoroutineScope()
+        val readerDirection by P.readingDirection.collectAsState()
+
+        fun toNext() {
+            if (pagerState.currentPage < pagerState.pageCount - 1)
+                scope.launch { pagerState.scrollToPage(pagerState.currentPage + 1) }
+            else viewModel.moveToNextChapter()
+        }
+
+        fun toPrev() {
+            if (pagerState.currentPage > 1)
+                scope.launch { pagerState.scrollToPage(pagerState.currentPage - 1) }
+            else viewModel.moveToPrevChapter()
+        }
+
+        val isRtl = readerDirection == P.ReadingDirection.RTL
+        fun toLeft() = if (isRtl) toNext() else toPrev()
+        fun toRight() = if (isRtl) toPrev() else toNext()
+
+        val useVolumeKey by P.useVolumeKey.collectAsState()
+        val invertVolumeKey by P.invertVolumeKey.collectAsState()
+
+        val focusRequester = remember { FocusRequester() }
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .focusRequester(focusRequester)
+            .focusable()
+            .onPreviewKeyEvent {
+                when (it.type) {
+                    KeyEventType.KeyDown -> {
+                        when (it.key) {
+                            Key.VolumeUp ->
+                                if (useVolumeKey && !viewModel.isMenuOpened.value) {
+                                    if (invertVolumeKey) toNext() else toPrev()
+                                } else return@onPreviewKeyEvent false
+                            Key.VolumeDown ->
+                                if (useVolumeKey && !viewModel.isMenuOpened.value) {
+                                    if (invertVolumeKey) toPrev() else toNext()
+                                } else return@onPreviewKeyEvent false
+                            else -> return@onPreviewKeyEvent false
+                        }
+                    }
+                    KeyEventType.KeyUp -> {
+                        when (it.key) {
+                            Key.Menu -> viewModel.isMenuOpened.value = !viewModel.isMenuOpened.value
+
+                            Key.N -> viewModel.moveToNextChapter()
+                            Key.P -> viewModel.moveToPrevChapter()
+
+                            Key.DirectionUp, Key.PageUp -> toPrev()
+                            Key.DirectionDown, Key.PageDown -> toNext()
+
+                            Key.DirectionLeft -> toLeft()
+                            Key.DirectionRight -> toRight()
+                            else -> return@onPreviewKeyEvent false
+                        }
+                    }
+                    else -> return@onPreviewKeyEvent false
+                }
+                true
+            }
+        ) {
+            PagerReader(
+                pagerState,
+                pointer.currChapter.images,
+                onTap = { viewModel.isMenuOpened.value = !viewModel.isMenuOpened.value }
+            )
+        }
+
+        DisposableEffect(Unit) {
+            focusRequester.requestFocus()
+            onDispose { }
+        }
+    }
+
+    @OptIn(ExperimentalPagerApi::class)
+    @Composable
+    private fun ReaderMenuBottom(size: Int, pagerState: PagerState) {
         val readingDirection = when (P.readingDirection.let {
             it.asFlow().collectAsState(it.get())
         }.value) {
@@ -282,7 +325,7 @@ class ReaderActivity : BaseActivity() {
                     .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val isOnlyOneChapter by viewModel.isOnlyOneChapter.observeAsState(true)
+                val isOnlyOneChapter by viewModel.isOnlyOneChapter.collectAsState()
                 if (!isOnlyOneChapter)
                     IconButton(onClick = { viewModel.openPrevChapter() }) {
                         Icon(
@@ -293,26 +336,22 @@ class ReaderActivity : BaseActivity() {
                     }
 
                 if (size > 1) {
-                    var sliderPosition by remember {
-                        mutableStateOf(position.toFloat() / size.minus(1))
-                    }
-
-                    fun sliderPositionToPage() =
-                        (sliderPosition * size).toInt().coerceIn(0, size - 1)
-
                     Text(
                         modifier = Modifier.width(32.dp),
-                        text = sliderPositionToPage().plus(1).toString(),
+                        text = pagerState.currentPage.plus(1).toString(),
                         color = Color.White,
                         textAlign = TextAlign.Center
                     )
+                    val scope = rememberCoroutineScope()
                     Slider(
                         modifier = Modifier
                             .weight(1f)
                             .padding(start = 8.dp, end = 8.dp),
-                        value = sliderPosition,
-                        onValueChange = { sliderPosition = it },
-                        onValueChangeFinished = { reader.setPage(sliderPositionToPage()) }
+                        value = pagerState.currentPage.toFloat() / size.minus(1),
+                        onValueChange = {
+                            val target = (it * (size - 1)).toInt().coerceIn(0, size - 1)
+                            scope.launch { pagerState.scrollToPage(target) }
+                        }
                     )
                     Text(
                         modifier = Modifier.width(32.dp),

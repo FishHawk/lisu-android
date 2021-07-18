@@ -17,8 +17,6 @@ abstract class ReaderView @JvmOverloads constructor(
     enum class ReadingDirection { LTR, RTL }
 
     abstract var readingOrientation: ReadingOrientation
-    val isHorizontal get() = readingOrientation == ReadingOrientation.HORIZONTAL
-    val isVertical get() = readingOrientation == ReadingOrientation.VERTICAL
 
     var readingDirection = ReadingDirection.LTR
         set(value) {
@@ -29,7 +27,6 @@ abstract class ReaderView @JvmOverloads constructor(
             field = value
         }
     val isRtl get() = readingDirection == ReadingDirection.RTL
-    val isLtr get() = readingDirection == ReadingDirection.LTR
 
     abstract var isPageIntervalEnabled: Boolean
 
@@ -80,50 +77,5 @@ abstract class ReaderView @JvmOverloads constructor(
             }
         }
         adapter.readerView = this
-    }
-
-
-    /* Key Event */
-    var useVolumeKey: Boolean = true
-    var invertVolumeKey: Boolean = true
-
-    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        if (event.action == KeyEvent.ACTION_UP) return super.dispatchKeyEvent(event)
-
-        return when (event.keyCode) {
-            KeyEvent.KEYCODE_VOLUME_UP ->
-                if (useVolumeKey && !isMenuVisible) {
-                    if (invertVolumeKey) toNext() else toPrev()
-                    true
-                } else false
-            KeyEvent.KEYCODE_VOLUME_DOWN ->
-                if (useVolumeKey && !isMenuVisible) {
-                    if (invertVolumeKey) toPrev() else toNext()
-                    true
-                } else false
-            else -> super.dispatchKeyEvent(event)
-        }
-    }
-
-    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        when (keyCode) {
-            KeyEvent.KEYCODE_MENU -> {
-                onRequestMenu?.invoke(!isMenuVisible)
-            }
-
-            KeyEvent.KEYCODE_N -> onRequestNextChapter?.invoke()
-            KeyEvent.KEYCODE_P -> onRequestPrevChapter?.invoke()
-
-            KeyEvent.KEYCODE_DPAD_RIGHT -> toRight()
-            KeyEvent.KEYCODE_DPAD_LEFT -> toLeft()
-
-            KeyEvent.KEYCODE_DPAD_UP,
-            KeyEvent.KEYCODE_PAGE_UP -> toPrev()
-
-            KeyEvent.KEYCODE_DPAD_DOWN,
-            KeyEvent.KEYCODE_PAGE_DOWN -> toNext()
-            else -> return super.onKeyUp(keyCode, event)
-        }
-        return true
     }
 }
