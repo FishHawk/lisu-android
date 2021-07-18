@@ -13,47 +13,6 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
 
-
-    <TextView
-        android:id="@+id/direction_label"
-        style="@style/Theme.TextAppearance.Body1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_reading_direction"
-        app:layout_constraintBaseline_toBaselineOf="@id/direction"
-        app:layout_constraintEnd_toStartOf="@id/vertical_center"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <androidx.appcompat.widget.AppCompatSpinner
-        android:id="@+id/direction"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:entries="@array/reading_direction_entries"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/vertical_center"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/orientation_label"
-        style="@style/Theme.TextAppearance.Body1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/settings_screen_orientation"
-        app:layout_constraintBaseline_toBaselineOf="@id/orientation"
-        app:layout_constraintEnd_toStartOf="@id/vertical_center"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <androidx.appcompat.widget.AppCompatSpinner
-        android:id="@+id/orientation"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:entries="@array/screen_orientation_entries"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/vertical_center"
-        app:layout_constraintTop_toBottomOf="@id/direction" />
-
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/page_interval"
         android:layout_width="match_parent"
@@ -61,7 +20,7 @@
         android:layout_marginTop="10dp"
         android:text="@string/settings_is_page_interval_enabled"
         android:textColor="?android:attr/textColorPrimary"
-        app:layout_constraintTop_toBottomOf="@id/orientation" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/show_info_bar"

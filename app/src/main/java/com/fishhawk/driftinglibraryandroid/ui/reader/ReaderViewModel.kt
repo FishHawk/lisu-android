@@ -56,9 +56,17 @@ class ReaderViewModel @Inject constructor(
         savedStateHandle.get<MangaDetail>("detail")?.let { ResultX.success(it) }
     )
 
-    val mangaLoadState = mangaDetail.map { detail ->
-        detail?.fold({ LoadState.Loaded }, { LoadState.Failure(it) }) ?: LoadState.Loading
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), LoadState.Loading)
+    val mangaLoadState = mangaDetail
+        .map { detail ->
+            detail?.fold({ LoadState.Loaded }, { LoadState.Failure(it) }) ?: LoadState.Loading
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), LoadState.Loading)
+
+    val mangaTitle = mangaDetail
+        .map { it?.getOrNull() }
+        .filterNotNull()
+        .map { it.title }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), mangaId)
 
     private val chapterList = mangaDetail
         .map { it?.getOrNull() }

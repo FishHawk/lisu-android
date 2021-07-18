@@ -32,8 +32,6 @@ class ReaderActivity : BaseActivity() {
         P.screenOrientation.asFlow()
             .onEach {
                 val newOrientation = when (it) {
-                    P.ScreenOrientation.DEFAULT -> ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                    P.ScreenOrientation.LOCK -> ActivityInfo.SCREEN_ORIENTATION_LOCKED
                     P.ScreenOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                     P.ScreenOrientation.LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                 }

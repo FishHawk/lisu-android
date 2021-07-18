@@ -14,9 +14,6 @@ class ReaderSettingsSheet(context: Context) : PreferenceBottomSheetDialog(contex
         )
 
     init {
-        bindPreference(P.readingDirection, binding.direction)
-        bindPreference(P.screenOrientation, binding.orientation)
-
         bindPreference(P.isPageIntervalEnabled, binding.pageInterval)
         bindPreference(P.showInfoBar, binding.showInfoBar)
         bindPreference(P.keepScreenOn, binding.keepScreenOn)

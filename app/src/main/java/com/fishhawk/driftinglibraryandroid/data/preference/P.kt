@@ -60,10 +60,10 @@ object P {
 
     // Settings reading
     enum class ReadingDirection { LTR, RTL, VERTICAL, CONTINUOUS }
-    enum class ScreenOrientation { DEFAULT, LOCK, PORTRAIT, LANDSCAPE }
+    enum class ScreenOrientation { PORTRAIT, LANDSCAPE }
 
     val readingDirection by get("reading_direction", ReadingDirection.LTR)
-    val screenOrientation by get("screen_orientation", ScreenOrientation.DEFAULT)
+    val screenOrientation by get("screen_orientation", ScreenOrientation.PORTRAIT)
     val isPageIntervalEnabled by get("is_page_interval_enabled", false)
     val showInfoBar by get("show_info_bar", true)
     val keepScreenOn by get("keep_screen_on", false)
