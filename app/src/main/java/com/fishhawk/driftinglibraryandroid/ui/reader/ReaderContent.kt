@@ -8,7 +8,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.Velocity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fishhawk.driftinglibraryandroid.data.preference.P
 import com.fishhawk.driftinglibraryandroid.data.preference.collectAsState
@@ -78,8 +83,54 @@ fun ReaderContent(
     val invertVolumeKey by P.invertVolumeKey.collectAsState()
 
     val focusRequester = remember { FocusRequester() }
+
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            var prepareToNext = false
+            var prepareToPrev = false
+
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                if (source == NestedScrollSource.Drag) {
+                    when (readerDirection) {
+                        P.ReadingDirection.LTR -> {
+                            prepareToNext = available.x < -10
+                            prepareToPrev = available.x > 10
+                        }
+                        P.ReadingDirection.RTL -> {
+                            prepareToNext = available.x > 10
+                            prepareToPrev = available.x < -10
+                            println("$available $prepareToPrev $prepareToNext")
+                        }
+                        P.ReadingDirection.VERTICAL -> {
+                            prepareToNext = available.y < -10
+                            prepareToPrev = available.y > 10
+                        }
+                        else -> Unit
+                    }
+                }
+                return Offset.Zero
+            }
+
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                if (prepareToNext) {
+                    prepareToNext = false
+                    viewModel.moveToNextChapter()
+                } else if (prepareToPrev) {
+                    prepareToPrev = false
+                    viewModel.moveToPrevChapter()
+                }
+                return Velocity.Zero
+            }
+        }
+    }
+
     Box(modifier = Modifier
         .fillMaxSize()
+        .nestedScroll(nestedScrollConnection)
         .focusRequester(focusRequester)
         .focusable()
         .onPreviewKeyEvent {

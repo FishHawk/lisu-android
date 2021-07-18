@@ -16,22 +16,22 @@ class ComicImageView : AppCompatImageView {
 
     override fun setImageDrawable(drawable: Drawable?) {
         super.setImageDrawable(drawable)
-        attacher?.resetDrawable()
+        attacher.resetDrawable()
     }
 
     override fun setImageResource(resId: Int) {
         super.setImageResource(resId)
-        attacher?.resetDrawable()
+        attacher.resetDrawable()
     }
 
     override fun setImageURI(uri: Uri?) {
         super.setImageURI(uri)
-        attacher?.resetDrawable()
+        attacher.resetDrawable()
     }
 
     override fun setFrame(l: Int, t: Int, r: Int, b: Int): Boolean {
         val changed = super.setFrame(l, t, r, b)
-        if (changed) attacher?.resetDrawable()
+        if (changed) attacher.resetDrawable()
         return changed
     }
 

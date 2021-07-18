@@ -111,7 +111,7 @@ fun Context.saveImage(url: String, filename: String) {
                 } ?: return@target toast(R.string.toast_image_already_exist)
 
                 contentResolver.openFileDescriptor(uri, "w", null).use { pfd ->
-                    val outputStream = FileOutputStream(pfd!!.fileDescriptor);
+                    val outputStream = FileOutputStream(pfd!!.fileDescriptor)
                     it.toBitmap().compress(CompressFormat.PNG, 100, outputStream)
                     outputStream.flush()
                     outputStream.close()
