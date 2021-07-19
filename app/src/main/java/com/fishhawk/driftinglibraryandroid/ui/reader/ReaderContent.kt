@@ -103,7 +103,6 @@ fun ReaderContent(
                         P.ReadingDirection.RTL -> {
                             prepareToNext = available.x > 10
                             prepareToPrev = available.x < -10
-                            println("$available $prepareToPrev $prepareToNext")
                         }
                         P.ReadingDirection.VERTICAL -> {
                             prepareToNext = available.y < -10

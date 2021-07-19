@@ -25,14 +25,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @HiltAndroidApp
-class MainApplication : Application() , ImageLoaderFactory {
+class MainApplication : Application(), ImageLoaderFactory {
     @Inject
     lateinit var serverInfoRepository: ServerInfoRepository
 

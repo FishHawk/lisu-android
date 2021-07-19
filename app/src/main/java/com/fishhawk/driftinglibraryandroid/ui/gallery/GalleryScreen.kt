@@ -22,6 +22,7 @@ import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
+import coil.util.CoilUtils
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.*
 import com.fishhawk.driftinglibraryandroid.ui.base.*
@@ -97,8 +98,9 @@ private fun MangaHeader(navController: NavHostController, detail: MangaDetail?) 
             .height(220.dp)
     ) {
         val context = LocalContext.current
+        val cover = detail?.cover ?: viewModel.outline.cover
         Image(
-            painter = rememberImagePainter(detail?.cover) {
+            painter = rememberImagePainter(cover) {
                 crossfade(true)
                 crossfade(500)
             },
@@ -169,7 +171,7 @@ private fun MangaHeader(navController: NavHostController, detail: MangaDetail?) 
                 elevation = 4.dp
             ) {
                 Image(
-                    painter = rememberImagePainter(detail?.cover) {
+                    painter = rememberImagePainter(cover) {
                         crossfade(true)
                         crossfade(500)
                     },
