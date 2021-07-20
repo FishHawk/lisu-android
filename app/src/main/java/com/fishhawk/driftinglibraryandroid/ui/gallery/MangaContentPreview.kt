@@ -3,16 +3,13 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
-import com.fishhawk.driftinglibraryandroid.R
 
 @Composable
 fun MangaContentPreview(
@@ -64,18 +61,5 @@ private fun PreviewPage(
             contentScale = ContentScale.Crop
         )
         Text(text = page.toString())
-    }
-}
-
-@Composable
-fun MangaNoChapter() {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = stringResource(R.string.gallery_no_chapters_hint),
-            color = MaterialTheme.colors.primary
-        )
     }
 }
