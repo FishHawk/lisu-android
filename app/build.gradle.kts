@@ -1,23 +1,29 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-parcelize")
-    id("dagger.hilt.android.plugin")
     id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
 }
 
 android {
     signingConfigs {
-        Properties properties = new Properties()
-        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+        getByName("debug") {
+            val properties = Properties()
+            properties.load(FileInputStream(project.rootProject.file("local.properties")))
 
-        debug {
             storeFile = file(properties.getProperty("signingConfigs.storeFile"))
             storePassword = properties.getProperty("signingConfigs.storePassword")
             keyAlias = properties.getProperty("signingConfigs.keyAlias")
             keyPassword = properties.getProperty("signingConfigs.keyPassword")
         }
-        release {
+        create("release") {
+            val properties = Properties()
+            properties.load(FileInputStream(project.rootProject.file("local.properties")))
+
             storeFile = file(properties.getProperty("signingConfigs.storeFile"))
             storePassword = properties.getProperty("signingConfigs.storePassword")
             keyAlias = properties.getProperty("signingConfigs.keyAlias")
@@ -40,14 +46,17 @@ android {
         multiDexEnabled = true
 
         ndk {
-            abiFilters("arm64-v8a", "armeabi-v7a")
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
         }
     }
 
     buildTypes {
-        release {
-            minifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        getByName("release") {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
@@ -57,14 +66,14 @@ android {
     }
 
     compileOptions {
-        coreLibraryDesugaringEnabled = true
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+
     kotlinOptions {
         jvmTarget = "1.8"
-        useIR = true
     }
 
     composeOptions {
