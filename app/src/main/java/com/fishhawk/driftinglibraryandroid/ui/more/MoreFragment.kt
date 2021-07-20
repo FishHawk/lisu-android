@@ -20,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
-import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.fishhawk.driftinglibraryandroid.R
@@ -60,7 +59,7 @@ class MoreFragment : PreferenceFragmentCompat() {
     private fun setPreferenceNavigation(key: String, action: Int) {
         findPreference<Preference>(key)!!.apply {
             setOnPreferenceClickListener {
-                findNavController().navigate(action)
+//                findNavController().navigate(action)
                 true
             }
         }

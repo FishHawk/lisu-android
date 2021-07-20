@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceFragmentCompat
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
 import com.google.accompanist.insets.LocalWindowInsets
@@ -40,9 +39,9 @@ abstract class BaseSettingFragment : PreferenceFragmentCompat() {
                                 contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
                                 title = { Text(stringResource(titleResId)) },
                                 navigationIcon = {
-                                    IconButton(onClick = { findNavController().navigateUp() }) {
-                                        Icon(Icons.Filled.NavigateBefore, "back")
-                                    }
+//                                    IconButton(onClick = { findNavController().navigateUp() }) {
+//                                        Icon(Icons.Filled.NavigateBefore, "back")
+//                                    }
                                 }
                             )
                         },
