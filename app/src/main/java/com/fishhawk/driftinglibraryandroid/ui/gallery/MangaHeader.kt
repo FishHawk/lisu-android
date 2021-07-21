@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
@@ -32,14 +31,11 @@ import com.fishhawk.driftinglibraryandroid.ui.base.saveImage
 import com.fishhawk.driftinglibraryandroid.ui.base.shareImage
 import com.fishhawk.driftinglibraryandroid.ui.base.toast
 import com.google.accompanist.insets.statusBarsPadding
-import com.google.accompanist.placeholder.PlaceholderHighlight
-import com.google.accompanist.placeholder.material.fade
-import com.google.accompanist.placeholder.material.placeholder
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 
 @Composable
-fun MangaHeader(navController: NavHostController, detail: MangaDetail?) {
+fun MangaHeader(navController: NavHostController, detail: MangaDetail) {
     val viewModel = hiltViewModel<GalleryViewModel>()
     Box(
         Modifier
@@ -47,21 +43,15 @@ fun MangaHeader(navController: NavHostController, detail: MangaDetail?) {
             .height(220.dp)
     ) {
         val context = LocalContext.current
-        val cover = detail?.cover ?: viewModel.outline.cover
-
-        val backPainter = rememberImagePainter(cover) {
+        val painter = rememberImagePainter(detail.cover) {
             crossfade(true)
             crossfade(500)
         }
+
         Image(
-            painter = backPainter,
+            modifier = Modifier.matchParentSize(),
+            painter = painter,
             contentDescription = null,
-            modifier = Modifier
-                .matchParentSize()
-                .placeholder(
-                    visible = backPainter.state is ImagePainter.State.Loading,
-                    highlight = PlaceholderHighlight.fade()
-                ),
             contentScale = ContentScale.Crop,
             alpha = 0.2f
         )
@@ -98,16 +88,17 @@ fun MangaHeader(navController: NavHostController, detail: MangaDetail?) {
                             }
 
                             override fun onEditMetadata() {
-                                if (viewModel.detail.value != null)
-                                    navController.navigate("edit")
+                                navController.navigate("edit")
                             }
 
                             override fun onEditCover() {
+                                if (viewModel.isRefreshing.value)
+                                    return context.toast(R.string.toast_manga_not_loaded)
                                 launcher.launch("test")
                             }
 
                             override fun onSaveCover() {
-                                if (detail == null)
+                                if (viewModel.isRefreshing.value)
                                     return context.toast(R.string.toast_manga_not_loaded)
                                 val url = detail.cover
                                     ?: return context.toast(R.string.toast_manga_no_cover)
@@ -115,7 +106,7 @@ fun MangaHeader(navController: NavHostController, detail: MangaDetail?) {
                             }
 
                             override fun onShareCover() {
-                                if (detail == null)
+                                if (viewModel.isRefreshing.value)
                                     return context.toast(R.string.toast_manga_not_loaded)
                                 val url = detail.cover
                                     ?: return context.toast(R.string.toast_manga_no_cover)
@@ -126,12 +117,8 @@ fun MangaHeader(navController: NavHostController, detail: MangaDetail?) {
                 shape = RoundedCornerShape(4.dp),
                 elevation = 4.dp
             ) {
-                val frontPainter = rememberImagePainter(cover) {
-                    crossfade(true)
-                    crossfade(500)
-                }
                 Image(
-                    painter = frontPainter,
+                    painter = painter,
                     contentDescription = null,
                     contentScale = ContentScale.Crop
                 )
@@ -144,8 +131,7 @@ fun MangaHeader(navController: NavHostController, detail: MangaDetail?) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun MangaInfo(navController: NavHostController, detail: MangaDetail?) {
-    val viewModel = hiltViewModel<GalleryViewModel>()
+private fun MangaInfo(navController: NavHostController, detail: MangaDetail) {
 
     fun globalSearch(keywords: String) {
         navController.currentBackStackEntry?.arguments =
@@ -160,7 +146,7 @@ private fun MangaInfo(navController: NavHostController, detail: MangaDetail?) {
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         val context = LocalContext.current
-        (detail?.title ?: viewModel.outline.title).let {
+        detail.title.let {
             Box(modifier = Modifier.weight(1f)) {
                 val defaultTextStyle = MaterialTheme.typography.subtitle1.copy(fontSize = 18.sp)
                 var textStyle by remember { mutableStateOf(defaultTextStyle) }
@@ -184,29 +170,28 @@ private fun MangaInfo(navController: NavHostController, detail: MangaDetail?) {
                 )
             }
         }
-        (detail?.metadata?.authors ?: viewModel.outline.metadata.authors)
-            ?.joinToString(separator = ";")?.let {
-                Text(
-                    modifier = Modifier.combinedClickable(
-                        onClick = { globalSearch(it) },
-                        onLongClick = {
-                            context.copyToClipboard(it, R.string.toast_manga_author_copied)
-                        }
-                    ),
-                    text = it,
-                    style = MaterialTheme.typography.body2,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+        detail.metadata.authors?.joinToString(separator = ";")?.let {
+            Text(
+                modifier = Modifier.combinedClickable(
+                    onClick = { globalSearch(it) },
+                    onLongClick = {
+                        context.copyToClipboard(it, R.string.toast_manga_author_copied)
+                    }
+                ),
+                text = it,
+                style = MaterialTheme.typography.body2,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            (detail?.metadata?.status ?: viewModel.outline.metadata.status)?.let {
+            detail.metadata.status?.let {
                 Text(
                     text = it.toString(),
                     style = MaterialTheme.typography.body2
                 )
             }
-            viewModel.provider?.title?.let {
+            detail.provider?.title?.let {
                 Text(
                     text = it,
                     style = MaterialTheme.typography.body2,

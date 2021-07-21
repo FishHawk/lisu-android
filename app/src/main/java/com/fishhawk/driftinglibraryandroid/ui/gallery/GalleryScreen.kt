@@ -13,7 +13,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -54,17 +53,17 @@ fun GalleryScreen(navController: NavHostController) {
 }
 
 @Composable
-private fun MangaBody(navController: NavHostController, detail: MangaDetail?) {
+private fun MangaBody(navController: NavHostController, detail: MangaDetail) {
     val viewModel = hiltViewModel<GalleryViewModel>()
 
     fun search(keywords: String) {
         navController.currentBackStackEntry?.arguments =
             bundleOf(
                 "keywords" to keywords,
-                "provider" to viewModel.provider
+                "provider" to detail.provider
             )
-        if (viewModel.isFromProvider) navController.navigate("search/${viewModel.provider!!.id}")
-        else navController.navigate("library-search")
+        if (detail.provider == null) navController.navigate("library-search")
+        else navController.navigate("search/${detail.provider.id}")
     }
 
     Column(
@@ -73,9 +72,9 @@ private fun MangaBody(navController: NavHostController, detail: MangaDetail?) {
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        detail?.source?.let { MangaSource(it) }
-        detail?.metadata?.description?.let { MangaDescription(it) }
-        detail?.metadata?.tags?.let { tags ->
+        detail.source?.let { MangaSource(it) }
+        detail.metadata.description?.let { MangaDescription(it) }
+        detail.metadata.tags?.let { tags ->
             val context = LocalContext.current
             MangaTagGroups(tags,
                 onTagClick = { search(it) },
@@ -84,7 +83,7 @@ private fun MangaBody(navController: NavHostController, detail: MangaDetail?) {
                 }
             )
         }
-        detail?.let { MangaContent(viewModel, it) }
+        MangaContent(viewModel, detail)
     }
 }
 

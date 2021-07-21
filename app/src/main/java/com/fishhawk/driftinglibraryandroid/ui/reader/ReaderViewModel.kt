@@ -223,8 +223,8 @@ class ReaderViewModel @Inject constructor(
     }
 
 //    fun makeImageFilenamePrefix(): String? {
-//        val pointer = chapterPointer.value ?: return null
-//        return "${mangaDetail?.title}-$collectionId-${pointer.currChapter.title}"
+//        val pointer = chapterPointer.value
+//        return "${mangaDetail.title}-$collectionId-${pointer.currChapter.title}"
 //    }
 }
 

@@ -24,24 +24,39 @@ data class TagGroup(
 
 @Parcelize
 data class MetadataDetail(
-    val title: String?,
-    val authors: List<String>?,
-    val status: MangaStatus?,
-    val description: String?,
-    val tags: List<TagGroup>?
-) : Parcelable
+    val title: String? = null,
+    val authors: List<String>? = null,
+    val status: MangaStatus? = null,
+    val description: String? = null,
+    val tags: List<TagGroup>? = null
+) : Parcelable {
+
+    constructor(outline: MetadataOutline) : this(
+        title = outline.title,
+        authors = outline.authors,
+        status = outline.status,
+    )
+}
 
 @Parcelize
 data class MangaDetail(
-    val provider: ProviderInfo?,
+    val provider: ProviderInfo? = null,
     val id: String,
-    var cover: String?,
-    val updateTime: Long?,
-    val source: Source?,
-    val metadata: MetadataDetail,
-    val collections: List<ChapterCollection>,
-    var preview: List<String>?
+    var cover: String? = null,
+    val updateTime: Long? = null,
+    val source: Source? = null,
+    val metadata: MetadataDetail = MetadataDetail(),
+    val collections: List<ChapterCollection> = emptyList(),
+    var preview: List<String>? = null
 ) : Parcelable {
     val title
         get() = metadata.title ?: id
+
+    constructor(outline: MangaOutline) : this(
+        id = outline.id,
+        cover = outline.cover,
+        updateTime = outline.updateTime,
+        source = outline.source,
+        metadata = MetadataDetail(outline.metadata)
+    )
 }
