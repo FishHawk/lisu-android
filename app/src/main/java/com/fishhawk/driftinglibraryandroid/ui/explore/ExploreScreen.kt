@@ -73,7 +73,7 @@ private fun Content(navHostController: NavHostController) {
         }
     }
     providerList?.exceptionOrNull()?.let {
-        ErrorView(message = it.message ?: "") { viewModel.providerList.reload() }
+        ErrorView(it) { viewModel.providerList.reload() }
     }
     providerList ?: LoadingView()
 }

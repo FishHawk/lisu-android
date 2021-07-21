@@ -100,7 +100,7 @@ private fun Content(navController: NavHostController) {
                     }
                 }
                 searchGroup.result?.exceptionOrNull()?.let {
-                    ErrorItem(message = it.message ?: "", onClickRetry = {})
+                    ErrorItem(it) {}
                 }
             }
         }

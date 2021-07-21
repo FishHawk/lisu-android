@@ -8,7 +8,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -57,9 +59,9 @@ class ReaderActivity : BaseActivity() {
             ApplicationTheme {
                 val viewModel = viewModel<ReaderViewModel>()
                 val mangaLoadState by viewModel.mangaLoadState.collectAsState()
-                when (mangaLoadState) {
+                when (val state = mangaLoadState) {
                     LoadState.Loading -> LoadingView()
-                    is LoadState.Failure -> ErrorView("Manga error") { viewModel.refreshReader() }
+                    is LoadState.Failure -> ErrorView(state.exception) { viewModel.refreshReader() }
                     LoadState.Loaded -> {
                         val pointer by viewModel.chapterPointer.collectAsState()
                         Reader(pointer)
@@ -79,9 +81,9 @@ private fun Reader(pointer: ReaderViewModel.ReaderChapterPointer) {
             initialOffscreenLimit = 3
         )
 
-        when (pointer.currChapter.state) {
+        when (val state = pointer.currChapter.state) {
             LoadState.Loading -> LoadingView()
-            is LoadState.Failure -> ErrorView(message = "Chapter error") { }
+            is LoadState.Failure -> ErrorView(state.exception) { }
             LoadState.Loaded -> ReaderContent(pagerState, pointer)
         }
 

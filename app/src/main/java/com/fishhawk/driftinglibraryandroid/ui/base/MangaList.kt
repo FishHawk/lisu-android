@@ -7,7 +7,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -40,10 +39,7 @@ fun RefreshableMangaList(
 ) {
     when (val state = mangaList.loadState.refresh) {
         is LoadState.Loading -> LoadingView()
-        is LoadState.Error -> ErrorView(
-            message = state.error.localizedMessage ?: "",
-            onClickRetry = { mangaList.retry() }
-        )
+        is LoadState.Error -> ErrorView(state.error) { mangaList.retry() }
         is LoadState.NotLoading -> {
             val isRefreshing = mangaList.loadState.refresh is LoadState.Loading
             SwipeRefresh(
@@ -97,10 +93,7 @@ private fun MangaList(
         when (val state = mangaList.loadState.append) {
             is LoadState.Loading -> item { LoadingItem() }
             is LoadState.Error -> item {
-                ErrorItem(
-                    message = state.error.localizedMessage!!,
-                    onClickRetry = { mangaList.retry() }
-                )
+                ErrorItem(state.error) { mangaList.retry() }
             }
         }
     }
