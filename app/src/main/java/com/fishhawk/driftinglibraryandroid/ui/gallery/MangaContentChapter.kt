@@ -136,51 +136,52 @@ fun ChapterListGrid(
     chapterMark: ChapterMark? = null,
     onChapterClick: OnChapterClickListener
 ) {
-    val nColumns = 4
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        val order by PR.chapterDisplayOrder.collectAsState()
         collections.mapIndexed { collectionIndex, it ->
             if (it.chapters.isEmpty()) return@mapIndexed
+
             if (it.id.isNotBlank()) {
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(2.dp),
                     text = it.id,
+                    style = MaterialTheme.typography.body2,
                     textAlign = TextAlign.Center
                 )
             }
 
+            val nColumns = 4
             val rows = (it.chapters.size + nColumns - 1) / nColumns
             (0..rows).map { rowIndex ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     for (columnIndex in 0 until nColumns) {
-                        val chapterIndex = rowIndex * nColumns + columnIndex
-                        if (chapterIndex < it.chapters.size) {
+                        val cellIndex = rowIndex * nColumns + columnIndex
+                        if (cellIndex < it.chapters.size) {
+                            val chapterIndex = when (order) {
+                                ChapterDisplayOrder.Ascend -> cellIndex
+                                ChapterDisplayOrder.Descend -> it.chapters.size - cellIndex - 1
+                            }
+
                             Box(
-                                modifier = Modifier.weight(1f, fill = true),
+                                modifier = Modifier.weight(1f),
                                 propagateMinConstraints = true
                             ) {
                                 val chapter = it.chapters[chapterIndex]
-                                if (chapterMark != null &&
-                                    chapterMark.collectionIndex == collectionIndex &&
-                                    chapterMark.chapterIndex == chapterIndex
-                                ) {
-                                    ChapterGrid(chapter, true) {
-                                        onChapterClick(
-                                            collectionIndex,
-                                            chapterIndex,
-                                            chapterMark.pageIndex
-                                        )
-                                    }
-                                } else {
-                                    ChapterGrid(chapter, false) {
-                                        onChapterClick(collectionIndex, chapterIndex, 0)
-                                    }
+                                val isMarked = chapterMark != null &&
+                                        chapterMark.collectionIndex == collectionIndex &&
+                                        chapterMark.chapterIndex == chapterIndex
+
+                                ChapterGrid(chapter, isMarked) {
+                                    onChapterClick(
+                                        collectionIndex,
+                                        chapterIndex,
+                                        if (isMarked) chapterMark!!.pageIndex else 0
+                                    )
                                 }
                             }
                         } else {

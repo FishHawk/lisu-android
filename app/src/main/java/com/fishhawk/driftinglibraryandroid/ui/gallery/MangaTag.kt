@@ -76,7 +76,7 @@ private fun Tag(
     ) {
         Text(
             modifier = Modifier
-                .padding(2.dp)
+                .padding(top = 4.dp, bottom = 4.dp, start = 8.dp, end = 8.dp)
                 .combinedClickable(
                     onClick = { onTagClick(value) },
                     onLongClick = { onTagLongClick(value) }
