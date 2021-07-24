@@ -128,7 +128,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:entries="@array/color_filter_mode_entries"
+        android:entries="@array/settings_filter_mode"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/vertical_center"
         app:layout_constraintTop_toBottomOf="@id/color_filter_A" />

@@ -148,7 +148,7 @@ private fun MangaInfo(navController: NavHostController, detail: MangaDetail) {
         val context = LocalContext.current
         detail.title.let {
             Box(modifier = Modifier.weight(1f)) {
-                val defaultTextStyle = MaterialTheme.typography.subtitle1.copy(fontSize = 18.sp)
+                val defaultTextStyle = MaterialTheme.typography.h6
                 var textStyle by remember { mutableStateOf(defaultTextStyle) }
                 Text(
                     modifier = Modifier

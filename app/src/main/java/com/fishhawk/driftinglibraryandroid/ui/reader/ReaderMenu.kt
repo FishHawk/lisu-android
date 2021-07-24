@@ -117,7 +117,7 @@ private fun ReaderMenuTop(name: String, title: String) {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 Text(
                     text = "$name $title",
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.body2,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = Color.White

@@ -64,7 +64,6 @@ private fun DeleteMangaDialog(isOpen: MutableState<Boolean>, id: String) {
     val viewModel = hiltViewModel<LibraryViewModel>()
     if (isOpen.value) {
         AlertDialog(
-            modifier = Modifier.fillMaxWidth(0.8f),
             onDismissRequest = { isOpen.value = false },
             title = { Text(text = "Confirm to delete manga?") },
             confirmButton = {

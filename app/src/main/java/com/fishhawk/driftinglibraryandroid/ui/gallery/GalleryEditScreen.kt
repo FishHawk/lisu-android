@@ -72,10 +72,7 @@ private fun Content(navController: NavHostController) {
                 enumValues<MangaStatus>().forEach {
                     RadioButton(
                         selected = (it == status.value),
-                        onClick = { status.value = it },
-                        colors = RadioButtonDefaults.colors(
-                            selectedColor = MaterialTheme.colors.primary
-                        )
+                        onClick = { status.value = it }
                     )
                     Text(
                         text = it.toString(),

@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
@@ -22,6 +23,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.data.datastore.HistoryFilter
 import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.Preference
 import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataOutline
@@ -29,6 +31,7 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaCover
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.more.ListPreferenceDialog
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import kotlinx.coroutines.launch
@@ -54,7 +57,17 @@ private fun ToolBar() {
         IconButton(onClick = { isOpen1.value = true }) {
             Icon(Icons.Filled.FilterList, stringResource(R.string.menu_filter))
         }
-        FilterSwitchDialog(isOpen1)
+        ListPreferenceDialog(
+            isOpen = isOpen1,
+            title = stringResource(R.string.dialog_filter_history),
+            preference = PR.historyFilter
+        ) {
+            when (it) {
+                HistoryFilter.All -> R.string.settings_history_filter_all
+                HistoryFilter.FromLibrary -> R.string.settings_history_filter_from_library
+                HistoryFilter.FromProvider -> R.string.settings_history_filter_from_provider
+            }
+        }
 
         val isOpen2 = remember { mutableStateOf(false) }
         IconButton(onClick = { isOpen2.value = true }) {
@@ -121,7 +134,7 @@ private fun HistoryListCard(navController: NavHostController, history: ReadingHi
             ) {
                 Text(
                     text = history.title,
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -164,48 +177,6 @@ private fun ClearHistoryDialog(isOpen: MutableState<Boolean>) {
                     Text(stringResource(R.string.dialog_clear_history_positive))
                 }
             }
-        )
-    }
-}
-
-@Composable
-private fun FilterSwitchDialog(isOpen: MutableState<Boolean>) {
-    if (isOpen.value) {
-        val viewModel = hiltViewModel<HistoryViewModel>()
-        AlertDialog(
-            onDismissRequest = { isOpen.value = false },
-            title = { Text(text = stringResource(R.string.dialog_filter_history)) },
-            text = {
-                val optionEntries = stringArrayResource(R.array.settings_history_filter_entries)
-                val selectedOption by PR.historyFilter.collectAsState()
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    enumValues<HistoryFilter>().forEachIndexed { index, it ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    viewModel.viewModelScope.launch { PR.historyFilter.set(it) }
-                                }
-                        ) {
-                            RadioButton(
-                                selected = (it == selectedOption),
-                                onClick = {
-                                    viewModel.viewModelScope.launch { PR.historyFilter.set(it) }
-                                },
-                                colors = RadioButtonDefaults.colors(
-                                    selectedColor = MaterialTheme.colors.primary
-                                )
-                            )
-                            Text(
-                                text = optionEntries[index],
-                                style = MaterialTheme.typography.body1,
-                                modifier = Modifier.padding(start = 16.dp)
-                            )
-                        }
-                    }
-                }
-            },
-            confirmButton = { }
         )
     }
 }

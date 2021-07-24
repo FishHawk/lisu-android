@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -43,7 +44,10 @@ fun MangaContentChapter(
     val viewModel = hiltViewModel<GalleryViewModel>()
 
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text("Chapters:", style = MaterialTheme.typography.subtitle1)
+        Text(
+            "Chapters:",
+            style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium)
+        )
         Spacer(modifier = Modifier.weight(1f, fill = true))
         IconButton(onClick = { viewModel.viewModelScope.launch { PR.chapterDisplayOrder.setNext() } }) {
             Icon(Icons.Filled.Sort, contentDescription = "Order")

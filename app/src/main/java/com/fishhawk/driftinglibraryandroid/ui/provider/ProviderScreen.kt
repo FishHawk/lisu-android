@@ -31,7 +31,6 @@ import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -197,8 +196,8 @@ private fun OptionGroupList(
 
     val option: Option = mutableMapOf()
     optionModel.map { (name, options) ->
-        val selectedIndex by viewModel.getOptionHistory(page, name).flow.collectAsState(-1)
-        option[name] = selectedIndex
+        val selectedIndex by viewModel.getOptionHistory(page, name).flow.collectAsState(null)
+        selectedIndex?.let { option[name] = it }
         FlowRow(
             modifier = Modifier.padding(bottom = 8.dp),
             mainAxisSpacing = 4.dp,
@@ -220,5 +219,5 @@ private fun OptionGroupList(
             }
         }
     }
-    if (optionModel.isNotEmpty()) mangaList.selectOption(option)
+    if (optionModel.keys.size == option.keys.size) mangaList.selectOption(option)
 }

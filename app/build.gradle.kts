@@ -138,8 +138,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
 
-    implementation("androidx.preference:preference-ktx:1.1.1")
-
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
 
     // Restful

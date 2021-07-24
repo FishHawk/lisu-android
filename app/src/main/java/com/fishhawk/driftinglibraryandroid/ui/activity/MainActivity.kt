@@ -37,7 +37,7 @@ import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryScreen
 import com.fishhawk.driftinglibraryandroid.ui.globalsearch.GlobalSearchScreen
 import com.fishhawk.driftinglibraryandroid.ui.history.HistoryScreen
 import com.fishhawk.driftinglibraryandroid.ui.library.LibraryScreen
-import com.fishhawk.driftinglibraryandroid.ui.more.MoreScreen
+import com.fishhawk.driftinglibraryandroid.ui.more.*
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderScreen
 import com.fishhawk.driftinglibraryandroid.ui.search.SearchScreen
 import com.fishhawk.driftinglibraryandroid.ui.server.ServerScreen
@@ -113,6 +113,10 @@ private fun MainNavHost(
         composable("search/{providerId}") { SearchScreen(navController) }
 
         composable("server") { ServerScreen(navController) }
+        composable("setting-general") { SettingGeneralScreen(navController) }
+        composable("setting-reader") { SettingReaderScreen(navController) }
+        composable("setting-advanced") { SettingAdvancedScreen(navController) }
+        composable("about") { AboutScreen(navController) }
 
         navigation(startDestination = "detail", route = "gallery/{mangaId}") {
             composable("detail") { GalleryScreen(navController) }

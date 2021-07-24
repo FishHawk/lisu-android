@@ -24,7 +24,6 @@ fun ServerEditDialog(
 
     if (isOpen.value) {
         AlertDialog(
-            modifier = Modifier.fillMaxWidth(0.8f),
             onDismissRequest = { isOpen.value = false },
             title = { Text(text = if (serverInfo == null) "Add server" else "Edit server") },
             text = {
