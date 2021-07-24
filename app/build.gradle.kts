@@ -1,5 +1,5 @@
 import java.io.FileInputStream
-import java.util.Properties
+import java.util.*
 
 plugins {
     id("com.android.application")
@@ -92,11 +92,11 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.0.0-rc02")
     implementation("androidx.compose.runtime:runtime-livedata:1.0.0-rc02")
 
+    implementation("androidx.datastore:datastore-preferences:1.0.0-rc01")
+
     implementation("androidx.room:room-runtime:2.3.0")
     implementation("androidx.room:room-ktx:2.3.0")
     kapt("androidx.room:room-compiler:2.3.0")
-
-    implementation("androidx.preference:preference-ktx:1.1.1")
 
     implementation("androidx.paging:paging-runtime-ktx:3.0.0")
     implementation("androidx.paging:paging-compose:1.0.0-alpha11")
@@ -134,16 +134,13 @@ dependencies {
     implementation("androidx.core:core-ktx:1.6.0")
 
     implementation("androidx.activity:activity-ktx:1.3.0-rc02")
-    implementation("androidx.fragment:fragment-ktx:1.4.0-alpha04")
 
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
 
-    implementation("androidx.cardview:cardview:1.0.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
+    implementation("androidx.preference:preference-ktx:1.1.1")
 
-    // Flow
-    implementation("com.github.tfcporciuncula.flow-preferences:flow-preferences:1.4.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
 
     // Restful
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

@@ -2,8 +2,9 @@ package com.fishhawk.driftinglibraryandroid.ui.explore
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.data.preference.P
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -11,7 +12,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 
 class RefreshHandle<T>(
     private val scope: CoroutineScope,
@@ -60,6 +60,6 @@ class ExploreViewModel @Inject constructor(
 ) : ViewModel() {
     val providerList = RefreshHandle(
         viewModelScope,
-        P.selectedServer.asFlow().map { suspend { remoteProviderRepository.listProvider() } }
+        PR.selectedServer.flow.map { suspend { remoteProviderRepository.listProvider() } }
     )
 }

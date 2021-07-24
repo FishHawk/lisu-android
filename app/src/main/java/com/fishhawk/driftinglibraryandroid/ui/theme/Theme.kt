@@ -11,7 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
-import com.fishhawk.driftinglibraryandroid.data.preference.P
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.Theme
+import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
@@ -20,12 +22,12 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun ApplicationTheme(content: @Composable () -> Unit) {
-    val theme by P.theme.asFlow().collectAsState(P.theme.get())
+    val theme by PR.theme.collectAsState()
 
     MaterialTheme(
         colors = when (theme) {
-            P.Theme.LIGHT -> ColorsLight
-            P.Theme.DARK -> ColorsDark
+            Theme.Light -> ColorsLight
+            Theme.Dark -> ColorsDark
         },
         typography = Typography
     ) {

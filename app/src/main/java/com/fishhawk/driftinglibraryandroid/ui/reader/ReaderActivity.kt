@@ -14,7 +14,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.fishhawk.driftinglibraryandroid.data.preference.P
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.ReaderOrientation
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.base.ErrorView
 import com.fishhawk.driftinglibraryandroid.ui.base.LoadingView
@@ -31,23 +32,23 @@ class ReaderActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        P.screenOrientation.asFlow()
+        PR.readerOrientation.flow
             .onEach {
                 val newOrientation = when (it) {
-                    P.ScreenOrientation.PORTRAIT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    P.ScreenOrientation.LANDSCAPE -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    ReaderOrientation.Portrait -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    ReaderOrientation.Landscape -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                 }
                 if (newOrientation != requestedOrientation) requestedOrientation = newOrientation
             }
             .launchIn(lifecycleScope)
 
-        P.keepScreenOn.asFlow()
+        PR.keepScreenOn.flow
             .onEach { setFlag(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, it) }
             .launchIn(lifecycleScope)
 
         combine(
-            P.customBrightness.asFlow(),
-            P.customBrightnessValue.asFlow()
+            PR.enableCustomBrightness.flow,
+            PR.customBrightness.flow
         ) { isEnabled, brightness ->
             val attrBrightness =
                 if (isEnabled) brightness.coerceIn(0, 100) / 100f

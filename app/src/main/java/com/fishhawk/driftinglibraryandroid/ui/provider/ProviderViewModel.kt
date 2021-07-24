@@ -1,16 +1,16 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider
 
-import androidx.lifecycle.*
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
-import dagger.assisted.Assisted
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,11 +19,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.collections.List
-import kotlin.collections.MutableMap
-import kotlin.collections.filterKeys
-import kotlin.collections.isNotEmpty
-import kotlin.collections.mutableMapOf
 import kotlin.collections.set
 
 typealias Option = MutableMap<String, Int>
@@ -78,6 +73,7 @@ class ProviderMangaList(
 class ProviderViewModel @Inject constructor(
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
+    private val providerBrowseHistoryRepository: ProviderBrowseHistoryRepository,
     savedStateHandle: SavedStateHandle
 ) : FeedbackViewModel() {
 
@@ -118,4 +114,9 @@ class ProviderViewModel @Inject constructor(
         )
         resultWarp(result) { feed(R.string.successfully_add_to_library) }
     }
+
+    val pageHistory = providerBrowseHistoryRepository.getPageHistory(provider.id)
+
+    fun getOptionHistory(page: Int, optionName: String) =
+        providerBrowseHistoryRepository.getOptionHistory(provider.id, page, optionName)
 }

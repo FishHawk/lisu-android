@@ -1,11 +1,17 @@
 package com.fishhawk.driftinglibraryandroid.ui.history
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.data.preference.P
+import com.fishhawk.driftinglibraryandroid.data.datastore.HistoryFilter
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.get
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,17 +22,17 @@ class HistoryViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val historyList =
         combine(
-            P.historyFilter.asFlow(),
-            P.selectedServer.asFlow().flatMapLatest { repository.list(it) }
+            PR.historyFilter.flow,
+            PR.selectedServer.flow.flatMapLatest { repository.list(it) }
         ) { mode, list ->
             when (mode) {
-                P.HistoryFilter.ALL -> list
-                P.HistoryFilter.FROM_LIBRARY -> list.filter { it.providerId == null }
-                P.HistoryFilter.FROM_SOURCES -> list.filter { it.providerId != null }
+                HistoryFilter.All -> list
+                HistoryFilter.FromLibrary -> list.filter { it.providerId == null }
+                HistoryFilter.FromProvider -> list.filter { it.providerId != null }
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
 
     fun clearReadingHistory() = viewModelScope.launch {
-        repository.clear(P.selectedServer.get())
+        repository.clear(PR.selectedServer.get())
     }
 }

@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.data.preference.P
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
@@ -44,9 +44,9 @@ class GalleryViewModel @Inject constructor(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
-    val history = readingHistoryRepository
-        .select(P.selectedServer.get(), mangaId)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+    val history = PR.selectedServer.flow.flatMapLatest {
+        readingHistoryRepository.select(it, mangaId)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     fun refreshManga() = viewModelScope.launch {
         _isRefreshing.value = true

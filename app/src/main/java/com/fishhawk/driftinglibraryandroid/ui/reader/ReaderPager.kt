@@ -21,8 +21,9 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
-import com.fishhawk.driftinglibraryandroid.data.preference.P
-import com.fishhawk.driftinglibraryandroid.data.preference.collectAsState
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.ReaderMode
+import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.util.interceptor.ProgressInterceptor
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -38,16 +39,16 @@ fun PagerReader(
     pages: List<String>,
     onTap: ((Offset) -> Unit)? = null
 ) {
-    val isPageIntervalEnabled by P.isPageIntervalEnabled.collectAsState()
+    val isPageIntervalEnabled by PR.isPageIntervalEnabled.collectAsState()
     val itemSpacing = if (isPageIntervalEnabled) 16.dp else 0.dp
 
-    val readerDirection by P.readingDirection.collectAsState()
+    val readerDirection by PR.readerMode.collectAsState()
     val layoutDirection =
-        if (readerDirection == P.ReadingDirection.RTL) LayoutDirection.Rtl
+        if (readerDirection == ReaderMode.Rtl) LayoutDirection.Rtl
         else LayoutDirection.Ltr
 
     CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
-        if (readerDirection == P.ReadingDirection.VERTICAL) {
+        if (readerDirection == ReaderMode.Vertical) {
             VerticalPager(state = state, itemSpacing = itemSpacing) { index ->
                 Page(position = index.plus(1), url = pages[index], onTap = onTap)
             }

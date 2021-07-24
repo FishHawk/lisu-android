@@ -22,11 +22,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.fishhawk.driftinglibraryandroid.data.preference.P
-import com.fishhawk.driftinglibraryandroid.data.preference.collectAsState
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.ReaderMode
+import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
+import com.fishhawk.driftinglibraryandroid.data.datastore.setNext
 import com.fishhawk.driftinglibraryandroid.ui.base.findActivity
-import com.fishhawk.driftinglibraryandroid.util.setNext
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
@@ -37,7 +39,7 @@ fun BoxScope.ReaderInfoBar(name: String, title: String, position: Int, size: Int
     val viewModel = viewModel<ReaderViewModel>()
     val isMenuOpened by viewModel.isMenuOpened.collectAsState()
 
-    val showInfoBar by P.showInfoBar.collectAsState()
+    val showInfoBar by PR.showInfoBar.collectAsState()
     if (!showInfoBar || isMenuOpened) return
 
     val infoBarText =
@@ -131,9 +133,9 @@ private fun ReaderMenuBottom(size: Int, pagerState: PagerState) {
     val viewModel = viewModel<ReaderViewModel>()
 
     Column {
-        val readingDirection by P.readingDirection.collectAsState()
+        val readingDirection by PR.readerMode.collectAsState()
         val layoutDirection =
-            if (readingDirection == P.ReadingDirection.RTL) LayoutDirection.Rtl
+            if (readingDirection == ReaderMode.Rtl) LayoutDirection.Rtl
             else LayoutDirection.Ltr
 
         CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
@@ -220,26 +222,25 @@ private fun ReaderMenuBottom(size: Int, pagerState: PagerState) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             val context = LocalContext.current
-            val scope = rememberCoroutineScope()
 
             IconButton(modifier = Modifier.weight(1f), onClick = {
-                P.readingDirection.setNext()
+                viewModel.viewModelScope.launch { PR.readerMode.setNext() }
             }) {
                 val icon = when (readingDirection) {
-                    P.ReadingDirection.LTR -> Icons.Filled.ArrowForward
-                    P.ReadingDirection.RTL -> Icons.Filled.ArrowBack
-                    P.ReadingDirection.VERTICAL -> Icons.Filled.ArrowDownward
-                    P.ReadingDirection.CONTINUOUS -> Icons.Filled.Expand
+                    ReaderMode.Ltr -> Icons.Filled.ArrowForward
+                    ReaderMode.Rtl -> Icons.Filled.ArrowBack
+                    ReaderMode.Vertical -> Icons.Filled.ArrowDownward
+                    ReaderMode.Continuous -> Icons.Filled.Expand
                 }
                 Icon(icon, "setting", tint = Color.White)
             }
 
             IconButton(modifier = Modifier.weight(1f), onClick = {
-                P.screenOrientation.setNext()
+                viewModel.viewModelScope.launch { PR.readerOrientation.setNext() }
             }) { Icon(Icons.Filled.ScreenRotation, null, tint = Color.White) }
 
             IconButton(modifier = Modifier.weight(1f), onClick = {
-                ReaderOverlaySheet(context, scope).apply {
+                ReaderOverlaySheet(context, viewModel.viewModelScope).apply {
                     setOnDismissListener { viewModel.isMenuOpened.value = true }
                     viewModel.isMenuOpened.value = false
                     window?.setDimAmount(0f)
@@ -247,7 +248,7 @@ private fun ReaderMenuBottom(size: Int, pagerState: PagerState) {
             }) { Icon(Icons.Filled.BrightnessMedium, "color-filter", tint = Color.White) }
 
             IconButton(modifier = Modifier.weight(1f), onClick = {
-                ReaderSettingsSheet(context).show()
+                ReaderSettingsSheet(context, viewModel.viewModelScope).show()
             }) { Icon(Icons.Filled.Settings, "setting", tint = Color.White) }
         }
     }

@@ -20,11 +20,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.preference.P
-import com.fishhawk.driftinglibraryandroid.data.preference.collectAsState
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
 import com.fishhawk.driftinglibraryandroid.ui.base.ErrorView
@@ -33,6 +34,7 @@ import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
@@ -83,7 +85,7 @@ private fun ProviderList(
     providers: List<ProviderInfo>,
     navHostController: NavHostController
 ) {
-    val lastUsedProvider by P.lastUsedProvider.collectAsState()
+    val lastUsedProvider by PR.lastUsedProvider.collectAsState()
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 8.dp, end = 8.dp),
@@ -114,7 +116,10 @@ private fun ProviderListHeader(label: String) {
 
 @Composable
 private fun ProviderCard(navController: NavHostController, provider: ProviderInfo) {
-    Card(modifier = Modifier.clickable { navController.navToProvider(provider) }) {
+    val viewModel = hiltViewModel<ExploreViewModel>()
+    Card(modifier = Modifier.clickable {
+        viewModel.viewModelScope.launch { navController.navToProvider(provider) }
+    }) {
         Row(
             modifier = Modifier.padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -137,8 +142,8 @@ private fun ProviderCard(navController: NavHostController, provider: ProviderInf
     }
 }
 
-private fun NavHostController.navToProvider(provider: ProviderInfo) {
-    P.lastUsedProvider.set(provider.id)
+private suspend fun NavHostController.navToProvider(provider: ProviderInfo) {
+    PR.lastUsedProvider.set(provider.id)
     currentBackStackEntry?.arguments =
         bundleOf("provider" to provider)
     navigate("provider/${provider.id}")

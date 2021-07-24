@@ -1,12 +1,12 @@
 package com.fishhawk.driftinglibraryandroid.data.remote.service
 
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
 import retrofit2.http.QueryMap
 
 interface RemoteProviderService {

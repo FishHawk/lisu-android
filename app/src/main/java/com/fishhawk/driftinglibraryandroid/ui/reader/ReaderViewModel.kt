@@ -1,10 +1,12 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
-import androidx.lifecycle.*
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.data.preference.P
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.get
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
@@ -207,7 +209,7 @@ class ReaderViewModel @Inject constructor(
             val readingHistory =
                 ReadingHistory(
                     mangaId,
-                    P.selectedServer.get(),
+                    PR.selectedServer.get(),
                     mangaDetail.value!!.getOrNull()!!.title,
                     mangaDetail.value!!.getOrNull()!!.cover ?: "",
                     providerId,

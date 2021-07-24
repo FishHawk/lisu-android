@@ -18,11 +18,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.fishhawk.driftinglibraryandroid.data.preference.P
-import com.fishhawk.driftinglibraryandroid.data.preference.collectAsState
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
+import com.fishhawk.driftinglibraryandroid.data.datastore.*
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Chapter
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ChapterCollection
-import com.fishhawk.driftinglibraryandroid.util.setNext
+import kotlinx.coroutines.launch
 
 typealias OnChapterClickListener = (collectionIndex: Int, chapterIndex: Int, pageIndex: Int) -> Unit
 
@@ -38,29 +39,30 @@ fun MangaContentChapter(
     chapterMark: ChapterMark? = null,
     onChapterClick: OnChapterClickListener
 ) {
-    val mode by P.chapterDisplayMode.collectAsState()
+    val mode by PR.chapterDisplayMode.collectAsState()
+    val viewModel = hiltViewModel<GalleryViewModel>()
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text("Chapters:", style = MaterialTheme.typography.subtitle1)
         Spacer(modifier = Modifier.weight(1f, fill = true))
-        IconButton(onClick = { P.run { chapterDisplayOrder.setNext() } }) {
+        IconButton(onClick = { viewModel.viewModelScope.launch { PR.chapterDisplayOrder.setNext() } }) {
             Icon(Icons.Filled.Sort, contentDescription = "Order")
         }
 
-        IconButton(onClick = { P.run { chapterDisplayMode.setNext() } }) {
+        IconButton(onClick = { viewModel.viewModelScope.launch { PR.chapterDisplayMode.setNext() } }) {
             val icon = when (mode) {
-                P.ChapterDisplayMode.GRID -> Icons.Filled.ViewModule
-                P.ChapterDisplayMode.LINEAR -> Icons.Filled.ViewList
+                ChapterDisplayMode.Grid -> Icons.Filled.ViewModule
+                ChapterDisplayMode.Linear -> Icons.Filled.ViewList
             }
             Icon(icon, contentDescription = "Display mode")
         }
     }
 
     when (mode) {
-        P.ChapterDisplayMode.GRID -> ChapterListGrid(
+        ChapterDisplayMode.Grid -> ChapterListGrid(
             collections, chapterMark, onChapterClick
         )
-        P.ChapterDisplayMode.LINEAR -> ChapterListLinear(
+        ChapterDisplayMode.Linear -> ChapterListLinear(
             collections, chapterMark, onChapterClick
         )
     }
@@ -72,12 +74,12 @@ fun ChapterListLinear(
     chapterMark: ChapterMark? = null,
     onChapterClick: OnChapterClickListener
 ) {
-    val order by P.chapterDisplayOrder.collectAsState()
+    val order by PR.chapterDisplayOrder.collectAsState()
     val chapters = collections.flatMapIndexed { collectionIndex, collection ->
         collection.chapters.mapIndexed { chapterIndex, chapter ->
             Triple(collectionIndex, chapterIndex, chapter)
         }.let {
-            if (order == P.ChapterDisplayOrder.DESCEND) it.asReversed() else it
+            if (order == ChapterDisplayOrder.Descend) it.asReversed() else it
         }
     }
     Column(modifier = Modifier.fillMaxWidth()) {

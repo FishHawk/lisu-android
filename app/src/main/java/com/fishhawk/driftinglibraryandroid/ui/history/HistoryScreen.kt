@@ -16,11 +16,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.data.preference.P
-import com.fishhawk.driftinglibraryandroid.data.preference.collectAsState
+import com.fishhawk.driftinglibraryandroid.data.datastore.HistoryFilter
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
@@ -29,6 +31,7 @@ import com.fishhawk.driftinglibraryandroid.ui.base.MangaCover
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
@@ -168,22 +171,27 @@ private fun ClearHistoryDialog(isOpen: MutableState<Boolean>) {
 @Composable
 private fun FilterSwitchDialog(isOpen: MutableState<Boolean>) {
     if (isOpen.value) {
+        val viewModel = hiltViewModel<HistoryViewModel>()
         AlertDialog(
             onDismissRequest = { isOpen.value = false },
             title = { Text(text = stringResource(R.string.dialog_filter_history)) },
             text = {
                 val optionEntries = stringArrayResource(R.array.settings_history_filter_entries)
-                val selectedOption by P.historyFilter.collectAsState()
+                val selectedOption by PR.historyFilter.collectAsState()
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    enumValues<P.HistoryFilter>().forEachIndexed { index, it ->
+                    enumValues<HistoryFilter>().forEachIndexed { index, it ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { P.historyFilter.set(it) }
+                                .clickable {
+                                    viewModel.viewModelScope.launch { PR.historyFilter.set(it) }
+                                }
                         ) {
                             RadioButton(
                                 selected = (it == selectedOption),
-                                onClick = { P.historyFilter.set(it) },
+                                onClick = {
+                                    viewModel.viewModelScope.launch { PR.historyFilter.set(it) }
+                                },
                                 colors = RadioButtonDefaults.colors(
                                     selectedColor = MaterialTheme.colors.primary
                                 )

@@ -15,8 +15,9 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.Velocity
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.fishhawk.driftinglibraryandroid.data.preference.P
-import com.fishhawk.driftinglibraryandroid.data.preference.collectAsState
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.ReaderMode
+import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -74,13 +75,13 @@ fun ReaderContent(
         else viewModel.moveToPrevChapter()
     }
 
-    val readerDirection by P.readingDirection.collectAsState()
-    val isRtl = readerDirection == P.ReadingDirection.RTL
+    val readerDirection by PR.readerMode.collectAsState()
+    val isRtl = readerDirection == ReaderMode.Rtl
     fun toLeft() = if (isRtl) toNext() else toPrev()
     fun toRight() = if (isRtl) toPrev() else toNext()
 
-    val useVolumeKey by P.useVolumeKey.collectAsState()
-    val invertVolumeKey by P.invertVolumeKey.collectAsState()
+    val useVolumeKey by PR.useVolumeKey.collectAsState()
+    val invertVolumeKey by PR.invertVolumeKey.collectAsState()
 
     val focusRequester = remember { FocusRequester() }
 
@@ -96,15 +97,15 @@ fun ReaderContent(
             ): Offset {
                 if (source == NestedScrollSource.Drag) {
                     when (readerDirection) {
-                        P.ReadingDirection.LTR -> {
+                        ReaderMode.Ltr -> {
                             prepareToNext = available.x < -10
                             prepareToPrev = available.x > 10
                         }
-                        P.ReadingDirection.RTL -> {
+                        ReaderMode.Rtl -> {
                             prepareToNext = available.x > 10
                             prepareToPrev = available.x < -10
                         }
-                        P.ReadingDirection.VERTICAL -> {
+                        ReaderMode.Vertical -> {
                             prepareToNext = available.y < -10
                             prepareToPrev = available.y > 10
                         }

@@ -1,11 +1,11 @@
 package com.fishhawk.driftinglibraryandroid.data.remote
 
-import retrofit2.Retrofit
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.data.remote.service.RemoteProviderService
+import retrofit2.Retrofit
 import java.net.URLEncoder
 
 class RemoteProviderRepository : BaseRemoteRepository<RemoteProviderService>() {

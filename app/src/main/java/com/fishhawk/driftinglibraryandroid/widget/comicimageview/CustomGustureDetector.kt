@@ -1,7 +1,9 @@
 package com.fishhawk.driftinglibraryandroid.widget.comicimageview
 
 import android.content.Context
-import android.view.*
+import android.view.GestureDetector
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.ScaleGestureDetector.OnScaleGestureListener
 
 internal class CustomGestureDetector(

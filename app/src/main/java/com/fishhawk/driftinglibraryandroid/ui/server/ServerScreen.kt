@@ -18,14 +18,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
-import com.fishhawk.driftinglibraryandroid.data.preference.P
-import com.fishhawk.driftinglibraryandroid.data.preference.collectAsState
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
+import kotlinx.coroutines.launch
 
 @Composable
 fun ServerScreen(navController: NavHostController) {
@@ -54,9 +56,12 @@ private fun ToolBar(navController: NavHostController) {
 private fun Content() {
     val viewModel = hiltViewModel<ServerViewModel>()
     val serverList by viewModel.serverList.collectAsState()
-    if (serverList.size == 1) P.selectedServer.set(serverList.first().id)
 
-    val selectedServer by P.selectedServer.collectAsState()
+    LaunchedEffect(serverList.size) {
+        if (serverList.size == 1) PR.selectedServer.set(serverList.first().id)
+    }
+
+    val selectedServer by PR.selectedServer.collectAsState()
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -74,7 +79,7 @@ private fun ServerInfoCard(info: ServerInfo, selected: Boolean) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { P.selectedServer.set(info.id) }
+            .clickable { viewModel.viewModelScope.launch { PR.selectedServer.set(info.id) } }
     ) {
         Row(
             modifier = Modifier.height(IntrinsicSize.Min),

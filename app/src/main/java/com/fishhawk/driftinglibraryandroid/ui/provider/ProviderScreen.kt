@@ -6,10 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -19,10 +16,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.preference.ProviderBrowseHistory
+import com.fishhawk.driftinglibraryandroid.data.datastore.get
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.OptionModel
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
@@ -33,7 +31,9 @@ import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -43,16 +43,12 @@ fun ProviderScreen(navController: NavHostController) {
     navController.currentBackStackEntry!!.arguments!!.putParcelable("provider", providerInfo)
 
     val viewModel = hiltViewModel<ProviderViewModel>()
-    val browseHistory = ProviderBrowseHistory(LocalContext.current)
+    val initialPage = remember { runBlocking { viewModel.pageHistory.get().coerceIn(0, 2) } }
+    val pagerState = rememberPagerState(pageCount = 3, initialPage = initialPage)
+    LaunchedEffect(pagerState.currentPage) {
+        viewModel.pageHistory.set(pagerState.currentPage)
+    }
 
-    val pagerState = rememberPagerState(
-        pageCount = 3,
-        initialPage = browseHistory.getPageHistory(viewModel.provider.id).coerceIn(0, 2)
-    )
-    browseHistory.setPageHistory(
-        viewModel.provider.id,
-        pagerState.currentPage
-    )
     Scaffold(
         topBar = { ToolBar(pagerState, navController) },
         content = {
@@ -198,13 +194,10 @@ private fun OptionGroupList(
     optionModel: OptionModel
 ) {
     val viewModel = hiltViewModel<ProviderViewModel>()
-    val browseHistory = ProviderBrowseHistory(LocalContext.current)
 
     val option: Option = mutableMapOf()
     optionModel.map { (name, options) ->
-        val selectedIndex = browseHistory.getOptionHistory(
-            viewModel.provider.id, page, name
-        )
+        val selectedIndex by viewModel.getOptionHistory(page, name).flow.collectAsState(-1)
         option[name] = selectedIndex
         FlowRow(
             modifier = Modifier.padding(bottom = 8.dp),
@@ -214,11 +207,10 @@ private fun OptionGroupList(
             options.mapIndexed { index, option ->
                 Text(
                     modifier = Modifier.clickable {
-                        browseHistory.setOptionHistory(
-                            viewModel.provider.id,
-                            page, name, index
-                        )
-                        mangaList.selectOption(name, index)
+                        viewModel.viewModelScope.launch {
+                            viewModel.getOptionHistory(page, name).set(index)
+                            mangaList.selectOption(name, index)
+                        }
                     },
                     style = TextStyle(fontSize = 12.sp).merge(),
                     text = option,

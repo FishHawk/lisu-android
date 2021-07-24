@@ -11,7 +11,9 @@ import com.fishhawk.driftinglibraryandroid.data.database.ApplicationDatabase
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.database.ServerInfoRepository
 import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
-import com.fishhawk.driftinglibraryandroid.data.preference.P
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.PreferenceRepository
+import com.fishhawk.driftinglibraryandroid.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.util.interceptor.ProgressInterceptor
@@ -24,10 +26,10 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.*
-import okhttp3.Interceptor
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import okhttp3.OkHttpClient
-import okhttp3.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
@@ -40,8 +42,8 @@ class MainApplication : Application(), ImageLoaderFactory {
 
     override fun onCreate() {
         super.onCreate()
-        P.initialize(this)
-        P.selectedServer.asFlow()
+        PR = PreferenceRepository(this)
+        PR.selectedServer.flow
             .flatMapLatest { serverInfoRepository.select(it) }
             .onEach { AppModule.selectServer(it) }
             .launchIn(CoroutineScope(SupervisorJob() + Dispatchers.Main))
@@ -74,8 +76,8 @@ object AppModule {
     @Singleton
     fun provideProviderRepository() = remoteProviderRepository
 
-    @Singleton
     @Provides
+    @Singleton
     fun database(@ApplicationContext applicationContext: Context) =
         Room.databaseBuilder(
             applicationContext,
@@ -83,15 +85,20 @@ object AppModule {
             "Test.db"
         ).build()
 
-    @Singleton
     @Provides
+    @Singleton
     fun provideReadingHistoryRepository(db: ApplicationDatabase) =
         ReadingHistoryRepository(db.readingHistoryDao())
 
-    @Singleton
     @Provides
+    @Singleton
     fun provideServerInfoRepository(db: ApplicationDatabase) =
         ServerInfoRepository(db.serverInfoDao())
+
+    @Provides
+    @Singleton
+    fun provideProviderBrowseHistoryRepository(@ApplicationContext applicationContext: Context) =
+        ProviderBrowseHistoryRepository(applicationContext)
 
 
     fun selectServer(serverInfo: ServerInfo?) {

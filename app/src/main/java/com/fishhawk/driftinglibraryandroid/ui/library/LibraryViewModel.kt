@@ -3,7 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.library
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
-import com.fishhawk.driftinglibraryandroid.data.preference.P
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
@@ -29,7 +29,7 @@ class LibraryViewModel @Inject constructor(
     val mangaList =
         combine(
             keywords,
-            P.selectedServer.asFlow()
+            PR.selectedServer.flow
         ) { keywords, _ -> keywords }.flatMapLatest {
             Pager(PagingConfig(pageSize = 20)) {
                 LibraryMangaSource().also { source = it }

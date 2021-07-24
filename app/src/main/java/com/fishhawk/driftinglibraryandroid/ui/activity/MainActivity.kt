@@ -15,6 +15,8 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -27,7 +29,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.preference.P
+import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.StartScreen
 import com.fishhawk.driftinglibraryandroid.ui.explore.ExploreScreen
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryEditScreen
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryScreen
@@ -42,6 +45,8 @@ import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
 import com.google.accompanist.insets.ui.BottomNavigation
 import com.google.accompanist.insets.ui.Scaffold
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 sealed class Screen(val route: String, val labelResId: Int, val icon: ImageVector) {
     object Library : Screen("library", R.string.label_library, Icons.Filled.CollectionsBookmark)
@@ -82,14 +87,18 @@ private fun MainNavHost(
     navController: NavHostController,
     modifier: Modifier
 ) {
-    val startScreen = when (P.startScreen.get()) {
-        P.StartScreen.LIBRARY -> Screen.Library
-        P.StartScreen.HISTORY -> Screen.History
-        P.StartScreen.EXPLORE -> Screen.Explore
+    val startDestination by remember {
+        val startDestination = when (runBlocking { PR.startScreen.flow.first() }) {
+            StartScreen.Library -> Screen.Library
+            StartScreen.History -> Screen.History
+            StartScreen.Explore -> Screen.Explore
+        }.route
+        mutableStateOf(startDestination)
     }
+
     NavHost(
         navController = navController,
-        startDestination = startScreen.route,
+        startDestination = startDestination,
         modifier = modifier
     ) {
         composable(Screen.Library.route) { LibraryScreen(navController) }
