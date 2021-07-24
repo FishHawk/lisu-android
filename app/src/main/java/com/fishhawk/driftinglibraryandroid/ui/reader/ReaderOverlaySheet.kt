@@ -2,6 +2,8 @@ package com.fishhawk.driftinglibraryandroid.ui.reader
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
+import android.widget.AdapterView
 import android.widget.SeekBar
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.compose.foundation.Canvas
@@ -17,8 +19,6 @@ import com.fishhawk.driftinglibraryandroid.data.datastore.PR
 import com.fishhawk.driftinglibraryandroid.data.datastore.Preference
 import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.databinding.ReaderOverlaySheetBinding
-import com.fishhawk.driftinglibraryandroid.widget.SimpleSeekBarListener
-import com.fishhawk.driftinglibraryandroid.widget.SimpleSpinnerListener
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.CoroutineScope
@@ -101,7 +101,15 @@ class ReaderOverlaySheet(
         seekBar: SeekBar
     ) {
         preference.flow.onEach { seekBar.progress = it }.launchIn(scope)
-        seekBar.setOnSeekBarChangeListener(SimpleSeekBarListener { scope.launch { preference.set(it) } })
+        seekBar.setOnSeekBarChangeListener(
+            object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar, value: Int, fromUser: Boolean) {
+                    if (fromUser) scope.launch { preference.set(value) }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar) {}
+            })
     }
 
     private fun bindPreference(
@@ -117,8 +125,17 @@ class ReaderOverlaySheet(
         spinner: AppCompatSpinner
     ) {
         preference.flow.onEach { spinner.setSelection(it.ordinal, false) }.launchIn(scope)
-        spinner.onItemSelectedListener = SimpleSpinnerListener {
-            scope.launch { preference.set(enumValues<T>()[it]) }
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                scope.launch { preference.set(enumValues<T>()[position]) }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
 }
