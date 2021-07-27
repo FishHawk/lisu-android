@@ -353,15 +353,15 @@ class ComicImageViewAttacher(private val imageView: ComicImageView) : View.OnTou
         if (!isAreaInterpolationEnabled) return
         if (drawable.intrinsicWidth <= 0 || drawable.intrinsicHeight <= 0) return
 
-        val scale = matrix.getScale()
-        val bitmap = ScaleAlgorithm.scale(drawable.toBitmap(), initScale * fixScale * scale)
-        val newD = BitmapDrawable(imageView.context.resources, bitmap)
-        imageView.setImageDrawableMy(newD)
-
-        val (tx, ty) = matrix.getTranslate()
-        fixScale *= scale
-        matrix.setTranslate(tx, ty)
-        applyMatrix()
+//        val scale = matrix.getScale()
+//        val bitmap = ScaleAlgorithm.scale(drawable.toBitmap(), initScale * fixScale * scale)
+//        val newD = BitmapDrawable(imageView.context.resources, bitmap)
+//        imageView.setImageDrawableMy(newD)
+//
+//        val (tx, ty) = matrix.getTranslate()
+//        fixScale *= scale
+//        matrix.setTranslate(tx, ty)
+//        applyMatrix()
     }
 
     private fun applyMatrix() {

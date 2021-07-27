@@ -11,6 +11,7 @@ import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 import com.fishhawk.driftinglibraryandroid.data.remote.model.*
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import okhttp3.RequestBody
@@ -44,6 +45,7 @@ class GalleryViewModel @Inject constructor(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val history = PR.selectedServer.flow.flatMapLatest {
         readingHistoryRepository.select(it, mangaId)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)

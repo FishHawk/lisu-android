@@ -19,6 +19,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import coil.annotation.ExperimentalCoilApi
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import com.fishhawk.driftinglibraryandroid.data.datastore.PR
@@ -60,6 +61,7 @@ fun PagerReader(
     }
 }
 
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun Page(
     position: Int,

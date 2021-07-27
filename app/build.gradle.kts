@@ -74,6 +74,7 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
     }
 
     composeOptions {
@@ -139,8 +140,7 @@ dependencies {
 
 
     // Wait to remove
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation("com.google.android.material:material:1.5.0-alpha01")
-    implementation("com.quickbirdstudios:opencv:4.1.0")
+//    implementation("com.quickbirdstudios:opencv:4.1.0")
 }

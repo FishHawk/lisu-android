@@ -1,36 +1,47 @@
 package com.fishhawk.driftinglibraryandroid.ui.base
 
-import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 sealed class Feedback {
     class Hint(val resId: Int) : Feedback()
     class Failure(val exception: Throwable) : Feedback()
 }
 
-fun Context.feedback(feedback: Feedback) {
-    when (feedback) {
-        is Feedback.Hint -> toast(feedback.resId)
-        is Feedback.Failure -> toast(feedback.exception)
-    }
-}
-
 open class FeedbackViewModel : ViewModel() {
-    private val _feedback: MutableLiveData<Event<Feedback>> = MutableLiveData()
-    val feedback: LiveData<Event<Feedback>> = _feedback
+    private val _feedback = Channel<Feedback>()
+    val feedback = _feedback.receiveAsFlow()
 
     protected fun feed(resId: Int) {
-        _feedback.value = Event(Feedback.Hint(resId))
+        viewModelScope.launch { _feedback.send(Feedback.Hint(resId)) }
     }
 
     protected fun feed(throwable: Throwable) {
-        _feedback.value = Event(Feedback.Failure(throwable))
+        viewModelScope.launch { _feedback.send(Feedback.Failure(throwable)) }
     }
 
     protected fun <T> resultWarp(result: ResultX<T>, runIfSuccess: (T) -> Unit) {
         result.onSuccess { runIfSuccess(it) }.onFailure { feed(it) }
+    }
+}
+
+@Composable
+fun Feedback(viewModel: FeedbackViewModel) {
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.feedback.collect {
+            when (it) {
+                is Feedback.Hint -> context.toast(it.resId)
+                is Feedback.Failure -> context.toast(it.exception)
+            }
+        }
     }
 }

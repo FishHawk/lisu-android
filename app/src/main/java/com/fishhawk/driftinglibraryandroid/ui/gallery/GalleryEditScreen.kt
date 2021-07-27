@@ -53,7 +53,7 @@ private fun ToolBar(navController: NavHostController) {
 @Composable
 private fun Content(navController: NavHostController) {
     val viewModel = hiltViewModel<GalleryViewModel>(navController.getBackStackEntry("detail"))
-    val detail = viewModel.detail.value!!
+    val detail = viewModel.detail.value
 
     Card(modifier = Modifier.padding(16.dp)) {
         Column(
