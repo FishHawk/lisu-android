@@ -167,20 +167,20 @@ private fun ProviderPanel(
                 navController.navigate("gallery/${it.id}")
             },
             onCardLongClick = {
-                ProviderActionSheet(
-                    context,
-                    it,
-                    viewModel.provider.id,
-                    object : ProviderActionSheet.Listener {
-                        override fun onReadClick(outline: MangaOutline, provider: String) {
-                            context.navToReaderActivity(outline.id, viewModel.provider.id, 0, 0, 0)
-                        }
-
-                        override fun onLibraryAddClick(outline: MangaOutline, provider: String) {
-                            viewModel.addToLibrary(outline.id, outline.title)
-                        }
-                    }
-                ).show()
+//                ProviderActionSheet(
+//                    context,
+//                    it,
+//                    viewModel.provider.id,
+//                    object : ProviderActionSheet.Listener {
+//                        override fun onReadClick(outline: MangaOutline, provider: String) {
+//                            context.navToReaderActivity(outline.id, viewModel.provider.id, 0, 0, 0)
+//                        }
+//
+//                        override fun onLibraryAddClick(outline: MangaOutline, provider: String) {
+//                            viewModel.addToLibrary(outline.id, outline.title)
+//                        }
+//                    }
+//                ).show()
             }
         )
     }

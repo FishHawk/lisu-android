@@ -1,30 +1,26 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
-import android.content.Context
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.AdapterView
-import android.widget.SeekBar
-import androidx.appcompat.widget.AppCompatSpinner
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Icon
+import androidx.compose.material.Slider
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BrightnessHigh
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ExperimentalGraphicsApi
-import com.fishhawk.driftinglibraryandroid.data.datastore.ColorFilterMode
-import com.fishhawk.driftinglibraryandroid.data.datastore.PR
-import com.fishhawk.driftinglibraryandroid.data.datastore.Preference
-import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
-import com.fishhawk.driftinglibraryandroid.databinding.ReaderOverlaySheetBinding
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.switchmaterial.SwitchMaterial
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.dp
+import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.data.datastore.*
+import com.fishhawk.driftinglibraryandroid.ui.more.ListPreference
+import com.fishhawk.driftinglibraryandroid.ui.more.SwitchPreference
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalGraphicsApi::class)
 @Composable
@@ -47,10 +43,10 @@ fun ReaderColorFilterOverlay() {
         val l by PR.colorFilterL.collectAsState()
         val a by PR.colorFilterA.collectAsState()
         val color = Color.hsl(
-            h.coerceIn(0, 360).toFloat(),
-            s.coerceIn(0, 100).toFloat() / 100f,
-            l.coerceIn(0, 100).toFloat() / 100f,
-            a.coerceIn(0, 255).toFloat() / 255f
+            h.coerceIn(0f, 1f) * 360,
+            s.coerceIn(0f, 1f),
+            l.coerceIn(0f, 1f),
+            a.coerceIn(0f, 1f)
         )
 
         Canvas(modifier = Modifier.fillMaxSize()) {
@@ -59,83 +55,83 @@ fun ReaderColorFilterOverlay() {
     }
 }
 
-class ReaderOverlaySheet(
-    context: Context,
-    private val scope: CoroutineScope
-) : BottomSheetDialog(context) {
+@Composable
+fun ReaderOverlaySheet() {
+    Column(modifier = Modifier.padding(8.dp)) {
+        val colorFilterEnabled by PR.enabledColorFilter.collectAsState()
+        SwitchPreference(title = "Custom color filter", preference = PR.enabledColorFilter)
+        SliderPreference(colorFilterEnabled, label = "H", preference = PR.colorFilterH)
+        SliderPreference(colorFilterEnabled, label = "S", preference = PR.colorFilterS)
+        SliderPreference(colorFilterEnabled, label = "L", preference = PR.colorFilterL)
+        SliderPreference(colorFilterEnabled, label = "A", preference = PR.colorFilterA)
+        ListPreference(title = "Blend mode", preference = PR.colorFilterMode) {
+            when (it) {
+                ColorFilterMode.Default -> R.string.settings_filter_mode_default
+                ColorFilterMode.Multiply -> R.string.settings_filter_mode_multiply
+                ColorFilterMode.Screen -> R.string.settings_filter_mode_screen
+                ColorFilterMode.Overlay -> R.string.settings_filter_mode_overlay
+                ColorFilterMode.Lighten -> R.string.settings_filter_mode_lighten
+                ColorFilterMode.Darken -> R.string.settings_filter_mode_darken
+            }
+        }
 
-    private val binding = ReaderOverlaySheetBinding.inflate(
-        LayoutInflater.from(context), null, false
-    )
-
-    init {
-        bindPreference(PR.enabledColorFilter, binding.colorFilterSwitch)
-        bindPreference(PR.colorFilterH, binding.colorFilterH)
-        bindPreference(PR.colorFilterS, binding.colorFilterS)
-        bindPreference(PR.colorFilterL, binding.colorFilterL)
-        bindPreference(PR.colorFilterA, binding.colorFilterA)
-        bindPreference(PR.colorFilterMode, binding.colorFilterMode)
-
-        bindPreference(PR.enableCustomBrightness, binding.customBrightnessSwitch)
-        bindPreference(PR.customBrightness, binding.customBrightnessValue)
-
-        PR.enabledColorFilter.flow
-            .onEach {
-                binding.colorFilterH.isEnabled = it
-                binding.colorFilterS.isEnabled = it
-                binding.colorFilterL.isEnabled = it
-                binding.colorFilterA.isEnabled = it
-                binding.colorFilterMode.isEnabled = it
-            }.launchIn(scope)
-
-        PR.enableCustomBrightness.flow
-            .onEach { binding.customBrightnessValue.isEnabled = it }
-            .launchIn(scope)
-
-        setContentView(binding.root)
+        val enableCustomBrightness by PR.enableCustomBrightness.collectAsState()
+        SwitchPreference(
+            title = "Custom color filter",
+            preference = PR.enableCustomBrightness
+        )
+        SliderPreference(
+            enableCustomBrightness,
+            icon = Icons.Filled.BrightnessHigh,
+            preference = PR.customBrightness
+        )
     }
+}
 
-
-    private fun bindPreference(
-        preference: Preference<Int>,
-        seekBar: SeekBar
+@Composable
+private fun SliderPreference(
+    enabled: Boolean,
+    label: String,
+    preference: Preference<Float>
+) {
+    Row(
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        preference.flow.onEach { seekBar.progress = it }.launchIn(scope)
-        seekBar.setOnSeekBarChangeListener(
-            object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar, value: Int, fromUser: Boolean) {
-                    if (fromUser) scope.launch { preference.set(value) }
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar) {}
-                override fun onStopTrackingTouch(seekBar: SeekBar) {}
+        val scope = rememberCoroutineScope()
+        var p by remember { mutableStateOf(runBlocking { preference.get() }) }
+        Text(text = label)
+        Slider(
+            modifier = Modifier.height(36.dp),
+            enabled = enabled,
+            value = p,
+            onValueChange = {
+                p = it
+                scope.launch { preference.set(it) }
             })
     }
+}
 
-    private fun bindPreference(
-        preference: Preference<Boolean>,
-        switch: SwitchMaterial
+@Composable
+private fun SliderPreference(
+    enabled: Boolean,
+    icon: ImageVector,
+    preference: Preference<Float>
+) {
+    Row(
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        preference.flow.onEach { switch.isChecked = it }.launchIn(scope)
-        switch.setOnCheckedChangeListener { _, it -> scope.launch { preference.set(it) } }
-    }
-
-    private inline fun <reified T : Enum<T>> bindPreference(
-        preference: Preference<T>,
-        spinner: AppCompatSpinner
-    ) {
-        preference.flow.onEach { spinner.setSelection(it.ordinal, false) }.launchIn(scope)
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                scope.launch { preference.set(enumValues<T>()[position]) }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
+        val scope = rememberCoroutineScope()
+        var p by remember { mutableStateOf(runBlocking { preference.get() }) }
+        Icon(icon, contentDescription = null)
+        Slider(
+            modifier = Modifier.height(36.dp),
+            enabled = enabled,
+            value = p,
+            onValueChange = {
+                p = it
+                scope.launch { preference.set(it) }
+            })
     }
 }

@@ -49,13 +49,13 @@ class PreferenceRepository(context: Context) {
 
     val enabledColorFilter by store.get("enableColorFilter", false)
     val colorFilterMode by store.get("colorFilterMode", ColorFilterMode.Default)
-    val colorFilterH by store.get("colorFilterH", 0)
-    val colorFilterS by store.get("colorFilterS", 50)
-    val colorFilterL by store.get("colorFilterL", 50)
-    val colorFilterA by store.get("colorFilterA", 127)
+    val colorFilterH by store.get("colorFilterH", 0f)
+    val colorFilterS by store.get("colorFilterS", 0.5f)
+    val colorFilterL by store.get("colorFilterL", 0.5f)
+    val colorFilterA by store.get("colorFilterA", 0.5f)
 
     val enableCustomBrightness by store.get("enableCustomBrightness", false)
-    val customBrightness by store.get("customBrightness", 10)
+    val customBrightness by store.get("customBrightness", 0.1f)
 }
 
 lateinit var PR: PreferenceRepository

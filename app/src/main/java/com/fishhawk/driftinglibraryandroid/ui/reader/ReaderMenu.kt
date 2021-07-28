@@ -240,15 +240,11 @@ private fun ReaderMenuBottom(size: Int, pagerState: PagerState) {
             }) { Icon(Icons.Filled.ScreenRotation, null, tint = Color.White) }
 
             IconButton(modifier = Modifier.weight(1f), onClick = {
-                ReaderOverlaySheet(context, viewModel.viewModelScope).apply {
-                    setOnDismissListener { viewModel.isMenuOpened.value = true }
-                    viewModel.isMenuOpened.value = false
-                    window?.setDimAmount(0f)
-                }.show()
+                openSheet(BottomSheet.ColorFilterSheet)
             }) { Icon(Icons.Filled.BrightnessMedium, "color-filter", tint = Color.White) }
 
             IconButton(modifier = Modifier.weight(1f), onClick = {
-                ReaderSettingsSheet(context, viewModel.viewModelScope).show()
+                openSheet(BottomSheet.SettingSheet)
             }) { Icon(Icons.Filled.Settings, "setting", tint = Color.White) }
         }
     }

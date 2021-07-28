@@ -1,77 +1,52 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery
 
-import android.content.Context
-import android.view.LayoutInflater
-import androidx.core.view.isVisible
-import com.fishhawk.driftinglibraryandroid.databinding.GalleryCoverSheetBinding
-import com.google.android.material.bottomsheet.BottomSheetDialog
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.SaveAlt
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 
-class GalleryCoverSheet(
-    context: Context,
-    private val listener: Listener
-) : BottomSheetDialog(context) {
-    private val binding = GalleryCoverSheetBinding.inflate(
-        LayoutInflater.from(context), null, false
-    )
-
-    var isFromProvider = false
-        set(value) {
-            field = value
-            updateVisibility()
+@Preview
+@Composable
+fun ReaderPageSheet() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        TextButton(onClick = { }) {
+            Row {
+                Icon(Icons.Filled.Edit, null)
+                Text("Edit metadata")
+            }
         }
-
-    var hasSource = false
-        set(value) {
-            field = value
-            updateVisibility()
+        TextButton(onClick = { }) {
+            Row {
+                Icon(Icons.Filled.Edit, null)
+                Text("Edit cover")
+            }
         }
-
-    private fun updateVisibility() {
-        binding.editCoverButton.isVisible = !isFromProvider
-        binding.syncSourceButton.isVisible = !isFromProvider && hasSource
-        binding.deleteSourceButton.isVisible = !isFromProvider && hasSource
-    }
-
-    init {
-        setContentView(binding.root)
-
-        binding.syncSourceButton.setOnClickListener {
-            listener.onSyncSource()
-            dismiss()
+        TextButton(onClick = { }) {
+            Row {
+                Icon(Icons.Filled.SaveAlt, null)
+                Text("Save cover")
+            }
         }
-
-        binding.deleteSourceButton.setOnClickListener {
-            listener.onDeleteSource()
-            dismiss()
+        TextButton(onClick = { }) {
+            Row {
+                Icon(Icons.Filled.Share, null)
+                Text("Share cover")
+            }
         }
-
-        binding.editMetadataButton.setOnClickListener {
-            listener.onEditMetadata()
-            dismiss()
-        }
-
-        binding.editCoverButton.setOnClickListener {
-            listener.onEditCover()
-            dismiss()
-        }
-
-        binding.saveCoverButton.setOnClickListener {
-            listener.onSaveCover()
-            dismiss()
-        }
-
-        binding.shareCoverButton.setOnClickListener {
-            listener.onShareCover()
-            dismiss()
-        }
-    }
-
-    interface Listener {
-        fun onSyncSource()
-        fun onDeleteSource()
-        fun onEditMetadata()
-        fun onEditCover()
-        fun onSaveCover()
-        fun onShareCover()
     }
 }

@@ -8,10 +8,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fishhawk.driftinglibraryandroid.data.datastore.PR
@@ -26,9 +26,20 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+
+sealed class BottomSheet() {
+    object SettingSheet : BottomSheet()
+    object ColorFilterSheet : BottomSheet()
+    class PageSheet(val argument: String) : BottomSheet()
+}
+
+lateinit var openSheet: (BottomSheet) -> Unit
+lateinit var closeSheet: () -> Unit
 
 @AndroidEntryPoint
 class ReaderActivity : BaseActivity() {
+    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -51,24 +62,54 @@ class ReaderActivity : BaseActivity() {
             PR.customBrightness.flow
         ) { isEnabled, brightness ->
             val attrBrightness =
-                if (isEnabled) brightness.coerceIn(0, 100) / 100f
+                if (isEnabled) brightness.coerceIn(0f, 1f)
                 else BRIGHTNESS_OVERRIDE_NONE
             window.attributes = window.attributes.apply { screenBrightness = attrBrightness }
         }.launchIn(lifecycleScope)
 
         setContent {
             ApplicationTheme {
-                val viewModel = viewModel<ReaderViewModel>()
-                val mangaLoadState by viewModel.mangaLoadState.collectAsState()
-                when (val state = mangaLoadState) {
-                    LoadState.Loading -> LoadingView()
-                    is LoadState.Failure -> ErrorView(state.exception) { viewModel.refreshReader() }
-                    LoadState.Loaded -> {
-                        val pointer by viewModel.chapterPointer.collectAsState()
-                        Reader(pointer)
+                val scope = rememberCoroutineScope()
+                val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+                var currentBottomSheet by remember { mutableStateOf<BottomSheet?>(null) }
+
+                openSheet = { it: BottomSheet ->
+                    scope.launch {
+                        currentBottomSheet = it
+                        sheetState.show()
                     }
                 }
+
+                closeSheet = { scope.launch { sheetState.hide() } }
+
+                ModalBottomSheetLayout(
+                    sheetState = sheetState,
+                    sheetContent = {
+                        when (currentBottomSheet) {
+                            BottomSheet.ColorFilterSheet -> ReaderOverlaySheet()
+                            BottomSheet.SettingSheet -> ReaderSettingsSheet()
+                            else -> {
+                                Text("test")
+                            }
+                        }
+                    },
+                    scrimColor = if (currentBottomSheet == BottomSheet.ColorFilterSheet) Color.Transparent else ModalBottomSheetDefaults.scrimColor
+                ) { ReaderScreen() }
             }
+        }
+    }
+}
+
+@Composable
+private fun ReaderScreen() {
+    val viewModel = viewModel<ReaderViewModel>()
+    val mangaLoadState by viewModel.mangaLoadState.collectAsState()
+    when (val state = mangaLoadState) {
+        LoadState.Loading -> LoadingView()
+        is LoadState.Failure -> ErrorView(state.exception) { viewModel.refreshReader() }
+        LoadState.Loaded -> {
+            val pointer by viewModel.chapterPointer.collectAsState()
+            Reader(pointer)
         }
     }
 }

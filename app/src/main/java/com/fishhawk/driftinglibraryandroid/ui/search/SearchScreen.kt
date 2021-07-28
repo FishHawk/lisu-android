@@ -13,11 +13,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableMangaList
-import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
-import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderActionSheet
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 
@@ -62,20 +59,20 @@ private fun Content(navController: NavHostController) {
             navController.navigate("gallery/${it.id}")
         },
         onCardLongClick = {
-            ProviderActionSheet(
-                context,
-                it,
-                viewModel.provider.id,
-                object : ProviderActionSheet.Listener {
-                    override fun onReadClick(outline: MangaOutline, provider: String) {
-                        context.navToReaderActivity(outline.id, viewModel.provider.id, 0, 0, 0)
-                    }
-
-                    override fun onLibraryAddClick(outline: MangaOutline, provider: String) {
-                        viewModel.addToLibrary(outline.id, outline.title)
-                    }
-                }
-            ).show()
+//            ProviderActionSheet(
+//                context,
+//                it,
+//                viewModel.provider.id,
+//                object : ProviderActionSheet.Listener {
+//                    override fun onReadClick(outline: MangaOutline, provider: String) {
+//                        context.navToReaderActivity(outline.id, viewModel.provider.id, 0, 0, 0)
+//                    }
+//
+//                    override fun onLibraryAddClick(outline: MangaOutline, provider: String) {
+//                        viewModel.addToLibrary(outline.id, outline.title)
+//                    }
+//                }
+//            ).show()
         }
     )
 }
