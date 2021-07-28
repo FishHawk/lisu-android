@@ -61,7 +61,6 @@ android {
     }
 
     buildFeatures {
-        viewBinding = true
         compose = true
     }
 
@@ -70,7 +69,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-
 
     kotlinOptions {
         jvmTarget = "1.8"
@@ -85,7 +83,8 @@ android {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
 
-    implementation("androidx.activity:activity-ktx:1.3.0-rc02")
+    implementation("androidx.activity:activity-compose:1.3.0-rc02")
+    implementation("androidx.appcompat:appcompat:1.4.0-alpha03")
 
     implementation("androidx.compose.ui:ui:1.0.0-rc02")
     implementation("androidx.compose.ui:ui-tooling:1.0.0-rc02")
@@ -138,8 +137,5 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.0-rc02")
 
-
-    // Wait to remove
-    implementation("com.google.android.material:material:1.5.0-alpha01")
-//    implementation("com.quickbirdstudios:opencv:4.1.0")
+    // implementation("com.quickbirdstudios:opencv:4.1.0")
 }
