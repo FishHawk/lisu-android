@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -17,10 +18,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.data.datastore.HistoryFilter
-import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
@@ -86,7 +87,7 @@ private fun HistoryList(navController: NavHostController) {
             .groupBy { Date(it.date).toInstant().atZone(ZoneId.systemDefault()).toLocalDate() }
             .forEach { (then, list) ->
                 item { HistoryListHeader(then) }
-                items(list, { it.mangaId }) { HistoryListCard(navController, it) }
+                items(list, { it.mangaId }) { HistoryListItem(navController, it) }
             }
     }
 }
@@ -111,44 +112,40 @@ private fun HistoryListHeader(then: LocalDate) {
 }
 
 @Composable
-private fun HistoryListCard(navController: NavHostController, history: ReadingHistory) {
-    Card(
+private fun HistoryListItem(navController: NavHostController, history: ReadingHistory) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(88.dp)
-            .clickable { navController.navToReader(history) }
+            .clickable { navController.navToReader(history) },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row {
-            MangaCover(
-                modifier = Modifier.clickable { navController.navToGallery(history) },
-                cover = history.cover
+        MangaCover(
+            modifier = Modifier.clickable { navController.navToGallery(history) },
+            cover = history.cover
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(
+                text = history.title,
+                style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
-            Column(
-                modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                Text(
-                    text = history.title,
-                    style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                val seen = listOf(
+                    history.collectionTitle,
+                    history.chapterTitle,
+                    stringResource(R.string.history_card_page, history.pageIndex.plus(1))
+                ).filter { it.isNotBlank() }.joinToString(" ")
+                Text(text = seen, style = MaterialTheme.typography.body2)
 
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    val seen = listOf(
-                        history.collectionTitle,
-                        history.chapterTitle,
-                        stringResource(R.string.history_card_page, history.pageIndex.plus(1))
-                    ).filter { it.isNotBlank() }.joinToString(" ")
-                    Text(text = seen, style = MaterialTheme.typography.body2)
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                        val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-                        val date = dateFormat.format(Date(history.date))
-                        Text(text = date, style = MaterialTheme.typography.body2)
-                        history.providerId?.let {
-                            Text(text = it, style = MaterialTheme.typography.body2)
-                        }
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                    val date = dateFormat.format(Date(history.date))
+                    Text(text = date, style = MaterialTheme.typography.body2)
+                    history.providerId?.let {
+                        Text(text = it, style = MaterialTheme.typography.body2)
                     }
                 }
             }

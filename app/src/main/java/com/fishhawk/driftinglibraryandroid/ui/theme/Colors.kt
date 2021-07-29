@@ -1,20 +1,44 @@
 package com.fishhawk.driftinglibraryandroid.ui.theme
 
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import kotlin.math.ln
+
+object MainElevationOverlay : ElevationOverlay {
+    @ReadOnlyComposable
+    @Composable
+    override fun apply(color: Color, elevation: Dp): Color {
+        val colors = MaterialTheme.colors
+        return if (elevation > 0.dp && !colors.isLight) {
+            val foregroundColor = calculateForegroundColor(color, elevation)
+            foregroundColor.compositeOver(color)
+        } else {
+            color
+        }
+    }
+}
+
+@ReadOnlyComposable
+@Composable
+private fun calculateForegroundColor(backgroundColor: Color, elevation: Dp): Color {
+    val alpha = ((1f * ln(elevation.value + 1)) + 2f) / 100f
+    val baseForegroundColor = contentColorFor(backgroundColor)
+    return baseForegroundColor.copy(alpha = alpha)
+}
+
 
 val ColorsLight = lightColors(
     primary = MaterialColors.BlueA400,
     primaryVariant = MaterialColors.BlueA400,
     secondary = MaterialColors.BlueA400,
     secondaryVariant = MaterialColors.BlueA400,
-    surface = Color.White,
     background = MaterialColors.Gray50,
-    onPrimary = MaterialColors.White,
-    onSecondary = MaterialColors.White,
-    onBackground = Color(0xDE000000),
-    onSurface = Color(0xDE000000),
+    surface = MaterialColors.White,
 )
 
 val ColorsDark = darkColors(
@@ -22,12 +46,8 @@ val ColorsDark = darkColors(
     primaryVariant = Color(0xFF3399FF),
     secondary = Color(0xFF3399FF),
     secondaryVariant = Color(0xFF3399FF),
-    surface = Color(0xFF121212),
-    background = Color(0xFF121212),
-    onPrimary = MaterialColors.White,
-    onSecondary = MaterialColors.White,
-    onBackground = MaterialColors.White,
-    onSurface = MaterialColors.White,
+    background = Color(0xFF212121),
+    surface = Color(0xFF212121),
 )
 
 @Suppress("unused")

@@ -24,22 +24,24 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 fun ApplicationTheme(content: @Composable () -> Unit) {
     val theme by PR.theme.collectAsState()
 
-    MaterialTheme(
-        colors = when (theme) {
-            Theme.Light -> ColorsLight
-            Theme.Dark -> ColorsDark
-        },
-        typography = Typography
-    ) {
-        val systemUiController = rememberSystemUiController()
-        val useDarkIcons = MaterialTheme.colors.isLight
-        SideEffect {
-            systemUiController.setSystemBarsColor(Color.Transparent, useDarkIcons)
-            systemUiController.setNavigationBarColor(Color.Transparent, useDarkIcons)
-        }
+    CompositionLocalProvider(LocalElevationOverlay provides MainElevationOverlay) {
+        MaterialTheme(
+            colors = when (theme) {
+                Theme.Light -> ColorsLight
+                Theme.Dark -> ColorsDark
+            },
+            typography = Typography
+        ) {
+            val systemUiController = rememberSystemUiController()
+            val useDarkIcons = MaterialTheme.colors.isLight
+            SideEffect {
+                systemUiController.setSystemBarsColor(Color.Transparent, useDarkIcons)
+                systemUiController.setNavigationBarColor(Color.Transparent, useDarkIcons)
+            }
 
-        ProvideWindowInsets {
-            content()
+            ProvideWindowInsets {
+                content()
+            }
         }
     }
 }

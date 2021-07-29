@@ -14,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,8 +25,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
-import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.PR
+import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
@@ -89,17 +90,17 @@ private fun ProviderList(
     val lastUsedProvider by PR.lastUsedProvider.collectAsState()
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 8.dp, end = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(1.dp)
+        contentPadding = PaddingValues(8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         providers.find { it.id == lastUsedProvider }?.let {
             item { ProviderListHeader(stringResource(R.string.explore_last_used)) }
-            item { ProviderCard(navHostController, it) }
+            item { ProviderItem(navHostController, it) }
         }
         val providerMap = providers.groupBy { it.lang }
         providerMap.map { (lang, list) ->
             item { ProviderListHeader(Locale(lang).displayLanguage) }
-            items(list) { ProviderCard(navHostController, it) }
+            items(list) { ProviderItem(navHostController, it) }
         }
     }
 }
@@ -109,37 +110,38 @@ private fun ProviderListHeader(label: String) {
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Text(
             text = label,
-            modifier = Modifier.padding(top = 12.dp, bottom = 12.dp),
+            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
             style = MaterialTheme.typography.subtitle2
         )
     }
 }
 
 @Composable
-private fun ProviderCard(navController: NavHostController, provider: ProviderInfo) {
+private fun ProviderItem(navController: NavHostController, provider: ProviderInfo) {
     val viewModel = hiltViewModel<ExploreViewModel>()
-    Card(modifier = Modifier.clickable {
-        viewModel.viewModelScope.launch { navController.navToProvider(provider) }
-    }) {
-        Row(
-            modifier = Modifier.padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Image(
-                modifier = Modifier.size(32.dp),
-                painter = rememberImagePainter(provider.icon) { crossfade(true) },
-                contentDescription = null,
-                contentScale = ContentScale.Crop
-            )
-            Text(
-                modifier = Modifier.weight(1f),
-                text = provider.name,
-                style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp)
+            .clickable {
+                viewModel.viewModelScope.launch { navController.navToProvider(provider) }
+            },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Image(
+            modifier = Modifier
+                .height(32.dp)
+                .aspectRatio(1f),
+            painter = rememberImagePainter(provider.icon) { crossfade(true) },
+            contentDescription = null
+        )
+        Text(
+            text = provider.name,
+            style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
