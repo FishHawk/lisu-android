@@ -1,6 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.activity
 
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -28,8 +29,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.PR
+import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.datastore.StartScreen
 import com.fishhawk.driftinglibraryandroid.ui.explore.ExploreScreen
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryEditScreen
@@ -156,5 +157,21 @@ private fun BottomNavigationBar(navController: NavHostController) {
                 )
             }
         }
+    }
+}
+
+fun <T : Parcelable> NavHostController.setArgument(key: String) {
+    previousBackStackEntry?.arguments?.let { prev ->
+        currentBackStackEntry?.arguments?.putParcelable(
+            key, prev.getParcelable<T>(key)
+        )
+    }
+}
+
+fun NavHostController.setString(key: String) {
+    previousBackStackEntry?.arguments?.let { prev ->
+        currentBackStackEntry?.arguments?.putString(
+            key, prev.getString(key)
+        )
     }
 }

@@ -22,6 +22,7 @@ import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.ui.activity.setString
 import com.fishhawk.driftinglibraryandroid.ui.base.ErrorItem
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListCard
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
@@ -29,9 +30,7 @@ import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 
 @Composable
 fun GlobalSearchScreen(navController: NavHostController) {
-    navController.previousBackStackEntry!!.arguments!!.getString("keywords").let {
-        navController.currentBackStackEntry!!.arguments!!.putString("keywords", it)
-    }
+    navController.setString("keywords")
 
     Scaffold(
         topBar = { ToolBar(navController) },

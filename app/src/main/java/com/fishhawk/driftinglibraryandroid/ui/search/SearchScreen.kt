@@ -13,19 +13,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.ui.activity.setArgument
+import com.fishhawk.driftinglibraryandroid.ui.activity.setString
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableMangaList
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 
 @Composable
 fun SearchScreen(navController: NavHostController) {
-    navController.previousBackStackEntry!!.arguments!!.getString("keywords").let {
-        navController.currentBackStackEntry!!.arguments!!.putString("keywords", it)
-    }
-    navController.previousBackStackEntry!!.arguments!!.getParcelable<ProviderInfo>("provider").let {
-        navController.currentBackStackEntry!!.arguments!!.putParcelable("provider", it)
-    }
+    navController.setString("keywords")
+    navController.setArgument<ProviderInfo>("provider")
 
     Scaffold(
         topBar = { ToolBar(navController) },

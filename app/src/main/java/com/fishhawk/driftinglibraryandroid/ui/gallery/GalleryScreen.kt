@@ -21,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.*
+import com.fishhawk.driftinglibraryandroid.ui.activity.setArgument
 import com.fishhawk.driftinglibraryandroid.ui.base.copyToClipboard
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.fishhawk.driftinglibraryandroid.ui.theme.MaterialColors
@@ -29,12 +30,8 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun GalleryScreen(navController: NavHostController) {
-    navController.previousBackStackEntry!!.arguments!!.getParcelable<MangaOutline>("outline").let {
-        navController.currentBackStackEntry!!.arguments!!.putParcelable("outline", it)
-    }
-    navController.previousBackStackEntry!!.arguments!!.getParcelable<ProviderInfo>("provider").let {
-        navController.currentBackStackEntry!!.arguments!!.putParcelable("provider", it)
-    }
+    navController.setArgument<MangaOutline>("outline")
+    navController.setArgument<ProviderInfo>("provider")
 
     ApplicationTransition {
         Column {
