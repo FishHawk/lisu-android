@@ -27,9 +27,6 @@ import coil.compose.rememberImagePainter
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.ui.base.copyToClipboard
-import com.fishhawk.driftinglibraryandroid.ui.base.saveImage
-import com.fishhawk.driftinglibraryandroid.ui.base.shareImage
-import com.fishhawk.driftinglibraryandroid.ui.base.toast
 import com.google.accompanist.insets.statusBarsPadding
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody

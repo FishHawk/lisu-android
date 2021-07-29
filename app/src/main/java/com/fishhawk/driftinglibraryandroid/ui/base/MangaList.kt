@@ -78,7 +78,7 @@ private fun MangaList(
                             propagateMinConstraints = true
                         ) {
                             MangaListCard(
-                                mangaList.getAsState(itemIndex).value,
+                                mangaList[itemIndex],
                                 onCardClick,
                                 onCardLongClick
                             )
