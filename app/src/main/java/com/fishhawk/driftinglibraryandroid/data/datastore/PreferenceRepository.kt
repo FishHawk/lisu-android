@@ -57,5 +57,3 @@ class PreferenceRepository(context: Context) {
     val enableCustomBrightness by store.get("enableCustomBrightness", false)
     val customBrightness by store.get("customBrightness", 0.1f)
 }
-
-lateinit var PR: PreferenceRepository

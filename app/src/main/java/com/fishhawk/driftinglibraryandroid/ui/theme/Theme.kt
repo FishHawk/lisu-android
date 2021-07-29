@@ -11,7 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
-import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.data.datastore.Theme
 import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.google.accompanist.insets.LocalWindowInsets

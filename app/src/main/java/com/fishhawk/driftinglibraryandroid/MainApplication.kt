@@ -10,8 +10,6 @@ import coil.util.CoilUtils
 import com.fishhawk.driftinglibraryandroid.data.database.ApplicationDatabase
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.database.ServerInfoRepository
-import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
-import com.fishhawk.driftinglibraryandroid.data.datastore.PR
 import com.fishhawk.driftinglibraryandroid.data.datastore.PreferenceRepository
 import com.fishhawk.driftinglibraryandroid.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
@@ -27,28 +25,23 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 
+lateinit var PR: PreferenceRepository
+
 @HiltAndroidApp
 class MainApplication : Application(), ImageLoaderFactory {
     @Inject
-    lateinit var serverInfoRepository: ServerInfoRepository
+    lateinit var pr: PreferenceRepository
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
-        PR = PreferenceRepository(this)
-        PR.selectedServer.flow
-            .flatMapLatest { serverInfoRepository.select(it) }
-            .onEach { AppModule.selectServer(it) }
-            .launchIn(CoroutineScope(SupervisorJob() + Dispatchers.Main))
+        PR = pr
     }
 
     override fun newImageLoader(): ImageLoader {
@@ -66,17 +59,52 @@ class MainApplication : Application(), ImageLoaderFactory {
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    private var selectedUrl: String? = null
-    private val remoteLibraryRepository = RemoteLibraryRepository()
-    private val remoteProviderRepository = RemoteProviderRepository()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Singleton
+    @Provides
+    fun provideRetrofit(
+        preferenceRepository: PreferenceRepository,
+        serverInfoRepository: ServerInfoRepository
+    ): StateFlow<Retrofit?> {
+        return preferenceRepository.selectedServer.flow
+            .flatMapLatest { serverInfoRepository.select(it) }
+            .distinctUntilChanged()
+            .map { server ->
+                val url = server.address.let {
+                    var newUrl = it
+                    newUrl = if (URLUtil.isNetworkUrl(newUrl)) newUrl else "http://${newUrl}"
+                    newUrl = if (newUrl.last() == '/') newUrl else "$newUrl/"
+                    newUrl
+                }
+
+                url.let {
+                    try {
+                        Retrofit.Builder()
+                            .baseUrl(url)
+                            .addConverterFactory(GsonConverterFactory.create())
+                            .build()
+                    } catch (e: Throwable) {
+                        null
+                    }
+                }
+            }
+            .stateIn(
+                CoroutineScope(SupervisorJob() + Dispatchers.Main),
+                SharingStarted.Eagerly,
+                null
+            )
+    }
 
     @Provides
     @Singleton
-    fun provideLibraryRepository() = remoteLibraryRepository
+    fun provideLibraryRepository(retrofit: StateFlow<Retrofit?>) =
+        RemoteLibraryRepository(retrofit)
 
     @Provides
     @Singleton
-    fun provideProviderRepository() = remoteProviderRepository
+    fun provideProviderRepository(retrofit: StateFlow<Retrofit?>) =
+        RemoteProviderRepository(retrofit)
 
     @Provides
     @Singleton
@@ -99,33 +127,11 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun preferenceRepository(@ApplicationContext applicationContext: Context) =
+        PreferenceRepository(applicationContext)
+
+    @Provides
+    @Singleton
     fun provideProviderBrowseHistoryRepository(@ApplicationContext applicationContext: Context) =
         ProviderBrowseHistoryRepository(applicationContext)
-
-
-    fun selectServer(serverInfo: ServerInfo?) {
-        val url = serverInfo?.address?.let {
-            var newUrl = it
-            newUrl = if (URLUtil.isNetworkUrl(newUrl)) newUrl else "http://${newUrl}"
-            newUrl = if (newUrl.last() == '/') newUrl else "$newUrl/"
-            newUrl
-        }
-
-        if (selectedUrl == url) return
-        else selectedUrl = url
-
-        val retrofit = url?.let {
-            try {
-                Retrofit.Builder()
-                    .baseUrl(url)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build()
-            } catch (e: Throwable) {
-                null
-            }
-        }
-
-        remoteLibraryRepository.connect(url, retrofit)
-        remoteProviderRepository.connect(url, retrofit)
-    }
 }

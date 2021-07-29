@@ -2,7 +2,6 @@ package com.fishhawk.driftinglibraryandroid.ui.explore
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.data.datastore.PR
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -56,10 +55,10 @@ class RefreshHandle<T>(
 
 @HiltViewModel
 class ExploreViewModel @Inject constructor(
-    private val remoteProviderRepository: RemoteProviderRepository
+    private val repository: RemoteProviderRepository
 ) : ViewModel() {
     val providerList = RefreshHandle(
         viewModelScope,
-        PR.selectedServer.flow.map { suspend { remoteProviderRepository.listProvider() } }
+        repository.serviceFlow.map { suspend { repository.listProvider() } }
     )
 }

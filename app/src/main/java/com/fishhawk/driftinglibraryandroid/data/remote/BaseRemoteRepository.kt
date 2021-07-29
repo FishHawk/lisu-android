@@ -1,5 +1,8 @@
 package com.fishhawk.driftinglibraryandroid.data.remote
 
+import kotlinx.coroutines.flow.StateFlow
+import retrofit2.Retrofit
+
 // Hack, see https://youtrack.jetbrains.com/issue/KT-46477#focus=Comments-27-4952485.0-0
 class ResultX<out T> internal constructor(internal val value: Any?) {
     val isSuccess: Boolean get() = value !is Failure
@@ -56,9 +59,14 @@ class ResultX<out T> internal constructor(internal val value: Any?) {
 internal fun createFailure(exception: Throwable): Any = ResultX.Failure(exception)
 
 
-open class BaseRemoteRepository<Service> {
-    var url: String? = null
-    var service: Service? = null
+abstract class BaseRemoteRepository<Service>(private val retrofit: StateFlow<Retrofit?>) {
+    val url: String?
+        get() = retrofit.value?.baseUrl()?.toUrl()?.toString()
+
+    abstract val serviceFlow: StateFlow<Service?>
+
+    val service
+        get() = serviceFlow.value
 
     protected inline fun <T> resultWrap(func: (Service) -> T): ResultX<T> {
         return service?.let {

@@ -29,7 +29,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.datastore.PR
+import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.data.datastore.StartScreen
 import com.fishhawk.driftinglibraryandroid.ui.explore.ExploreScreen
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryEditScreen

@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.datastore.PR
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
@@ -35,8 +34,8 @@ class SearchViewModel @Inject constructor(
 
     init {
         listOf(
-            PR.selectedServer.flow,
-            keywords
+            keywords,
+            remoteProviderRepository.serviceFlow
         ).forEach { it.onEach { source?.invalidate() }.launchIn(viewModelScope) }
     }
 
