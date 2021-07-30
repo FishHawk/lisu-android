@@ -117,13 +117,13 @@ fun ChapterLinear(
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
-            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
+            modifier = Modifier.padding(vertical = 16.dp),
             text = chapter.name,
             style = MaterialTheme.typography.subtitle2,
             color = if (isMarked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
         )
         Text(
-            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
+            modifier = Modifier.padding(vertical = 16.dp),
             text = chapter.title,
             style = MaterialTheme.typography.body1
         )
@@ -209,7 +209,7 @@ fun ChapterGrid(
         Text(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp, bottom = 8.dp, start = 2.dp, end = 2.dp),
+                .padding(horizontal = 2.dp, vertical = 8.dp),
             text = chapter.name,
             style = MaterialTheme.typography.body1.copy(fontSize = 12.sp),
             color = if (isMarked) Color.White else MaterialTheme.colors.onSurface,

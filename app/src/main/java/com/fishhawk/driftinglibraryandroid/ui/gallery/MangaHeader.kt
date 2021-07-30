@@ -131,7 +131,7 @@ private fun MangaInfo(navController: NavHostController, detail: MangaDetail) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 16.dp, bottom = 16.dp),
+            .padding(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         val context = LocalContext.current

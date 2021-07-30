@@ -31,7 +31,6 @@ import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.more.ListPreferenceDialog
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -73,6 +72,7 @@ private fun ToolBar() {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun HistoryList(navController: NavHostController) {
     val viewModel = hiltViewModel<HistoryViewModel>()
@@ -83,12 +83,12 @@ private fun HistoryList(navController: NavHostController) {
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         if (historyList.isEmpty()) item { EmptyView() }
-        historyList
-            .groupBy { Date(it.date).toInstant().atZone(ZoneId.systemDefault()).toLocalDate() }
-            .forEach { (then, list) ->
-                item { HistoryListHeader(then) }
-                items(list, { it.mangaId }) { HistoryListItem(navController, it) }
+        historyList.forEach { (then, list) ->
+            item { HistoryListHeader(then) }
+            items(list, { Pair(it.providerId, it.mangaId) }) {
+                HistoryListItem(navController, it)
             }
+        }
     }
 }
 
@@ -105,7 +105,7 @@ private fun HistoryListHeader(then: LocalDate) {
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Text(
             text = dateString,
-            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+            modifier = Modifier.padding(vertical = 8.dp),
             style = MaterialTheme.typography.subtitle2
         )
     }
@@ -137,12 +137,13 @@ private fun HistoryListItem(navController: NavHostController, history: ReadingHi
                     history.collectionTitle,
                     history.chapterTitle,
                     stringResource(R.string.history_card_page, history.pageIndex.plus(1))
-                ).filter { it.isNotBlank() }.joinToString(" ")
+                ).filter { it.isNotBlank() }.joinToString("-")
                 Text(text = seen, style = MaterialTheme.typography.body2)
 
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-                    val date = dateFormat.format(Date(history.date))
+                    val date =
+                        Date(history.date).toInstant().atZone(ZoneId.systemDefault()).toLocalTime()
+                            .format(DateTimeFormatter.ofPattern("H:mm"))
                     Text(text = date, style = MaterialTheme.typography.body2)
                     history.providerId?.let {
                         Text(text = it, style = MaterialTheme.typography.body2)

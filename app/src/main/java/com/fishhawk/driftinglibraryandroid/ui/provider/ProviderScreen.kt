@@ -1,6 +1,7 @@
 package com.fishhawk.driftinglibraryandroid.ui.provider
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
@@ -192,27 +193,28 @@ private fun OptionGroupList(
     val viewModel = hiltViewModel<ProviderViewModel>()
 
     val option: Option = mutableMapOf()
-    optionModel.map { (name, options) ->
-        val selectedIndex by viewModel.getOptionHistory(page, name).flow.collectAsState(null)
-        selectedIndex?.let { option[name] = it }
-        FlowRow(
-            modifier = Modifier.padding(bottom = 8.dp),
-            mainAxisSpacing = 4.dp,
-            crossAxisSpacing = 4.dp
-        ) {
-            options.mapIndexed { index, option ->
-                Text(
-                    modifier = Modifier.clickable {
-                        viewModel.viewModelScope.launch {
-                            viewModel.getOptionHistory(page, name).set(index)
-                            mangaList.selectOption(name, index)
-                        }
-                    },
-                    style = TextStyle(fontSize = 12.sp).merge(),
-                    text = option,
-                    color = if (index != selectedIndex) MaterialTheme.colors.onSurface
-                    else MaterialTheme.colors.primary
-                )
+    Column(
+        modifier = Modifier.padding(top = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        optionModel.map { (name, options) ->
+            val selectedIndex by viewModel.getOptionHistory(page, name).flow.collectAsState(null)
+            selectedIndex?.let { option[name] = it }
+            FlowRow(mainAxisSpacing = 4.dp, crossAxisSpacing = 2.dp) {
+                options.mapIndexed { index, option ->
+                    Text(
+                        modifier = Modifier.clickable {
+                            viewModel.viewModelScope.launch {
+                                viewModel.getOptionHistory(page, name).set(index)
+                                mangaList.selectOption(name, index)
+                            }
+                        },
+                        style = TextStyle(fontSize = 12.sp).merge(),
+                        text = option,
+                        color = if (index != selectedIndex) MaterialTheme.colors.onSurface
+                        else MaterialTheme.colors.primary
+                    )
+                }
             }
         }
     }

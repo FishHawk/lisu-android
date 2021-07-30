@@ -1,7 +1,10 @@
 package com.fishhawk.driftinglibraryandroid.ui.more
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -111,7 +114,7 @@ inline fun <reified T : Enum<T>> ListPreferenceDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { scope.launch { preference.set(it) } }
-                            .padding(top = 12.dp, bottom = 12.dp)
+                            .padding(vertical = 12.dp)
                     ) {
                         RadioButton(
                             selected = (it == selected),

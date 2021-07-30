@@ -98,7 +98,7 @@ private fun SliderPreference(
     preference: Preference<Float>
 ) {
     Row(
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+        modifier = Modifier.padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         val scope = rememberCoroutineScope()
@@ -122,7 +122,7 @@ private fun SliderPreference(
     preference: Preference<Float>
 ) {
     Row(
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+        modifier = Modifier.padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         val scope = rememberCoroutineScope()

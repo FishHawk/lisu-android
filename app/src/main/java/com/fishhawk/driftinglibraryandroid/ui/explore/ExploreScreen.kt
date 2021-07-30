@@ -108,7 +108,7 @@ private fun ProviderListHeader(label: String) {
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Text(
             text = label,
-            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp),
+            modifier = Modifier.padding(vertical = 8.dp),
             style = MaterialTheme.typography.subtitle2
         )
     }

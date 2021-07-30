@@ -50,7 +50,7 @@ fun BoxScope.ReaderInfoBar(name: String, title: String, position: Int, size: Int
         modifier = Modifier
             .align(Alignment.BottomEnd)
             .background(Color(0xAA000000))
-            .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(text = infoBarText, color = Color.White)
     }
@@ -166,7 +166,7 @@ private fun ReaderMenuBottom(size: Int, pagerState: PagerState) {
                     color = Color(0xAA000000)
                 ) {
                     Row(
-                        modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {

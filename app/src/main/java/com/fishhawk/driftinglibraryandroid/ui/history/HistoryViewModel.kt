@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.ZoneId
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,17 +22,20 @@ class HistoryViewModel @Inject constructor(
     private val repository: ReadingHistoryRepository
 ) : ViewModel() {
     @OptIn(ExperimentalCoroutinesApi::class)
-    val historyList =
-        combine(
-            PR.historyFilter.flow,
-            PR.selectedServer.flow.flatMapLatest { repository.list(it) }
-        ) { mode, list ->
+    val historyList = combine(
+        PR.historyFilter.flow,
+        PR.selectedServer.flow.flatMapLatest { repository.list(it) }
+    ) { mode, list ->
+        list.run {
             when (mode) {
-                HistoryFilter.All -> list
-                HistoryFilter.FromLibrary -> list.filter { it.providerId == null }
-                HistoryFilter.FromProvider -> list.filter { it.providerId != null }
+                HistoryFilter.All -> this
+                HistoryFilter.FromLibrary -> filter { it.providerId == null }
+                HistoryFilter.FromProvider -> filter { it.providerId != null }
             }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), listOf())
+        }.groupBy {
+            Date(it.date).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
     fun clearReadingHistory() = viewModelScope.launch {
         repository.clear(PR.selectedServer.get())
