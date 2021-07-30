@@ -6,6 +6,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -105,9 +106,11 @@ inline fun <reified T : Enum<T>> DataStore<Preferences>.get(
 @Composable
 fun <T> Preference<T>.collectAsState(
     context: CoroutineContext = EmptyCoroutineContext
-): State<T> = flow.collectAsState(defaultValue, context)
+): State<T> = flow.collectAsState(getBlocking(), context)
 
 suspend fun <T> Preference<T>.get(): T = flow.first()
+
+fun <T> Preference<T>.getBlocking(): T = runBlocking { get() }
 
 inline fun <reified T : Enum<T>> T.next(): T {
     val values = enumValues<T>()

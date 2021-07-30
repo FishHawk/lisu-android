@@ -93,8 +93,10 @@ class ReaderActivity : BaseActivity() {
                             }
                         }
                     },
-                    scrimColor = if (currentBottomSheet == BottomSheet.ColorFilterSheet) Color.Transparent else ModalBottomSheetDefaults.scrimColor
-                ) { ReaderScreen() }
+                    scrimColor = Color.Transparent
+                ) {
+                    Surface(modifier = Modifier.fillMaxSize()) { ReaderScreen() }
+                }
             }
         }
     }

@@ -17,11 +17,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.datastore.*
+import com.fishhawk.driftinglibraryandroid.data.datastore.ColorFilterMode
+import com.fishhawk.driftinglibraryandroid.data.datastore.Preference
+import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
+import com.fishhawk.driftinglibraryandroid.data.datastore.getBlocking
 import com.fishhawk.driftinglibraryandroid.ui.more.ListPreference
 import com.fishhawk.driftinglibraryandroid.ui.more.SwitchPreference
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalGraphicsApi::class)
 @Composable
@@ -100,7 +102,7 @@ private fun SliderPreference(
         verticalAlignment = Alignment.CenterVertically
     ) {
         val scope = rememberCoroutineScope()
-        var p by remember { mutableStateOf(runBlocking { preference.get() }) }
+        var p by remember { mutableStateOf(preference.getBlocking()) }
         Text(text = label)
         Slider(
             modifier = Modifier.height(36.dp),
@@ -124,7 +126,7 @@ private fun SliderPreference(
         verticalAlignment = Alignment.CenterVertically
     ) {
         val scope = rememberCoroutineScope()
-        var p by remember { mutableStateOf(runBlocking { preference.get() }) }
+        var p by remember { mutableStateOf(preference.getBlocking()) }
         Icon(icon, contentDescription = null)
         Slider(
             modifier = Modifier.height(36.dp),

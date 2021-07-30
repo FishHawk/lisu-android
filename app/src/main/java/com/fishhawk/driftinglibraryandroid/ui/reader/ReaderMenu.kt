@@ -146,11 +146,12 @@ private fun ReaderMenuBottom(size: Int, pagerState: PagerState) {
             ) {
                 val isOnlyOneChapter by viewModel.isOnlyOneChapter.collectAsState()
                 if (!isOnlyOneChapter)
-                    Surface(modifier = Modifier.size(48.dp), shape = CircleShape) {
-                        IconButton(
-                            modifier = Modifier.background(Color(0xAA000000)),
-                            onClick = { viewModel.openPrevChapter() }
-                        ) {
+                    Surface(
+                        modifier = Modifier.size(48.dp),
+                        shape = CircleShape,
+                        color = Color(0xAA000000)
+                    ) {
+                        IconButton(onClick = { viewModel.openPrevChapter() }) {
                             Icon(
                                 if (LocalLayoutDirection.current == LayoutDirection.Ltr)
                                     Icons.Filled.SkipPrevious else Icons.Filled.SkipNext,
@@ -161,12 +162,11 @@ private fun ReaderMenuBottom(size: Int, pagerState: PagerState) {
 
                 Surface(
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(24.dp)
+                    shape = RoundedCornerShape(24.dp),
+                    color = Color(0xAA000000)
                 ) {
                     Row(
-                        modifier = Modifier
-                            .background(Color(0xAA000000))
-                            .padding(start = 8.dp, end = 8.dp),
+                        modifier = Modifier.padding(start = 8.dp, end = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -199,11 +199,12 @@ private fun ReaderMenuBottom(size: Int, pagerState: PagerState) {
                 }
 
                 if (!isOnlyOneChapter)
-                    Surface(modifier = Modifier.size(48.dp), shape = CircleShape) {
-                        IconButton(
-                            modifier = Modifier.background(Color(0xAA000000)),
-                            onClick = { viewModel.openNextChapter() }
-                        ) {
+                    Surface(
+                        modifier = Modifier.size(48.dp),
+                        shape = CircleShape,
+                        color = Color(0xAA000000)
+                    ) {
+                        IconButton(onClick = { viewModel.openNextChapter() }) {
                             Icon(
                                 if (LocalLayoutDirection.current == LayoutDirection.Ltr)
                                     Icons.Filled.SkipNext else Icons.Filled.SkipPrevious,
@@ -216,7 +217,6 @@ private fun ReaderMenuBottom(size: Int, pagerState: PagerState) {
 
         Row(
             modifier = Modifier
-                .fillMaxWidth()
                 .background(Color(0xAA000000))
                 .padding(top = 4.dp),
             verticalAlignment = Alignment.CenterVertically

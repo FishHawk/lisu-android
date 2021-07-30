@@ -32,6 +32,7 @@ import androidx.navigation.navigation
 import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.datastore.StartScreen
+import com.fishhawk.driftinglibraryandroid.data.datastore.getBlocking
 import com.fishhawk.driftinglibraryandroid.ui.explore.ExploreScreen
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryEditScreen
 import com.fishhawk.driftinglibraryandroid.ui.gallery.GalleryScreen
@@ -46,8 +47,6 @@ import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
 import com.google.accompanist.insets.ui.BottomNavigation
 import com.google.accompanist.insets.ui.Scaffold
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 
 sealed class Screen(val route: String, val labelResId: Int, val icon: ImageVector) {
     object Library : Screen("library", R.string.label_library, Icons.Filled.CollectionsBookmark)
@@ -89,12 +88,13 @@ private fun MainNavHost(
     modifier: Modifier
 ) {
     val startDestination by remember {
-        val startDestination = when (runBlocking { PR.startScreen.flow.first() }) {
-            StartScreen.Library -> Screen.Library
-            StartScreen.History -> Screen.History
-            StartScreen.Explore -> Screen.Explore
-        }.route
-        mutableStateOf(startDestination)
+        mutableStateOf(
+            when (PR.startScreen.getBlocking()) {
+                StartScreen.Library -> Screen.Library
+                StartScreen.History -> Screen.History
+                StartScreen.Explore -> Screen.Explore
+            }.route
+        )
     }
 
     NavHost(
