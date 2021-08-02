@@ -5,25 +5,14 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.data.remote.service.RemoteProviderService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.Flow
 import retrofit2.Retrofit
 import java.net.URLEncoder
 
-class RemoteProviderRepository(retrofit: StateFlow<Retrofit?>) :
+class RemoteProviderRepository(retrofit: Flow<ResultX<Retrofit>?>) :
     BaseRemoteRepository<RemoteProviderService>(retrofit) {
 
-    override val serviceFlow = retrofit.map {
-        it?.create(RemoteProviderService::class.java)
-    }.stateIn(
-        CoroutineScope(SupervisorJob() + Dispatchers.Main),
-        SharingStarted.Eagerly, null
-    )
+    override val serviceType = RemoteProviderService::class.java
 
     suspend fun listProvider(): ResultX<List<ProviderInfo>> =
         resultWrap {

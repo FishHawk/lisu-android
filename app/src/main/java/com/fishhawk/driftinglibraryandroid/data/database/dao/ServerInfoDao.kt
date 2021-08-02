@@ -10,7 +10,7 @@ interface ServerInfoDao {
     fun list(): Flow<List<ServerInfo>>
 
     @Query("SELECT * FROM ServerInfo WHERE id = :id")
-    fun select(id: Int): Flow<ServerInfo>
+    fun select(id: Int): Flow<ServerInfo?>
 
     @Insert
     suspend fun insert(serverInfo: ServerInfo)

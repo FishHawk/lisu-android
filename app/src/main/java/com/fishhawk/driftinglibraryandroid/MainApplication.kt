@@ -14,6 +14,7 @@ import com.fishhawk.driftinglibraryandroid.data.datastore.PreferenceRepository
 import com.fishhawk.driftinglibraryandroid.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
+import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 import com.fishhawk.driftinglibraryandroid.util.interceptor.ProgressInterceptor
 import dagger.Module
 import dagger.Provides
@@ -66,44 +67,48 @@ object AppModule {
     fun provideRetrofit(
         preferenceRepository: PreferenceRepository,
         serverInfoRepository: ServerInfoRepository
-    ): StateFlow<Retrofit?> {
+    ): Flow<ResultX<Retrofit>?> {
         return preferenceRepository.selectedServer.flow
             .flatMapLatest { serverInfoRepository.select(it) }
-            .distinctUntilChanged()
             .map { server ->
-                val url = server.address.let {
+                server?.address?.let {
                     var newUrl = it
                     newUrl = if (URLUtil.isNetworkUrl(newUrl)) newUrl else "http://${newUrl}"
                     newUrl = if (newUrl.last() == '/') newUrl else "$newUrl/"
                     newUrl
                 }
+            }
+            .distinctUntilChanged()
+            .map { url ->
+                if (url == null)
+                    return@map ResultX.failure(Exception("No server selected"))
 
-                url.let {
-                    try {
+                try {
+                    ResultX.success(
                         Retrofit.Builder()
                             .baseUrl(url)
                             .addConverterFactory(GsonConverterFactory.create())
                             .build()
-                    } catch (e: Throwable) {
-                        null
-                    }
+                    )
+                } catch (e: Throwable) {
+                    ResultX.failure(e)
                 }
             }
-            .stateIn(
+            .shareIn(
                 CoroutineScope(SupervisorJob() + Dispatchers.Main),
                 SharingStarted.Eagerly,
-                null
+                1
             )
     }
 
     @Provides
     @Singleton
-    fun provideLibraryRepository(retrofit: StateFlow<Retrofit?>) =
+    fun provideLibraryRepository(retrofit: Flow<ResultX<Retrofit>?>) =
         RemoteLibraryRepository(retrofit)
 
     @Provides
     @Singleton
-    fun provideProviderRepository(retrofit: StateFlow<Retrofit?>) =
+    fun provideProviderRepository(retrofit: Flow<ResultX<Retrofit>?>) =
         RemoteProviderRepository(retrofit)
 
     @Provides

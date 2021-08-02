@@ -4,25 +4,14 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.service.RemoteLibraryService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.Flow
 import okhttp3.RequestBody
 import retrofit2.Retrofit
 
-class RemoteLibraryRepository(retrofit: StateFlow<Retrofit?>) :
+class RemoteLibraryRepository(retrofit: Flow<ResultX<Retrofit>?>) :
     BaseRemoteRepository<RemoteLibraryService>(retrofit) {
 
-    override val serviceFlow = retrofit.map {
-        it?.create(RemoteLibraryService::class.java)
-    }.stateIn(
-        CoroutineScope(SupervisorJob() + Dispatchers.Main),
-        SharingStarted.Eagerly, null
-    )
+    override val serviceType = RemoteLibraryService::class.java
 
     suspend fun listManga(
         lastTime: Long,

@@ -1,6 +1,9 @@
 package com.fishhawk.driftinglibraryandroid.data.remote
 
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.*
 import retrofit2.Retrofit
 
 // Hack, see https://youtrack.jetbrains.com/issue/KT-46477#focus=Comments-27-4952485.0-0
@@ -56,25 +59,48 @@ class ResultX<out T> internal constructor(internal val value: Any?) {
     }
 }
 
+suspend fun <T, R> T.runCatching(block: suspend T.() -> R): ResultX<R> {
+    return try {
+        ResultX.success(block())
+    } catch (e: Throwable) {
+        ResultX.failure(e)
+    }
+}
+
+fun <R, T> ResultX<T>.map(transform: (value: T) -> R): ResultX<R> {
+    return when {
+        isSuccess -> ResultX.success(transform(value as T))
+        else -> ResultX(value)
+    }
+}
+
+suspend fun <R, T> ResultX<T>.mapCatching(transform: suspend (value: T) -> R): ResultX<R> {
+    return when {
+        isSuccess -> runCatching { transform(value as T) }
+        else -> ResultX(value)
+    }
+}
+
 internal fun createFailure(exception: Throwable): Any = ResultX.Failure(exception)
 
 
-abstract class BaseRemoteRepository<Service>(private val retrofit: StateFlow<Retrofit?>) {
-    val url: String?
-        get() = retrofit.value?.baseUrl()?.toUrl()?.toString()
+abstract class BaseRemoteRepository<Service>(retrofit: Flow<ResultX<Retrofit>?>) {
+    abstract val serviceType: Class<Service>
 
-    abstract val serviceFlow: StateFlow<Service?>
+    var url: String? = null
 
-    val service
-        get() = serviceFlow.value
+    val serviceFlow = retrofit
+        .map { result ->
+            url = result?.getOrNull()?.baseUrl()?.toUrl()?.toString()
+            result?.map { it.create(serviceType) }
+        }
+        .stateIn(
+            CoroutineScope(SupervisorJob() + Dispatchers.Main),
+            SharingStarted.Eagerly, null
+        )
 
-    protected inline fun <T> resultWrap(func: (Service) -> T): ResultX<T> {
-        return service?.let {
-            try {
-                ResultX.success(func(service!!))
-            } catch (e: Exception) {
-                ResultX.failure(e)
-            }
-        } ?: ResultX.failure(IllegalAccessError())
+    protected suspend inline fun <T> resultWrap(crossinline func: suspend (Service) -> T): ResultX<T> {
+        val service = serviceFlow.filterNotNull().first()
+        return service.mapCatching { func(it) }
     }
 }
