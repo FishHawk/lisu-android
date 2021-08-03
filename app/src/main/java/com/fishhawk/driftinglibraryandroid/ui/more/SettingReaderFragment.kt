@@ -37,7 +37,6 @@ private fun Content() {
             when (it) {
                 ReaderMode.Ltr -> R.string.settings_reader_mode_left_to_right
                 ReaderMode.Rtl -> R.string.settings_reader_mode_right_to_Left
-                ReaderMode.Vertical -> R.string.settings_reader_mode_vertical
                 ReaderMode.Continuous -> R.string.settings_reader_mode_continuous
             }
         }

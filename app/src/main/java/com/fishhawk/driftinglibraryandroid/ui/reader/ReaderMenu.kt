@@ -30,12 +30,10 @@ import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.data.datastore.setNext
 import com.fishhawk.driftinglibraryandroid.ui.base.findActivity
 import com.google.accompanist.insets.statusBarsPadding
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.launch
 
 @Composable
-fun BoxScope.ReaderInfoBar(name: String, title: String, position: Int, size: Int) {
+fun BoxScope.ReaderInfoBar(name: String, title: String, readerState: ReaderState?) {
     val viewModel = viewModel<ReaderViewModel>()
     val isMenuOpened by viewModel.isMenuOpened.collectAsState()
 
@@ -43,7 +41,7 @@ fun BoxScope.ReaderInfoBar(name: String, title: String, position: Int, size: Int
     if (!showInfoBar || isMenuOpened) return
 
     val infoBarText =
-        if (size != 0) "$name $title ${position + 1}/$size"
+        if (readerState != null) "$name $title ${readerState.position + 1}/${readerState.size}"
         else "$name $title"
 
     Box(
@@ -56,13 +54,12 @@ fun BoxScope.ReaderInfoBar(name: String, title: String, position: Int, size: Int
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun BoxScope.ReaderMenu(
     name: String,
     title: String,
-    size: Int,
-    pagerState: PagerState
+    readerState: ReaderState?
 ) {
     val viewModel = viewModel<ReaderViewModel>()
     val isMenuOpened by viewModel.isMenuOpened.collectAsState()
@@ -82,7 +79,7 @@ fun BoxScope.ReaderMenu(
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it })
     ) {
-        ReaderMenuBottom(size, pagerState)
+        ReaderMenuBottom(readerState)
     }
 }
 
@@ -127,9 +124,8 @@ private fun ReaderMenuTop(name: String, title: String) {
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun ReaderMenuBottom(size: Int, pagerState: PagerState) {
+private fun ReaderMenuBottom(readerState: ReaderState?) {
     val viewModel = viewModel<ReaderViewModel>()
 
     Column {
@@ -172,7 +168,8 @@ private fun ReaderMenuBottom(size: Int, pagerState: PagerState) {
                     ) {
                         Text(
                             modifier = Modifier.width(32.dp),
-                            text = pagerState.currentPage.plus(1).toString(),
+                            text = readerState?.position?.plus(1)?.toString() ?: "-",
+                            style = MaterialTheme.typography.body2,
                             color = Color.White,
                             textAlign = TextAlign.Center
                         )
@@ -180,18 +177,22 @@ private fun ReaderMenuBottom(size: Int, pagerState: PagerState) {
                         val scope = rememberCoroutineScope()
                         Slider(
                             modifier = Modifier.weight(1f),
-                            value = pagerState.currentPage.toFloat() /
-                                    size.minus(1).coerceAtLeast(1),
+                            value = readerState?.run {
+                                position.toFloat() / size.minus(1).coerceAtLeast(1)
+                            } ?: 0f,
                             onValueChange = {
-                                val target = (it * (size - 1)).toInt().coerceIn(0, size - 1)
-                                scope.launch { pagerState.scrollToPage(target) }
+                                readerState?.apply {
+                                    val target = (it * (size - 1)).toInt().coerceIn(0, size - 1)
+                                    scope.launch { scrollToPage(target) }
+                                }
                             },
-                            enabled = size > 1
+                            enabled = readerState != null && readerState.size > 1
                         )
 
                         Text(
                             modifier = Modifier.width(32.dp),
-                            text = size.toString(),
+                            text = readerState?.size?.toString() ?: "-",
+                            style = MaterialTheme.typography.body2,
                             color = Color.White,
                             textAlign = TextAlign.Center
                         )
@@ -229,7 +230,6 @@ private fun ReaderMenuBottom(size: Int, pagerState: PagerState) {
                 val icon = when (readingDirection) {
                     ReaderMode.Ltr -> Icons.Filled.ArrowForward
                     ReaderMode.Rtl -> Icons.Filled.ArrowBack
-                    ReaderMode.Vertical -> Icons.Filled.ArrowDownward
                     ReaderMode.Continuous -> Icons.Filled.Expand
                 }
                 Icon(icon, "setting", tint = Color.White)

@@ -11,7 +11,7 @@ enum class HistoryFilter { All, FromLibrary, FromProvider }
 enum class ChapterDisplayMode { Grid, Linear }
 enum class ChapterDisplayOrder { Ascend, Descend }
 
-enum class ReaderMode { Ltr, Rtl, Vertical, Continuous }
+enum class ReaderMode { Ltr, Rtl, Continuous }
 enum class ReaderOrientation { Portrait, Landscape }
 
 enum class ColorFilterMode { Default, Multiply, Screen, Overlay, Lighten, Darken }

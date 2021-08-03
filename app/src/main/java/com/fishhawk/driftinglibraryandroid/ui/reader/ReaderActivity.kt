@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
 import androidx.activity.compose.setContent
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.annotation.IntRange
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -15,12 +17,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fishhawk.driftinglibraryandroid.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.ReaderMode
 import com.fishhawk.driftinglibraryandroid.data.datastore.ReaderOrientation
+import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.base.ErrorView
 import com.fishhawk.driftinglibraryandroid.ui.base.LoadingView
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
@@ -102,42 +107,87 @@ class ReaderActivity : BaseActivity() {
     }
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun ReaderScreen() {
     val viewModel = viewModel<ReaderViewModel>()
     val mangaLoadState by viewModel.mangaLoadState.collectAsState()
-    when (val state = mangaLoadState) {
+
+    when (mangaLoadState) {
         LoadState.Loading -> LoadingView()
-        is LoadState.Failure -> ErrorView(state.exception) { viewModel.refreshReader() }
+        is LoadState.Failure -> ErrorView((mangaLoadState as LoadState.Failure).exception) { viewModel.refreshReader() }
         LoadState.Loaded -> {
             val pointer by viewModel.chapterPointer.collectAsState()
-            Reader(pointer)
+            Box(modifier = Modifier.fillMaxSize()) {
+                var readerState: ReaderState? = null
+                when (val state = pointer.currChapter.state) {
+                    LoadState.Loading -> LoadingView()
+                    is LoadState.Failure -> ErrorView(state.exception) { }
+                    LoadState.Loaded -> {
+                        val readerMode by PR.readerMode.collectAsState()
+                        if (readerMode == ReaderMode.Continuous) {
+                            readerState = ReaderState.List(rememberLazyListState())
+                            ListReader(readerState, pointer)
+                        } else {
+                            readerState = ReaderState.Pager(
+                                rememberPagerState(
+                                    pageCount = pointer.currChapter.images.size,
+                                    initialOffscreenLimit = 3
+                                )
+                            )
+                            PagerReader(readerState.state, pointer, readerMode == ReaderMode.Rtl)
+                        }
+                        LaunchedEffect(pointer) {
+                            if (readerState.size > 0) {
+                                readerState.scrollToPage(
+                                    pointer.startPage.coerceAtMost(readerState.size - 1)
+                                )
+                            }
+                        }
+                        LaunchedEffect(readerState.position) {
+                            viewModel.updateReadingHistory(readerState.position)
+                        }
+                    }
+                }
+
+                val name = pointer.currChapter.name
+                val title = pointer.currChapter.title
+
+                ReaderInfoBar(name, title, readerState)
+                ReaderColorFilterOverlay()
+                ReaderMenu(name, title, readerState)
+            }
         }
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
-@Composable
-private fun Reader(pointer: ReaderViewModel.ReaderChapterPointer) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        val pagerState = rememberPagerState(
-            pageCount = pointer.currChapter.images.size,
-            initialOffscreenLimit = 3
-        )
+sealed interface ReaderState {
+    @get:IntRange(from = 0)
+    val position: Int
 
-        when (val state = pointer.currChapter.state) {
-            LoadState.Loading -> LoadingView()
-            is LoadState.Failure -> ErrorView(state.exception) { }
-            LoadState.Loaded -> ReaderContent(pagerState, pointer)
-        }
+    @get:IntRange(from = 0)
+    val size: Int
 
-        val name = pointer.currChapter.name
-        val title = pointer.currChapter.title
-        val size = pointer.currChapter.images.size
-        val position = pagerState.currentPage
+    suspend fun scrollToPage(@IntRange(from = 0) page: Int)
 
-        ReaderInfoBar(name, title, position, size)
-        ReaderColorFilterOverlay()
-        ReaderMenu(name, title, size, pagerState)
+    @OptIn(ExperimentalPagerApi::class)
+    class Pager(val state: PagerState) : ReaderState {
+        override val position: Int
+            get() = state.currentPage
+
+        override val size: Int
+            get() = state.pageCount
+
+        override suspend fun scrollToPage(page: Int) = state.scrollToPage(page)
+    }
+
+    class List(val state: LazyListState) : ReaderState {
+        override val position: Int
+            get() = state.firstVisibleItemIndex
+
+        override val size: Int
+            get() = state.layoutInfo.totalItemsCount
+
+        override suspend fun scrollToPage(page: Int) = state.scrollToItem(page)
     }
 }
