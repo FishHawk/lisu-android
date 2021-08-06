@@ -9,9 +9,9 @@ import androidx.annotation.IntRange
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.lifecycleScope
@@ -26,7 +26,6 @@ import com.fishhawk.driftinglibraryandroid.ui.base.LoadingView
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -124,28 +123,36 @@ private fun ReaderScreen() {
                     LoadState.Loading -> LoadingView()
                     is LoadState.Failure -> ErrorView(state.exception) { }
                     LoadState.Loaded -> {
-                        val readerMode by PR.readerMode.collectAsState()
-                        if (readerMode == ReaderMode.Continuous) {
-                            readerState = ReaderState.List(rememberLazyListState())
+                        val mode by PR.readerMode.collectAsState()
+                        val size = pointer.currChapter.images.size
+                        var startPage by remember(pointer) {
+                            mutableStateOf(pointer.startPage.coerceAtMost(size - 1))
+                        }
+
+                        if (mode == ReaderMode.Continuous) {
+                            readerState = ReaderState.List(
+                                rememberSaveable(pointer, mode, saver = LazyListState.Saver) {
+                                    LazyListState(firstVisibleItemIndex = startPage)
+                                }
+                            )
                             ListReader(readerState, pointer)
                         } else {
                             readerState = ReaderState.Pager(
-                                rememberPagerState(
-                                    pageCount = pointer.currChapter.images.size,
-                                    initialOffscreenLimit = 3
-                                )
+                                rememberSaveable(pointer, mode, saver = PagerState.Saver) {
+                                    PagerState(
+                                        pageCount = size,
+                                        currentPage = startPage,
+                                        offscreenLimit = 3,
+                                    )
+                                }
                             )
-                            PagerReader(readerState.state, pointer, readerMode == ReaderMode.Rtl)
-                        }
-                        LaunchedEffect(pointer) {
-                            if (readerState.size > 0) {
-                                readerState.scrollToPage(
-                                    pointer.startPage.coerceAtMost(readerState.size - 1)
-                                )
-                            }
+                            PagerReader(readerState.state, pointer, mode == ReaderMode.Rtl)
                         }
                         LaunchedEffect(readerState.position) {
-                            viewModel.updateReadingHistory(readerState.position)
+                            readerState.position.let {
+                                startPage = it
+                                viewModel.updateReadingHistory(it)
+                            }
                         }
                     }
                 }
