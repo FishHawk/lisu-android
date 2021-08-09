@@ -62,7 +62,7 @@ private fun MangaList(
     val nColumns = 3
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
+        contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         val rows = (mangaList.itemCount + nColumns - 1) / nColumns
