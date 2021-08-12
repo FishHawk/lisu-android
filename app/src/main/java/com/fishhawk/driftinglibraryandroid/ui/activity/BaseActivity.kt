@@ -22,10 +22,7 @@ open class BaseActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        setupSecureModule()
-    }
 
-    private fun setupSecureModule() {
         PR.secureMode.flow
             .onEach { setFlag(WindowManager.LayoutParams.FLAG_SECURE, it) }
             .launchIn(lifecycleScope)

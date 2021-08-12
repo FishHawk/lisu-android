@@ -84,7 +84,6 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
 
     implementation("androidx.activity:activity-compose:1.3.1")
-    implementation("androidx.appcompat:appcompat:1.4.0-alpha03")
 
     implementation("androidx.compose.ui:ui:1.1.0-alpha01")
     implementation("androidx.compose.ui:ui-tooling:1.1.0-alpha01")
@@ -133,7 +132,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.0")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.1")
 
     // implementation("com.quickbirdstudios:opencv:4.1.0")
 }

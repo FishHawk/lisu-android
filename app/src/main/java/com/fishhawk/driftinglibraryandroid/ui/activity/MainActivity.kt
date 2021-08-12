@@ -14,10 +14,8 @@ import androidx.compose.material.icons.filled.CollectionsBookmark
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -87,14 +85,12 @@ private fun MainNavHost(
     navController: NavHostController,
     modifier: Modifier
 ) {
-    val startDestination by remember {
-        mutableStateOf(
-            when (PR.startScreen.getBlocking()) {
-                StartScreen.Library -> Screen.Library
-                StartScreen.History -> Screen.History
-                StartScreen.Explore -> Screen.Explore
-            }.route
-        )
+    val startDestination = rememberSaveable {
+        when (PR.startScreen.getBlocking()) {
+            StartScreen.Library -> Screen.Library
+            StartScreen.History -> Screen.History
+            StartScreen.Explore -> Screen.Explore
+        }.route
     }
 
     NavHost(
@@ -146,6 +142,7 @@ private fun BottomNavigationBar(navController: NavHostController) {
                     selectedContentColor = MaterialTheme.colors.primary,
                     unselectedContentColor = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
                     onClick = {
+                        if (screen.route == navController.currentDestination?.route) return@BottomNavigationItem
                         navController.navigate(screen.route) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
