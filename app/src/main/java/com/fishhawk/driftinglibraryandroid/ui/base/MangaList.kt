@@ -37,19 +37,12 @@ fun RefreshableMangaList(
     onCardClick: (outline: MangaOutline) -> Unit = {},
     onCardLongClick: (outline: MangaOutline) -> Unit = {}
 ) {
-    when (val state = mangaList.loadState.refresh) {
-        is LoadState.Loading -> LoadingView()
-        is LoadState.Error -> ErrorView(state.error) { mangaList.retry() }
-        is LoadState.NotLoading -> {
-            val isRefreshing = mangaList.loadState.refresh is LoadState.Loading
-            SwipeRefresh(
-                state = rememberSwipeRefreshState(isRefreshing),
-                onRefresh = { mangaList.refresh() },
-            ) {
-                if (mangaList.itemCount == 0) EmptyView()
-                else MangaList(mangaList, onCardClick, onCardLongClick)
-            }
-        }
+    val isRefreshing = mangaList.loadState.refresh is LoadState.Loading
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing),
+        onRefresh = { mangaList.refresh() },
+    ) {
+        MangaList(mangaList, onCardClick, onCardLongClick)
     }
 }
 
@@ -59,12 +52,12 @@ private fun MangaList(
     onCardClick: (outline: MangaOutline) -> Unit = {},
     onCardLongClick: (outline: MangaOutline) -> Unit = {}
 ) {
-    val nColumns = 3
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        val nColumns = 3
         val rows = (mangaList.itemCount + nColumns - 1) / nColumns
         items(rows) { rowIndex ->
             Row(
@@ -95,6 +88,19 @@ private fun MangaList(
             is LoadState.Error -> item {
                 ErrorItem(state.error) { mangaList.retry() }
             }
+        }
+
+        println(mangaList.loadState.refresh)
+        when (val state = mangaList.loadState.refresh) {
+            is LoadState.Error -> item {
+                ErrorView(
+                    modifier = Modifier.fillParentMaxSize(),
+                    exception = state.error
+                ) { mangaList.retry() }
+            }
+//            is LoadState.NotLoading -> {
+//                if (mangaList.itemCount == 0) item { EmptyView() }
+//            }
         }
     }
 }

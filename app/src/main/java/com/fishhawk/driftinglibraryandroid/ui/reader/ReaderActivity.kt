@@ -114,14 +114,20 @@ private fun ReaderScreen() {
 
     when (mangaLoadState) {
         LoadState.Loading -> LoadingView()
-        is LoadState.Failure -> ErrorView((mangaLoadState as LoadState.Failure).exception) { viewModel.refreshReader() }
+        is LoadState.Failure -> ErrorView(
+            modifier = Modifier.fillMaxSize(),
+            exception = (mangaLoadState as LoadState.Failure).exception
+        ) { viewModel.refreshReader() }
         LoadState.Loaded -> {
             val pointer by viewModel.chapterPointer.collectAsState()
             Box(modifier = Modifier.fillMaxSize()) {
                 var readerState: ReaderState? = null
                 when (val state = pointer.currChapter.state) {
                     LoadState.Loading -> LoadingView()
-                    is LoadState.Failure -> ErrorView(state.exception) { }
+                    is LoadState.Failure -> ErrorView(
+                        modifier = Modifier.fillMaxSize(),
+                        exception = state.exception
+                    ) { }
                     LoadState.Loaded -> {
                         val mode by PR.readerMode.collectAsState()
                         val size = pointer.currChapter.images.size

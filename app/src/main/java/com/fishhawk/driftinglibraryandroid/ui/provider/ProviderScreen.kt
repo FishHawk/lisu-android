@@ -3,7 +3,6 @@ package com.fishhawk.driftinglibraryandroid.ui.provider
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -17,12 +16,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.data.datastore.OptionGroup
 import com.fishhawk.driftinglibraryandroid.data.datastore.get
-import com.fishhawk.driftinglibraryandroid.data.remote.model.OptionModel
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.activity.setArgument
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableMangaList
@@ -69,19 +69,19 @@ private fun Content(
             0 -> ProviderPanel(
                 navController,
                 0,
-                viewModel.popularMangaList,
+                viewModel.popularMangaList.collectAsLazyPagingItems(),
                 viewModel.popularOptionModel
             )
             1 -> ProviderPanel(
                 navController,
                 1,
-                viewModel.latestMangaList,
+                viewModel.latestMangaList.collectAsLazyPagingItems(),
                 viewModel.latestOptionModel
             )
             2 -> ProviderPanel(
                 navController,
                 2,
-                viewModel.categoryMangaList,
+                viewModel.categoryMangaList.collectAsLazyPagingItems(),
                 viewModel.categoryOptionModel
             )
         }
@@ -140,22 +140,19 @@ private fun ToolBar(pagerState: PagerState, navController: NavHostController) {
 private fun ProviderPanel(
     navController: NavHostController,
     page: Int,
-    mangaList: ProviderMangaList,
-    optionModelFlow: StateFlow<OptionModel>
+    mangaList: LazyPagingItems<MangaOutline>,
+    optionModelFlow: StateFlow<List<OptionGroup>?>
 ) {
     val viewModel = hiltViewModel<ProviderViewModel>()
-    val optionModel by optionModelFlow.collectAsState()
 
     Column {
-        OptionGroupList(
-            page = page,
-            mangaList = mangaList,
-            optionModel = optionModel
-        )
+        val optionGroup by optionModelFlow.collectAsState()
+        if (!optionGroup.isNullOrEmpty())
+            OptionGroupList(page = page, optionGroup = optionGroup!!)
 
         val context = LocalContext.current
         RefreshableMangaList(
-            mangaList = mangaList.list.collectAsLazyPagingItems(),
+            mangaList = mangaList,
             onCardClick = {
                 navController.currentBackStackEntry?.arguments =
                     bundleOf(
@@ -187,36 +184,24 @@ private fun ProviderPanel(
 @Composable
 private fun OptionGroupList(
     page: Int,
-    mangaList: ProviderMangaList,
-    optionModel: OptionModel
+    optionGroup: List<OptionGroup>
 ) {
     val viewModel = hiltViewModel<ProviderViewModel>()
 
-    val option: Option = mutableMapOf()
-    Column(
-        modifier = Modifier.padding(top = 4.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        optionModel.map { (name, options) ->
-            val selectedIndex by viewModel.getOptionHistory(page, name).flow.collectAsState(null)
-            selectedIndex?.let { option[name] = it }
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        optionGroup.forEach { (name, options, selected) ->
             FlowRow(mainAxisSpacing = 4.dp, crossAxisSpacing = 2.dp) {
                 options.mapIndexed { index, option ->
                     Text(
                         modifier = Modifier.clickable {
-                            viewModel.viewModelScope.launch {
-                                viewModel.getOptionHistory(page, name).set(index)
-                                mangaList.selectOption(name, index)
-                            }
+                            viewModel.updateOptionHistory(page, name, index)
                         },
                         style = TextStyle(fontSize = 12.sp).merge(),
                         text = option,
-                        color = if (index != selectedIndex) MaterialTheme.colors.onSurface
-                        else MaterialTheme.colors.primary
+                        color = MaterialTheme.colors.run { if (index != selected) onSurface else primary }
                     )
                 }
             }
         }
     }
-    if (optionModel.keys.size == option.keys.size) mangaList.selectOption(option)
 }

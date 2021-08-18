@@ -29,7 +29,6 @@ import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
 import com.fishhawk.driftinglibraryandroid.ui.base.ErrorView
-import com.fishhawk.driftinglibraryandroid.ui.base.LoadingView
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -75,9 +74,11 @@ private fun Content(navHostController: NavHostController) {
         }
     }
     providerList?.exceptionOrNull()?.let {
-        ErrorView(it) { viewModel.providerList.reload() }
+        ErrorView(
+            modifier = Modifier.fillMaxSize(),
+            exception = it
+        ) { viewModel.providerList.reload() }
     }
-    providerList ?: LoadingView()
 }
 
 @Composable

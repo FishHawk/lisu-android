@@ -45,16 +45,16 @@ fun LoadingItem(modifier: Modifier = Modifier) {
 
 @Composable
 fun ErrorView(
+    modifier: Modifier = Modifier,
     exception: Throwable,
     onClickRetry: () -> Unit
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(48.dp),
+        modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
         Column(
+            modifier = Modifier.padding(48.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
