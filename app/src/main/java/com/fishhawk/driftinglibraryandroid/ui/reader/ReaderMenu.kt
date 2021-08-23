@@ -29,11 +29,12 @@ import com.fishhawk.driftinglibraryandroid.data.datastore.ReaderMode
 import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.data.datastore.setNext
 import com.fishhawk.driftinglibraryandroid.ui.base.findActivity
+import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ViewerState
 import com.google.accompanist.insets.statusBarsPadding
 import kotlinx.coroutines.launch
 
 @Composable
-fun BoxScope.ReaderInfoBar(name: String, title: String, readerState: ReaderState?) {
+fun BoxScope.ReaderInfoBar(name: String, title: String, readerState: ViewerState?) {
     val viewModel = viewModel<ReaderViewModel>()
     val isMenuOpened by viewModel.isMenuOpened.collectAsState()
 
@@ -59,7 +60,7 @@ fun BoxScope.ReaderInfoBar(name: String, title: String, readerState: ReaderState
 fun BoxScope.ReaderMenu(
     name: String,
     title: String,
-    readerState: ReaderState?
+    viewerState: ViewerState?
 ) {
     val viewModel = viewModel<ReaderViewModel>()
     val isMenuOpened by viewModel.isMenuOpened.collectAsState()
@@ -79,7 +80,7 @@ fun BoxScope.ReaderMenu(
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it })
     ) {
-        ReaderMenuBottom(readerState)
+        ReaderMenuBottom(viewerState)
     }
 }
 
@@ -125,7 +126,7 @@ private fun ReaderMenuTop(name: String, title: String) {
 }
 
 @Composable
-private fun ReaderMenuBottom(readerState: ReaderState?) {
+private fun ReaderMenuBottom(viewerState: ViewerState?) {
     val viewModel = viewModel<ReaderViewModel>()
 
     Column {
@@ -168,7 +169,7 @@ private fun ReaderMenuBottom(readerState: ReaderState?) {
                     ) {
                         Text(
                             modifier = Modifier.width(32.dp),
-                            text = readerState?.position?.plus(1)?.toString() ?: "-",
+                            text = viewerState?.position?.plus(1)?.toString() ?: "-",
                             style = MaterialTheme.typography.body2,
                             color = Color.White,
                             textAlign = TextAlign.Center
@@ -177,21 +178,21 @@ private fun ReaderMenuBottom(readerState: ReaderState?) {
                         val scope = rememberCoroutineScope()
                         Slider(
                             modifier = Modifier.weight(1f),
-                            value = readerState?.run {
+                            value = viewerState?.run {
                                 position.toFloat() / size.minus(1).coerceAtLeast(1)
                             } ?: 0f,
                             onValueChange = {
-                                readerState?.apply {
+                                viewerState?.apply {
                                     val target = (it * (size - 1)).toInt().coerceIn(0, size - 1)
                                     scope.launch { scrollToPage(target) }
                                 }
                             },
-                            enabled = readerState != null && readerState.size > 1
+                            enabled = viewerState != null && viewerState.size > 1
                         )
 
                         Text(
                             modifier = Modifier.width(32.dp),
-                            text = readerState?.size?.toString() ?: "-",
+                            text = viewerState?.size?.toString() ?: "-",
                             style = MaterialTheme.typography.body2,
                             color = Color.White,
                             textAlign = TextAlign.Center

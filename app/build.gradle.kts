@@ -31,7 +31,7 @@ android {
         }
     }
 
-    compileSdk = 30
+    compileSdk = 31
     buildToolsVersion = "30.0.3"
 
     defaultConfig {
@@ -76,7 +76,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.1.0-alpha01"
+        kotlinCompilerExtensionVersion = "1.1.0-alpha02"
     }
 }
 
@@ -85,14 +85,14 @@ dependencies {
 
     implementation("androidx.activity:activity-compose:1.3.1")
 
-    implementation("androidx.compose.ui:ui:1.1.0-alpha01")
-    implementation("androidx.compose.ui:ui-tooling:1.1.0-alpha01")
-    implementation("androidx.compose.foundation:foundation:1.1.0-alpha01")
-    implementation("androidx.compose.material:material:1.1.0-alpha01")
-    implementation("androidx.compose.material:material-icons-core:1.1.0-alpha01")
-    implementation("androidx.compose.material:material-icons-extended:1.1.0-alpha01")
+    implementation("androidx.compose.ui:ui:1.1.0-alpha02")
+    implementation("androidx.compose.ui:ui-tooling:1.1.0-alpha02")
+    implementation("androidx.compose.foundation:foundation:1.1.0-alpha02")
+    implementation("androidx.compose.material:material:1.1.0-alpha02")
+    implementation("androidx.compose.material:material-icons-core:1.1.0-alpha02")
+    implementation("androidx.compose.material:material-icons-extended:1.1.0-alpha02")
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-alpha05")
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha07")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
 
@@ -111,14 +111,14 @@ dependencies {
     kapt("androidx.room:room-compiler:2.3.0")
 
 
-    implementation("com.google.accompanist:accompanist-flowlayout:0.16.0")
-    implementation("com.google.accompanist:accompanist-insets:0.16.0")
-    implementation("com.google.accompanist:accompanist-insets-ui:0.16.0")
-    implementation("com.google.accompanist:accompanist-pager:0.16.0")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.16.0")
-    implementation("com.google.accompanist:accompanist-placeholder-material:0.16.0")
-    implementation("com.google.accompanist:accompanist-swiperefresh:0.16.0")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.16.0")
+    implementation("com.google.accompanist:accompanist-flowlayout:0.17.0")
+    implementation("com.google.accompanist:accompanist-insets:0.17.0")
+    implementation("com.google.accompanist:accompanist-insets-ui:0.17.0")
+    implementation("com.google.accompanist:accompanist-pager:0.17.0")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.17.0")
+    implementation("com.google.accompanist:accompanist-placeholder-material:0.17.0")
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.17.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.17.0")
 
     implementation("io.coil-kt:coil:1.3.2")
     implementation("io.coil-kt:coil-compose:1.3.2")

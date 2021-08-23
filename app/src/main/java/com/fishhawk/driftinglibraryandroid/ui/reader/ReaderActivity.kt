@@ -23,6 +23,9 @@ import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.base.ErrorView
 import com.fishhawk.driftinglibraryandroid.ui.base.LoadingView
+import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ListViewer
+import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.PagerViewer
+import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ViewerState
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
@@ -121,7 +124,7 @@ private fun ReaderScreen() {
         LoadState.Loaded -> {
             val pointer by viewModel.chapterPointer.collectAsState()
             Box(modifier = Modifier.fillMaxSize()) {
-                var readerState: ReaderState? = null
+                var readerState: ViewerState? = null
                 when (val state = pointer.currChapter.state) {
                     LoadState.Loading -> LoadingView()
                     is LoadState.Failure -> ErrorView(
@@ -136,14 +139,14 @@ private fun ReaderScreen() {
                         }
 
                         if (mode == ReaderMode.Continuous) {
-                            readerState = ReaderState.List(
+                            readerState = ViewerState.List(
                                 rememberSaveable(pointer, mode, saver = LazyListState.Saver) {
                                     LazyListState(firstVisibleItemIndex = startPage)
                                 }
                             )
-                            ListReader(readerState, pointer)
+                            ListViewer(readerState, pointer)
                         } else {
-                            readerState = ReaderState.Pager(
+                            readerState = ViewerState.Pager(
                                 rememberSaveable(pointer, mode, saver = PagerState.Saver) {
                                     PagerState(
                                         pageCount = size,
@@ -152,7 +155,7 @@ private fun ReaderScreen() {
                                     )
                                 }
                             )
-                            PagerReader(readerState.state, pointer, mode == ReaderMode.Rtl)
+                            PagerViewer(readerState, pointer, mode == ReaderMode.Rtl)
                         }
                         LaunchedEffect(readerState.position) {
                             readerState.position.let {
@@ -171,36 +174,5 @@ private fun ReaderScreen() {
                 ReaderMenu(name, title, readerState)
             }
         }
-    }
-}
-
-sealed interface ReaderState {
-    @get:IntRange(from = 0)
-    val position: Int
-
-    @get:IntRange(from = 0)
-    val size: Int
-
-    suspend fun scrollToPage(@IntRange(from = 0) page: Int)
-
-    @OptIn(ExperimentalPagerApi::class)
-    class Pager(val state: PagerState) : ReaderState {
-        override val position: Int
-            get() = state.currentPage
-
-        override val size: Int
-            get() = state.pageCount
-
-        override suspend fun scrollToPage(page: Int) = state.scrollToPage(page)
-    }
-
-    class List(val state: LazyListState) : ReaderState {
-        override val position: Int
-            get() = state.firstVisibleItemIndex
-
-        override val size: Int
-            get() = state.layoutInfo.totalItemsCount
-
-        override suspend fun scrollToPage(page: Int) = state.scrollToItem(page)
     }
 }

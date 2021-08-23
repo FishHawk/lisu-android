@@ -90,7 +90,6 @@ private fun MangaList(
             }
         }
 
-        println(mangaList.loadState.refresh)
         when (val state = mangaList.loadState.refresh) {
             is LoadState.Error -> item {
                 ErrorView(
