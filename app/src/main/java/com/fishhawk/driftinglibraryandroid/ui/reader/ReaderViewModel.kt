@@ -13,17 +13,12 @@ import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Chapter
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
+import com.fishhawk.driftinglibraryandroid.ui.base.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
-
-sealed class LoadState {
-    object Loading : LoadState()
-    object Loaded : LoadState()
-    data class Failure(val exception: Throwable) : LoadState()
-}
 
 class ReaderChapter(
     val collectionIndex: Int,
@@ -34,7 +29,7 @@ class ReaderChapter(
     val id = chapter.id
     val title = chapter.title
     val name = chapter.name
-    var state: LoadState = LoadState.Loading
+    var state: ViewState = ViewState.Loading
     var images: List<String> = listOf()
 }
 
@@ -60,9 +55,9 @@ class ReaderViewModel @Inject constructor(
 
     val mangaLoadState = mangaDetail
         .map { detail ->
-            detail?.fold({ LoadState.Loaded }, { LoadState.Failure(it) }) ?: LoadState.Loading
+            detail?.fold({ ViewState.Loaded }, { ViewState.Failure(it) }) ?: ViewState.Loading
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), LoadState.Loading)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState.Loading)
 
     val mangaTitle = mangaDetail
         .map { it?.getOrNull() }
@@ -114,8 +109,8 @@ class ReaderViewModel @Inject constructor(
     }
 
     private suspend fun loadChapter(chapter: ReaderChapter) {
-        if (chapter.state == LoadState.Loaded) return
-        chapter.state = LoadState.Loading
+        if (chapter.state == ViewState.Loaded) return
+        chapter.state = ViewState.Loading
 
         val result =
             if (providerId != null)
@@ -132,12 +127,12 @@ class ReaderViewModel @Inject constructor(
         }
 
         result.fold({
-            chapter.state = LoadState.Loaded
+            chapter.state = ViewState.Loaded
             chapter.images = it
             refreshPointerIfNeed()
         }, {
-            if (chapter.state != LoadState.Loaded) {
-                chapter.state = LoadState.Failure(it)
+            if (chapter.state != ViewState.Loaded) {
+                chapter.state = ViewState.Failure(it)
                 refreshPointerIfNeed()
             }
         })
@@ -153,7 +148,7 @@ class ReaderViewModel @Inject constructor(
         val result =
             if (providerId == null) remoteLibraryRepository.getManga(mangaId)
             else remoteProviderRepository.getManga(providerId, mangaId)
-        if (mangaLoadState.value != LoadState.Loaded) {
+        if (mangaLoadState.value != ViewState.Loaded) {
             mangaDetail.value = result
         }
     }
@@ -181,7 +176,7 @@ class ReaderViewModel @Inject constructor(
         val nextChapter = pointer.nextChapter
             ?: return feed(R.string.toast_no_next_chapter)
 
-        if (nextChapter.state is LoadState.Loaded) {
+        if (nextChapter.state is ViewState.Loaded) {
             chapterPointer.value =
                 ReaderChapterPointer(nextChapter.index, 0)
             loadChapterPointer()
@@ -195,7 +190,7 @@ class ReaderViewModel @Inject constructor(
         val prevChapter = pointer.prevChapter
             ?: return feed(R.string.toast_no_prev_chapter)
 
-        if (prevChapter.state is LoadState.Loaded) {
+        if (prevChapter.state is ViewState.Loaded) {
             chapterPointer.value =
                 ReaderChapterPointer(prevChapter.index, Int.MAX_VALUE)
             loadChapterPointer()

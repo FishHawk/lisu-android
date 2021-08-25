@@ -35,8 +35,7 @@ fun ApplicationTheme(content: @Composable () -> Unit) {
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = MaterialTheme.colors.isLight
             SideEffect {
-                systemUiController.setSystemBarsColor(Color.Transparent, useDarkIcons)
-                systemUiController.setNavigationBarColor(Color.Transparent, useDarkIcons)
+                systemUiController.setStatusBarColor(Color.Transparent, useDarkIcons)
             }
 
             ProvideWindowInsets {

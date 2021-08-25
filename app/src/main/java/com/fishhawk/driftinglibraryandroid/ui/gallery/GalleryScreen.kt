@@ -19,6 +19,7 @@ import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.*
 import com.fishhawk.driftinglibraryandroid.ui.activity.setArgument
+import com.fishhawk.driftinglibraryandroid.ui.base.StateView
 import com.fishhawk.driftinglibraryandroid.ui.base.copyToClipboard
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.fishhawk.driftinglibraryandroid.ui.theme.MaterialColors
@@ -36,12 +37,18 @@ fun GalleryScreen(navController: NavHostController) {
         Scaffold(
             topBar = { MangaHeader(navController, detail) },
             content = {
-                val isRefreshing by viewModel.isRefreshing.collectAsState()
-                SwipeRefresh(
-                    modifier = Modifier.fillMaxSize(),
-                    state = rememberSwipeRefreshState(isRefreshing),
-                    onRefresh = { viewModel.refreshManga() },
-                ) { MangaBody(navController, detail) }
+                val viewState by viewModel.viewState.collectAsState()
+                StateView(
+                    viewState = viewState,
+                    onRetry = { viewModel.reloadManga() }
+                ) {
+                    val isRefreshing by viewModel.isRefreshing.collectAsState()
+                    SwipeRefresh(
+                        modifier = Modifier.fillMaxSize(),
+                        state = rememberSwipeRefreshState(isRefreshing),
+                        onRefresh = { viewModel.refreshManga() },
+                    ) { MangaBody(navController, detail) }
+                }
             }
         )
     }
@@ -65,6 +72,18 @@ private fun MangaBody(navController: NavHostController, detail: MangaDetail) {
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+//        when (val state = mangaList.loadState.refresh) {
+//            is LoadState.Error -> item {
+//                ErrorView(
+//                    modifier = Modifier.fillParentMaxSize(),
+//                    exception = state.error
+//                ) { mangaList.retry() }
+//            }
+////            is LoadState.NotLoading -> {
+////                if (mangaList.itemCount == 0) item { EmptyView() }
+////            }
+//        }
+
         detail.source?.let { item { MangaSource(it) } }
         detail.metadata.description?.let { item { MangaDescription(it) } }
         detail.metadata.tags?.let { tags ->

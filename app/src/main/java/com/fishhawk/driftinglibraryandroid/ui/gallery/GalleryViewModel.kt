@@ -2,14 +2,14 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
-import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 import com.fishhawk.driftinglibraryandroid.data.remote.model.*
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
+import com.fishhawk.driftinglibraryandroid.ui.base.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -25,16 +25,17 @@ class GalleryViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : FeedbackViewModel() {
 
-    private val _detail = MutableStateFlow<ResultX<MangaDetail>?>(null)
-    val detail = _detail
-        .map { it?.getOrNull() }
-        .filterNotNull()
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(),
-            MangaDetail(savedStateHandle.get("outline")!!)
-                .copy(provider = savedStateHandle.get("provider"))
-        )
+    private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
+    val viewState = _viewState.asStateFlow()
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
+    private val _detail = MutableStateFlow(
+        MangaDetail(savedStateHandle.get("outline")!!)
+            .copy(provider = savedStateHandle.get("provider"))
+    )
+    val detail = _detail.asStateFlow()
 
     private val mangaId
         get() = detail.value.id
@@ -42,29 +43,39 @@ class GalleryViewModel @Inject constructor(
     private val providerId
         get() = detail.value.provider?.id
 
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing = _isRefreshing.asStateFlow()
-
     @OptIn(ExperimentalCoroutinesApi::class)
     val history = PR.selectedServer.flow.flatMapLatest {
         readingHistoryRepository.select(it, mangaId)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
+    private suspend fun getManga() = providerId?.let {
+        remoteProviderRepository.getManga(it, mangaId)
+    } ?: remoteLibraryRepository.getManga(mangaId)
+
+    fun reloadManga() = viewModelScope.launch {
+        _viewState.value = ViewState.Loading
+        getManga()
+            .onSuccess {
+                _viewState.value = ViewState.Loaded
+                _detail.value = it
+            }.onFailure {
+                _viewState.value = ViewState.Failure(it)
+            }
+    }
+
     fun refreshManga() = viewModelScope.launch {
         _isRefreshing.value = true
-        _detail.value = providerId?.let {
-            remoteProviderRepository.getManga(it, mangaId)
-        } ?: remoteLibraryRepository.getManga(mangaId)
+        getManga().onSuccess { _detail.value = it }
         _isRefreshing.value = false
     }
 
     init {
-        refreshManga()
+        reloadManga()
     }
 
     fun updateCover(requestBody: RequestBody) = viewModelScope.launch {
         val result = remoteLibraryRepository.updateMangaCover(mangaId, requestBody)
-        if (result.isSuccess) _detail.value = result
+        result.onSuccess { _detail.value = it }
         resultWarp(result) {
             feed(R.string.toast_manga_cover_updated)
         }
@@ -72,10 +83,12 @@ class GalleryViewModel @Inject constructor(
 
     fun updateMetadata(metadata: MetadataDetail) = viewModelScope.launch {
         val result = remoteLibraryRepository.updateMangaMetadata(mangaId, metadata)
-        if (result.isSuccess) {
-            _detail.value = result
+        result.onSuccess {
+            _detail.value = it
             feed(R.string.toast_manga_metadata_updated)
-        } else result.exceptionOrNull()?.let { feed(it) }
+        }.onFailure {
+            result.exceptionOrNull()?.let { feed(it) }
+        }
     }
 
     fun syncSource() = viewModelScope.launch {

@@ -28,11 +28,9 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
-import com.fishhawk.driftinglibraryandroid.ui.base.ErrorView
+import com.fishhawk.driftinglibraryandroid.ui.base.StateView
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -61,23 +59,14 @@ private fun ToolBar() {
 @Composable
 private fun Content(navHostController: NavHostController) {
     val viewModel = hiltViewModel<ExploreViewModel>()
-    val providerList by viewModel.providerList.flow.collectAsState()
-
-    providerList?.getOrNull()?.let {
-        val isRefreshing by viewModel.providerList.isRefreshing.collectAsState()
-        SwipeRefresh(
-            state = rememberSwipeRefreshState(isRefreshing),
-            onRefresh = { viewModel.providerList.refresh() },
-        ) {
-            if (it.isEmpty()) EmptyView()
-            else ProviderList(it, navHostController)
-        }
-    }
-    providerList?.exceptionOrNull()?.let {
-        ErrorView(
-            modifier = Modifier.fillMaxSize(),
-            exception = it
-        ) { viewModel.providerList.reload() }
+    val viewState by viewModel.viewState.collectAsState()
+    StateView(
+        viewState = viewState,
+        onRetry = { viewModel.reload() }
+    ) {
+        val providerList by viewModel.providerList.collectAsState()
+        if (providerList.isEmpty()) EmptyView()
+        else ProviderList(providerList, navHostController)
     }
 }
 

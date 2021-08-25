@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
 import androidx.activity.compose.setContent
-import androidx.annotation.IntRange
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
@@ -21,8 +20,7 @@ import com.fishhawk.driftinglibraryandroid.data.datastore.ReaderMode
 import com.fishhawk.driftinglibraryandroid.data.datastore.ReaderOrientation
 import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
-import com.fishhawk.driftinglibraryandroid.ui.base.ErrorView
-import com.fishhawk.driftinglibraryandroid.ui.base.LoadingView
+import com.fishhawk.driftinglibraryandroid.ui.base.StateView
 import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ListViewer
 import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.PagerViewer
 import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ViewerState
@@ -113,66 +111,60 @@ class ReaderActivity : BaseActivity() {
 @Composable
 private fun ReaderScreen() {
     val viewModel = viewModel<ReaderViewModel>()
-    val mangaLoadState by viewModel.mangaLoadState.collectAsState()
+    val mangaViewState by viewModel.mangaLoadState.collectAsState()
 
-    when (mangaLoadState) {
-        LoadState.Loading -> LoadingView()
-        is LoadState.Failure -> ErrorView(
-            modifier = Modifier.fillMaxSize(),
-            exception = (mangaLoadState as LoadState.Failure).exception
-        ) { viewModel.refreshReader() }
-        LoadState.Loaded -> {
+    StateView(
+        viewState = mangaViewState,
+        onRetry = { viewModel.refreshReader() }
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             val pointer by viewModel.chapterPointer.collectAsState()
-            Box(modifier = Modifier.fillMaxSize()) {
-                var readerState: ViewerState? = null
-                when (val state = pointer.currChapter.state) {
-                    LoadState.Loading -> LoadingView()
-                    is LoadState.Failure -> ErrorView(
-                        modifier = Modifier.fillMaxSize(),
-                        exception = state.exception
-                    ) { }
-                    LoadState.Loaded -> {
-                        val mode by PR.readerMode.collectAsState()
-                        val size = pointer.currChapter.images.size
-                        var startPage by remember(pointer) {
-                            mutableStateOf(pointer.startPage.coerceAtMost(size - 1))
-                        }
-
-                        if (mode == ReaderMode.Continuous) {
-                            readerState = ViewerState.List(
-                                rememberSaveable(pointer, mode, saver = LazyListState.Saver) {
-                                    LazyListState(firstVisibleItemIndex = startPage)
-                                }
-                            )
-                            ListViewer(readerState, pointer)
-                        } else {
-                            readerState = ViewerState.Pager(
-                                rememberSaveable(pointer, mode, saver = PagerState.Saver) {
-                                    PagerState(
-                                        pageCount = size,
-                                        currentPage = startPage,
-                                        offscreenLimit = 3,
-                                    )
-                                }
-                            )
-                            PagerViewer(readerState, pointer, mode == ReaderMode.Rtl)
-                        }
-                        LaunchedEffect(readerState.position) {
-                            readerState.position.let {
-                                startPage = it
-                                viewModel.updateReadingHistory(it)
-                            }
-                        }
-                    }
+            var readerState: ViewerState? = null
+            StateView(
+                viewState = pointer.currChapter.state,
+                onRetry = { }
+            ) {
+                val mode by PR.readerMode.collectAsState()
+                val size = pointer.currChapter.images.size
+                var startPage by remember(pointer) {
+                    mutableStateOf(pointer.startPage.coerceAtMost(size - 1))
                 }
 
-                val name = pointer.currChapter.name
-                val title = pointer.currChapter.title
-
-                ReaderInfoBar(name, title, readerState)
-                ReaderColorFilterOverlay()
-                ReaderMenu(name, title, readerState)
+                if (mode == ReaderMode.Continuous) {
+                    readerState = ViewerState.List(
+                        rememberSaveable(pointer, mode, saver = LazyListState.Saver) {
+                            LazyListState(firstVisibleItemIndex = startPage)
+                        }
+                    ).also {
+                        ListViewer(it, pointer)
+                    }
+                } else {
+                    readerState = ViewerState.Pager(
+                        rememberSaveable(pointer, mode, saver = PagerState.Saver) {
+                            PagerState(
+                                pageCount = size,
+                                currentPage = startPage,
+                                offscreenLimit = 3,
+                            )
+                        }
+                    ).also {
+                        PagerViewer(it, pointer, mode == ReaderMode.Rtl)
+                    }
+                }
+                LaunchedEffect(readerState!!.position) {
+                    readerState!!.position.let {
+                        startPage = it
+                        viewModel.updateReadingHistory(it)
+                    }
+                }
             }
+
+            val name = pointer.currChapter.name
+            val title = pointer.currChapter.title
+
+            ReaderInfoBar(name, title, readerState)
+            ReaderColorFilterOverlay()
+            ReaderMenu(name, title, readerState)
         }
     }
 }
