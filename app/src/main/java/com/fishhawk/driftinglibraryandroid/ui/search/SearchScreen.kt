@@ -13,7 +13,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.activity.setArgument
 import com.fishhawk.driftinglibraryandroid.ui.activity.setString
@@ -34,7 +33,10 @@ fun SearchScreen(navController: NavHostController) {
 
 @Composable
 private fun ToolBar(navController: NavHostController) {
-    ApplicationToolBar(stringResource(R.string.label_search, navController)) {
+    ApplicationToolBar(
+        title = stringResource(R.string.label_search),
+        navController = navController
+    ) {
         // queryHint = getString(R.string.menu_search_hint)
         // setQuery(viewModel.keywords.value, false)
         IconButton(onClick = { }) {

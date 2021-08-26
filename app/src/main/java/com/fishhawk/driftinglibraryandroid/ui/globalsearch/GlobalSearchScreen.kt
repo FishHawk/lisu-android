@@ -40,7 +40,10 @@ fun GlobalSearchScreen(navController: NavHostController) {
 
 @Composable
 private fun ToolBar(navController: NavHostController) {
-    ApplicationToolBar(stringResource(R.string.label_global_search), navController) {
+    ApplicationToolBar(
+        title = stringResource(R.string.label_global_search),
+        navController = navController
+    ) {
         // queryHint = getString(R.string.menu_search_global_hint)
         // setQuery(viewModel.keywords.value, false)
         IconButton(onClick = { }) {

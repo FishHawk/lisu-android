@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.*
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -23,8 +26,9 @@ import com.fishhawk.driftinglibraryandroid.ui.base.StateView
 import com.fishhawk.driftinglibraryandroid.ui.base.copyToClipboard
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.fishhawk.driftinglibraryandroid.ui.theme.MaterialColors
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import me.onebone.toolbar.CollapsingToolbarScaffold
+import me.onebone.toolbar.ScrollStrategy
+import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
 @Composable
 fun GalleryScreen(navController: NavHostController) {
@@ -34,23 +38,20 @@ fun GalleryScreen(navController: NavHostController) {
     ApplicationTransition {
         val viewModel = hiltViewModel<GalleryViewModel>()
         val detail by viewModel.detail.collectAsState()
-        Scaffold(
-            topBar = { MangaHeader(navController, detail) },
-            content = {
-                val viewState by viewModel.viewState.collectAsState()
-                StateView(
-                    viewState = viewState,
-                    onRetry = { viewModel.reloadManga() }
-                ) {
-                    val isRefreshing by viewModel.isRefreshing.collectAsState()
-                    SwipeRefresh(
-                        modifier = Modifier.fillMaxSize(),
-                        state = rememberSwipeRefreshState(isRefreshing),
-                        onRefresh = { viewModel.refreshManga() },
-                    ) { MangaBody(navController, detail) }
-                }
+        CollapsingToolbarScaffold(
+            modifier = Modifier.fillMaxSize(),
+            state = rememberCollapsingToolbarScaffoldState(),
+            scrollStrategy = ScrollStrategy.ExitUntilCollapsed,
+            toolbar = { MangaHeader(navController, detail) }
+        ) {
+            val viewState by viewModel.viewState.collectAsState()
+            StateView(
+                viewState = viewState,
+                onRetry = { viewModel.reloadManga() }
+            ) {
+                MangaBody(navController, detail)
             }
-        )
+        }
     }
 }
 
@@ -69,6 +70,7 @@ private fun MangaBody(navController: NavHostController, detail: MangaDetail) {
     }
 
     LazyColumn(
+        modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {

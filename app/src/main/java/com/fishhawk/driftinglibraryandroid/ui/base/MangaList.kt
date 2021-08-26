@@ -59,7 +59,7 @@ fun RefreshableMangaList(
 }
 
 @Composable
-private fun MangaList(
+fun MangaList(
     mangaList: LazyPagingItems<MangaOutline>,
     onCardClick: (outline: MangaOutline) -> Unit = {},
     onCardLongClick: (outline: MangaOutline) -> Unit = {}

@@ -8,7 +8,9 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.PR
@@ -61,11 +63,19 @@ fun ApplicationTransition(
 @Composable
 fun ApplicationToolBar(
     title: String,
+    modifier: Modifier = Modifier,
     navController: NavHostController? = null,
     elevation: Dp = AppBarDefaults.TopAppBarElevation,
     actions: @Composable RowScope.() -> Unit = {}
 ) = TopAppBar(
-    title = { Text(title) },
+    title = {
+        Text(
+            text = title,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    },
+    modifier = modifier,
     contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
     navigationIcon = navController?.let {
         {

@@ -11,8 +11,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import coil.imageLoader
 import coil.util.CoilUtils
-import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.PR
+import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.ui.base.toast
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
@@ -23,8 +23,8 @@ fun SettingAdvancedScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             ApplicationToolBar(
-                stringResource(R.string.label_settings_advanced),
-                navController
+                title = stringResource(R.string.label_settings_advanced),
+                navController = navController
             )
         },
         content = { ApplicationTransition { Content() } }

@@ -95,7 +95,11 @@ private fun ToolBar(pagerState: PagerState, navController: NavHostController) {
 
     Surface(elevation = AppBarDefaults.TopAppBarElevation) {
         Column {
-            ApplicationToolBar(viewModel.provider.title, navController, 0.dp) {
+            ApplicationToolBar(
+                title = viewModel.provider.title,
+                navController = navController,
+                elevation = 0.dp
+            ) {
                 IconButton(onClick = {
 //            queryHint = getString(R.string.menu_search_hint)
 //                    findNavController().navigate(

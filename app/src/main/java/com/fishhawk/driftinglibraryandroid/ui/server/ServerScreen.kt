@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ServerInfo
-import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
@@ -42,7 +42,10 @@ fun ServerScreen(navController: NavHostController) {
 private fun ToolBar(navController: NavHostController) {
     val viewModel = hiltViewModel<ServerViewModel>()
 
-    ApplicationToolBar(stringResource(R.string.label_server), navController) {
+    ApplicationToolBar(
+        title = stringResource(R.string.label_server),
+        navController = navController
+    ) {
         val isOpen = remember { mutableStateOf(false) }
         IconButton(onClick = { isOpen.value = true }) {
             Icon(Icons.Filled.Add, contentDescription = "Add")

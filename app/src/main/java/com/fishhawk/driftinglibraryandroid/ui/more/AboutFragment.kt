@@ -17,7 +17,12 @@ import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 @Composable
 fun AboutScreen(navController: NavHostController) {
     Scaffold(
-        topBar = { ApplicationToolBar(stringResource(R.string.label_about), navController) },
+        topBar = {
+            ApplicationToolBar(
+                title = stringResource(R.string.label_about),
+                navController = navController
+            )
+        },
         content = { ApplicationTransition { Content() } }
     )
 }

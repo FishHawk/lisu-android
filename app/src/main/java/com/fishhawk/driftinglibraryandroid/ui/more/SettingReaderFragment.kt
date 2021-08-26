@@ -7,8 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
-import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.PR
+import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.datastore.ReaderMode
 import com.fishhawk.driftinglibraryandroid.data.datastore.ReaderOrientation
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
@@ -19,8 +19,8 @@ fun SettingReaderScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             ApplicationToolBar(
-                stringResource(R.string.label_settings_reader),
-                navController
+                title = stringResource(R.string.label_settings_reader),
+                navController = navController
             )
         },
         content = { ApplicationTransition { Content() } }

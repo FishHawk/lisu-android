@@ -18,8 +18,8 @@ fun SettingGeneralScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             ApplicationToolBar(
-                stringResource(R.string.label_settings_general),
-                navController
+                title = stringResource(R.string.label_settings_general),
+                navController = navController
             )
         },
         content = { ApplicationTransition { Content() } }
