@@ -105,7 +105,7 @@ private fun ReaderMenuSurface(
 ) = Surface(
     modifier = modifier,
     shape = shape,
-    color = Color.Black.copy(alpha = 0.7f),
+    color = Color(0xFF333333).copy(alpha = 0.8f),
     contentColor = Color.White,
     content = content
 )

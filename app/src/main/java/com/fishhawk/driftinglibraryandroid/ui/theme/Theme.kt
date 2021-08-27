@@ -37,6 +37,8 @@ fun ApplicationTheme(content: @Composable () -> Unit) {
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = MaterialTheme.colors.isLight
             SideEffect {
+                // hack, see https://github.com/google/accompanist/issues/683
+                systemUiController.setStatusBarColor(Color.Transparent, true)
                 systemUiController.setStatusBarColor(Color.Transparent, useDarkIcons)
             }
 
