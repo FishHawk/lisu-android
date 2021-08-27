@@ -15,7 +15,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -31,6 +34,7 @@ import com.fishhawk.driftinglibraryandroid.data.datastore.setNext
 import com.fishhawk.driftinglibraryandroid.ui.base.findActivity
 import com.fishhawk.driftinglibraryandroid.ui.reader.viewer.ViewerState
 import com.google.accompanist.insets.statusBarsPadding
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 
 @Composable
@@ -65,6 +69,15 @@ fun BoxScope.ReaderMenu(
     val viewModel = viewModel<ReaderViewModel>()
     val isMenuOpened by viewModel.isMenuOpened.collectAsState()
 
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = MaterialTheme.colors.isLight
+    LaunchedEffect(isMenuOpened) {
+        systemUiController.setStatusBarColor(
+            Color.Transparent,
+            darkIcons = useDarkIcons && !isMenuOpened
+        )
+    }
+
     AnimatedVisibility(
         modifier = Modifier.align(Alignment.TopCenter),
         visible = isMenuOpened,
@@ -85,41 +98,53 @@ fun BoxScope.ReaderMenu(
 }
 
 @Composable
-private fun ReaderMenuTop(name: String, title: String) {
-    Row(
-        modifier = Modifier
-            .background(Color(0xAA000000))
-            .padding(4.dp)
-            .statusBarsPadding(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val context = LocalContext.current
-        IconButton(onClick = { context.findActivity().finish() }) {
-            Icon(Icons.Filled.ArrowBack, "back", tint = Color.White)
-        }
+private fun ReaderMenuSurface(
+    modifier: Modifier = Modifier,
+    shape: Shape = RectangleShape,
+    content: @Composable () -> Unit
+) = Surface(
+    modifier = modifier,
+    shape = shape,
+    color = Color.Black.copy(alpha = 0.7f),
+    contentColor = Color.White,
+    content = content
+)
 
-        Column(
+@Composable
+private fun ReaderMenuTop(name: String, title: String) {
+    ReaderMenuSurface {
+        Row(
             modifier = Modifier
-                .weight(1f)
-                .padding(8.dp)
+                .padding(4.dp)
+                .statusBarsPadding(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            val viewModel = viewModel<ReaderViewModel>()
-            val mangaTitle by viewModel.mangaTitle.collectAsState()
-            Text(
-                text = mangaTitle,
-                style = MaterialTheme.typography.subtitle1.copy(fontSize = 18.sp),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = Color.White
-            )
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            val context = LocalContext.current
+            IconButton(onClick = { context.findActivity().finish() }) {
+                Icon(Icons.Filled.ArrowBack, "back")
+            }
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(8.dp)
+            ) {
+                val viewModel = viewModel<ReaderViewModel>()
+                val mangaTitle by viewModel.mangaTitle.collectAsState()
                 Text(
-                    text = "$name $title",
-                    style = MaterialTheme.typography.body2,
+                    text = mangaTitle,
+                    style = MaterialTheme.typography.subtitle1.copy(fontSize = 18.sp),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.White
+                    overflow = TextOverflow.Ellipsis
                 )
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    Text(
+                        text = "$name $title",
+                        style = MaterialTheme.typography.body2,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
     }
@@ -127,9 +152,9 @@ private fun ReaderMenuTop(name: String, title: String) {
 
 @Composable
 private fun ReaderMenuBottom(viewerState: ViewerState?) {
-    val viewModel = viewModel<ReaderViewModel>()
-
     Column {
+        val viewModel = viewModel<ReaderViewModel>()
+
         val readingDirection by PR.readerMode.collectAsState()
         val layoutDirection =
             if (readingDirection == ReaderMode.Rtl) LayoutDirection.Rtl
@@ -143,35 +168,39 @@ private fun ReaderMenuBottom(viewerState: ViewerState?) {
             ) {
                 val isOnlyOneChapter by viewModel.isOnlyOneChapter.collectAsState()
                 if (!isOnlyOneChapter)
-                    Surface(
+                    ReaderMenuSurface(
                         modifier = Modifier.size(48.dp),
-                        shape = CircleShape,
-                        color = Color(0xAA000000)
+                        shape = CircleShape
                     ) {
                         IconButton(onClick = { viewModel.openPrevChapter() }) {
                             Icon(
                                 if (LocalLayoutDirection.current == LayoutDirection.Ltr)
                                     Icons.Filled.SkipPrevious else Icons.Filled.SkipNext,
-                                "prev", tint = Color.White
+                                "prev"
                             )
                         }
                     }
 
-                Surface(
+                ReaderMenuSurface(
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(24.dp),
-                    color = Color(0xAA000000)
+                    shape = RoundedCornerShape(24.dp)
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 8.dp),
+                        modifier = Modifier.padding(horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
+                        var sizeLabelWidth by remember { mutableStateOf<Int?>(null) }
+                        val widthModifier = sizeLabelWidth?.let { width ->
+                            with(LocalDensity.current) {
+                                Modifier.width(width.toDp())
+                            }
+                        } ?: Modifier
+
                         Text(
-                            modifier = Modifier.width(32.dp),
+                            modifier = widthModifier,
                             text = viewerState?.position?.plus(1)?.toString() ?: "-",
                             style = MaterialTheme.typography.body2,
-                            color = Color.White,
                             textAlign = TextAlign.Center
                         )
 
@@ -191,62 +220,60 @@ private fun ReaderMenuBottom(viewerState: ViewerState?) {
                         )
 
                         Text(
-                            modifier = Modifier.width(32.dp),
                             text = viewerState?.size?.toString() ?: "-",
                             style = MaterialTheme.typography.body2,
-                            color = Color.White,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
+                            onTextLayout = { sizeLabelWidth = it.size.width }
                         )
                     }
                 }
 
                 if (!isOnlyOneChapter)
-                    Surface(
+                    ReaderMenuSurface(
                         modifier = Modifier.size(48.dp),
-                        shape = CircleShape,
-                        color = Color(0xAA000000)
+                        shape = CircleShape
                     ) {
                         IconButton(onClick = { viewModel.openNextChapter() }) {
                             Icon(
                                 if (LocalLayoutDirection.current == LayoutDirection.Ltr)
                                     Icons.Filled.SkipNext else Icons.Filled.SkipPrevious,
-                                "next", tint = Color.White
+                                "next"
                             )
                         }
                     }
             }
         }
 
-        Row(
-            modifier = Modifier
-                .background(Color(0xAA000000))
-                .padding(top = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val context = LocalContext.current
+        ReaderMenuSurface {
+            Row(
+                modifier = Modifier.padding(top = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val context = LocalContext.current
 
-            IconButton(modifier = Modifier.weight(1f), onClick = {
-                viewModel.viewModelScope.launch { PR.readerMode.setNext() }
-            }) {
-                val icon = when (readingDirection) {
-                    ReaderMode.Ltr -> Icons.Filled.ArrowForward
-                    ReaderMode.Rtl -> Icons.Filled.ArrowBack
-                    ReaderMode.Continuous -> Icons.Filled.Expand
+                IconButton(modifier = Modifier.weight(1f), onClick = {
+                    viewModel.viewModelScope.launch { PR.readerMode.setNext() }
+                }) {
+                    val icon = when (readingDirection) {
+                        ReaderMode.Ltr -> Icons.Filled.ArrowForward
+                        ReaderMode.Rtl -> Icons.Filled.ArrowBack
+                        ReaderMode.Continuous -> Icons.Filled.Expand
+                    }
+                    Icon(icon, "setting")
                 }
-                Icon(icon, "setting", tint = Color.White)
+
+                IconButton(modifier = Modifier.weight(1f), onClick = {
+                    viewModel.viewModelScope.launch { PR.readerOrientation.setNext() }
+                }) { Icon(Icons.Filled.ScreenRotation, null) }
+
+                IconButton(modifier = Modifier.weight(1f), onClick = {
+                    openSheet(BottomSheet.ColorFilterSheet)
+                }) { Icon(Icons.Filled.BrightnessMedium, "color-filter") }
+
+                IconButton(modifier = Modifier.weight(1f), onClick = {
+                    openSheet(BottomSheet.SettingSheet)
+                }) { Icon(Icons.Filled.Settings, "setting") }
             }
-
-            IconButton(modifier = Modifier.weight(1f), onClick = {
-                viewModel.viewModelScope.launch { PR.readerOrientation.setNext() }
-            }) { Icon(Icons.Filled.ScreenRotation, null, tint = Color.White) }
-
-            IconButton(modifier = Modifier.weight(1f), onClick = {
-                openSheet(BottomSheet.ColorFilterSheet)
-            }) { Icon(Icons.Filled.BrightnessMedium, "color-filter", tint = Color.White) }
-
-            IconButton(modifier = Modifier.weight(1f), onClick = {
-                openSheet(BottomSheet.SettingSheet)
-            }) { Icon(Icons.Filled.Settings, "setting", tint = Color.White) }
         }
     }
 }
