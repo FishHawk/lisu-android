@@ -12,7 +12,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fishhawk.driftinglibraryandroid.data.remote.model.TagGroup
@@ -70,13 +69,12 @@ private fun Tag(
     onTagClose: () -> Unit = {}
 ) {
     Surface(
-        modifier = Modifier,
         shape = RoundedCornerShape(16.dp),
-        color = Color.LightGray
+        color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
     ) {
         Text(
             modifier = Modifier
-                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .padding(horizontal = 12.dp, vertical = 4.dp)
                 .combinedClickable(
                     onClick = { onTagClick(value) },
                     onLongClick = { onTagLongClick(value) }

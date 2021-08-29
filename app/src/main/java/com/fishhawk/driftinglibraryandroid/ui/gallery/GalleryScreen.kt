@@ -74,20 +74,10 @@ private fun MangaBody(navController: NavHostController, detail: MangaDetail) {
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-//        when (val state = mangaList.loadState.refresh) {
-//            is LoadState.Error -> item {
-//                ErrorView(
-//                    modifier = Modifier.fillParentMaxSize(),
-//                    exception = state.error
-//                ) { mangaList.retry() }
-//            }
-////            is LoadState.NotLoading -> {
-////                if (mangaList.itemCount == 0) item { EmptyView() }
-////            }
-//        }
-
         detail.source?.let { item { MangaSource(it) } }
-        detail.metadata.description?.let { item { MangaDescription(it) } }
+        if (!detail.metadata.description.isNullOrBlank()) {
+            item { MangaDescription(detail.metadata.description) }
+        }
         detail.metadata.tags?.let { tags ->
             item {
                 val context = LocalContext.current
