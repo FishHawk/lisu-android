@@ -64,18 +64,14 @@ fun ApplicationTransition(
 
 @Composable
 fun ApplicationToolBar(
-    title: String,
+    title: String? = null,
     modifier: Modifier = Modifier,
     navController: NavHostController? = null,
     elevation: Dp = AppBarDefaults.TopAppBarElevation,
     actions: @Composable RowScope.() -> Unit = {}
 ) = TopAppBar(
     title = {
-        Text(
-            text = title,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        title?.let { Text(text = it, maxLines = 1, overflow = TextOverflow.Ellipsis) }
     },
     modifier = modifier,
     contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),

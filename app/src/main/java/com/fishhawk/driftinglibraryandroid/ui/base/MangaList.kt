@@ -79,7 +79,7 @@ fun MangaList(
                     val itemIndex = rowIndex * nColumns + columnIndex
                     if (itemIndex < mangaList.itemCount) {
                         Box(
-                            modifier = Modifier.weight(1f, fill = true),
+                            modifier = Modifier.weight(1f),
                             propagateMinConstraints = true
                         ) {
                             MangaListCard(

@@ -4,105 +4,167 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NavigateNext
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.activity.setString
 import com.fishhawk.driftinglibraryandroid.ui.base.ErrorItem
+import com.fishhawk.driftinglibraryandroid.ui.base.LoadingItem
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListCard
+import com.fishhawk.driftinglibraryandroid.ui.base.ViewState
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
+import kotlinx.coroutines.flow.StateFlow
+
+
+private typealias GlobalSearchActionHandler = (GlobalSearchAction) -> Unit
+
+private sealed class GlobalSearchAction {
+    data class NavToGallery(
+        val provider: ProviderInfo,
+        val outline: MangaOutline
+    ) : GlobalSearchAction()
+
+    data class NavToProviderSearch(
+        val provider: ProviderInfo
+    ) : GlobalSearchAction()
+
+    data class Search(
+        val keywords: String
+    ) : GlobalSearchAction()
+}
 
 @Composable
 fun GlobalSearchScreen(navController: NavHostController) {
     navController.setString("keywords")
 
+    val viewModel = hiltViewModel<GlobalSearchViewModel>()
+    val initKeywords = viewModel.keywords.value
+    val searchResultList by viewModel.searchResultList.collectAsState()
+    val onAction: GlobalSearchActionHandler = { action ->
+        when (action) {
+            is GlobalSearchAction.NavToGallery -> {
+                navController.currentBackStackEntry?.arguments =
+                    bundleOf(
+                        "outline" to action.outline,
+                        "provider" to action.provider
+                    )
+                navController.navigate("gallery/${action.outline.id}")
+            }
+            is GlobalSearchAction.NavToProviderSearch -> {
+                navController.currentBackStackEntry?.arguments =
+                    bundleOf(
+                        "keywords" to viewModel.keywords.value,
+                        "provider" to action.provider
+                    )
+                navController.navigate("search/${action.provider.id}")
+            }
+            is GlobalSearchAction.Search -> viewModel.search(action.keywords)
+        }
+    }
+
     Scaffold(
-        topBar = { ToolBar(navController) },
-        content = { ApplicationTransition { Content(navController) } }
+        topBar = { ToolBar(navController, initKeywords, onAction) },
+        content = { ApplicationTransition { SearchResultList(searchResultList, onAction) } }
     )
 }
 
 @Composable
-private fun ToolBar(navController: NavHostController) {
-    ApplicationToolBar(
-        title = stringResource(R.string.label_global_search),
-        navController = navController
-    ) {
-        // queryHint = getString(R.string.menu_search_global_hint)
-        // setQuery(viewModel.keywords.value, false)
-        IconButton(onClick = { }) {
-            Icon(Icons.Filled.Search, contentDescription = "search")
-        }
+private fun ToolBar(
+    navController: NavHostController,
+    initKeywords: String?,
+    onAction: GlobalSearchActionHandler
+) {
+    val focusRequester = remember { FocusRequester() }
+
+    ApplicationToolBar(navController = navController) {
+        var keywords by remember { mutableStateOf(TextFieldValue(initKeywords ?: "")) }
+        TextField(
+            modifier = Modifier.focusRequester(focusRequester),
+            value = keywords,
+            onValueChange = { keywords = it },
+            singleLine = true,
+            placeholder = { Text(stringResource(R.string.menu_search_global_hint)) },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(onSearch = {
+                onAction(GlobalSearchAction.Search(keywords.text))
+            }),
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            )
+        )
+    }
+
+    DisposableEffect(Unit) {
+        if (initKeywords == null) focusRequester.requestFocus()
+        onDispose { }
     }
 }
 
 @Composable
-private fun Content(navController: NavHostController) {
-    val viewModel = hiltViewModel<GlobalSearchViewModel>()
-    val searchGroupList by viewModel.searchGroupList.collectAsState()
-
+private fun SearchResultList(
+    searchResultList: List<StateFlow<SearchResult>>,
+    onAction: GlobalSearchActionHandler
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(searchGroupList) {
-            Column {
-                val searchGroup by it.collectAsState()
+        items(searchResultList) {
+            val searchResult by it.collectAsState()
+            SearchResultItem(searchResult, onAction)
+        }
+    }
+}
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(searchGroup.provider.title)
-                    Spacer(modifier = Modifier.weight(1f, fill = true))
-                    IconButton(onClick = {
-                        navController.currentBackStackEntry?.arguments =
-                            bundleOf(
-                                "keywords" to viewModel.keywords.value,
-                                "provider" to searchGroup.provider
+@Composable
+private fun SearchResultItem(searchResult: SearchResult, onAction: GlobalSearchActionHandler) {
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(searchResult.provider.title)
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = {
+                onAction(GlobalSearchAction.NavToProviderSearch(provider = searchResult.provider))
+            }) { Icon(Icons.Filled.NavigateNext, "Forward") }
+        }
+
+        when (searchResult.viewState) {
+            ViewState.Loading -> LoadingItem()
+            is ViewState.Failure -> ErrorItem(exception = searchResult.viewState.throwable) { }
+            ViewState.Loaded -> LazyRow(
+                modifier = Modifier.height(140.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(searchResult.mangas) {
+                    MangaListCard(it, onCardClick = { outline ->
+                        onAction(
+                            GlobalSearchAction.NavToGallery(
+                                provider = searchResult.provider,
+                                outline = outline
                             )
-                        navController.navigate("search/${searchGroup.provider.id}")
-                    }) { Icon(Icons.Filled.NavigateNext, "Forward") }
-                }
-
-                searchGroup.result?.getOrNull()?.let {
-                    LazyRow(
-                        modifier = Modifier.height(140.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        items(it) {
-                            Box(
-                                modifier = Modifier.weight(1f, fill = true),
-                                propagateMinConstraints = true
-                            ) {
-                                MangaListCard(it, onCardClick = {
-                                    navController.currentBackStackEntry?.arguments =
-                                        bundleOf(
-                                            "outline" to it,
-                                            "provider" to searchGroup.provider
-                                        )
-                                    navController.navigate("gallery/${it.id}")
-                                })
-                            }
-                        }
-                    }
-                }
-                searchGroup.result?.exceptionOrNull()?.let {
-                    ErrorItem(it) {}
+                        )
+                    })
                 }
             }
         }

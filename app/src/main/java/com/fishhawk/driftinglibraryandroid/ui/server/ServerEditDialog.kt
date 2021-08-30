@@ -33,7 +33,6 @@ fun ServerEditDialog(
                         onValueChange = { name = it },
                         maxLines = 1,
                         label = { Text("Name") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
                     )
                     TextField(

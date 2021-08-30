@@ -8,10 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -20,7 +17,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.fishhawk.driftinglibraryandroid.PR
@@ -31,33 +27,29 @@ import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
 import com.fishhawk.driftinglibraryandroid.ui.base.StateView
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
-fun ExploreScreen(navHostController: NavHostController) {
+fun ExploreScreen(navController: NavHostController) {
     Scaffold(
-        topBar = { ToolBar() },
-        content = { ApplicationTransition { Content(navHostController) } }
+        topBar = { ToolBar(navController) },
+        content = { ApplicationTransition { Content(navController) } }
     )
 }
 
 @Composable
-private fun ToolBar() {
+private fun ToolBar(navController: NavHostController) {
     ApplicationToolBar(stringResource(R.string.label_explore)) {
-        //  queryHint = getString(R.string.menu_search_global_hint)
-        //  binding.root.findNavController().navigate(
-        //      R.id.action_explore_to_global_search,
-        //      bundleOf("keywords" to query)
-        //  )
-        IconButton(onClick = { }) {
+        IconButton(onClick = { navController.navToGlobalSearch() }) {
             Icon(Icons.Filled.Search, contentDescription = "search")
         }
     }
 }
 
 @Composable
-private fun Content(navHostController: NavHostController) {
+private fun Content(navController: NavHostController) {
     val viewModel = hiltViewModel<ExploreViewModel>()
     val viewState by viewModel.viewState.collectAsState()
     StateView(
@@ -66,7 +58,7 @@ private fun Content(navHostController: NavHostController) {
     ) {
         val providerList by viewModel.providerList.collectAsState()
         if (providerList.isEmpty()) EmptyView()
-        else ProviderList(providerList, navHostController)
+        else ProviderList(providerList, navController)
     }
 }
 
@@ -106,14 +98,12 @@ private fun ProviderListHeader(label: String) {
 
 @Composable
 private fun ProviderItem(navController: NavHostController, provider: ProviderInfo) {
-    val viewModel = hiltViewModel<ExploreViewModel>()
+    val scope = rememberCoroutineScope()
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp)
-            .clickable {
-                viewModel.viewModelScope.launch { navController.navToProvider(provider) }
-            },
+            .clickable { navController.navToProvider(scope, provider) },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -133,8 +123,12 @@ private fun ProviderItem(navController: NavHostController, provider: ProviderInf
     }
 }
 
-private suspend fun NavHostController.navToProvider(provider: ProviderInfo) {
-    PR.lastUsedProvider.set(provider.id)
+private fun NavHostController.navToGlobalSearch() {
+    navigate("global-search")
+}
+
+private fun NavHostController.navToProvider(scope: CoroutineScope, provider: ProviderInfo) {
+    scope.launch { PR.lastUsedProvider.set(provider.id) }
     currentBackStackEntry?.arguments =
         bundleOf("provider" to provider)
     navigate("provider/${provider.id}")
