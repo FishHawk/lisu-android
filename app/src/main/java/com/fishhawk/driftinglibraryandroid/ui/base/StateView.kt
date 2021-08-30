@@ -2,7 +2,6 @@ package com.fishhawk.driftinglibraryandroid.ui.base
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -90,7 +89,7 @@ fun LoadingItem(modifier: Modifier = Modifier) {
 
 @Composable
 fun ErrorItem(
-    exception: Throwable,
+    throwable: Throwable,
     onRetry: () -> Unit
 ) {
     Row(
@@ -99,11 +98,11 @@ fun ErrorItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = exception.localizedMessage
+            text = throwable.localizedMessage
                 ?: stringResource(R.string.toast_unknown_error),
             modifier = Modifier.weight(1f),
-            style = typography.h6,
-            color = colors.error
+            style = typography.subtitle2,
+            textAlign = TextAlign.Center
         )
         TextButton(onClick = onRetry) {
             Text(text = "Try again")

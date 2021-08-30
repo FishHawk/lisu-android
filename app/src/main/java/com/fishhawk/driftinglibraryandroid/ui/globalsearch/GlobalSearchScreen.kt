@@ -151,7 +151,7 @@ private fun SearchResultItem(searchResult: SearchResult, onAction: GlobalSearchA
 
         when (searchResult.viewState) {
             ViewState.Loading -> LoadingItem()
-            is ViewState.Failure -> ErrorItem(exception = searchResult.viewState.throwable) { }
+            is ViewState.Failure -> ErrorItem(throwable = searchResult.viewState.throwable) { }
             ViewState.Loaded -> LazyRow(
                 modifier = Modifier.height(140.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
