@@ -69,18 +69,29 @@ fun ApplicationToolBar(
     navController: NavHostController? = null,
     elevation: Dp = AppBarDefaults.TopAppBarElevation,
     actions: @Composable RowScope.() -> Unit = {}
+) = ApplicationToolBar(
+    modifier = modifier,
+    title = title,
+    elevation = elevation,
+    onNavigationIconClick = navController?.let { { it.navigateUp() } },
+    actions = actions
+)
+
+@Composable
+fun ApplicationToolBar(
+    modifier: Modifier = Modifier,
+    title: String? = null,
+    elevation: Dp = AppBarDefaults.TopAppBarElevation,
+    onNavigationIconClick: (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {}
 ) = TopAppBar(
     title = {
         title?.let { Text(text = it, maxLines = 1, overflow = TextOverflow.Ellipsis) }
     },
     modifier = modifier,
     contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
-    navigationIcon = navController?.let {
-        {
-            IconButton(onClick = { navController.navigateUp() }) {
-                Icon(Icons.Filled.ArrowBack, "back")
-            }
-        }
+    navigationIcon = onNavigationIconClick?.let {
+        { IconButton(onClick = { it() }) { Icon(Icons.Filled.ArrowBack, "back") } }
     },
     actions = { CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) { actions() } },
     backgroundColor = MaterialTheme.colors.surface,

@@ -8,7 +8,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.NavigateNext
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,7 +26,6 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.activity.setString
-import com.fishhawk.driftinglibraryandroid.ui.base.ErrorItem
 import com.fishhawk.driftinglibraryandroid.ui.base.LoadingItem
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListCard
 import com.fishhawk.driftinglibraryandroid.ui.base.ViewState
@@ -34,22 +33,23 @@ import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import kotlinx.coroutines.flow.StateFlow
 
-
 private typealias GlobalSearchActionHandler = (GlobalSearchAction) -> Unit
 
-private sealed class GlobalSearchAction {
+private sealed interface GlobalSearchAction {
+    object NavUp : GlobalSearchAction
+
     data class NavToGallery(
         val provider: ProviderInfo,
         val outline: MangaOutline
-    ) : GlobalSearchAction()
+    ) : GlobalSearchAction
 
     data class NavToProviderSearch(
         val provider: ProviderInfo
-    ) : GlobalSearchAction()
+    ) : GlobalSearchAction
 
     data class Search(
         val keywords: String
-    ) : GlobalSearchAction()
+    ) : GlobalSearchAction
 }
 
 @Composable
@@ -61,41 +61,40 @@ fun GlobalSearchScreen(navController: NavHostController) {
     val searchResultList by viewModel.searchResultList.collectAsState()
     val onAction: GlobalSearchActionHandler = { action ->
         when (action) {
-            is GlobalSearchAction.NavToGallery -> {
-                navController.currentBackStackEntry?.arguments =
+            GlobalSearchAction.NavUp -> navController.navigateUp()
+            is GlobalSearchAction.NavToGallery -> navController.apply {
+                currentBackStackEntry?.arguments =
                     bundleOf(
                         "outline" to action.outline,
                         "provider" to action.provider
                     )
-                navController.navigate("gallery/${action.outline.id}")
+                navigate("gallery/${action.outline.id}")
             }
-            is GlobalSearchAction.NavToProviderSearch -> {
-                navController.currentBackStackEntry?.arguments =
+            is GlobalSearchAction.NavToProviderSearch -> navController.apply {
+                currentBackStackEntry?.arguments =
                     bundleOf(
                         "keywords" to viewModel.keywords.value,
                         "provider" to action.provider
                     )
-                navController.navigate("search/${action.provider.id}")
+                navigate("search/${action.provider.id}")
             }
             is GlobalSearchAction.Search -> viewModel.search(action.keywords)
         }
     }
 
     Scaffold(
-        topBar = { ToolBar(navController, initKeywords, onAction) },
+        topBar = { ToolBar(initKeywords, onAction) },
         content = { ApplicationTransition { SearchResultList(searchResultList, onAction) } }
     )
 }
 
 @Composable
 private fun ToolBar(
-    navController: NavHostController,
     initKeywords: String?,
     onAction: GlobalSearchActionHandler
 ) {
     val focusRequester = remember { FocusRequester() }
-
-    ApplicationToolBar(navController = navController) {
+    ApplicationToolBar(onNavigationIconClick = { onAction(GlobalSearchAction.NavUp) }) {
         var keywords by remember { mutableStateOf(TextFieldValue(initKeywords ?: "")) }
         TextField(
             modifier = Modifier.focusRequester(focusRequester),
@@ -129,7 +128,7 @@ private fun SearchResultList(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(searchResultList) {
             val searchResult by it.collectAsState()
@@ -139,34 +138,50 @@ private fun SearchResultList(
 }
 
 @Composable
-private fun SearchResultItem(searchResult: SearchResult, onAction: GlobalSearchActionHandler) {
+private fun SearchResultItem(
+    searchResult: SearchResult,
+    onAction: GlobalSearchActionHandler
+) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(searchResult.provider.title)
+            Text(text = searchResult.provider.title, style = MaterialTheme.typography.body2)
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = {
                 onAction(GlobalSearchAction.NavToProviderSearch(provider = searchResult.provider))
-            }) { Icon(Icons.Filled.NavigateNext, "Forward") }
+            }) { Icon(Icons.Filled.ArrowForward, "Forward") }
         }
 
         when (searchResult.viewState) {
             ViewState.Loading -> LoadingItem()
-            is ViewState.Failure -> ErrorItem(throwable = searchResult.viewState.throwable) { }
-            ViewState.Loaded -> LazyRow(
-                modifier = Modifier.height(140.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(searchResult.mangas) {
-                    MangaListCard(it, onCardClick = { outline ->
-                        onAction(
-                            GlobalSearchAction.NavToGallery(
-                                provider = searchResult.provider,
-                                outline = outline
+            is ViewState.Failure -> NoResultFound()
+            ViewState.Loaded -> {
+                if (searchResult.mangas.isEmpty()) NoResultFound()
+                else LazyRow(
+                    modifier = Modifier.height(140.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    items(searchResult.mangas) {
+                        MangaListCard(it, onCardClick = { outline ->
+                            onAction(
+                                GlobalSearchAction.NavToGallery(
+                                    provider = searchResult.provider,
+                                    outline = outline
+                                )
                             )
-                        )
-                    })
+                        })
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun NoResultFound() {
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        Text(
+            text = "No result found.",
+            style = MaterialTheme.typography.body2
+        )
     }
 }

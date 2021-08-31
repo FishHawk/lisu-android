@@ -101,14 +101,11 @@ private fun ToolBar(pagerState: PagerState, navController: NavHostController) {
                 elevation = 0.dp
             ) {
                 IconButton(onClick = {
-//            queryHint = getString(R.string.menu_search_hint)
-//                    findNavController().navigate(
-//                        R.id.action_to_search,
-//                        bundleOf(
-//                            "provider" to viewModel.provider,
-//                            "keywords" to query
-//                        )
-//                    )
+                    navController.currentBackStackEntry?.arguments =
+                        bundleOf(
+                            "provider" to viewModel.provider
+                        )
+                    navController.navigate("search/${viewModel.provider.id}")
                 }) { Icon(Icons.Filled.Search, contentDescription = "search") }
             }
 

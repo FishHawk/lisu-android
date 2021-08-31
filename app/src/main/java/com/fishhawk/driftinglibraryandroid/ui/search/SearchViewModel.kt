@@ -10,9 +10,7 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,19 +22,27 @@ class SearchViewModel @Inject constructor(
 ) : FeedbackViewModel() {
 
     val provider: ProviderInfo = savedStateHandle.get("provider")!!
-    val keywords = MutableStateFlow(savedStateHandle.get<String>("keywords")!!)
+
+    private val _keywords = MutableStateFlow(savedStateHandle.get<String>("keywords"))
+    val keywords = _keywords.asStateFlow()
 
     private var source: ProviderSearchMangaSource? = null
 
-    val mangaList = Pager(PagingConfig(pageSize = 20)) {
-        ProviderSearchMangaSource().also { source = it }
-    }.flow.cachedIn(viewModelScope)
+    val mangaList = keywords.filterNotNull().flatMapLatest { keywords ->
+        Pager(PagingConfig(pageSize = 20)) {
+            ProviderSearchMangaSource(keywords).also { source = it }
+        }.flow
+    }.cachedIn(viewModelScope)
 
     init {
         listOf(
             keywords,
             remoteProviderRepository.serviceFlow
         ).forEach { it.onEach { source?.invalidate() }.launchIn(viewModelScope) }
+    }
+
+    fun search(keywords: String) {
+        _keywords.value = keywords
     }
 
     fun addToLibrary(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
@@ -49,12 +55,14 @@ class SearchViewModel @Inject constructor(
         resultWarp(result) { feed(R.string.successfully_add_to_library) }
     }
 
-    inner class ProviderSearchMangaSource : PagingSource<Int, MangaOutline>() {
+    inner class ProviderSearchMangaSource(
+        private val keywords: String
+    ) : PagingSource<Int, MangaOutline>() {
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MangaOutline> {
             val page = params.key ?: 1
             return remoteProviderRepository.listManga(
                 provider.id,
-                keywords.value,
+                keywords,
                 page
             ).fold({
                 LoadResult.Page(
