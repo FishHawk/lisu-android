@@ -5,7 +5,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -28,7 +27,7 @@ open class FeedbackViewModel : ViewModel() {
         viewModelScope.launch { _feedback.send(Feedback.Failure(throwable)) }
     }
 
-    protected fun <T> resultWarp(result: ResultX<T>, runIfSuccess: (T) -> Unit) {
+    protected fun <T> resultWarp(result: Result<T>, runIfSuccess: (T) -> Unit) {
         result.onSuccess { runIfSuccess(it) }.onFailure { feed(it) }
     }
 }

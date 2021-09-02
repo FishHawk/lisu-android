@@ -9,26 +9,26 @@ import kotlinx.coroutines.flow.Flow
 import retrofit2.Retrofit
 import java.net.URLEncoder
 
-class RemoteProviderRepository(retrofit: Flow<ResultX<Retrofit>?>) :
+class RemoteProviderRepository(retrofit: Flow<Result<Retrofit>?>) :
     BaseRemoteRepository<RemoteProviderService>(retrofit) {
 
     override val serviceType = RemoteProviderService::class.java
 
-    suspend fun listProvider(): ResultX<List<ProviderInfo>> =
+    suspend fun listProvider(): Result<List<ProviderInfo>> =
         resultWrap {
             it.listProvider().onEach { info ->
                 info.icon = "${url}providers/${info.id}/icon"
             }
         }
 
-    suspend fun getProvider(providerId: String): ResultX<ProviderDetail> =
+    suspend fun getProvider(providerId: String): Result<ProviderDetail> =
         resultWrap { it.getProvider(providerId) }
 
     suspend fun listPopularManga(
         providerId: String,
         page: Int,
         option: Map<String, Int>
-    ): ResultX<List<MangaOutline>> =
+    ): Result<List<MangaOutline>> =
         resultWrap {
             it.listPopularManga(providerId, page, option)
                 .map { outline -> processMangaOutline(providerId, outline) }
@@ -38,7 +38,7 @@ class RemoteProviderRepository(retrofit: Flow<ResultX<Retrofit>?>) :
         providerId: String,
         page: Int,
         option: Map<String, Int>
-    ): ResultX<List<MangaOutline>> =
+    ): Result<List<MangaOutline>> =
         resultWrap {
             it.listLatestManga(providerId, page, option)
                 .map { outline -> processMangaOutline(providerId, outline) }
@@ -48,7 +48,7 @@ class RemoteProviderRepository(retrofit: Flow<ResultX<Retrofit>?>) :
         providerId: String,
         page: Int,
         option: Map<String, Int>
-    ): ResultX<List<MangaOutline>> =
+    ): Result<List<MangaOutline>> =
         resultWrap {
             it.listCategoryManga(providerId, page, option)
                 .map { outline -> processMangaOutline(providerId, outline) }
@@ -58,13 +58,13 @@ class RemoteProviderRepository(retrofit: Flow<ResultX<Retrofit>?>) :
         providerId: String,
         keywords: String,
         page: Int
-    ): ResultX<List<MangaOutline>> =
+    ): Result<List<MangaOutline>> =
         resultWrap {
             it.listManga(providerId, keywords, page)
                 .map { outline -> processMangaOutline(providerId, outline) }
         }
 
-    suspend fun getManga(providerId: String, mangaId: String): ResultX<MangaDetail> =
+    suspend fun getManga(providerId: String, mangaId: String): Result<MangaDetail> =
         resultWrap { service ->
             service.getManga(providerId, mangaId)
                 .apply { cover = cover?.let { processImageUrl(providerId, it) } }
@@ -74,7 +74,7 @@ class RemoteProviderRepository(retrofit: Flow<ResultX<Retrofit>?>) :
         providerId: String,
         mangaId: String,
         chapterId: String
-    ): ResultX<List<String>> =
+    ): Result<List<String>> =
         resultWrap { service ->
             service.getChapter(providerId, mangaId, chapterId)
                 .map { processImageUrl(providerId, it) }

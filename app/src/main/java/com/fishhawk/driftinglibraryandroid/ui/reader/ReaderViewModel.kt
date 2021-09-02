@@ -9,7 +9,6 @@ import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.data.datastore.get
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
-import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Chapter
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
@@ -50,7 +49,7 @@ class ReaderViewModel @Inject constructor(
             ?: savedStateHandle.get<String>("providerId")
 
     private val mangaDetail = MutableStateFlow(
-        savedStateHandle.get<MangaDetail>("detail")?.let { ResultX.success(it) }
+        savedStateHandle.get<MangaDetail>("detail")?.let { Result.success(it) }
     )
 
     val mangaLoadState = mangaDetail

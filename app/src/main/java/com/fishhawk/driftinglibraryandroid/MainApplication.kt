@@ -14,7 +14,6 @@ import com.fishhawk.driftinglibraryandroid.data.datastore.PreferenceRepository
 import com.fishhawk.driftinglibraryandroid.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
-import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 import com.fishhawk.driftinglibraryandroid.util.interceptor.ProgressInterceptor
 import dagger.Module
 import dagger.Provides
@@ -67,7 +66,7 @@ object AppModule {
     fun provideRetrofit(
         preferenceRepository: PreferenceRepository,
         serverInfoRepository: ServerInfoRepository
-    ): Flow<ResultX<Retrofit>?> {
+    ): Flow<Result<Retrofit>?> {
         return preferenceRepository.selectedServer.flow
             .flatMapLatest { serverInfoRepository.select(it) }
             .map { server ->
@@ -81,17 +80,17 @@ object AppModule {
             .distinctUntilChanged()
             .map { url ->
                 if (url == null)
-                    return@map ResultX.failure(Exception("No server selected"))
+                    return@map Result.failure(Exception("No server selected"))
 
                 try {
-                    ResultX.success(
+                    Result.success(
                         Retrofit.Builder()
                             .baseUrl(url)
                             .addConverterFactory(GsonConverterFactory.create())
                             .build()
                     )
                 } catch (e: Throwable) {
-                    ResultX.failure(e)
+                    Result.failure(e)
                 }
             }
             .shareIn(
@@ -103,12 +102,12 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideLibraryRepository(retrofit: Flow<ResultX<Retrofit>?>) =
+    fun provideLibraryRepository(retrofit: Flow<Result<Retrofit>?>) =
         RemoteLibraryRepository(retrofit)
 
     @Provides
     @Singleton
-    fun provideProviderRepository(retrofit: Flow<ResultX<Retrofit>?>) =
+    fun provideProviderRepository(retrofit: Flow<Result<Retrofit>?>) =
         RemoteProviderRepository(retrofit)
 
     @Provides

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import okhttp3.RequestBody
 import retrofit2.Retrofit
 
-class RemoteLibraryRepository(retrofit: Flow<ResultX<Retrofit>?>) :
+class RemoteLibraryRepository(retrofit: Flow<Result<Retrofit>?>) :
     BaseRemoteRepository<RemoteLibraryService>(retrofit) {
 
     override val serviceType = RemoteLibraryService::class.java
@@ -17,7 +17,7 @@ class RemoteLibraryRepository(retrofit: Flow<ResultX<Retrofit>?>) :
         lastTime: Long,
         keywords: String,
         limit: Int = 20
-    ): ResultX<List<MangaOutline>> =
+    ): Result<List<MangaOutline>> =
         resultWrap {
             it.listManga(lastTime, keywords, limit).onEach { outline ->
                 outline.cover = "${url}library/mangas/${outline.id}/cover"
@@ -40,7 +40,7 @@ class RemoteLibraryRepository(retrofit: Flow<ResultX<Retrofit>?>) :
         )
     }
 
-    suspend fun getManga(mangaId: String): ResultX<MangaDetail> =
+    suspend fun getManga(mangaId: String): Result<MangaDetail> =
         resultWrap {
             it.getManga(mangaId).apply {
                 val collectionId = collections.firstOrNull()?.id
@@ -52,13 +52,13 @@ class RemoteLibraryRepository(retrofit: Flow<ResultX<Retrofit>?>) :
             }
         }
 
-    suspend fun deleteManga(mangaId: String): ResultX<String> =
+    suspend fun deleteManga(mangaId: String): Result<String> =
         resultWrap { it.deleteManga(mangaId) }
 
     suspend fun updateMangaMetadata(
         mangaId: String,
         metadata: MetadataDetail
-    ): ResultX<MangaDetail> =
+    ): Result<MangaDetail> =
         resultWrap {
             it.updateMangaMetadata(mangaId, metadata).apply {
                 cover = "${url}library/mangas/${mangaId}/cover"
@@ -92,7 +92,7 @@ class RemoteLibraryRepository(retrofit: Flow<ResultX<Retrofit>?>) :
     suspend fun updateMangaCover(
         mangaId: String,
         requestBody: RequestBody
-    ): ResultX<MangaDetail> =
+    ): Result<MangaDetail> =
         resultWrap {
             it.updateMangaCover(mangaId, requestBody).apply {
                 cover = "${url}library/mangas/${mangaId}/cover"
@@ -103,7 +103,7 @@ class RemoteLibraryRepository(retrofit: Flow<ResultX<Retrofit>?>) :
         mangaId: String,
         collectionId: String,
         chapterId: String
-    ): ResultX<List<String>> =
+    ): Result<List<String>> =
         resultWrap { service ->
             val content =
                 if (collectionId.isBlank())

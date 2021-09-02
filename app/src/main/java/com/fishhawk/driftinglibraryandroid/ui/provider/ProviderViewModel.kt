@@ -8,7 +8,6 @@ import com.fishhawk.driftinglibraryandroid.data.datastore.OptionGroup
 import com.fishhawk.driftinglibraryandroid.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
-import com.fishhawk.driftinglibraryandroid.data.remote.ResultX
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
@@ -20,7 +19,7 @@ import javax.inject.Inject
 
 class ProviderMangaSource(
     private val option: Map<String, Int>,
-    private val loadFunction: suspend (key: Int, option: Map<String, Int>) -> ResultX<List<MangaOutline>>
+    private val loadFunction: suspend (key: Int, option: Map<String, Int>) -> Result<List<MangaOutline>>
 ) : PagingSource<Int, MangaOutline>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MangaOutline> {
         val page = params.key ?: 1
@@ -81,7 +80,7 @@ class ProviderViewModel @Inject constructor(
 
     private fun createProviderMangaList(
         optionGroup: Flow<List<OptionGroup>?>,
-        loadFunction: suspend (key: Int, option: Map<String, Int>) -> ResultX<List<MangaOutline>>
+        loadFunction: suspend (key: Int, option: Map<String, Int>) -> Result<List<MangaOutline>>
     ) = optionGroup.filterNotNull().flatMapLatest { groups ->
         Pager(PagingConfig(pageSize = 20)) {
             val option = groups.map { it.name to it.selected }.toMap()
