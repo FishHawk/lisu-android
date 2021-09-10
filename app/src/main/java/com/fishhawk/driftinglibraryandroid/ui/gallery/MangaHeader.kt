@@ -3,9 +3,6 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -18,7 +15,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
@@ -31,12 +27,7 @@ import coil.compose.rememberImagePainter
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.ui.base.copyToClipboard
-import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.google.accompanist.insets.statusBarsPadding
-import me.onebone.toolbar.CollapsingToolbarScopeInstance.parallax
-import me.onebone.toolbar.CollapsingToolbarScopeInstance.pin
-import me.onebone.toolbar.CollapsingToolbarScopeInstance.progress
-import me.onebone.toolbar.ProgressListener
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 
@@ -44,27 +35,10 @@ import okhttp3.RequestBody.Companion.toRequestBody
 fun MangaHeader(navController: NavHostController, detail: MangaDetail) {
     val viewModel = hiltViewModel<GalleryViewModel>()
 
-    var progress by remember { mutableStateOf(1f) }
-    val alpha by animateFloatAsState(
-        targetValue = if (progress == 0f) 0f else 1f,
-        animationSpec = spring(stiffness = Spring.StiffnessLow)
-    )
-
-    ApplicationToolBar(
-        modifier = Modifier
-            .pin()
-            .progress(ProgressListener { progress = it })
-            .alpha(1f - alpha),
-        title = detail.title,
-        navController = navController
-    )
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(220.dp)
-            .parallax(0.2f)
-            .alpha(alpha)
     ) {
         val context = LocalContext.current
         val painter = rememberImagePainter(detail.cover) {

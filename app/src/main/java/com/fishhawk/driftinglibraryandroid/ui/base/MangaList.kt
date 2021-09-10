@@ -39,6 +39,7 @@ fun RefreshableMangaList(
 ) {
     val state = mangaList.loadState.refresh
     StateView(
+        modifier = Modifier.fillMaxSize(),
         viewState = state.let {
             when (it) {
                 LoadState.Loading -> ViewState.Loading

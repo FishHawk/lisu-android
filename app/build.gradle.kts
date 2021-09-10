@@ -127,13 +127,12 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
 
-    implementation("me.onebone:toolbar-compose:2.1.2")
 
     // UI Tests
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.2")
 
     // implementation("com.quickbirdstudios:opencv:4.1.0")
 }

@@ -53,6 +53,7 @@ private fun Content(navController: NavHostController) {
     val viewModel = hiltViewModel<ExploreViewModel>()
     val viewState by viewModel.viewState.collectAsState()
     StateView(
+        modifier = Modifier.fillMaxSize(),
         viewState = viewState,
         onRetry = { viewModel.reload() }
     ) {

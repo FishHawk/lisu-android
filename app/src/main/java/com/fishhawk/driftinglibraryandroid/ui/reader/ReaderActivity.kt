@@ -114,6 +114,7 @@ private fun ReaderScreen() {
     val mangaViewState by viewModel.mangaLoadState.collectAsState()
 
     StateView(
+        modifier = Modifier.fillMaxSize(),
         viewState = mangaViewState,
         onRetry = { viewModel.refreshReader() }
     ) {

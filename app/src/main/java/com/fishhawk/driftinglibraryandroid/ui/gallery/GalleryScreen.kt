@@ -1,18 +1,22 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -24,12 +28,11 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.*
 import com.fishhawk.driftinglibraryandroid.ui.activity.setArgument
 import com.fishhawk.driftinglibraryandroid.ui.base.StateView
 import com.fishhawk.driftinglibraryandroid.ui.base.copyToClipboard
+import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.fishhawk.driftinglibraryandroid.ui.theme.MaterialColors
-import me.onebone.toolbar.CollapsingToolbarScaffold
-import me.onebone.toolbar.ScrollStrategy
-import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun GalleryScreen(navController: NavHostController) {
     navController.setArgument<MangaOutline>("outline")
@@ -38,26 +41,34 @@ fun GalleryScreen(navController: NavHostController) {
     ApplicationTransition {
         val viewModel = hiltViewModel<GalleryViewModel>()
         val detail by viewModel.detail.collectAsState()
-        CollapsingToolbarScaffold(
-            modifier = Modifier.fillMaxSize(),
-            state = rememberCollapsingToolbarScaffoldState(),
-            scrollStrategy = ScrollStrategy.ExitUntilCollapsed,
-            toolbar = { MangaHeader(navController, detail) }
+
+        val scrollState = rememberScrollState()
+        MangaDetail(navController, scrollState, detail)
+
+        val toolBarVisibleState = remember { MutableTransitionState(false) }
+        toolBarVisibleState.targetState = scrollState.value > 100
+        AnimatedVisibility(
+            visibleState = toolBarVisibleState,
+            enter = fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)),
+            exit = fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow))
         ) {
-            val viewState by viewModel.viewState.collectAsState()
-            StateView(
-                viewState = viewState,
-                onRetry = { viewModel.reloadManga() }
-            ) {
-                MangaBody(navController, detail)
-            }
+            ApplicationToolBar(
+                title = detail.title,
+                navController = navController
+            )
         }
+
     }
 }
 
 @Composable
-private fun MangaBody(navController: NavHostController, detail: MangaDetail) {
+private fun MangaDetail(
+    navController: NavHostController,
+    scrollState: ScrollState,
+    detail: MangaDetail
+) {
     val viewModel = hiltViewModel<GalleryViewModel>()
+    val viewState by viewModel.viewState.collectAsState()
 
     fun search(keywords: String) {
         navController.currentBackStackEntry?.arguments =
@@ -69,27 +80,39 @@ private fun MangaBody(navController: NavHostController, detail: MangaDetail) {
         else navController.navigate("search/${detail.provider.id}")
     }
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
     ) {
-        detail.source?.let { item { MangaSource(it) } }
-        if (!detail.metadata.description.isNullOrBlank()) {
-            item { MangaDescription(detail.metadata.description) }
-        }
-        detail.metadata.tags?.let { tags ->
-            item {
-                val context = LocalContext.current
-                MangaTagGroups(tags,
-                    onTagClick = { search(it) },
-                    onTagLongClick = {
-                        context.copyToClipboard(it, R.string.toast_manga_tag_saved)
-                    }
-                )
+        MangaHeader(navController, detail)
+        StateView(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            viewState = viewState,
+            onRetry = { viewModel.reloadManga() }
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                detail.source?.let { MangaSource(it) }
+                if (!detail.metadata.description.isNullOrBlank()) {
+                    MangaDescription(detail.metadata.description)
+                }
+                detail.metadata.tags?.let { tags ->
+                    val context = LocalContext.current
+                    MangaTagGroups(tags,
+                        onTagClick = { search(it) },
+                        onTagLongClick = {
+                            context.copyToClipboard(it, R.string.toast_manga_tag_saved)
+                        }
+                    )
+                }
+                MangaContent(viewModel, detail)
             }
         }
-        item { MangaContent(viewModel, detail) }
     }
 }
 

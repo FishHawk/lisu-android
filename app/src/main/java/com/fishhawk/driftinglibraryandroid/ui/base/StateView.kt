@@ -21,31 +21,35 @@ sealed class ViewState {
 
 @Composable
 fun StateView(
+    modifier: Modifier = Modifier,
     viewState: ViewState,
     onRetry: () -> Unit,
     content: @Composable () -> Unit
 ) {
     when (viewState) {
-        ViewState.Loading -> LoadingView()
+        ViewState.Loading -> LoadingView(modifier)
         ViewState.Loaded -> content()
-        is ViewState.Failure -> ErrorView(viewState.throwable, onRetry)
+        is ViewState.Failure -> ErrorView(modifier, viewState.throwable, onRetry)
     }
 }
 
 @Composable
-private fun LoadingView() {
-    Box(modifier = Modifier.fillMaxSize()) {
+private fun LoadingView(
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier) {
         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
     }
 }
 
 @Composable
 private fun ErrorView(
+    modifier: Modifier = Modifier,
     throwable: Throwable,
     onRetry: () -> Unit
 ) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
         Column(
