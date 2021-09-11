@@ -1,8 +1,5 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery
 
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -16,31 +13,26 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.os.bundleOf
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
-import com.fishhawk.driftinglibraryandroid.ui.base.copyToClipboard
 import com.google.accompanist.insets.statusBarsPadding
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
+
+internal val MangaHeaderHeight = 220.dp
 
 @Composable
-fun MangaHeader(navController: NavHostController, detail: MangaDetail) {
-    val viewModel = hiltViewModel<GalleryViewModel>()
-
+internal fun MangaHeader(
+    detail: MangaDetail,
+    onAction: GalleryActionHandler
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(220.dp)
+            .height(MangaHeaderHeight)
     ) {
-        val context = LocalContext.current
         val painter = rememberImagePainter(detail.cover) {
             crossfade(true)
             crossfade(500)
@@ -60,22 +52,19 @@ fun MangaHeader(navController: NavHostController, detail: MangaDetail) {
                 .statusBarsPadding(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            val newCover = remember { mutableStateOf<Uri?>(null) }
-            val launcher = rememberLauncherForActivityResult(
-                ActivityResultContracts.GetContent()
-            ) { newCover.value = it }
+//        val context = LocalContext.current
+//            val newCover = remember { mutableStateOf<Uri?>(null) }
+//            val launcher = rememberLauncherForActivityResult(
+//                ActivityResultContracts.GetContent()
+//            ) { newCover.value = it }
 
-            newCover.value?.let {
-                val content = context.contentResolver.openInputStream(it)?.readBytes()
-                val type = context.contentResolver.getType(it)?.toMediaTypeOrNull()
-                if (content != null && type != null)
-                    viewModel.updateCover(content.toRequestBody(type))
-            }
+//            newCover.value?.let {
+//                val content = context.contentResolver.openInputStream(it)?.readBytes()
+//                val type = context.contentResolver.getType(it)?.toMediaTypeOrNull()
+//                if (content != null && type != null)
+//                    viewModel.updateCover(content.toRequestBody(type))
+//            }
 
-            Surface(
-                modifier = Modifier
-                    .aspectRatio(0.75f)
-                    .clickable {
 //                        GalleryCoverSheet(context, object : GalleryCoverSheet.Listener {
 //                            override fun onEditMetadata() {
 //                                navController.navigate("edit")
@@ -103,7 +92,11 @@ fun MangaHeader(navController: NavHostController, detail: MangaDetail) {
 //                                context.shareImage(url, "${detail.id}-cover")
 //                            }
 //                        }).show()
-                    },
+
+            Surface(
+                modifier = Modifier
+                    .aspectRatio(0.75f)
+                    .clickable { },
                 shape = RoundedCornerShape(4.dp),
                 elevation = 4.dp
             ) {
@@ -113,7 +106,7 @@ fun MangaHeader(navController: NavHostController, detail: MangaDetail) {
                     contentScale = ContentScale.Crop
                 )
             }
-            MangaInfo(navController, detail)
+            MangaInfo(detail, onAction)
         }
     }
 }
@@ -121,74 +114,80 @@ fun MangaHeader(navController: NavHostController, detail: MangaDetail) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun MangaInfo(navController: NavHostController, detail: MangaDetail) {
-
-    fun globalSearch(keywords: String) {
-        navController.currentBackStackEntry?.arguments =
-            bundleOf("keywords" to keywords)
-        navController.navigate("global-search")
-    }
-
+private fun MangaInfo(
+    detail: MangaDetail,
+    onAction: GalleryActionHandler
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        val context = LocalContext.current
         detail.title.let {
             Box(modifier = Modifier.weight(1f)) {
-                val defaultTextStyle = MaterialTheme.typography.h6
-                var textStyle by remember { mutableStateOf(defaultTextStyle) }
-                Text(
+                MangaInfoTitle(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .combinedClickable(
-                            onClick = { globalSearch(it) },
+                            onClick = { onAction(GalleryAction.NavToGlobalSearch(it)) },
                             onLongClick = {
-                                context.copyToClipboard(it, R.string.toast_manga_title_copied)
+                                onAction(GalleryAction.Copy(it, R.string.toast_manga_title_copied))
                             }
                         ),
-                    text = it,
-                    style = textStyle,
-                    onTextLayout = { textLayoutResult ->
-                        if (textLayoutResult.didOverflowHeight && textStyle.fontSize > 12.sp) {
-                            textStyle = textStyle.copy(fontSize = textStyle.fontSize.times(0.9))
-                        }
-                    },
-                    overflow = TextOverflow.Ellipsis
+                    text = it
                 )
             }
         }
         detail.metadata.authors?.joinToString(separator = ";")?.let {
-            Text(
+            MangaInfoSubtitle(
                 modifier = Modifier.combinedClickable(
-                    onClick = { globalSearch(it) },
+                    onClick = { onAction(GalleryAction.NavToGlobalSearch(it)) },
                     onLongClick = {
-                        context.copyToClipboard(it, R.string.toast_manga_author_copied)
+                        onAction(GalleryAction.Copy(it, R.string.toast_manga_author_copied))
                     }
                 ),
-                text = it,
-                style = MaterialTheme.typography.body2,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                text = it
             )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            detail.metadata.status?.let {
-                Text(
-                    text = it.toString(),
-                    style = MaterialTheme.typography.body2
-                )
-            }
-            detail.provider?.title?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.body2,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
+            detail.metadata.status?.let { MangaInfoSubtitle(text = it.toString()) }
+            detail.provider?.title?.let { MangaInfoSubtitle(text = it) }
         }
     }
+}
+
+@Composable
+private fun MangaInfoTitle(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    val defaultTextStyle = MaterialTheme.typography.h6
+    var textStyle by remember { mutableStateOf(defaultTextStyle) }
+    Text(
+        text = text,
+        modifier = modifier,
+        style = textStyle,
+        onTextLayout = { textLayoutResult ->
+            if (textLayoutResult.didOverflowHeight && textStyle.fontSize > 12.sp) {
+                textStyle = textStyle.copy(fontSize = textStyle.fontSize.times(0.9))
+            }
+        },
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+
+@Composable
+private fun MangaInfoSubtitle(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        style = MaterialTheme.typography.body2,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
 }

@@ -19,79 +19,115 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.data.remote.model.*
 import com.fishhawk.driftinglibraryandroid.ui.activity.setArgument
 import com.fishhawk.driftinglibraryandroid.ui.base.StateView
+import com.fishhawk.driftinglibraryandroid.ui.base.ViewState
 import com.fishhawk.driftinglibraryandroid.ui.base.copyToClipboard
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.fishhawk.driftinglibraryandroid.ui.theme.MaterialColors
 
-@OptIn(ExperimentalAnimationApi::class)
+internal typealias GalleryActionHandler = (GalleryAction) -> Unit
+
+internal sealed interface GalleryAction {
+    object NavUp : GalleryAction
+    data class NavToGlobalSearch(val keywords: String) : GalleryAction
+    data class NavToSearch(val keywords: String) : GalleryAction
+    data class Copy(val text: String, val hintResId: Int? = null) : GalleryAction
+    object Reload : GalleryAction
+}
+
 @Composable
 fun GalleryScreen(navController: NavHostController) {
     navController.setArgument<MangaOutline>("outline")
     navController.setArgument<ProviderInfo>("provider")
 
-    ApplicationTransition {
-        val viewModel = hiltViewModel<GalleryViewModel>()
-        val detail by viewModel.detail.collectAsState()
+    val context = LocalContext.current
 
-        val scrollState = rememberScrollState()
-        MangaDetail(navController, scrollState, detail)
+    val viewModel = hiltViewModel<GalleryViewModel>()
+    val viewState by viewModel.viewState.collectAsState()
+    val detail by viewModel.detail.collectAsState()
+    val history by viewModel.history.collectAsState()
 
-        val toolBarVisibleState = remember { MutableTransitionState(false) }
-        toolBarVisibleState.targetState = scrollState.value > 100
-        AnimatedVisibility(
-            visibleState = toolBarVisibleState,
-            enter = fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)),
-            exit = fadeOut(animationSpec = spring(stiffness = Spring.StiffnessLow))
-        ) {
-            ApplicationToolBar(
-                title = detail.title,
-                navController = navController
-            )
+    val onAction: GalleryActionHandler = { action ->
+        when (action) {
+            GalleryAction.NavUp -> navController.navigateUp()
+            is GalleryAction.NavToGlobalSearch -> {
+                navController.currentBackStackEntry?.arguments =
+                    bundleOf("keywords" to action.keywords)
+                navController.navigate("global-search")
+            }
+            is GalleryAction.NavToSearch -> {
+                navController.currentBackStackEntry?.arguments =
+                    bundleOf(
+                        "keywords" to action.keywords,
+                        "provider" to detail.provider
+                    )
+                if (detail.provider == null) navController.navigate("library-search")
+                else navController.navigate("search/${detail.provider!!.id}")
+            }
+            is GalleryAction.Copy -> context.copyToClipboard(action.text, action.hintResId)
+            GalleryAction.Reload -> viewModel.reloadManga()
         }
+    }
 
+    ApplicationTransition {
+        val scrollState = rememberScrollState()
+        MangaDetail(viewState, detail, history, scrollState, onAction)
+        ToolBar(detail.title, scrollState, onAction)
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+private fun ToolBar(
+    title: String,
+    scrollState: ScrollState,
+    onAction: GalleryActionHandler
+) {
+    val toolBarVisibleState = remember { MutableTransitionState(false) }
+    val mangaHeaderHeightPx = with(LocalDensity.current) { MangaHeaderHeight.toPx() }
+    toolBarVisibleState.targetState = scrollState.value > mangaHeaderHeightPx
+    AnimatedVisibility(
+        visibleState = toolBarVisibleState,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        ApplicationToolBar(
+            title = title,
+            onNavigationIconClick = { onAction(GalleryAction.NavUp) }
+        )
     }
 }
 
 @Composable
 private fun MangaDetail(
-    navController: NavHostController,
+    viewState: ViewState,
+    detail: MangaDetail,
+    history: ReadingHistory?,
     scrollState: ScrollState,
-    detail: MangaDetail
+    onAction: GalleryActionHandler
 ) {
-    val viewModel = hiltViewModel<GalleryViewModel>()
-    val viewState by viewModel.viewState.collectAsState()
-
-    fun search(keywords: String) {
-        navController.currentBackStackEntry?.arguments =
-            bundleOf(
-                "keywords" to keywords,
-                "provider" to detail.provider
-            )
-        if (detail.provider == null) navController.navigate("library-search")
-        else navController.navigate("search/${detail.provider.id}")
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        MangaHeader(navController, detail)
+        MangaHeader(detail, onAction)
         StateView(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
             viewState = viewState,
-            onRetry = { viewModel.reloadManga() }
+            onRetry = { onAction(GalleryAction.Reload) }
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -102,15 +138,12 @@ private fun MangaDetail(
                     MangaDescription(detail.metadata.description)
                 }
                 detail.metadata.tags?.let { tags ->
-                    val context = LocalContext.current
                     MangaTagGroups(tags,
-                        onTagClick = { search(it) },
-                        onTagLongClick = {
-                            context.copyToClipboard(it, R.string.toast_manga_tag_saved)
-                        }
+                        onTagClick = { onAction(GalleryAction.NavToSearch(it)) },
+                        onTagLongClick = { onAction(GalleryAction.Copy(it, R.string.toast_manga_tag_saved)) }
                     )
                 }
-                MangaContent(viewModel, detail)
+                MangaContent(detail, history)
             }
         }
     }

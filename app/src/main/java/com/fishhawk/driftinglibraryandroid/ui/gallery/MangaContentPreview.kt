@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 
 @Composable
-fun MangaContentPreview(
+internal fun MangaContentPreview(
     preview: List<String>,
     onPageClick: (Int) -> Unit = {}
 ) {

@@ -26,16 +26,16 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.Chapter
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ChapterCollection
 import kotlinx.coroutines.launch
 
-typealias OnChapterClickListener = (collectionIndex: Int, chapterIndex: Int, pageIndex: Int) -> Unit
+internal typealias OnChapterClickListener = (collectionIndex: Int, chapterIndex: Int, pageIndex: Int) -> Unit
 
-data class ChapterMark(
+internal data class ChapterMark(
     val collectionIndex: Int,
     val chapterIndex: Int,
     val pageIndex: Int
 )
 
 @Composable
-fun MangaContentChapter(
+internal fun MangaContentChapter(
     collections: List<ChapterCollection>,
     chapterMark: ChapterMark? = null,
     onChapterClick: OnChapterClickListener
@@ -73,7 +73,7 @@ fun MangaContentChapter(
 }
 
 @Composable
-fun ChapterListLinear(
+private fun ChapterListLinear(
     collections: List<ChapterCollection>,
     chapterMark: ChapterMark? = null,
     onChapterClick: OnChapterClickListener
@@ -105,7 +105,7 @@ fun ChapterListLinear(
 }
 
 @Composable
-fun ChapterLinear(
+private fun ChapterLinear(
     chapter: Chapter,
     isMarked: Boolean,
     onChapterClick: () -> Unit = {},
@@ -131,7 +131,7 @@ fun ChapterLinear(
 }
 
 @Composable
-fun ChapterListGrid(
+private fun ChapterListGrid(
     collections: List<ChapterCollection>,
     chapterMark: ChapterMark? = null,
     onChapterClick: OnChapterClickListener
@@ -195,7 +195,7 @@ fun ChapterListGrid(
 }
 
 @Composable
-fun ChapterGrid(
+private fun ChapterGrid(
     chapter: Chapter,
     isMarked: Boolean,
     onChapterClick: () -> Unit = {},

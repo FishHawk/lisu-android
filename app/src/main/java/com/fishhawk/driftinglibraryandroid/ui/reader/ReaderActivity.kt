@@ -122,6 +122,7 @@ private fun ReaderScreen() {
             val pointer by viewModel.chapterPointer.collectAsState()
             var readerState: ViewerState? = null
             StateView(
+                modifier = Modifier.fillMaxSize(),
                 viewState = pointer.currChapter.state,
                 onRetry = { }
             ) {

@@ -5,18 +5,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
 
 @Composable
-fun MangaContent(viewModel: GalleryViewModel, detail: MangaDetail) {
+internal fun MangaContent(
+    detail: MangaDetail,
+    history: ReadingHistory?
+) {
     val context = LocalContext.current
     val hasPreview = detail.collections.size == 1 && !detail.preview.isNullOrEmpty()
     val hasChapter = detail.collections.isNotEmpty()
@@ -27,7 +29,6 @@ fun MangaContent(viewModel: GalleryViewModel, detail: MangaDetail) {
                 context.navToReaderActivity(detail, 0, 0, it)
             })
         hasChapter -> {
-            val history by viewModel.history.collectAsState()
             MangaContentChapter(
                 collections = detail.collections,
                 chapterMark = history?.let {
