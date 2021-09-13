@@ -53,47 +53,6 @@ internal fun MangaHeader(
                 .statusBarsPadding(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-//        val context = LocalContext.current
-//            val newCover = remember { mutableStateOf<Uri?>(null) }
-//            val launcher = rememberLauncherForActivityResult(
-//                ActivityResultContracts.GetContent()
-//            ) { newCover.value = it }
-
-//            newCover.value?.let {
-//                val content = context.contentResolver.openInputStream(it)?.readBytes()
-//                val type = context.contentResolver.getType(it)?.toMediaTypeOrNull()
-//                if (content != null && type != null)
-//                    viewModel.updateCover(content.toRequestBody(type))
-//            }
-
-//                        GalleryCoverSheet(context, object : GalleryCoverSheet.Listener {
-//                            override fun onEditMetadata() {
-//                                navController.navigate("edit")
-//                            }
-//
-//                            override fun onEditCover() {
-//                                if (viewModel.isRefreshing.value)
-//                                    return context.toast(R.string.toast_manga_not_loaded)
-//                                launcher.launch("test")
-//                            }
-//
-//                            override fun onSaveCover() {
-//                                if (viewModel.isRefreshing.value)
-//                                    return context.toast(R.string.toast_manga_not_loaded)
-//                                val url = detail.cover
-//                                    ?: return context.toast(R.string.toast_manga_no_cover)
-//                                context.saveImage(url, "${detail.id}-cover")
-//                            }
-//
-//                            override fun onShareCover() {
-//                                if (viewModel.isRefreshing.value)
-//                                    return context.toast(R.string.toast_manga_not_loaded)
-//                                val url = detail.cover
-//                                    ?: return context.toast(R.string.toast_manga_no_cover)
-//                                context.shareImage(url, "${detail.id}-cover")
-//                            }
-//                        }).show()
-
             Surface(
                 modifier = Modifier
                     .aspectRatio(0.75f)

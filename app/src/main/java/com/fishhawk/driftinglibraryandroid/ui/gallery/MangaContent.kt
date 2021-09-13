@@ -17,7 +17,8 @@ import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
 @Composable
 internal fun MangaContent(
     detail: MangaDetail,
-    history: ReadingHistory?
+    history: ReadingHistory?,
+    onAction: GalleryActionHandler
 ) {
     val context = LocalContext.current
     val hasPreview = detail.collections.size == 1 && !detail.preview.isNullOrEmpty()
@@ -35,7 +36,7 @@ internal fun MangaContent(
                     ChapterMark(it.collectionIndex, it.chapterIndex, it.pageIndex)
                 },
                 onChapterClick = { collectionIndex, chapterIndex, pageIndex ->
-                    context.navToReaderActivity(detail, collectionIndex, chapterIndex, pageIndex)
+                    onAction(GalleryAction.NavToReader(collectionIndex, chapterIndex, pageIndex))
                 }
             )
         }
