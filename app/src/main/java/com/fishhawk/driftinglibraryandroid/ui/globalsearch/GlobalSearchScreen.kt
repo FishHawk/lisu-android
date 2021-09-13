@@ -144,7 +144,10 @@ private fun SearchResultItem(
 ) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = searchResult.provider.title, style = MaterialTheme.typography.body2)
+            Text(
+                text = searchResult.provider.run { "$name($lang)" },
+                style = MaterialTheme.typography.body2
+            )
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = {
                 onAction(GlobalSearchAction.NavToProviderSearch(provider = searchResult.provider))

@@ -96,7 +96,7 @@ private fun ToolBar(pagerState: PagerState, navController: NavHostController) {
     Surface(elevation = AppBarDefaults.TopAppBarElevation) {
         Column {
             ApplicationToolBar(
-                title = viewModel.provider.title,
+                title = viewModel.provider.name,
                 navController = navController,
                 elevation = 0.dp
             ) {

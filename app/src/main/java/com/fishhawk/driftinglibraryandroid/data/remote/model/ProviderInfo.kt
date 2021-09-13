@@ -9,8 +9,4 @@ data class ProviderInfo(
     val name: String,
     val lang: String,
     var icon: String?
-) : Parcelable {
-    val title
-        get() = "$name($lang)"
-}
-
+) : Parcelable

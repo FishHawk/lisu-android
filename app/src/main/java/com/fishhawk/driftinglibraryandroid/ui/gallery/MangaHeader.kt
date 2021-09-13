@@ -12,6 +12,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -152,7 +153,7 @@ private fun MangaInfo(
         }
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             detail.metadata.status?.let { MangaInfoSubtitle(text = it.toString()) }
-            detail.provider?.title?.let { MangaInfoSubtitle(text = it) }
+            detail.provider?.apply { MangaInfoSubtitle(text = "$name($lang)") }
         }
     }
 }
@@ -164,13 +165,22 @@ private fun MangaInfoTitle(
 ) {
     val defaultTextStyle = MaterialTheme.typography.h6
     var textStyle by remember { mutableStateOf(defaultTextStyle) }
+    var readyToDraw by remember { mutableStateOf(false) }
+
     Text(
         text = text,
-        modifier = modifier,
+        modifier = modifier.drawWithContent {
+            if (readyToDraw) {
+                drawContent()
+            }
+        },
         style = textStyle,
         onTextLayout = { textLayoutResult ->
             if (textLayoutResult.didOverflowHeight && textStyle.fontSize > 12.sp) {
+                readyToDraw = false
                 textStyle = textStyle.copy(fontSize = textStyle.fontSize.times(0.9))
+            } else {
+                readyToDraw = true
             }
         },
         overflow = TextOverflow.Ellipsis
