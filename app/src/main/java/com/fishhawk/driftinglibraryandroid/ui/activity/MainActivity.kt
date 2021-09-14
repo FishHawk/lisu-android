@@ -40,7 +40,6 @@ import com.fishhawk.driftinglibraryandroid.ui.library.LibraryScreen
 import com.fishhawk.driftinglibraryandroid.ui.more.*
 import com.fishhawk.driftinglibraryandroid.ui.provider.ProviderScreen
 import com.fishhawk.driftinglibraryandroid.ui.search.SearchScreen
-import com.fishhawk.driftinglibraryandroid.ui.server.ServerScreen
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTheme
 import com.google.accompanist.insets.ui.BottomNavigation
 import com.google.accompanist.insets.ui.Scaffold
@@ -109,7 +108,6 @@ private fun MainNavHost(
         composable("provider/{providerId}") { ProviderScreen(navController) }
         composable("search/{providerId}") { SearchScreen(navController) }
 
-        composable("server") { ServerScreen(navController) }
         composable("setting-general") { SettingGeneralScreen(navController) }
         composable("setting-reader") { SettingReaderScreen(navController) }
         composable("setting-advanced") { SettingAdvancedScreen(navController) }
@@ -119,6 +117,8 @@ private fun MainNavHost(
             composable("detail") { GalleryScreen(navController) }
             composable("edit") { GalleryEditScreen(navController) }
         }
+
+        composable("test") { }
     }
 }
 

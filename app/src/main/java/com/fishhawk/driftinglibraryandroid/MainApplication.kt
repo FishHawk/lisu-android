@@ -9,7 +9,6 @@ import coil.ImageLoaderFactory
 import coil.util.CoilUtils
 import com.fishhawk.driftinglibraryandroid.data.database.ApplicationDatabase
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.data.database.ServerInfoRepository
 import com.fishhawk.driftinglibraryandroid.data.datastore.PreferenceRepository
 import com.fishhawk.driftinglibraryandroid.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
@@ -63,25 +62,18 @@ object AppModule {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Singleton
     @Provides
-    fun provideRetrofit(
-        preferenceRepository: PreferenceRepository,
-        serverInfoRepository: ServerInfoRepository
-    ): Flow<Result<Retrofit>?> {
-        return preferenceRepository.selectedServer.flow
-            .flatMapLatest { serverInfoRepository.select(it) }
-            .map { server ->
-                server?.address?.let {
-                    var newUrl = it
-                    newUrl = if (URLUtil.isNetworkUrl(newUrl)) newUrl else "http://${newUrl}"
-                    newUrl = if (newUrl.last() == '/') newUrl else "$newUrl/"
-                    newUrl
-                }
+    fun provideRetrofit(preferenceRepository: PreferenceRepository): Flow<Result<Retrofit>?> {
+        return preferenceRepository.serverAddress.flow
+            .map { address ->
+                address
+                    .let { if (it.isBlank()) null else it }
+                    ?.let { if (URLUtil.isNetworkUrl(it)) it else "http://$it" }
+                    ?.let { if (it.last() == '/') it else "$it/" }
             }
             .distinctUntilChanged()
             .map { url ->
                 if (url == null)
                     return@map Result.failure(Exception("No server selected"))
-
                 try {
                     Result.success(
                         Retrofit.Builder()
@@ -123,11 +115,6 @@ object AppModule {
     @Singleton
     fun provideReadingHistoryRepository(db: ApplicationDatabase) =
         ReadingHistoryRepository(db.readingHistoryDao())
-
-    @Provides
-    @Singleton
-    fun provideServerInfoRepository(db: ApplicationDatabase) =
-        ServerInfoRepository(db.serverInfoDao())
 
     @Provides
     @Singleton

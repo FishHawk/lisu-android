@@ -6,11 +6,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ReadingHistoryDao {
-    @Query("SELECT * FROM ReadingHistory WHERE serverId = :serverId ORDER BY date DESC")
-    fun list(serverId: Int): Flow<List<ReadingHistory>>
+    @Query("SELECT * FROM ReadingHistory ORDER BY date DESC")
+    fun list(): Flow<List<ReadingHistory>>
 
-    @Query("SELECT * FROM ReadingHistory WHERE serverId = :serverId AND mangaId = :mangaId")
-    fun select(serverId: Int, mangaId: String): Flow<ReadingHistory>
+    @Query("SELECT * FROM ReadingHistory WHERE mangaId = :mangaId")
+    fun select(mangaId: String): Flow<ReadingHistory>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(history: ReadingHistory)
@@ -18,7 +18,7 @@ interface ReadingHistoryDao {
     @Update
     suspend fun update(history: ReadingHistory)
 
-    @Query("DELETE FROM ReadingHistory WHERE serverId = :id")
-    suspend fun clear(id: Int)
+    @Query("DELETE FROM ReadingHistory")
+    suspend fun clear()
 }
 

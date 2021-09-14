@@ -112,6 +112,8 @@ suspend fun <T> Preference<T>.get(): T = flow.first()
 
 fun <T> Preference<T>.getBlocking(): T = runBlocking { get() }
 
+fun <T> Preference<T>.setBlocking(value: T) = runBlocking { set(value) }
+
 inline fun <reified T : Enum<T>> T.next(): T {
     val values = enumValues<T>()
     val nextOrdinal = (ordinal + 1) % values.size

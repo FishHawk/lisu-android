@@ -203,7 +203,6 @@ class ReaderViewModel @Inject constructor(
             val readingHistory =
                 ReadingHistory(
                     mangaId,
-                    PR.selectedServer.get(),
                     mangaDetail.value!!.getOrNull()!!.title,
                     mangaDetail.value!!.getOrNull()!!.cover ?: "",
                     providerId,

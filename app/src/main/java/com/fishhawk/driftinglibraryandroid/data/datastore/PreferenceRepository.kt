@@ -20,8 +20,8 @@ class PreferenceRepository(context: Context) {
     private val Context.store by preferencesDataStore(name = "preference")
     private val store = context.store
 
+    val serverAddress by store.get("serverAddress", "")
 
-    val selectedServer by store.get("selected_library", 1)
     val lastUsedProvider by store.get("last_used_provider", "")
 
     val theme by store.get("theme", Theme.Light)

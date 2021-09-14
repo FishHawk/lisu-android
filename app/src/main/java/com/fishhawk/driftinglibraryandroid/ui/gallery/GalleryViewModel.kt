@@ -2,7 +2,6 @@ package com.fishhawk.driftinglibraryandroid.ui.gallery
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
@@ -44,9 +43,8 @@ class GalleryViewModel @Inject constructor(
         get() = detail.value.provider?.name
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val history = PR.selectedServer.flow.flatMapLatest {
-        readingHistoryRepository.select(it, mangaId)
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+    val history = readingHistoryRepository.select(mangaId)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     private suspend fun getManga() = providerId?.let {
         remoteProviderRepository.getManga(it, mangaId)

@@ -2,15 +2,13 @@ package com.fishhawk.driftinglibraryandroid.ui.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.datastore.HistoryFilter
-import com.fishhawk.driftinglibraryandroid.PR
-import com.fishhawk.driftinglibraryandroid.data.datastore.get
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.ZoneId
@@ -24,7 +22,7 @@ class HistoryViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val historyList = combine(
         PR.historyFilter.flow,
-        PR.selectedServer.flow.flatMapLatest { repository.list(it) }
+        repository.list()
     ) { mode, list ->
         list.run {
             when (mode) {
@@ -37,7 +35,5 @@ class HistoryViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
-    fun clearReadingHistory() = viewModelScope.launch {
-        repository.clear(PR.selectedServer.get())
-    }
+    fun clearReadingHistory() = viewModelScope.launch { repository.clear() }
 }

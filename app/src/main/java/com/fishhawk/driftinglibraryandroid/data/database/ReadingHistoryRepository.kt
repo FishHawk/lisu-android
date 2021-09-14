@@ -5,11 +5,11 @@ import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
 
 class ReadingHistoryRepository(private val dao: ReadingHistoryDao) {
 
-    fun list(serverId: Int) = dao.list(serverId)
+    fun list() = dao.list()
 
-    fun select(serverId: Int, mangaId: String) = dao.select(serverId, mangaId)
+    fun select(mangaId: String) = dao.select(mangaId)
 
     suspend fun update(readingHistory: ReadingHistory) = dao.insert(readingHistory)
 
-    suspend fun clear(serverId: Int) = dao.clear(serverId)
+    suspend fun clear() = dao.clear()
 }
