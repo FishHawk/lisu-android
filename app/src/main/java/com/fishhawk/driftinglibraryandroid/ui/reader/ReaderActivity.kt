@@ -33,18 +33,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-sealed class BottomSheet() {
-    object SettingSheet : BottomSheet()
-    object ColorFilterSheet : BottomSheet()
-    class PageSheet(val argument: String) : BottomSheet()
-}
-
-lateinit var openSheet: (BottomSheet) -> Unit
-lateinit var closeSheet: () -> Unit
-
 @AndroidEntryPoint
 class ReaderActivity : BaseActivity() {
-    @OptIn(ExperimentalMaterialApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -74,99 +64,118 @@ class ReaderActivity : BaseActivity() {
 
         setContent {
             ApplicationTheme {
-                val scope = rememberCoroutineScope()
-                val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
-                var currentBottomSheet by remember { mutableStateOf<BottomSheet?>(null) }
-
-                openSheet = { it: BottomSheet ->
-                    scope.launch {
-                        currentBottomSheet = it
-                        sheetState.show()
-                    }
-                }
-
-                closeSheet = { scope.launch { sheetState.hide() } }
-
-                ModalBottomSheetLayout(
-                    sheetState = sheetState,
-                    sheetContent = {
-                        when (currentBottomSheet) {
-                            BottomSheet.ColorFilterSheet -> ReaderOverlaySheet()
-                            BottomSheet.SettingSheet -> ReaderSettingsSheet()
-                            else -> {
-                                Text("test")
-                            }
-                        }
-                    },
-                    scrimColor = Color.Transparent
-                ) {
-                    Surface(modifier = Modifier.fillMaxSize()) { ReaderScreen() }
-                }
+                ReaderScreen()
             }
         }
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
+
+internal typealias ReaderActionHandler = (ReaderAction) -> Unit
+
+internal sealed interface ReaderAction {
+    object NavUp : ReaderAction
+
+    object OpenSettingSheet : ReaderAction
+    object OpenColorFilterSheet : ReaderAction
+    class OpenPageSheet(val url: String) : ReaderAction
+
+}
+
+@OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
 @Composable
 private fun ReaderScreen() {
+    val scope = rememberCoroutineScope()
     val viewModel = viewModel<ReaderViewModel>()
-    val mangaViewState by viewModel.mangaLoadState.collectAsState()
 
-    StateView(
-        modifier = Modifier.fillMaxSize(),
-        viewState = mangaViewState,
-        onRetry = { viewModel.refreshReader() }
+    val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    var currentBottomSheet by remember { mutableStateOf<ReaderAction?>(null) }
+
+    val onAction: ReaderActionHandler = { action ->
+        when (action) {
+            ReaderAction.NavUp -> Unit
+
+            ReaderAction.OpenSettingSheet,
+            ReaderAction.OpenColorFilterSheet,
+            is ReaderAction.OpenPageSheet ->
+                scope.launch {
+                    currentBottomSheet = action
+                    sheetState.show()
+                }
+        }
+    }
+
+    ModalBottomSheetLayout(
+        sheetState = sheetState,
+        sheetContent = {
+            when (currentBottomSheet) {
+                ReaderAction.OpenColorFilterSheet -> ReaderOverlaySheet()
+                ReaderAction.OpenSettingSheet -> ReaderSettingsSheet()
+                is ReaderAction.OpenPageSheet -> ReaderPageSheet()
+                else -> Text("test")
+            }
+        },
+        scrimColor = Color.Transparent
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            val pointer by viewModel.chapterPointer.collectAsState()
-            var readerState: ViewerState? = null
+        Surface(modifier = Modifier.fillMaxSize()) {
+            val mangaViewState by viewModel.mangaLoadState.collectAsState()
+
             StateView(
                 modifier = Modifier.fillMaxSize(),
-                viewState = pointer.currChapter.state,
-                onRetry = { }
+                viewState = mangaViewState,
+                onRetry = { viewModel.refreshReader() }
             ) {
-                val mode by PR.readerMode.collectAsState()
-                val size = pointer.currChapter.images.size
-                var startPage by remember(pointer) {
-                    mutableStateOf(pointer.startPage.coerceAtMost(size - 1))
-                }
+                Box(modifier = Modifier.fillMaxSize()) {
+                    val pointer by viewModel.chapterPointer.collectAsState()
+                    var readerState: ViewerState? = null
+                    StateView(
+                        modifier = Modifier.fillMaxSize(),
+                        viewState = pointer.currChapter.state,
+                        onRetry = { }
+                    ) {
+                        val mode by PR.readerMode.collectAsState()
+                        val size = pointer.currChapter.images.size
+                        var startPage by remember(pointer) {
+                            mutableStateOf(pointer.startPage.coerceAtMost(size - 1))
+                        }
 
-                if (mode == ReaderMode.Continuous) {
-                    readerState = ViewerState.List(
-                        rememberSaveable(pointer, mode, saver = LazyListState.Saver) {
-                            LazyListState(firstVisibleItemIndex = startPage)
+                        if (mode == ReaderMode.Continuous) {
+                            readerState = ViewerState.List(
+                                rememberSaveable(pointer, mode, saver = LazyListState.Saver) {
+                                    LazyListState(firstVisibleItemIndex = startPage)
+                                }
+                            ).also {
+                                ListViewer(it, pointer, onAction)
+                            }
+                        } else {
+                            readerState = ViewerState.Pager(
+                                rememberSaveable(pointer, mode, saver = PagerState.Saver) {
+                                    PagerState(
+                                        pageCount = size,
+                                        currentPage = startPage,
+                                        offscreenLimit = 3,
+                                    )
+                                }
+                            ).also {
+                                PagerViewer(it, pointer, mode == ReaderMode.Rtl, onAction)
+                            }
                         }
-                    ).also {
-                        ListViewer(it, pointer)
-                    }
-                } else {
-                    readerState = ViewerState.Pager(
-                        rememberSaveable(pointer, mode, saver = PagerState.Saver) {
-                            PagerState(
-                                pageCount = size,
-                                currentPage = startPage,
-                                offscreenLimit = 3,
-                            )
+                        LaunchedEffect(readerState!!.position) {
+                            readerState!!.position.let {
+                                startPage = it
+                                viewModel.updateReadingHistory(it)
+                            }
                         }
-                    ).also {
-                        PagerViewer(it, pointer, mode == ReaderMode.Rtl)
                     }
-                }
-                LaunchedEffect(readerState!!.position) {
-                    readerState!!.position.let {
-                        startPage = it
-                        viewModel.updateReadingHistory(it)
-                    }
+
+                    val name = pointer.currChapter.name
+                    val title = pointer.currChapter.title
+
+                    ReaderInfoBar(name, title, readerState)
+                    ReaderColorFilterOverlay()
+                    ReaderMenu(name, title, readerState, onAction)
                 }
             }
-
-            val name = pointer.currChapter.name
-            val title = pointer.currChapter.title
-
-            ReaderInfoBar(name, title, readerState)
-            ReaderColorFilterOverlay()
-            ReaderMenu(name, title, readerState)
         }
     }
 }

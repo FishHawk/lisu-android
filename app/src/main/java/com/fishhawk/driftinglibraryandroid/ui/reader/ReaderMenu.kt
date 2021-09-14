@@ -38,7 +38,11 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 
 @Composable
-fun BoxScope.ReaderInfoBar(name: String, title: String, readerState: ViewerState?) {
+internal fun BoxScope.ReaderInfoBar(
+    name: String,
+    title: String,
+    readerState: ViewerState?
+) {
     val viewModel = viewModel<ReaderViewModel>()
     val isMenuOpened by viewModel.isMenuOpened.collectAsState()
 
@@ -61,10 +65,11 @@ fun BoxScope.ReaderInfoBar(name: String, title: String, readerState: ViewerState
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun BoxScope.ReaderMenu(
+internal fun BoxScope.ReaderMenu(
     name: String,
     title: String,
-    viewerState: ViewerState?
+    viewerState: ViewerState?,
+    onAction: ReaderActionHandler
 ) {
     val viewModel = viewModel<ReaderViewModel>()
     val isMenuOpened by viewModel.isMenuOpened.collectAsState()
@@ -93,7 +98,7 @@ fun BoxScope.ReaderMenu(
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it })
     ) {
-        ReaderMenuBottom(viewerState)
+        ReaderMenuBottom(viewerState, onAction)
     }
 }
 
@@ -151,7 +156,10 @@ private fun ReaderMenuTop(name: String, title: String) {
 }
 
 @Composable
-private fun ReaderMenuBottom(viewerState: ViewerState?) {
+private fun ReaderMenuBottom(
+    viewerState: ViewerState?,
+    onAction: ReaderActionHandler
+) {
     Column {
         val viewModel = viewModel<ReaderViewModel>()
 
@@ -267,11 +275,11 @@ private fun ReaderMenuBottom(viewerState: ViewerState?) {
                 }) { Icon(Icons.Filled.ScreenRotation, null) }
 
                 IconButton(modifier = Modifier.weight(1f), onClick = {
-                    openSheet(BottomSheet.ColorFilterSheet)
+                    onAction(ReaderAction.OpenColorFilterSheet)
                 }) { Icon(Icons.Filled.BrightnessMedium, "color-filter") }
 
                 IconButton(modifier = Modifier.weight(1f), onClick = {
-                    openSheet(BottomSheet.SettingSheet)
+                    onAction(ReaderAction.OpenSettingSheet)
                 }) { Icon(Icons.Filled.Settings, "setting") }
             }
         }

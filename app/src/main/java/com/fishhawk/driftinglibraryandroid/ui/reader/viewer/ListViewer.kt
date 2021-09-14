@@ -22,18 +22,22 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.annotation.ExperimentalCoilApi
+import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
+import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderAction
+import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActionHandler
 import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun ListViewer(
+internal fun ListViewer(
     state: ViewerState.List,
-    pointer: ReaderViewModel.ReaderChapterPointer
+    pointer: ReaderViewModel.ReaderChapterPointer,
+    onAction: ReaderActionHandler
 ) {
     val viewModel = viewModel<ReaderViewModel>()
     val scope = rememberCoroutineScope()
@@ -113,7 +117,8 @@ fun ListViewer(
                     url = url,
                     onTap = {
                         viewModel.isMenuOpened.value = !viewModel.isMenuOpened.value
-                    }
+                    },
+                    onLongPress = { onAction(ReaderAction.OpenPageSheet(it)) }
                 )
             }
         }
@@ -130,7 +135,8 @@ fun ListViewer(
 private fun Page(
     position: Int,
     url: String,
-    onTap: ((Offset) -> Unit)
+    onTap: ((Offset) -> Unit),
+    onLongPress: ((String) -> Unit)
 ) {
     val painter = rememberImagePainter(url) { size(OriginalSize) }
     var layout: LayoutCoordinates? = null
@@ -143,7 +149,10 @@ private fun Page(
                 detectTapGestures(
                     onPress = { /* Called when the gesture starts */ },
                     onDoubleTap = { /* Called on Double Tap */ },
-                    onLongPress = { /* Called on Long Press */ },
+                    onLongPress = {
+                        if (painter.state is ImagePainter.State.Success)
+                            onLongPress(url)
+                    },
                     onTap = { offset ->
                         onTap(
                             layout?.let {

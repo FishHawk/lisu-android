@@ -25,10 +25,13 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.annotation.ExperimentalCoilApi
+import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
+import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderAction
+import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActionHandler
 import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -57,10 +60,11 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalComposeUiApi::class, InternalCoroutinesApi::class)
 @Composable
-fun PagerViewer(
+internal fun PagerViewer(
     state: ViewerState.Pager,
     pointer: ReaderViewModel.ReaderChapterPointer,
-    isRtl: Boolean
+    isRtl: Boolean,
+    onAction: ReaderActionHandler
 ) {
     val viewModel = viewModel<ReaderViewModel>()
     val scope = rememberCoroutineScope()
@@ -153,7 +157,8 @@ fun PagerViewer(
                             offset.x > 0.75 -> toRight()
                             else -> viewModel.isMenuOpened.value = !viewModel.isMenuOpened.value
                         }
-                    }
+                    },
+                    onLongPress = { onAction(ReaderAction.OpenPageSheet(it)) }
                 )
             }
         }
@@ -170,7 +175,8 @@ fun PagerViewer(
 private fun Page(
     position: Int,
     url: String,
-    onTap: ((Offset) -> Unit)
+    onTap: ((Offset) -> Unit),
+    onLongPress: ((String) -> Unit)
 ) {
     Box(modifier = Modifier.clipToBounds()) {
         val painter = rememberImagePainter(url) { size(OriginalSize) }
@@ -209,7 +215,10 @@ private fun Page(
 //                        }
 //                    }
                     detectTapGestures(
-                        onLongPress = {},
+                        onLongPress = {
+                            if (painter.state is ImagePainter.State.Success)
+                                onLongPress(url)
+                        },
                         onDoubleTap = {
                             val maxScale = 2f
                             val midScale = 1.5f
