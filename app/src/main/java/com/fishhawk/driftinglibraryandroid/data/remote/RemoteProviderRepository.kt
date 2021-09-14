@@ -3,7 +3,7 @@ package com.fishhawk.driftinglibraryandroid.data.remote
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderDetail
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.data.remote.service.RemoteProviderService
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Retrofit
@@ -14,10 +14,10 @@ class RemoteProviderRepository(retrofit: Flow<Result<Retrofit>?>) :
 
     override val serviceType = RemoteProviderService::class.java
 
-    suspend fun listProvider(): Result<List<ProviderInfo>> =
+    suspend fun listProvider(): Result<List<Provider>> =
         resultWrap {
             it.listProvider().onEach { info ->
-                info.icon = "${url}providers/${info.id}/icon"
+                info.icon = "${url}providers/${info.name}/icon"
             }
         }
 

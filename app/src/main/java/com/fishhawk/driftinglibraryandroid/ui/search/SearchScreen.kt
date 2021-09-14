@@ -21,7 +21,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.ui.activity.setArgument
 import com.fishhawk.driftinglibraryandroid.ui.activity.setString
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableMangaList
@@ -40,7 +40,7 @@ private sealed interface SearchAction {
 @Composable
 fun SearchScreen(navController: NavHostController) {
     navController.setString("keywords")
-    navController.setArgument<ProviderInfo>("provider")
+    navController.setArgument<Provider>("provider")
 
     val viewModel = hiltViewModel<SearchViewModel>()
     val initKeywords = viewModel.keywords.value

@@ -7,7 +7,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -21,7 +21,7 @@ class SearchViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : FeedbackViewModel() {
 
-    val provider: ProviderInfo = savedStateHandle.get("provider")!!
+    val provider: Provider = savedStateHandle.get("provider")!!
 
     private val _keywords = MutableStateFlow(savedStateHandle.get<String>("keywords"))
     val keywords = _keywords.asStateFlow()
@@ -48,7 +48,7 @@ class SearchViewModel @Inject constructor(
     fun addToLibrary(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
         val result = remoteLibraryRepository.createManga(
             targetMangaId,
-            provider.id,
+            provider.name,
             sourceMangaId,
             false
         )
@@ -61,7 +61,7 @@ class SearchViewModel @Inject constructor(
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MangaOutline> {
             val page = params.key ?: 1
             return remoteProviderRepository.listManga(
-                provider.id,
+                provider.name,
                 keywords,
                 page
             ).fold({

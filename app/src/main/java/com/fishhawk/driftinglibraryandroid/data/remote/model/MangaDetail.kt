@@ -40,7 +40,7 @@ data class MetadataDetail(
 
 @Parcelize
 data class MangaDetail(
-    val provider: ProviderInfo? = null,
+    val provider: Provider? = null,
     val id: String,
     var cover: String? = null,
     val updateTime: Long? = null,

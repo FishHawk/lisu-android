@@ -6,7 +6,6 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -61,7 +60,7 @@ internal sealed interface GalleryAction {
 @Composable
 fun GalleryScreen(navController: NavHostController) {
     navController.setArgument<MangaOutline>("outline")
-    navController.setArgument<ProviderInfo>("provider")
+    navController.setArgument<Provider>("provider")
 
     val context = LocalContext.current
 
@@ -86,7 +85,7 @@ fun GalleryScreen(navController: NavHostController) {
                         "provider" to detail.provider
                     )
                 if (detail.provider == null) navController.navigate("library-search")
-                else navController.navigate("search/${detail.provider!!.id}")
+                else navController.navigate("search/${detail.provider!!.name}")
             }
             is GalleryAction.NavToReader -> {
                 action.apply {

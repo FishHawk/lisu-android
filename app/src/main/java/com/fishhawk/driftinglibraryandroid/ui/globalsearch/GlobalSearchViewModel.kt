@@ -5,14 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.ui.base.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 data class SearchResult(
-    val provider: ProviderInfo,
+    val provider: Provider,
     val viewState: ViewState,
     val mangas: List<MangaOutline> = emptyList()
 )
@@ -34,7 +34,7 @@ class GlobalSearchViewModel @Inject constructor(
             providerList.map { provider ->
                 flow {
                     emit(
-                        remoteLibraryRepository.listManga(provider.id, keywords, 1).fold(
+                        remoteLibraryRepository.listManga(provider.name, keywords, 1).fold(
                             { SearchResult(provider, ViewState.Loaded, it) },
                             { SearchResult(provider, ViewState.Failure(it)) }
                         )

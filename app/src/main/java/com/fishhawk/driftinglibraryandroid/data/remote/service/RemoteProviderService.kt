@@ -3,7 +3,7 @@ package com.fishhawk.driftinglibraryandroid.data.remote.service
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderDetail
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -11,7 +11,7 @@ import retrofit2.http.QueryMap
 
 interface RemoteProviderService {
     @GET("/providers")
-    suspend fun listProvider(): List<ProviderInfo>
+    suspend fun listProvider(): List<Provider>
 
     @GET("/providers/{providerId}")
     suspend fun getProvider(

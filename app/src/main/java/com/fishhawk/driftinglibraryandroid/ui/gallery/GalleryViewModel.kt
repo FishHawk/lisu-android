@@ -41,7 +41,7 @@ class GalleryViewModel @Inject constructor(
         get() = detail.value.id
 
     private val providerId
-        get() = detail.value.provider?.id
+        get() = detail.value.provider?.name
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val history = PR.selectedServer.flow.flatMapLatest {

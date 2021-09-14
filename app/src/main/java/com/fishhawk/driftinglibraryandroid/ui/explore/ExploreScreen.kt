@@ -22,7 +22,7 @@ import coil.compose.rememberImagePainter
 import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
 import com.fishhawk.driftinglibraryandroid.ui.base.StateView
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
@@ -65,7 +65,7 @@ private fun Content(navController: NavHostController) {
 
 @Composable
 private fun ProviderList(
-    providers: List<ProviderInfo>,
+    providers: List<Provider>,
     navHostController: NavHostController
 ) {
     val lastUsedProvider by PR.lastUsedProvider.collectAsState()
@@ -74,7 +74,7 @@ private fun ProviderList(
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        providers.find { it.id == lastUsedProvider }?.let {
+        providers.find { it.name == lastUsedProvider }?.let {
             item { ProviderListHeader(stringResource(R.string.explore_last_used)) }
             item { ProviderItem(navHostController, it) }
         }
@@ -98,7 +98,7 @@ private fun ProviderListHeader(label: String) {
 }
 
 @Composable
-private fun ProviderItem(navController: NavHostController, provider: ProviderInfo) {
+private fun ProviderItem(navController: NavHostController, provider: Provider) {
     val scope = rememberCoroutineScope()
     Row(
         modifier = Modifier
@@ -128,9 +128,9 @@ private fun NavHostController.navToGlobalSearch() {
     navigate("global-search")
 }
 
-private fun NavHostController.navToProvider(scope: CoroutineScope, provider: ProviderInfo) {
-    scope.launch { PR.lastUsedProvider.set(provider.id) }
+private fun NavHostController.navToProvider(scope: CoroutineScope, provider: Provider) {
+    scope.launch { PR.lastUsedProvider.set(provider.name) }
     currentBackStackEntry?.arguments =
         bundleOf("provider" to provider)
-    navigate("provider/${provider.id}")
+    navigate("provider/${provider.name}")
 }

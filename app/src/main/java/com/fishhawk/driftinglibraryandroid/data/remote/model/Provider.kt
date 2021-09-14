@@ -4,8 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class ProviderInfo(
-    val id: String,
+data class Provider(
     val name: String,
     val lang: String,
     var icon: String?

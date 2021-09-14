@@ -9,7 +9,7 @@ import com.fishhawk.driftinglibraryandroid.data.datastore.ProviderBrowseHistoryR
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -44,38 +44,38 @@ class ProviderViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : FeedbackViewModel() {
 
-    val provider: ProviderInfo = savedStateHandle.get("provider")!!
+    val provider: Provider = savedStateHandle.get("provider")!!
 
     private val detail = flow {
-        emit(remoteProviderRepository.getProvider(provider.id))
+        emit(remoteProviderRepository.getProvider(provider.name))
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), 1)
 
     val popularOptionModel = detail.flatMapLatest {
         it.getOrNull()?.optionModels?.popular?.let { model ->
-            providerBrowseHistoryRepository.getOption(provider.id, 0, model)
+            providerBrowseHistoryRepository.getOption(provider.name, 0, model)
         } ?: flow { emptyList<OptionGroup>() }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     val latestOptionModel = detail.flatMapLatest {
         it.getOrNull()?.optionModels?.latest?.let { model ->
-            providerBrowseHistoryRepository.getOption(provider.id, 1, model)
+            providerBrowseHistoryRepository.getOption(provider.name, 1, model)
         } ?: flow { emptyList<OptionGroup>() }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     val categoryOptionModel = detail.flatMapLatest {
         it.getOrNull()?.optionModels?.category?.let { model ->
-            providerBrowseHistoryRepository.getOption(provider.id, 2, model)
+            providerBrowseHistoryRepository.getOption(provider.name, 2, model)
         } ?: flow { emptyList<OptionGroup>() }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     val popularMangaList = createProviderMangaList(popularOptionModel) { page, option ->
-        remoteProviderRepository.listPopularManga(provider.id, page, option)
+        remoteProviderRepository.listPopularManga(provider.name, page, option)
     }
     val latestMangaList = createProviderMangaList(latestOptionModel) { page, option ->
-        remoteProviderRepository.listLatestManga(provider.id, page, option)
+        remoteProviderRepository.listLatestManga(provider.name, page, option)
     }
     val categoryMangaList = createProviderMangaList(categoryOptionModel) { page, option ->
-        remoteProviderRepository.listCategoryManga(provider.id, page, option)
+        remoteProviderRepository.listCategoryManga(provider.name, page, option)
     }
 
     private fun createProviderMangaList(
@@ -91,17 +91,17 @@ class ProviderViewModel @Inject constructor(
     fun addToLibrary(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
         val result = remoteLibraryRepository.createManga(
             targetMangaId,
-            provider.id,
+            provider.name,
             sourceMangaId,
             true
         )
         resultWarp(result) { feed(R.string.successfully_add_to_library) }
     }
 
-    val pageHistory = providerBrowseHistoryRepository.getPageHistory(provider.id)
+    val pageHistory = providerBrowseHistoryRepository.getPageHistory(provider.name)
 
     fun updateOptionHistory(page: Int, name: String, selected: Int) =
         viewModelScope.launch {
-            providerBrowseHistoryRepository.setOption(provider.id, page, name, selected)
+            providerBrowseHistoryRepository.setOption(provider.name, page, name, selected)
         }
 }

@@ -24,7 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.ui.activity.setString
 import com.fishhawk.driftinglibraryandroid.ui.base.LoadingItem
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListCard
@@ -39,12 +39,12 @@ private sealed interface GlobalSearchAction {
     object NavUp : GlobalSearchAction
 
     data class NavToGallery(
-        val provider: ProviderInfo,
+        val provider: Provider,
         val outline: MangaOutline
     ) : GlobalSearchAction
 
     data class NavToProviderSearch(
-        val provider: ProviderInfo
+        val provider: Provider
     ) : GlobalSearchAction
 
     data class Search(
@@ -76,7 +76,7 @@ fun GlobalSearchScreen(navController: NavHostController) {
                         "keywords" to viewModel.keywords.value,
                         "provider" to action.provider
                     )
-                navigate("search/${action.provider.id}")
+                navigate("search/${action.provider.name}")
             }
             is GlobalSearchAction.Search -> viewModel.search(action.keywords)
         }

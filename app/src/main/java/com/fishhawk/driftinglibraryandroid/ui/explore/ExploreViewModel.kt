@@ -3,7 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.explore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.ui.base.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +22,7 @@ class ExploreViewModel @Inject constructor(
     val viewState = _viewState.asStateFlow()
 
     private val _providerList = MutableStateFlow(
-        emptyList<ProviderInfo>()
+        emptyList<Provider>()
     )
     val providerList = _providerList.asStateFlow()
 

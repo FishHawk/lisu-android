@@ -45,7 +45,7 @@ class ReaderViewModel @Inject constructor(
             ?: savedStateHandle.get<String>("id")!!
 
     private val providerId =
-        savedStateHandle.get<MangaDetail>("detail")?.provider?.id
+        savedStateHandle.get<MangaDetail>("detail")?.provider?.name
             ?: savedStateHandle.get<String>("providerId")
 
     private val mangaDetail = MutableStateFlow(

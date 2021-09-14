@@ -23,7 +23,7 @@ import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.datastore.OptionGroup
 import com.fishhawk.driftinglibraryandroid.data.datastore.get
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderInfo
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.ui.activity.setArgument
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableMangaList
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
@@ -37,7 +37,7 @@ import kotlinx.coroutines.runBlocking
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ProviderScreen(navController: NavHostController) {
-    navController.setArgument<ProviderInfo>("provider")
+    navController.setArgument<Provider>("provider")
 
     val viewModel = hiltViewModel<ProviderViewModel>()
     val initialPage = remember { runBlocking { viewModel.pageHistory.get().coerceIn(0, 2) } }
@@ -105,7 +105,7 @@ private fun ToolBar(pagerState: PagerState, navController: NavHostController) {
                         bundleOf(
                             "provider" to viewModel.provider
                         )
-                    navController.navigate("search/${viewModel.provider.id}")
+                    navController.navigate("search/${viewModel.provider.name}")
                 }) { Icon(Icons.Filled.Search, contentDescription = "search") }
             }
 

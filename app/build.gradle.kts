@@ -106,9 +106,9 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    implementation("androidx.room:room-runtime:2.3.0")
-    implementation("androidx.room:room-ktx:2.3.0")
-    kapt("androidx.room:room-compiler:2.3.0")
+    implementation("androidx.room:room-runtime:2.4.0-alpha04")
+    implementation("androidx.room:room-ktx:2.4.0-alpha04")
+    kapt("androidx.room:room-compiler:2.4.0-alpha04")
 
 
     implementation("com.google.accompanist:accompanist-flowlayout:0.17.0")
