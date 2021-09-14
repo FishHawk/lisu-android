@@ -22,7 +22,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 import okhttp3.OkHttpClient
@@ -59,7 +58,6 @@ class MainApplication : Application(), ImageLoaderFactory {
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Singleton
     @Provides
     fun provideRetrofit(preferenceRepository: PreferenceRepository): Flow<Result<Retrofit>?> {

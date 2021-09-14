@@ -2,38 +2,29 @@ package com.fishhawk.driftinglibraryandroid.ui.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
-import com.fishhawk.driftinglibraryandroid.data.datastore.HistoryFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.util.*
 import javax.inject.Inject
 
+internal fun Long.toLocalDate() =
+    Date(this).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+
+internal fun Long.toLocalTime() =
+    Date(this).toInstant().atZone(ZoneId.systemDefault()).toLocalTime()
+
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     private val repository: ReadingHistoryRepository
 ) : ViewModel() {
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val historyList = combine(
-        PR.historyFilter.flow,
-        repository.list()
-    ) { mode, list ->
-        list.run {
-            when (mode) {
-                HistoryFilter.All -> this
-                HistoryFilter.FromLibrary -> filter { it.providerId == null }
-                HistoryFilter.FromProvider -> filter { it.providerId != null }
-            }
-        }.groupBy {
-            Date(it.date).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+    val historyList = repository.list()
+        .map { list -> list.groupBy { it.date.toLocalDate() } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
-    fun clearReadingHistory() = viewModelScope.launch { repository.clear() }
+    fun clear() = viewModelScope.launch { repository.clear() }
 }

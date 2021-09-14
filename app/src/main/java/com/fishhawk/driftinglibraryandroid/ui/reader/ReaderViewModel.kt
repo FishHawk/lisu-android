@@ -5,8 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.PR
-import com.fishhawk.driftinglibraryandroid.data.datastore.get
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Chapter
@@ -20,7 +18,6 @@ import java.util.*
 import javax.inject.Inject
 
 class ReaderChapter(
-    val collectionIndex: Int,
     val collectionId: String,
     val index: Int,
     chapter: Chapter
@@ -67,12 +64,22 @@ class ReaderViewModel @Inject constructor(
     private val chapterList = mangaDetail
         .map { it?.getOrNull() }
         .filterNotNull()
-        .map {
-            val collectionIndex = savedStateHandle.get<Int>("collectionIndex") ?: 0
-            val collection = it.collections[collectionIndex]
+        .map { detail ->
+            val collectionId = savedStateHandle.get<String>("collection")
+            val collection = detail.collections.run { find { it.id == collectionId } ?: first() }
             collection.chapters.mapIndexed { index, chapter ->
-                ReaderChapter(collectionIndex, collection.id, index, chapter)
+                ReaderChapter(collection.id, index, chapter)
             }
+        }
+        .onEach { chapters ->
+            val chapterId = savedStateHandle.get<String>("chapter")
+            val chapterIndex = chapters.indexOfFirst { it.id == chapterId }
+            chapterPointer = MutableStateFlow(
+                ReaderChapterPointer(
+                    index = if (chapterIndex < 0) 0 else chapterIndex,
+                    startPage = savedStateHandle.get<Int>("page") ?: 0
+                )
+            )
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
@@ -85,12 +92,7 @@ class ReaderViewModel @Inject constructor(
         val prevChapter get() = chapterList.value!!.getOrNull(index - 1)
     }
 
-    val chapterPointer = MutableStateFlow(
-        ReaderChapterPointer(
-            index = savedStateHandle.get<Int>("chapterIndex") ?: 0,
-            startPage = savedStateHandle.get<Int>("pageIndex") ?: 0
-        )
-    )
+    lateinit var chapterPointer: MutableStateFlow<ReaderChapterPointer>
 
     init {
         refreshReader()
@@ -199,22 +201,21 @@ class ReaderViewModel @Inject constructor(
     }
 
     suspend fun updateReadingHistory(page: Int) {
-        chapterPointer.value.currChapter.let {
-            val readingHistory =
-                ReadingHistory(
-                    mangaId,
-                    mangaDetail.value!!.getOrNull()!!.title,
-                    mangaDetail.value!!.getOrNull()!!.cover ?: "",
-                    providerId,
-                    Calendar.getInstance().time.time,
-                    it.collectionId,
-                    it.collectionIndex,
-                    it.name,
-                    it.index,
-                    page
-                )
-            readingHistoryRepository.update(readingHistory)
-        }
+        val detail = mangaDetail.value!!.getOrNull()!!
+        val chapter = chapterPointer.value.currChapter
+        val readingHistory = ReadingHistory(
+            mangaId = mangaId,
+            cover = detail.cover,
+            title = detail.title,
+            authors = detail.metadata.authors?.joinToString(separator = ";"),
+            provider = detail.provider,
+            date = Calendar.getInstance().time.time,
+            collection = chapter.collectionId,
+            chapterId = chapter.id,
+            chapterName = chapter.name,
+            page = page
+        )
+        readingHistoryRepository.update(readingHistory)
     }
 
 //    fun makeImageFilenamePrefix(): String? {
@@ -222,5 +223,3 @@ class ReaderViewModel @Inject constructor(
 //        return "${mangaDetail.title}-$collectionId-${pointer.currChapter.title}"
 //    }
 }
-
-

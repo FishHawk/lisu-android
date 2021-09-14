@@ -41,9 +41,9 @@ internal sealed interface GalleryAction {
     data class NavToGlobalSearch(val keywords: String) : GalleryAction
     data class NavToSearch(val keywords: String) : GalleryAction
     data class NavToReader(
-        val collectionIndex: Int,
-        val chapterIndex: Int,
-        val pageIndex: Int
+        val collection: String,
+        val chapter: String,
+        val page: Int
     ) : GalleryAction
 
     object ShareCover : GalleryAction
@@ -91,9 +91,9 @@ fun GalleryScreen(navController: NavHostController) {
                 action.apply {
                     context.navToReaderActivity(
                         detail,
-                        collectionIndex,
-                        chapterIndex,
-                        pageIndex
+                        collection,
+                        chapter,
+                        page
                     )
                 }
             }

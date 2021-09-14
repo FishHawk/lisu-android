@@ -27,16 +27,15 @@ internal fun MangaContent(
         hasPreview -> MangaContentPreview(
             preview = detail.preview!!,
             onPageClick = {
-                context.navToReaderActivity(detail, 0, 0, it)
+                context.navToReaderActivity(detail, null, null, it)
             })
         hasChapter -> {
             MangaContentChapter(
                 collections = detail.collections,
-                chapterMark = history?.let {
-                    ChapterMark(it.collectionIndex, it.chapterIndex, it.pageIndex)
-                },
-                onChapterClick = { collectionIndex, chapterIndex, pageIndex ->
-                    onAction(GalleryAction.NavToReader(collectionIndex, chapterIndex, pageIndex))
+                chapterMark =
+                history?.let { ChapterMark(it.collection, it.chapterId, it.page) },
+                onChapterClick = { collection, chapter, page ->
+                    onAction(GalleryAction.NavToReader(collection, chapter, page))
                 }
             )
         }

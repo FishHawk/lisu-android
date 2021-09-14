@@ -6,8 +6,6 @@ import androidx.datastore.preferences.preferencesDataStore
 enum class StartScreen { Library, History, Explore }
 enum class Theme { Light, Dark }
 
-enum class HistoryFilter { All, FromLibrary, FromProvider }
-
 enum class ChapterDisplayMode { Grid, Linear }
 enum class ChapterDisplayOrder { Ascend, Descend }
 
@@ -29,7 +27,6 @@ class PreferenceRepository(context: Context) {
 
 
     val startScreen by store.get("start_screen", StartScreen.Library)
-    val historyFilter by store.get("history_filter", HistoryFilter.FromLibrary)
     val chapterDisplayMode by store.get("chapter_display_mode", ChapterDisplayMode.Grid)
     val chapterDisplayOrder by store.get("chapter_display_order", ChapterDisplayOrder.Ascend)
 

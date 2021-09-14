@@ -2,14 +2,12 @@ package com.fishhawk.driftinglibraryandroid.ui.explore
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.ui.base.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,10 +19,16 @@ class ExploreViewModel @Inject constructor(
     private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
     val viewState = _viewState.asStateFlow()
 
-    private val _providerList = MutableStateFlow(
-        emptyList<Provider>()
-    )
-    val providerList = _providerList.asStateFlow()
+    private val providerList = MutableStateFlow(emptyList<Provider>())
+
+    val providerMap = providerList
+        .map { list -> list.groupBy { it.lang } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+
+    val lastUsedProvider =
+        combine(providerList, PR.lastUsedProvider.flow) { list, name ->
+            list.find { it.name == name }
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     init {
         reload()
@@ -36,7 +40,7 @@ class ExploreViewModel @Inject constructor(
         repository.listProvider()
             .onSuccess {
                 _viewState.value = ViewState.Loaded
-                _providerList.value = it
+                providerList.value = it
             }.onFailure {
                 _viewState.value = ViewState.Failure(it)
             }

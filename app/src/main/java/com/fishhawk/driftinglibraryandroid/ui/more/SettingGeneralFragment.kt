@@ -51,17 +51,6 @@ private fun Content() {
         }
 
         ListPreference(
-            title = stringResource(R.string.settings_history_filter),
-            preference = PR.historyFilter
-        ) {
-            when (it) {
-                HistoryFilter.All -> R.string.settings_history_filter_all
-                HistoryFilter.FromLibrary -> R.string.settings_history_filter_from_library
-                HistoryFilter.FromProvider -> R.string.settings_history_filter_from_provider
-            }
-        }
-
-        ListPreference(
             title = stringResource(R.string.settings_chapter_display_mode),
             preference = PR.chapterDisplayMode
         ) {

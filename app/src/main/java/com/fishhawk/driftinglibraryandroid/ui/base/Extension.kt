@@ -25,16 +25,16 @@ import java.io.FileOutputStream
 fun Context.navToReaderActivity(
     id: String,
     providerId: String?,
-    collectionIndex: Int = 0,
-    chapterIndex: Int = 0,
-    pageIndex: Int = 0
+    collection: String? = null,
+    chapter: String? = null,
+    page: Int = 0
 ) {
     val bundle = bundleOf(
         "id" to id,
         "providerId" to providerId,
-        "collectionIndex" to collectionIndex,
-        "chapterIndex" to chapterIndex,
-        "pageIndex" to pageIndex
+        "collection" to collection,
+        "chapter" to chapter,
+        "page" to page
     )
 
     val intent = Intent(this, ReaderActivity::class.java)
@@ -44,15 +44,15 @@ fun Context.navToReaderActivity(
 
 fun Context.navToReaderActivity(
     detail: MangaDetail,
-    collectionIndex: Int = 0,
-    chapterIndex: Int = 0,
-    pageIndex: Int = 0
+    collection: String? = null,
+    chapter: String? = null,
+    page: Int = 0
 ) {
     val bundle = bundleOf(
         "detail" to detail,
-        "collectionIndex" to collectionIndex,
-        "chapterIndex" to chapterIndex,
-        "pageIndex" to pageIndex
+        "collection" to collection,
+        "chapter" to chapter,
+        "page" to page
     )
 
     val intent = Intent(this, ReaderActivity::class.java)

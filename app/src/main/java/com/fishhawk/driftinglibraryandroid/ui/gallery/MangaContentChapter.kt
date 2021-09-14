@@ -26,12 +26,12 @@ import com.fishhawk.driftinglibraryandroid.data.remote.model.Chapter
 import com.fishhawk.driftinglibraryandroid.data.remote.model.ChapterCollection
 import kotlinx.coroutines.launch
 
-internal typealias OnChapterClickListener = (collectionIndex: Int, chapterIndex: Int, pageIndex: Int) -> Unit
+internal typealias OnChapterClickListener = (collection: String, chapter: String, page: Int) -> Unit
 
 internal data class ChapterMark(
-    val collectionIndex: Int,
-    val chapterIndex: Int,
-    val pageIndex: Int
+    val collection: String,
+    val chapter: String,
+    val page: Int
 )
 
 @Composable
@@ -79,25 +79,25 @@ private fun ChapterListLinear(
     onChapterClick: OnChapterClickListener
 ) {
     val order by PR.chapterDisplayOrder.collectAsState()
-    val chapters = collections.flatMapIndexed { collectionIndex, collection ->
-        collection.chapters.mapIndexed { chapterIndex, chapter ->
-            Triple(collectionIndex, chapterIndex, chapter)
+    val chapters = collections.flatMap { collection ->
+        collection.chapters.map { chapter ->
+            Pair(collection.id, chapter)
         }.let {
             if (order == ChapterDisplayOrder.Descend) it.asReversed() else it
         }
     }
     Column(modifier = Modifier.fillMaxWidth()) {
-        chapters.map { (collectionIndex, chapterIndex, chapter) ->
+        chapters.map { (collection, chapter) ->
             if (chapterMark != null &&
-                chapterMark.collectionIndex == collectionIndex &&
-                chapterMark.chapterIndex == chapterIndex
+                chapterMark.collection == collection &&
+                chapterMark.chapter == chapter.id
             ) {
                 ChapterLinear(chapter, true) {
-                    onChapterClick(collectionIndex, chapterIndex, chapterMark.pageIndex)
+                    onChapterClick(collection, chapter.id, chapterMark.page)
                 }
             } else {
                 ChapterLinear(chapter, false) {
-                    onChapterClick(collectionIndex, chapterIndex, 0)
+                    onChapterClick(collection, chapter.id, 0)
                 }
             }
         }
@@ -141,46 +141,46 @@ private fun ChapterListGrid(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         val order by PR.chapterDisplayOrder.collectAsState()
-        collections.mapIndexed { collectionIndex, it ->
-            if (it.chapters.isEmpty()) return@mapIndexed
+        collections.map { collection ->
+            if (collection.chapters.isEmpty()) return@map
 
-            if (it.id.isNotBlank()) {
+            if (collection.id.isNotBlank()) {
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(2.dp),
-                    text = it.id,
+                    text = collection.id,
                     style = MaterialTheme.typography.body2,
                     textAlign = TextAlign.Center
                 )
             }
 
             val nColumns = 4
-            val rows = (it.chapters.size + nColumns - 1) / nColumns
+            val rows = (collection.chapters.size + nColumns - 1) / nColumns
             (0..rows).map { rowIndex ->
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     for (columnIndex in 0 until nColumns) {
                         val cellIndex = rowIndex * nColumns + columnIndex
-                        if (cellIndex < it.chapters.size) {
+                        if (cellIndex < collection.chapters.size) {
                             val chapterIndex = when (order) {
                                 ChapterDisplayOrder.Ascend -> cellIndex
-                                ChapterDisplayOrder.Descend -> it.chapters.size - cellIndex - 1
+                                ChapterDisplayOrder.Descend -> collection.chapters.size - cellIndex - 1
                             }
 
                             Box(
                                 modifier = Modifier.weight(1f),
                                 propagateMinConstraints = true
                             ) {
-                                val chapter = it.chapters[chapterIndex]
+                                val chapter = collection.chapters[chapterIndex]
                                 val isMarked = chapterMark != null &&
-                                        chapterMark.collectionIndex == collectionIndex &&
-                                        chapterMark.chapterIndex == chapterIndex
+                                        chapterMark.collection == collection.id &&
+                                        chapterMark.chapter == chapter.id
 
                                 ChapterGrid(chapter, isMarked) {
                                     onChapterClick(
-                                        collectionIndex,
-                                        chapterIndex,
-                                        if (isMarked) chapterMark!!.pageIndex else 0
+                                        collection.id,
+                                        chapter.id,
+                                        if (isMarked) chapterMark!!.page else 0
                                     )
                                 }
                             }

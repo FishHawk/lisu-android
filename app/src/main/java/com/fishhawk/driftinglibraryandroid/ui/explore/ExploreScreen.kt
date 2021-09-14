@@ -21,67 +21,93 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
 import com.fishhawk.driftinglibraryandroid.ui.base.StateView
+import com.fishhawk.driftinglibraryandroid.ui.base.ViewState
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.util.*
 
+private typealias ExploreActionHandler = (ExploreAction) -> Unit
+
+private sealed interface ExploreAction {
+    object NavToGlobalSearch : ExploreAction
+    data class NavToProvider(val provider: Provider) : ExploreAction
+
+    object Reload : ExploreAction
+}
+
 @Composable
 fun ExploreScreen(navController: NavHostController) {
+    val viewModel = hiltViewModel<ExploreViewModel>()
+    val viewState by viewModel.viewState.collectAsState()
+    val providers by viewModel.providerMap.collectAsState()
+    val lastUsedProvider by viewModel.lastUsedProvider.collectAsState()
+
+    val scope = rememberCoroutineScope()
+    val onAction: ExploreActionHandler = { action ->
+        when (action) {
+            ExploreAction.NavToGlobalSearch -> navController.navigate("global-search")
+            is ExploreAction.NavToProvider -> {
+                val provider = action.provider
+                scope.launch { PR.lastUsedProvider.set(provider.name) }
+                navController.currentBackStackEntry?.arguments =
+                    bundleOf("provider" to provider)
+                navController.navigate("provider/${provider.name}")
+            }
+            ExploreAction.Reload -> viewModel.reload()
+        }
+    }
+
     Scaffold(
-        topBar = { ToolBar(navController) },
-        content = { ApplicationTransition { Content(navController) } }
+        topBar = { ToolBar(onAction) },
+        content = {
+            ApplicationTransition {
+                ProviderList(viewState, providers, lastUsedProvider, onAction)
+            }
+        }
     )
 }
 
 @Composable
-private fun ToolBar(navController: NavHostController) {
+private fun ToolBar(onAction: ExploreActionHandler) {
     ApplicationToolBar(stringResource(R.string.label_explore)) {
-        IconButton(onClick = { navController.navToGlobalSearch() }) {
+        IconButton(onClick = { onAction(ExploreAction.NavToGlobalSearch) }) {
             Icon(Icons.Filled.Search, contentDescription = "search")
         }
     }
 }
 
 @Composable
-private fun Content(navController: NavHostController) {
-    val viewModel = hiltViewModel<ExploreViewModel>()
-    val viewState by viewModel.viewState.collectAsState()
+private fun ProviderList(
+    viewState: ViewState,
+    providers: Map<String, List<Provider>>,
+    lastUsedProvider: Provider?,
+    onAction: ExploreActionHandler
+) {
     StateView(
         modifier = Modifier.fillMaxSize(),
         viewState = viewState,
-        onRetry = { viewModel.reload() }
+        onRetry = { onAction(ExploreAction.Reload) }
     ) {
-        val providerList by viewModel.providerList.collectAsState()
-        if (providerList.isEmpty()) EmptyView()
-        else ProviderList(providerList, navController)
-    }
-}
-
-@Composable
-private fun ProviderList(
-    providers: List<Provider>,
-    navHostController: NavHostController
-) {
-    val lastUsedProvider by PR.lastUsedProvider.collectAsState()
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        providers.find { it.name == lastUsedProvider }?.let {
-            item { ProviderListHeader(stringResource(R.string.explore_last_used)) }
-            item { ProviderItem(navHostController, it) }
-        }
-        val providerMap = providers.groupBy { it.lang }
-        providerMap.map { (lang, list) ->
-            item { ProviderListHeader(Locale(lang).displayLanguage) }
-            items(list) { ProviderItem(navHostController, it) }
+        if (providers.isEmpty()) EmptyView()
+        else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                lastUsedProvider?.let {
+                    item { ProviderListHeader(stringResource(R.string.explore_last_used)) }
+                    item { ProviderListItem(it, onAction) }
+                }
+                providers.forEach { (lang, list) ->
+                    item { ProviderListHeader(Locale(lang).displayLanguage) }
+                    items(list) { ProviderListItem(it, onAction) }
+                }
+            }
         }
     }
 }
@@ -91,20 +117,23 @@ private fun ProviderListHeader(label: String) {
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Text(
             text = label,
-            modifier = Modifier.padding(vertical = 8.dp),
+            modifier = Modifier.padding(8.dp),
             style = MaterialTheme.typography.subtitle2
         )
     }
 }
 
 @Composable
-private fun ProviderItem(navController: NavHostController, provider: Provider) {
-    val scope = rememberCoroutineScope()
+private fun ProviderListItem(
+    provider: Provider,
+    onAction: ExploreActionHandler
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp)
-            .clickable { navController.navToProvider(scope, provider) },
+            .clickable { onAction(ExploreAction.NavToProvider(provider)) }
+            .padding(horizontal = 8.dp)
+            .height(48.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -122,15 +151,4 @@ private fun ProviderItem(navController: NavHostController, provider: Provider) {
             overflow = TextOverflow.Ellipsis,
         )
     }
-}
-
-private fun NavHostController.navToGlobalSearch() {
-    navigate("global-search")
-}
-
-private fun NavHostController.navToProvider(scope: CoroutineScope, provider: Provider) {
-    scope.launch { PR.lastUsedProvider.set(provider.name) }
-    currentBackStackEntry?.arguments =
-        bundleOf("provider" to provider)
-    navigate("provider/${provider.name}")
 }
