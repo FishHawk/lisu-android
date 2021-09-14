@@ -3,7 +3,6 @@ package com.fishhawk.driftinglibraryandroid.ui.reader
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
@@ -17,17 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.fishhawk.driftinglibraryandroid.R
 
 @Preview
 @Composable
 internal fun ReaderPageSheet() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         SheetListItem(
             icon = Icons.Filled.Refresh,
             title = stringResource(R.string.page_action_refresh)

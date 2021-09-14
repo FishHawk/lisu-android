@@ -115,7 +115,9 @@ private fun ReaderScreen() {
                 else -> Text("test")
             }
         },
-        scrimColor = Color.Transparent
+        scrimColor =
+            if (currentBottomSheet is ReaderAction.OpenColorFilterSheet) Color.Transparent
+            else ModalBottomSheetDefaults.scrimColor
     ) {
         Surface(modifier = Modifier.fillMaxSize()) {
             val mangaViewState by viewModel.mangaLoadState.collectAsState()
