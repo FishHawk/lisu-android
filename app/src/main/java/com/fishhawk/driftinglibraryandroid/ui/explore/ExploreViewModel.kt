@@ -19,14 +19,14 @@ class ExploreViewModel @Inject constructor(
     private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
     val viewState = _viewState.asStateFlow()
 
-    private val providerList = MutableStateFlow(emptyList<Provider>())
+    private val _providers = MutableStateFlow(emptyList<Provider>())
 
-    val providerMap = providerList
+    val providers = _providers
         .map { list -> list.groupBy { it.lang } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
     val lastUsedProvider =
-        combine(providerList, PR.lastUsedProvider.flow) { list, name ->
+        combine(_providers, PR.lastUsedProvider.flow) { list, name ->
             list.find { it.name == name }
         }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
@@ -40,7 +40,7 @@ class ExploreViewModel @Inject constructor(
         repository.listProvider()
             .onSuccess {
                 _viewState.value = ViewState.Loaded
-                providerList.value = it
+                _providers.value = it
             }.onFailure {
                 _viewState.value = ViewState.Failure(it)
             }

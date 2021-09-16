@@ -43,7 +43,7 @@ private sealed interface ExploreAction {
 fun ExploreScreen(navController: NavHostController) {
     val viewModel = hiltViewModel<ExploreViewModel>()
     val viewState by viewModel.viewState.collectAsState()
-    val providers by viewModel.providerMap.collectAsState()
+    val providers by viewModel.providers.collectAsState()
     val lastUsedProvider by viewModel.lastUsedProvider.collectAsState()
 
     val scope = rememberCoroutineScope()
@@ -94,11 +94,7 @@ private fun ProviderList(
     ) {
         if (providers.isEmpty()) EmptyView()
         else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
+            LazyColumn {
                 lastUsedProvider?.let {
                     item { ProviderListHeader(stringResource(R.string.explore_last_used)) }
                     item { ProviderListItem(it, onAction) }
@@ -117,7 +113,7 @@ private fun ProviderListHeader(label: String) {
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Text(
             text = label,
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp),
             style = MaterialTheme.typography.subtitle2
         )
     }
@@ -132,15 +128,12 @@ private fun ProviderListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onAction(ExploreAction.NavToProvider(provider)) }
-            .padding(horizontal = 8.dp)
-            .height(48.dp),
+            .padding(horizontal = 8.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Image(
-            modifier = Modifier
-                .height(32.dp)
-                .aspectRatio(1f),
+            modifier = Modifier.size(32.dp),
             painter = rememberImagePainter(provider.icon) { crossfade(true) },
             contentDescription = null
         )
@@ -148,7 +141,7 @@ private fun ProviderListItem(
             text = provider.name,
             style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
