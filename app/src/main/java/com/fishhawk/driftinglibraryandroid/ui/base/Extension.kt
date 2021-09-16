@@ -170,20 +170,9 @@ fun Context.toast(throwable: Throwable) =
     throwable.message?.let { toast(it) }
         ?: toast(R.string.toast_unknown_error)
 
-val Context.clipboardManager
-    get() = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-
 fun Context.copyToClipboard(text: String, hintResId: Int? = null) {
     val clip = ClipData.newPlainText("simple text", text)
-    clipboardManager.setPrimaryClip(clip)
+    val manager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+    manager.setPrimaryClip(clip)
     hintResId?.let { toast(it) }
 }
-
-//val Fragment.inputMethodManager
-//    get() = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-//
-//fun Fragment.closeInputMethod() {
-//    inputMethodManager.hideSoftInputFromWindow(requireView().windowToken, 0)
-//}
-
-

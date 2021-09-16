@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,54 +31,88 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
+private typealias HistoryActionHandler = (HistoryAction) -> Unit
+
+private sealed interface HistoryAction {
+    data class NavToGallery(val history: ReadingHistory) : HistoryAction
+    data class NavToReader(val history: ReadingHistory) : HistoryAction
+    object ClearHistory : HistoryAction
+}
+
 @Composable
 fun HistoryScreen(navController: NavHostController) {
+    val context = LocalContext.current
+
+    val viewModel = hiltViewModel<HistoryViewModel>()
+    val histories by viewModel.histories.collectAsState()
+    val onAction: HistoryActionHandler = { action ->
+        when (action) {
+            is HistoryAction.NavToGallery -> with(action.history) {
+                navController.currentBackStackEntry?.arguments =
+                    bundleOf(
+                        "outline" to MangaOutline(
+                            mangaId, cover, null, null,
+                            MetadataOutline(title, authors = authors?.let { listOf(it) }, null),
+                            null
+                        ),
+                        "provider" to provider
+                    )
+                navController.navigate("gallery/${mangaId}")
+            }
+            is HistoryAction.NavToReader -> with(action.history) {
+                context.navToReaderActivity(
+                    mangaId, provider?.name,
+                    collection, chapterId, page
+                )
+            }
+            HistoryAction.ClearHistory -> viewModel.clear()
+        }
+    }
+
     Scaffold(
-        topBar = { ToolBar() },
-        content = { ApplicationTransition { HistoryList(navController) } }
+        topBar = { ToolBar(onAction) },
+        content = { ApplicationTransition { HistoryList(histories, onAction) } }
     )
 }
 
 @Composable
-private fun ToolBar() {
+private fun ToolBar(onAction: HistoryActionHandler) {
     ApplicationToolBar(stringResource(R.string.label_history)) {
         val isOpen = remember { mutableStateOf(false) }
         IconButton(onClick = { isOpen.value = true }) {
             Icon(Icons.Filled.ClearAll, stringResource(R.string.menu_history_clear))
         }
-        ClearHistoryDialog(isOpen)
+        ClearHistoryDialog(isOpen, onAction)
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun HistoryList(navController: NavHostController) {
-    val viewModel = hiltViewModel<HistoryViewModel>()
-    val historyList by viewModel.historyList.collectAsState()
+private fun HistoryList(
+    histories: Map<LocalDate, List<ReadingHistory>>,
+    onAction: HistoryActionHandler
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(top = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        if (historyList.isEmpty()) item { EmptyView() }
-        historyList.forEach { (then, list) ->
-            item { HistoryListHeader(then) }
-            items(list, { Pair(it.provider?.name, it.mangaId) }) {
-                HistoryListItem(navController, it)
-            }
+        if (histories.isEmpty()) item { EmptyView() }
+        histories.forEach { (date, list) ->
+            item { HistoryListHeader(date) }
+            items(list) { HistoryListItem(it, onAction) }
         }
     }
 }
 
 @Composable
-private fun HistoryListHeader(then: LocalDate) {
+private fun HistoryListHeader(date: LocalDate) {
     val now = LocalDate.now()
-    val days = ChronoUnit.DAYS.between(then, now)
+    val days = ChronoUnit.DAYS.between(date, now)
     val dateString = when {
         days == 0L -> stringResource(R.string.history_today)
         days == 1L -> stringResource(R.string.history_yesterday)
         days <= 5L -> stringResource(R.string.history_n_days_ago).format(days)
-        else -> then.format(DateTimeFormatter.ofPattern(stringResource(R.string.history_date_format)))
+        else -> date.format(DateTimeFormatter.ofPattern(stringResource(R.string.history_date_format)))
     }
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Text(
@@ -89,18 +124,21 @@ private fun HistoryListHeader(then: LocalDate) {
 }
 
 @Composable
-private fun HistoryListItem(navController: NavHostController, history: ReadingHistory) {
+private fun HistoryListItem(
+    history: ReadingHistory,
+    onAction: HistoryActionHandler
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { navController.navToReader(history) }
+            .clickable { onAction(HistoryAction.NavToReader(history)) }
             .padding(horizontal = 8.dp)
             .height(88.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         MangaCover(
-            modifier = Modifier.clickable { navController.navToGallery(history) },
+            modifier = Modifier.clickable { onAction(HistoryAction.NavToGallery(history)) },
             cover = history.cover
         )
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -132,8 +170,10 @@ private fun HistoryListItem(navController: NavHostController, history: ReadingHi
 }
 
 @Composable
-private fun ClearHistoryDialog(isOpen: MutableState<Boolean>) {
-    val viewModel = hiltViewModel<HistoryViewModel>()
+private fun ClearHistoryDialog(
+    isOpen: MutableState<Boolean>,
+    onAction: HistoryActionHandler
+) {
     if (isOpen.value) {
         AlertDialog(
             onDismissRequest = { isOpen.value = false },
@@ -141,32 +181,13 @@ private fun ClearHistoryDialog(isOpen: MutableState<Boolean>) {
             confirmButton = {
                 TextButton(
                     onClick = {
-                        viewModel.clear()
+                        onAction(HistoryAction.ClearHistory)
                         isOpen.value = false
-                    }) {
+                    }
+                ) {
                     Text(stringResource(R.string.dialog_clear_history_positive))
                 }
             }
         )
     }
-}
-
-private fun NavHostController.navToReader(history: ReadingHistory) = with(history) {
-    context.navToReaderActivity(
-        mangaId, provider?.name,
-        collection, chapterId, page
-    )
-}
-
-private fun NavHostController.navToGallery(history: ReadingHistory) = with(history) {
-    currentBackStackEntry?.arguments =
-        bundleOf(
-            "outline" to MangaOutline(
-                mangaId, cover, null, null,
-                MetadataOutline(title, authors = authors?.let { listOf(it) }, null),
-                null
-            ),
-            "provider" to provider
-        )
-    navigate("gallery/${mangaId}")
 }

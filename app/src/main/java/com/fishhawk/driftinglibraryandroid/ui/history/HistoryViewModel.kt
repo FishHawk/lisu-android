@@ -22,7 +22,7 @@ internal fun Long.toLocalTime() =
 class HistoryViewModel @Inject constructor(
     private val repository: ReadingHistoryRepository
 ) : ViewModel() {
-    val historyList = repository.list()
+    val histories = repository.list()
         .map { list -> list.groupBy { it.date.toLocalDate() } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
