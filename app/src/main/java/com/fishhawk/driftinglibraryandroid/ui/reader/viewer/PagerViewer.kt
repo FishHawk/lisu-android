@@ -29,6 +29,7 @@ import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import coil.size.OriginalSize
 import com.fishhawk.driftinglibraryandroid.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.ScaleType
 import com.fishhawk.driftinglibraryandroid.data.datastore.collectAsState
 import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderAction
 import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActionHandler
@@ -86,6 +87,7 @@ internal fun PagerViewer(
 
     val useVolumeKey by PR.useVolumeKey.collectAsState()
     val invertVolumeKey by PR.invertVolumeKey.collectAsState()
+    val scaleType by PR.scaleType.collectAsState()
 
     val focusRequester = remember { FocusRequester() }
 
@@ -150,6 +152,12 @@ internal fun PagerViewer(
                 Page(
                     position = index.plus(1),
                     url = pointer.currChapter.images[index],
+                    contentScale = when (scaleType) {
+                        ScaleType.FitScreen -> ContentScale.Fit
+                        ScaleType.FitWidth -> ContentScale.FillWidth
+                        ScaleType.FitHeight -> ContentScale.FillHeight
+                        ScaleType.OriginalSize -> ContentScale.None
+                    },
                     onTap = { offset ->
                         if (viewModel.isMenuOpened.value) viewModel.isMenuOpened.value = false
                         else when {
@@ -175,6 +183,7 @@ internal fun PagerViewer(
 private fun Page(
     position: Int,
     url: String,
+    contentScale: ContentScale,
     onTap: ((Offset) -> Unit),
     onLongPress: ((String) -> Unit)
 ) {

@@ -13,6 +13,7 @@ enum class ReaderMode { Ltr, Rtl, Continuous }
 enum class ReaderOrientation { Portrait, Landscape }
 
 enum class ColorFilterMode { Default, Multiply, Screen, Overlay, Lighten, Darken }
+enum class ScaleType { FitScreen, FitWidth, FitHeight, OriginalSize }
 
 class PreferenceRepository(context: Context) {
     private val Context.store by preferencesDataStore(name = "preference")
@@ -33,6 +34,8 @@ class PreferenceRepository(context: Context) {
 
     val readerMode by store.get("reader_mode", ReaderMode.Ltr)
     val readerOrientation by store.get("reader_orientation", ReaderOrientation.Portrait)
+
+    val scaleType by store.get("scale_type", ScaleType.FitScreen)
 
     val isPageIntervalEnabled by store.get("is_page_interval_enabled", false)
     val showInfoBar by store.get("show_info_bar", true)
