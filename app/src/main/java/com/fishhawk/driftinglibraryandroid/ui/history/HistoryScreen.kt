@@ -1,5 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.history
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,6 +11,7 @@ import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,7 +38,9 @@ private typealias HistoryActionHandler = (HistoryAction) -> Unit
 private sealed interface HistoryAction {
     data class NavToGallery(val history: ReadingHistory) : HistoryAction
     data class NavToReader(val history: ReadingHistory) : HistoryAction
-    object ClearHistory : HistoryAction
+
+    data class Delete(val history: ReadingHistory) : HistoryAction
+    object Clear : HistoryAction
 }
 
 @Composable
@@ -65,7 +69,8 @@ fun HistoryScreen(navController: NavHostController) {
                     collection, chapterId, page
                 )
             }
-            HistoryAction.ClearHistory -> viewModel.clear()
+            is HistoryAction.Delete -> viewModel.delete(action.history)
+            HistoryAction.Clear -> viewModel.clear()
         }
     }
 
@@ -91,15 +96,13 @@ private fun HistoryList(
     histories: Map<LocalDate, List<ReadingHistory>>,
     onAction: HistoryActionHandler
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(top = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        if (histories.isEmpty()) item { EmptyView() }
+    if (histories.isEmpty()) EmptyView()
+    LazyColumn {
         histories.forEach { (date, list) ->
             item { HistoryListHeader(date) }
-            items(list) { HistoryListItem(it, onAction) }
+            items(list, key = { Pair(it.provider?.name, it.mangaId) }) {
+                HistoryListItem(it, onAction)
+            }
         }
     }
 }
@@ -117,56 +120,81 @@ private fun HistoryListHeader(date: LocalDate) {
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Text(
             text = dateString,
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp),
             style = MaterialTheme.typography.subtitle2
         )
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun HistoryListItem(
     history: ReadingHistory,
     onAction: HistoryActionHandler
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onAction(HistoryAction.NavToReader(history)) }
-            .padding(horizontal = 8.dp)
-            .height(88.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        MangaCover(
-            modifier = Modifier.clickable { onAction(HistoryAction.NavToGallery(history)) },
-            cover = history.cover
-        )
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(
-                text = history.title ?: history.mangaId,
-                style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+    val dismissState = rememberDismissState(
+        confirmStateChange = {
+            (it == DismissValue.DismissedToStart).also { confirmed ->
+                if (confirmed) onAction(HistoryAction.Delete(history))
+            }
+        }
+    )
+    SwipeToDismiss(
+        state = dismissState,
+        directions = setOf(DismissDirection.EndToStart),
+        dismissThresholds = { FractionalThreshold(0.4f) },
+        background = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.LightGray)
             )
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                val seen = listOf(
-                    history.collection,
-                    history.chapterName,
-                    stringResource(R.string.history_card_page, history.page.plus(1))
-                ).filter { it.isNotBlank() }.joinToString("-")
-                Text(text = seen, style = MaterialTheme.typography.body2)
+        },
+        dismissContent = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colors.background)
+                    .clickable { onAction(HistoryAction.NavToReader(history)) }
+                    .padding(horizontal = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                MangaCover(
+                    modifier = Modifier
+                        .height(92.dp)
+                        .padding(vertical = 2.dp)
+                        .clickable { onAction(HistoryAction.NavToGallery(history)) },
+                    cover = history.cover
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = history.title ?: history.mangaId,
+                        style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                        val seen = listOf(
+                            history.collection,
+                            history.chapterName,
+                            stringResource(R.string.history_card_page, history.page.plus(1))
+                        ).filter { it.isNotBlank() }.joinToString("-")
+                        Text(text = seen, style = MaterialTheme.typography.body2)
 
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    val date = history.date.toLocalTime()
-                        .format(DateTimeFormatter.ofPattern("H:mm"))
-                    Text(text = date, style = MaterialTheme.typography.body2)
-                    history.provider?.let {
-                        Text(text = it.name, style = MaterialTheme.typography.body2)
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            val date = history.date.toLocalTime()
+                                .format(DateTimeFormatter.ofPattern("H:mm"))
+                            Text(text = date, style = MaterialTheme.typography.body2)
+                            history.provider?.let {
+                                Text(text = it.name, style = MaterialTheme.typography.body2)
+                            }
+                        }
                     }
                 }
             }
         }
-    }
+    )
 }
 
 @Composable
@@ -174,20 +202,17 @@ private fun ClearHistoryDialog(
     isOpen: MutableState<Boolean>,
     onAction: HistoryActionHandler
 ) {
-    if (isOpen.value) {
-        AlertDialog(
-            onDismissRequest = { isOpen.value = false },
-            title = { Text(text = stringResource(R.string.dialog_clear_history)) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onAction(HistoryAction.ClearHistory)
-                        isOpen.value = false
-                    }
-                ) {
-                    Text(stringResource(R.string.dialog_clear_history_positive))
+    if (!isOpen.value) return
+    AlertDialog(
+        onDismissRequest = { isOpen.value = false },
+        title = { Text(text = stringResource(R.string.dialog_clear_history)) },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onAction(HistoryAction.Clear)
+                    isOpen.value = false
                 }
-            }
-        )
-    }
+            ) { Text(stringResource(R.string.dialog_clear_history_positive)) }
+        }
+    )
 }

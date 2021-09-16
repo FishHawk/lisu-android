@@ -3,6 +3,7 @@ package com.fishhawk.driftinglibraryandroid.ui.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepository
+import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -25,6 +26,8 @@ class HistoryViewModel @Inject constructor(
     val histories = repository.list()
         .map { list -> list.groupBy { it.date.toLocalDate() } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+
+    fun delete(history: ReadingHistory) = viewModelScope.launch { repository.delete(history) }
 
     fun clear() = viewModelScope.launch { repository.clear() }
 }

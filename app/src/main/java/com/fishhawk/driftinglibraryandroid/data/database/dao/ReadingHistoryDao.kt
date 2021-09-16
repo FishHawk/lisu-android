@@ -18,6 +18,9 @@ interface ReadingHistoryDao {
     @Update
     suspend fun update(history: ReadingHistory)
 
+    @Delete
+    suspend fun delete(history: ReadingHistory)
+
     @Query("DELETE FROM ReadingHistory")
     suspend fun clear()
 }

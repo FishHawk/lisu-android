@@ -11,5 +11,7 @@ class ReadingHistoryRepository(private val dao: ReadingHistoryDao) {
 
     suspend fun update(readingHistory: ReadingHistory) = dao.insert(readingHistory)
 
+    suspend fun delete(readingHistory: ReadingHistory) = dao.delete(readingHistory)
+
     suspend fun clear() = dao.clear()
 }

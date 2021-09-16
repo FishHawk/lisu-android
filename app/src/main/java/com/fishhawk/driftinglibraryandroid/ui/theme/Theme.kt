@@ -2,6 +2,7 @@ package com.fishhawk.driftinglibraryandroid.ui.theme
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.*
@@ -57,7 +58,7 @@ fun ApplicationTransition(
     visibleState = remember {
         MutableTransitionState(false)
     }.apply { targetState = true },
-    enter = fadeIn(animationSpec = spring(stiffness = 100f)),
+    enter = fadeIn(animationSpec = spring(stiffness = Spring.StiffnessLow)),
     exit = fadeOut(),
     content = content
 )
