@@ -87,7 +87,6 @@ internal fun PagerViewer(
 
     val useVolumeKey by PR.useVolumeKey.collectAsState()
     val invertVolumeKey by PR.invertVolumeKey.collectAsState()
-    val scaleType by PR.scaleType.collectAsState()
 
     val focusRequester = remember { FocusRequester() }
 
@@ -140,14 +139,14 @@ internal fun PagerViewer(
         }
     ) {
         val isPageIntervalEnabled by PR.isPageIntervalEnabled.collectAsState()
-        val itemSpacing = if (isPageIntervalEnabled) 16.dp else 0.dp
+        val scaleType by PR.scaleType.collectAsState()
 
         val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
         CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
             HorizontalPager(
                 modifier = Modifier.fillMaxSize(),
                 state = state.state,
-                itemSpacing = itemSpacing
+                itemSpacing = if (isPageIntervalEnabled) 16.dp else 0.dp
             ) { index ->
                 Page(
                     position = index.plus(1),

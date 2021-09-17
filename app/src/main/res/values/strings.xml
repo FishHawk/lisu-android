@@ -74,6 +74,12 @@
     <string name="settings_reader_orientation_portrait">Portrait</string>
     <string name="settings_reader_orientation_landscape">Landscape</string>
 
+    <string name="settings_scale_type">Screen orientation</string>
+    <string name="settings_scale_type_fit_screen">Fit screen</string>
+    <string name="settings_scale_type_fit_width">Fit width</string>
+    <string name="settings_scale_type_fit_height">Fit height</string>
+    <string name="settings_scale_type_original_size">Original size</string>
+
     <string name="settings_is_page_interval_enabled">Page interval</string>
     <string name="settings_show_info_bar">Show info bar</string>
     <string name="settings_keep_screen_on">Keep screen on</string>

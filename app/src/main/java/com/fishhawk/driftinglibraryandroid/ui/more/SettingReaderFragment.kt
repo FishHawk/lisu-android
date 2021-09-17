@@ -11,6 +11,7 @@ import com.fishhawk.driftinglibraryandroid.PR
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.datastore.ReaderMode
 import com.fishhawk.driftinglibraryandroid.data.datastore.ReaderOrientation
+import com.fishhawk.driftinglibraryandroid.data.datastore.ScaleType
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 
@@ -48,6 +49,18 @@ private fun Content() {
             when (it) {
                 ReaderOrientation.Portrait -> R.string.settings_reader_orientation_portrait
                 ReaderOrientation.Landscape -> R.string.settings_reader_orientation_landscape
+            }
+        }
+
+        ListPreference(
+            title = stringResource(R.string.settings_scale_type),
+            preference = PR.scaleType
+        ) {
+            when (it) {
+                ScaleType.FitScreen -> R.string.settings_scale_type_fit_screen
+                ScaleType.FitWidth -> R.string.settings_scale_type_fit_width
+                ScaleType.FitHeight -> R.string.settings_scale_type_fit_height
+                ScaleType.OriginalSize -> R.string.settings_scale_type_original_size
             }
         }
 

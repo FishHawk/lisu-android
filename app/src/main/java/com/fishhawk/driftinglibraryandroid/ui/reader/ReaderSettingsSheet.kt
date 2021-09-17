@@ -8,11 +8,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.PR
+import com.fishhawk.driftinglibraryandroid.data.datastore.ScaleType
+import com.fishhawk.driftinglibraryandroid.ui.more.ListPreference
 import com.fishhawk.driftinglibraryandroid.ui.more.SwitchPreference
 
 @Composable
 fun ReaderSettingsSheet() {
     Column(modifier = Modifier.padding(8.dp)) {
+        ListPreference(
+            title = stringResource(R.string.settings_scale_type),
+            preference = PR.scaleType
+        ) {
+            when (it) {
+                ScaleType.FitScreen -> R.string.settings_scale_type_fit_screen
+                ScaleType.FitWidth -> R.string.settings_scale_type_fit_width
+                ScaleType.FitHeight -> R.string.settings_scale_type_fit_height
+                ScaleType.OriginalSize -> R.string.settings_scale_type_original_size
+            }
+        }
+
         SwitchPreference(
             title = stringResource(R.string.settings_is_page_interval_enabled),
             preference = PR.isPageIntervalEnabled
