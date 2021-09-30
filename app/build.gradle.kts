@@ -76,7 +76,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.1.0-alpha04"
+        kotlinCompilerExtensionVersion = "1.1.0-alpha05"
     }
 }
 
@@ -85,21 +85,21 @@ dependencies {
 
     implementation("androidx.activity:activity-compose:1.3.1")
 
-    implementation("androidx.compose.ui:ui:1.1.0-alpha04")
-    implementation("androidx.compose.ui:ui-tooling:1.1.0-alpha04")
-    implementation("androidx.compose.foundation:foundation:1.1.0-alpha04")
-    implementation("androidx.compose.material:material:1.1.0-alpha04")
-    implementation("androidx.compose.material:material-icons-core:1.1.0-alpha04")
-    implementation("androidx.compose.material:material-icons-extended:1.1.0-alpha04")
+    implementation("androidx.compose.ui:ui:1.1.0-alpha05")
+    implementation("androidx.compose.ui:ui-tooling:1.1.0-alpha05")
+    implementation("androidx.compose.foundation:foundation:1.1.0-alpha05")
+    implementation("androidx.compose.material:material:1.1.0-alpha05")
+    implementation("androidx.compose.material:material-icons-core:1.1.0-alpha05")
+    implementation("androidx.compose.material:material-icons-extended:1.1.0-alpha05")
 
     implementation("androidx.navigation:navigation-compose:2.4.0-alpha07")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0-beta01")
 
     implementation("androidx.paging:paging-compose:1.0.0-alpha12")
 
-    implementation("com.google.dagger:hilt-android:2.38.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.38.1")
+    implementation("com.google.dagger:hilt-android:2.39")
+    kapt("com.google.dagger:hilt-android-compiler:2.39")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
@@ -111,14 +111,14 @@ dependencies {
     kapt("androidx.room:room-compiler:2.4.0-alpha04")
 
 
-    implementation("com.google.accompanist:accompanist-flowlayout:0.17.0")
-    implementation("com.google.accompanist:accompanist-insets:0.17.0")
-    implementation("com.google.accompanist:accompanist-insets-ui:0.17.0")
-    implementation("com.google.accompanist:accompanist-pager:0.17.0")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.17.0")
-    implementation("com.google.accompanist:accompanist-placeholder-material:0.17.0")
-    implementation("com.google.accompanist:accompanist-swiperefresh:0.17.0")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.17.0")
+    implementation("com.google.accompanist:accompanist-flowlayout:0.18.0")
+    implementation("com.google.accompanist:accompanist-insets:0.18.0")
+    implementation("com.google.accompanist:accompanist-insets-ui:0.18.0")
+    implementation("com.google.accompanist:accompanist-pager:0.18.0")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.18.0")
+    implementation("com.google.accompanist:accompanist-placeholder-material:0.18.0")
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.18.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.18.0")
 
     implementation("io.coil-kt:coil:1.3.2")
     implementation("io.coil-kt:coil-compose:1.3.2")

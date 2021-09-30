@@ -269,6 +269,7 @@ private fun Page(
                         translation = originTranslation * (1 - this.value)
                     }
                 } else {
+                    if (layout == null) return@LaunchedEffect
                     val maxX = layout!!.size.width * (scale - 1) / 2f
                     val maxY = layout!!.size.height * (scale - 1) / 2f
                     val target = Offset(

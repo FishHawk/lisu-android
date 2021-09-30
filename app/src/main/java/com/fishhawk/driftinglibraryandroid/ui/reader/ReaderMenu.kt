@@ -1,7 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
@@ -63,7 +62,6 @@ internal fun BoxScope.ReaderInfoBar(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun BoxScope.ReaderMenu(
     name: String,

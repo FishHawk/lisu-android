@@ -1,7 +1,6 @@
 package com.fishhawk.driftinglibraryandroid.ui.gallery
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -151,7 +150,6 @@ fun GalleryScreen(navController: NavHostController) {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun ToolBar(
     title: String,

@@ -50,7 +50,6 @@ fun ApplicationTheme(content: @Composable () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ApplicationTransition(
     content: @Composable AnimatedVisibilityScope.() -> Unit
