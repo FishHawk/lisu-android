@@ -7,40 +7,34 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
-import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetailDto
 
 @Composable
 internal fun MangaContent(
-    detail: MangaDetail,
+    detail: MangaDetailDto,
     history: ReadingHistory?,
     onAction: GalleryActionHandler
 ) {
-    val context = LocalContext.current
-    val hasPreview = detail.collections.size == 1 && !detail.preview.isNullOrEmpty()
-    val hasChapter = detail.collections.isNotEmpty()
-    when {
-        hasPreview -> MangaContentPreview(
-            preview = detail.preview!!,
-            onPageClick = {
-                context.navToReaderActivity(detail, null, null, it)
-            })
-        hasChapter -> {
-            MangaContentChapter(
-                collections = detail.collections,
-                chapterMark =
-                history?.let { ChapterMark(it.collection, it.chapterId, it.page) },
-                onChapterClick = { collection, chapter, page ->
-                    onAction(GalleryAction.NavToReader(collection, chapter, page))
-                }
-            )
-        }
-        else -> MangaNoChapter()
+    val isMarked = { collectionId: String, chapterId: String ->
+        history?.let {
+            it.collectionId == collectionId
+                    && it.chapterId == chapterId
+        } ?: false
     }
+    val onChapterClick = { collectionId: String, chapterId: String ->
+        val page = if (isMarked(collectionId, chapterId)) history!!.page else 0
+        onAction(GalleryAction.NavToReader(collectionId, chapterId, page))
+    }
+    val onPageClick = { page: Int ->
+        onAction(GalleryAction.NavToReader(" ", " ", page))
+    }
+    detail.collections?.also { MangaContentCollections(it, isMarked, onChapterClick) }
+        ?: detail.chapters?.also { MangaContentChapters(it, isMarked, onChapterClick) }
+        ?: detail.preview?.also { MangaContentPreview(it, onPageClick) }
+        ?: MangaNoChapter()
 }
 
 @Composable

@@ -24,8 +24,7 @@ import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDto
 import com.fishhawk.driftinglibraryandroid.ui.activity.setString
 import com.fishhawk.driftinglibraryandroid.ui.base.LoadingItem
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaListCard
@@ -39,18 +38,9 @@ private typealias GlobalSearchActionHandler = (GlobalSearchAction) -> Unit
 private sealed interface GlobalSearchAction {
     object NavUp : GlobalSearchAction
 
-    data class NavToGallery(
-        val provider: Provider,
-        val outline: MangaOutline
-    ) : GlobalSearchAction
-
-    data class NavToProviderSearch(
-        val provider: Provider
-    ) : GlobalSearchAction
-
-    data class Search(
-        val keywords: String
-    ) : GlobalSearchAction
+    data class NavToGallery(val manga: MangaDto) : GlobalSearchAction
+    data class NavToProviderSearch(val providerId: String) : GlobalSearchAction
+    data class Search(val keywords: String) : GlobalSearchAction
 }
 
 @Composable
@@ -65,19 +55,13 @@ fun GlobalSearchScreen(navController: NavHostController) {
             GlobalSearchAction.NavUp -> navController.navigateUp()
             is GlobalSearchAction.NavToGallery -> navController.apply {
                 currentBackStackEntry?.arguments =
-                    bundleOf(
-                        "outline" to action.outline,
-                        "provider" to action.provider
-                    )
-                navigate("gallery/${action.outline.id}")
+                    bundleOf("manga" to action.manga)
+                navigate("gallery/${action.manga.id}")
             }
             is GlobalSearchAction.NavToProviderSearch -> navController.apply {
                 currentBackStackEntry?.arguments =
-                    bundleOf(
-                        "keywords" to viewModel.keywords.value,
-                        "provider" to action.provider
-                    )
-                navigate("search/${action.provider.name}")
+                    bundleOf("keywords" to viewModel.keywords.value)
+                navigate("search/${action.providerId}")
             }
             is GlobalSearchAction.Search -> viewModel.search(action.keywords)
         }
@@ -147,12 +131,12 @@ private fun SearchResultItem(
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = searchResult.provider.run { "$name($lang)" },
+                text = searchResult.provider.run { "$id($lang)" },
                 style = MaterialTheme.typography.body2
             )
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = {
-                onAction(GlobalSearchAction.NavToProviderSearch(provider = searchResult.provider))
+                onAction(GlobalSearchAction.NavToProviderSearch(searchResult.provider.id))
             }) { Icon(Icons.Filled.ArrowForward, "Forward") }
         }
 
@@ -166,13 +150,8 @@ private fun SearchResultItem(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(searchResult.mangas) {
-                        MangaListCard(it, onCardClick = { outline ->
-                            onAction(
-                                GlobalSearchAction.NavToGallery(
-                                    provider = searchResult.provider,
-                                    outline = outline
-                                )
-                            )
+                        MangaListCard(it, onCardClick = { manga ->
+                            onAction(GlobalSearchAction.NavToGallery(manga))
                         })
                     }
                 }

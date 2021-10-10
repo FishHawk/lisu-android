@@ -16,49 +16,13 @@ import androidx.core.os.bundleOf
 import coil.imageLoader
 import coil.request.ImageRequest
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetailDto
 import com.fishhawk.driftinglibraryandroid.ui.activity.BaseActivity
 import com.fishhawk.driftinglibraryandroid.ui.reader.ReaderActivity
 import java.io.File
 import java.io.FileOutputStream
 
-fun Context.navToReaderActivity(
-    id: String,
-    providerId: String?,
-    collection: String? = null,
-    chapter: String? = null,
-    page: Int = 0
-) {
-    val bundle = bundleOf(
-        "id" to id,
-        "providerId" to providerId,
-        "collection" to collection,
-        "chapter" to chapter,
-        "page" to page
-    )
 
-    val intent = Intent(this, ReaderActivity::class.java)
-    intent.putExtras(bundle)
-    startActivity(intent)
-}
-
-fun Context.navToReaderActivity(
-    detail: MangaDetail,
-    collection: String? = null,
-    chapter: String? = null,
-    page: Int = 0
-) {
-    val bundle = bundleOf(
-        "detail" to detail,
-        "collection" to collection,
-        "chapter" to chapter,
-        "page" to page
-    )
-
-    val intent = Intent(this, ReaderActivity::class.java)
-    intent.putExtras(bundle)
-    startActivity(intent)
-}
 
 fun Context.findActivity(): Activity {
     var context = this

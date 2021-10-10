@@ -5,18 +5,18 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -25,12 +25,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.data.remote.model.*
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetailDto
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDto
+import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.ui.activity.setArgument
 import com.fishhawk.driftinglibraryandroid.ui.base.*
+import com.fishhawk.driftinglibraryandroid.ui.reader.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
-import com.fishhawk.driftinglibraryandroid.ui.theme.MaterialColors
 
 internal typealias GalleryActionHandler = (GalleryAction) -> Unit
 
@@ -40,8 +42,8 @@ internal sealed interface GalleryAction {
     data class NavToGlobalSearch(val keywords: String) : GalleryAction
     data class NavToSearch(val keywords: String) : GalleryAction
     data class NavToReader(
-        val collection: String,
-        val chapter: String,
+        val collectionId: String,
+        val chapterId: String,
         val page: Int
     ) : GalleryAction
 
@@ -58,7 +60,7 @@ internal sealed interface GalleryAction {
 
 @Composable
 fun GalleryScreen(navController: NavHostController) {
-    navController.setArgument<MangaOutline>("outline")
+    navController.setArgument<MangaDto>("manga")
     navController.setArgument<Provider>("provider")
 
     val context = LocalContext.current
@@ -79,21 +81,12 @@ fun GalleryScreen(navController: NavHostController) {
             }
             is GalleryAction.NavToSearch -> {
                 navController.currentBackStackEntry?.arguments =
-                    bundleOf(
-                        "keywords" to action.keywords,
-                        "provider" to detail.provider
-                    )
-                if (detail.provider == null) navController.navigate("library-search")
-                else navController.navigate("search/${detail.provider!!.name}")
+                    bundleOf("keywords" to action.keywords)
+                navController.navigate("search/${detail.providerId}")
             }
             is GalleryAction.NavToReader -> {
                 action.apply {
-                    context.navToReaderActivity(
-                        detail,
-                        collection,
-                        chapter,
-                        page
-                    )
+                    context.navToReaderActivity(detail, collectionId, chapterId, page)
                 }
             }
 
@@ -137,8 +130,8 @@ fun GalleryScreen(navController: NavHostController) {
 
             GalleryAction.Reload -> viewModel.reloadManga()
             GalleryAction.Share -> Unit
-            GalleryAction.AddToLibrary -> Unit
-            GalleryAction.RemoveFromLibrary -> Unit
+            GalleryAction.AddToLibrary -> viewModel.addToLibrary()
+            GalleryAction.RemoveFromLibrary -> viewModel.removeFromLibrary()
             is GalleryAction.Copy -> context.copyToClipboard(action.text, action.hintResId)
         }
     }
@@ -146,14 +139,14 @@ fun GalleryScreen(navController: NavHostController) {
     ApplicationTransition {
         val scrollState = rememberScrollState()
         MangaDetail(viewState, detail, history, scrollState, onAction)
-        ToolBar(detail.title, detail.provider != null, scrollState, onAction)
+        ToolBar(detail.title ?: detail.id, detail.inLibrary, scrollState, onAction)
     }
 }
 
 @Composable
 private fun ToolBar(
     title: String,
-    isFromProvider: Boolean,
+    inLibrary: Boolean,
     scrollState: ScrollState,
     onAction: GalleryActionHandler
 ) {
@@ -169,13 +162,16 @@ private fun ToolBar(
             title = title,
             onNavigationIconClick = { onAction(GalleryAction.NavUp) }
         ) {
-            if (isFromProvider) {
-                IconButton(onClick = { onAction(GalleryAction.Share) }) {
-                    Icon(Icons.Default.FavoriteBorder, contentDescription = "share")
+            if (inLibrary) {
+                IconButton(onClick = { onAction(GalleryAction.NavToEdit) }) {
+                    Icon(Icons.Default.Edit, contentDescription = "edit")
+                }
+                IconButton(onClick = { onAction(GalleryAction.RemoveFromLibrary) }) {
+                    Icon(Icons.Default.Favorite, contentDescription = "remove from library")
                 }
             } else {
-                IconButton(onClick = { onAction(GalleryAction.Share) }) {
-                    Icon(Icons.Default.Edit, contentDescription = "share")
+                IconButton(onClick = { onAction(GalleryAction.AddToLibrary) }) {
+                    Icon(Icons.Default.FavoriteBorder, contentDescription = "add to library")
                 }
             }
             IconButton(onClick = { onAction(GalleryAction.Share) }) {
@@ -185,27 +181,11 @@ private fun ToolBar(
     }
 }
 
-@Composable
-private fun MangaActionButton(modifier: Modifier) {
-    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-        Column(
-            modifier = modifier.padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                Icons.Default.FavoriteBorder,
-                modifier = Modifier.size(24.dp),
-                contentDescription = "add to library"
-            )
-            Text("Add to library", style = MaterialTheme.typography.body2)
-        }
-    }
-}
 
 @Composable
 private fun MangaDetail(
     viewState: ViewState,
-    detail: MangaDetail,
+    detail: MangaDetailDto,
     history: ReadingHistory?,
     scrollState: ScrollState,
     onAction: GalleryActionHandler
@@ -227,11 +207,44 @@ private fun MangaDetail(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                detail.source?.let { MangaSource(it) }
-                if (!detail.metadata.description.isNullOrBlank()) {
-                    MangaDescription(detail.metadata.description)
+                Row {
+                    if (detail.inLibrary)
+                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.primary) {
+                            MangaActionButton(
+                                icon = Icons.Default.Favorite,
+                                text = "In library"
+                            ) { onAction(GalleryAction.RemoveFromLibrary) }
+                        }
+                    else CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                        MangaActionButton(
+                            icon = Icons.Default.FavoriteBorder,
+                            text = "Add to library"
+                        ) { onAction(GalleryAction.AddToLibrary) }
+                    }
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                        MangaActionButton(
+                            icon = Icons.Default.AutoStories,
+                            text = if (history == null) "Read" else "Continue"
+                        ) {
+                            onAction(
+                                GalleryAction.NavToReader(
+                                    collectionId = history?.collectionId
+                                        ?: detail.collections?.keys?.first() ?: " ",
+                                    chapterId = history?.chapterId
+                                        ?: detail.collections?.values?.first()?.first()?.id
+                                        ?: detail.chapters?.first()?.id
+                                        ?: " ",
+                                    page = history?.page ?: 0
+                                )
+                            )
+                        }
+                    }
                 }
-                detail.metadata.tags?.let { tags ->
+
+                if (!detail.description.isNullOrBlank()) {
+                    MangaDescription(detail.description)
+                }
+                detail.tags?.let { tags ->
                     MangaTagGroups(tags,
                         onTagClick = { onAction(GalleryAction.NavToSearch(it)) },
                         onTagLongClick = {
@@ -251,16 +264,25 @@ private fun MangaDetail(
 }
 
 @Composable
-private fun MangaSource(source: Source) {
-    Text(
-        text = "From ${source.providerId} - ${source.mangaId} ${source.state}",
-        color = when (source.state) {
-            SourceState.DOWNLOADING -> MaterialColors.Blue400
-            SourceState.WAITING -> MaterialColors.Green400
-            SourceState.ERROR -> MaterialTheme.colors.error
-            SourceState.UPDATED -> MaterialTheme.colors.onSurface
-        }
-    )
+private fun RowScope.MangaActionButton(
+    icon: ImageVector,
+    text: String,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .clickable(onClick = onClick)
+            .padding(vertical = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            icon,
+            modifier = Modifier.size(24.dp),
+            contentDescription = text
+        )
+        Text(text, style = MaterialTheme.typography.caption)
+    }
 }
 
 @Composable

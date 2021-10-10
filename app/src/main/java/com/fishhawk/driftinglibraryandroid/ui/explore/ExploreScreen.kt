@@ -52,10 +52,10 @@ fun ExploreScreen(navController: NavHostController) {
             ExploreAction.NavToGlobalSearch -> navController.navigate("global-search")
             is ExploreAction.NavToProvider -> {
                 val provider = action.provider
-                scope.launch { PR.lastUsedProvider.set(provider.name) }
+                scope.launch { PR.lastUsedProvider.set(provider.id) }
                 navController.currentBackStackEntry?.arguments =
                     bundleOf("provider" to provider)
-                navController.navigate("provider/${provider.name}")
+                navController.navigate("provider/${provider.id}")
             }
             ExploreAction.Reload -> viewModel.reload()
         }
@@ -138,7 +138,7 @@ private fun ProviderListItem(
             contentDescription = null
         )
         Text(
-            text = provider.name,
+            text = provider.id,
             style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis

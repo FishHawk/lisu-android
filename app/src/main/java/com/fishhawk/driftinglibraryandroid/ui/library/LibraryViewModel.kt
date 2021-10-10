@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDto
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,25 +35,20 @@ class LibraryViewModel @Inject constructor(
             }.flow.cachedIn(viewModelScope)
         }
 
-    fun deleteManga(id: String) = viewModelScope.launch {
-        val result = repository.deleteManga(id)
+    fun deleteManga(manga: MangaDto) = viewModelScope.launch {
+        val result = repository.unsubscribe(manga.providerId, manga.id)
         resultWarp(result) { source?.invalidate() }
     }
 
-    inner class LibraryMangaSource : PagingSource<Long, MangaOutline>() {
-        override suspend fun load(params: LoadParams<Long>): LoadResult<Long, MangaOutline> {
-            return repository.listManga(
-                params.key ?: Long.MAX_VALUE,
-                keywords.value
-            ).fold({
-                LoadResult.Page(
-                    data = it,
-                    prevKey = null,
-                    nextKey = it.lastOrNull()?.updateTime
-                )
-            }, { LoadResult.Error(it) })
+    inner class LibraryMangaSource : PagingSource<Int, MangaDto>() {
+        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MangaDto> {
+            val page = params.key ?: 0
+            return repository.search(page, keywords.value).fold(
+                { LoadResult.Page(it, null, if (it.isEmpty()) null else page + 1) },
+                { LoadResult.Error(it) }
+            )
         }
 
-        override fun getRefreshKey(state: PagingState<Long, MangaOutline>): Long? = null
+        override fun getRefreshKey(state: PagingState<Int, MangaDto>): Int = 0
     }
 }

@@ -21,7 +21,7 @@ import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDto
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.ui.activity.setArgument
 import com.fishhawk.driftinglibraryandroid.ui.activity.setString
@@ -33,9 +33,9 @@ private typealias SearchActionHandler = (SearchAction) -> Unit
 
 private sealed interface SearchAction {
     object NavUp : SearchAction
-    data class NavToGallery(val outline: MangaOutline) : SearchAction
+    data class NavToGallery(val manga: MangaDto) : SearchAction
     data class Search(val keywords: String) : SearchAction
-    data class OpenSheet(val outline: MangaOutline) : SearchAction
+    data class OpenSheet(val manga: MangaDto) : SearchAction
 }
 
 @Composable
@@ -51,21 +51,11 @@ fun SearchScreen(navController: NavHostController) {
             SearchAction.NavUp -> navController.navigateUp()
             is SearchAction.NavToGallery -> navController.apply {
                 currentBackStackEntry?.arguments =
-                    bundleOf(
-                        "outline" to action.outline,
-                        "provider" to viewModel.provider
-                    )
-                navigate("gallery/${action.outline.id}")
+                    bundleOf("manga" to action.manga)
+                navigate("gallery/${action.manga.id}")
             }
             is SearchAction.Search -> viewModel.search(action.keywords)
             is SearchAction.OpenSheet -> Unit
-//override fun onReadClick(outline: MangaOutline, provider: String) {
-//  context.navToReaderActivity(outline.id, viewModel.provider.id, 0, 0, 0)
-//}
-//
-//override fun onLibraryAddClick(outline: MangaOutline, provider: String) {
-//  viewModel.addToLibrary(outline.id, outline.title)
-//}
         }
     }
 
@@ -111,7 +101,7 @@ private fun ToolBar(
 
 @Composable
 private fun MangaList(
-    mangaList: LazyPagingItems<MangaOutline>,
+    mangaList: LazyPagingItems<MangaDto>,
     onAction: SearchActionHandler
 ) {
     RefreshableMangaList(

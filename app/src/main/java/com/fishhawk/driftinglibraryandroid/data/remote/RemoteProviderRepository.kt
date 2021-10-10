@@ -1,11 +1,12 @@
 package com.fishhawk.driftinglibraryandroid.data.remote
 
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.data.remote.model.ProviderDetail
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetailDto
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDto
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataDto
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.data.remote.service.RemoteProviderService
 import kotlinx.coroutines.flow.Flow
+import okhttp3.RequestBody
 import retrofit2.Retrofit
 import java.net.URLEncoder
 
@@ -14,79 +15,80 @@ class RemoteProviderRepository(retrofit: Flow<Result<Retrofit>?>) :
 
     override val serviceType = RemoteProviderService::class.java
 
-    suspend fun listProvider(): Result<List<Provider>> =
-        resultWrap {
-            it.listProvider().onEach { info ->
-                info.icon = "${url}providers/${info.name}/icon"
-            }
+    suspend fun listProvider(): Result<List<Provider>> = resultWrap {
+        it.listProvider().map { info ->
+            info.copy(icon = "${url}provider/${info.id}/icon")
         }
-
-    suspend fun getProvider(providerId: String): Result<ProviderDetail> =
-        resultWrap { it.getProvider(providerId) }
-
-    suspend fun listPopularManga(
-        providerId: String,
-        page: Int,
-        option: Map<String, Int>
-    ): Result<List<MangaOutline>> =
-        resultWrap {
-            it.listPopularManga(providerId, page, option)
-                .map { outline -> processMangaOutline(providerId, outline) }
-        }
-
-    suspend fun listLatestManga(
-        providerId: String,
-        page: Int,
-        option: Map<String, Int>
-    ): Result<List<MangaOutline>> =
-        resultWrap {
-            it.listLatestManga(providerId, page, option)
-                .map { outline -> processMangaOutline(providerId, outline) }
-        }
-
-    suspend fun listCategoryManga(
-        providerId: String,
-        page: Int,
-        option: Map<String, Int>
-    ): Result<List<MangaOutline>> =
-        resultWrap {
-            it.listCategoryManga(providerId, page, option)
-                .map { outline -> processMangaOutline(providerId, outline) }
-        }
-
-    suspend fun listManga(
-        providerId: String,
-        keywords: String,
-        page: Int
-    ): Result<List<MangaOutline>> =
-        resultWrap {
-            it.listManga(providerId, keywords, page)
-                .map { outline -> processMangaOutline(providerId, outline) }
-        }
-
-    suspend fun getManga(providerId: String, mangaId: String): Result<MangaDetail> =
-        resultWrap { service ->
-            service.getManga(providerId, mangaId)
-                .apply { cover = cover?.let { processImageUrl(providerId, it) } }
-        }
-
-    suspend fun getChapterContent(
-        providerId: String,
-        mangaId: String,
-        chapterId: String
-    ): Result<List<String>> =
-        resultWrap { service ->
-            service.getChapter(providerId, mangaId, chapterId)
-                .map { processImageUrl(providerId, it) }
-        }
-
-    private fun processMangaOutline(providerId: String, outline: MangaOutline): MangaOutline {
-        outline.cover = outline.cover?.let { processImageUrl(providerId, it) }
-        return outline
     }
 
-    private fun processImageUrl(providerId: String, imageUrl: String): String {
-        val encoded = URLEncoder.encode(imageUrl, "UTF-8")
-        return "${url}providers/${providerId}/images/${encoded}"
+    suspend fun getBoard(
+        providerId: String,
+        boardId: String,
+        page: Int,
+        filters: Map<String, Int>
+    ): Result<List<MangaDto>> = resultWrap { service ->
+        service.getBoard(providerId, boardId, page, filters)
+            .map { it.copy(cover = processCover(it.providerId, it.id, it.cover)) }
+    }
+
+    suspend fun search(
+        providerId: String,
+        page: Int,
+        keywords: String,
+    ): Result<List<MangaDto>> = resultWrap { service ->
+        service.search(providerId, page, keywords)
+            .map { it.copy(cover = processCover(it.providerId, it.id, it.cover)) }
+    }
+
+    suspend fun getManga(
+        providerId: String,
+        mangaId: String
+    ): Result<MangaDetailDto> = resultWrap { service ->
+        service.getManga(providerId, mangaId).let { detail ->
+            detail.copy(
+                cover = processCover(detail.providerId, detail.id, detail.cover),
+                preview = detail.preview?.map {
+                    processImage(providerId, mangaId, " ", " ", it)
+                }
+            )
+        }
+    }
+
+    suspend fun updateMangaMetadata(
+        providerId: String,
+        mangaId: String,
+        metadata: MetadataDto
+    ): Result<String> = resultWrap { it.updateMangaMetadata(providerId, mangaId, metadata) }
+
+    suspend fun updateMangaCover(
+        providerId: String,
+        mangaId: String,
+        requestBody: RequestBody
+    ): Result<String> = resultWrap { it.updateMangaCover(providerId, mangaId, requestBody) }
+
+    suspend fun getContent(
+        providerId: String,
+        mangaId: String,
+        collectionId: String,
+        chapterId: String
+    ): Result<List<String>> = resultWrap { service ->
+        service.getContent(providerId, mangaId, collectionId, chapterId)
+            .map { processImage(providerId, mangaId, collectionId, chapterId, it) }
+    }
+
+    private fun processImage(
+        providerId: String,
+        mangaId: String,
+        collectionId: String,
+        chapterId: String,
+        imageId: String
+    ): String {
+        val encoded = URLEncoder.encode(imageId, "UTF-8")
+        return "${url}provider/${providerId}/manga/${mangaId}/image/${collectionId}/${chapterId}/${encoded}"
+    }
+
+    private fun processCover(providerId: String, mangaId: String, cover: String?): String {
+        val imageId = cover?.let { URLEncoder.encode(it, "UTF-8") }
+        return "${url}provider/${providerId}/manga/${mangaId}/cover?imageId=${imageId}"
     }
 }

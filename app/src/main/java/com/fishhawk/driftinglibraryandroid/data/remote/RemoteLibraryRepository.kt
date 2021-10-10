@@ -1,126 +1,36 @@
 package com.fishhawk.driftinglibraryandroid.data.remote
 
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataDetail
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDto
 import com.fishhawk.driftinglibraryandroid.data.remote.service.RemoteLibraryService
 import kotlinx.coroutines.flow.Flow
-import okhttp3.RequestBody
 import retrofit2.Retrofit
+import java.net.URLEncoder
 
 class RemoteLibraryRepository(retrofit: Flow<Result<Retrofit>?>) :
     BaseRemoteRepository<RemoteLibraryService>(retrofit) {
 
     override val serviceType = RemoteLibraryService::class.java
 
-    suspend fun listManga(
-        lastTime: Long,
-        keywords: String,
-        limit: Int = 20
-    ): Result<List<MangaOutline>> =
-        resultWrap {
-            it.listManga(lastTime, keywords, limit).onEach { outline ->
-                outline.cover = "${url}library/mangas/${outline.id}/cover"
-            }
-        }
-
-    suspend fun createManga(
-        mangaId: String,
+    suspend fun subscribe(
         providerId: String,
-        sourceMangaId: String,
-        keepAfterCompleted: Boolean
-    ) = resultWrap {
-        it.createManga(
-            RemoteLibraryService.CreateMangaBody(
-                mangaId,
-                providerId,
-                sourceMangaId,
-                keepAfterCompleted
-            )
-        )
-    }
+        mangaId: String
+    ): Result<String> = resultWrap { it.subscribe(providerId, mangaId) }
 
-    suspend fun getManga(mangaId: String): Result<MangaDetail> =
-        resultWrap {
-            it.getManga(mangaId).apply {
-                val collectionId = collections.firstOrNull()?.id
-                val chapterId = collections.firstOrNull()?.chapters?.firstOrNull()?.id
-                cover = "${url}library/mangas/${mangaId}/cover"
-                preview = preview?.map { imageId ->
-                    makeImageUrl(mangaId, collectionId, chapterId, imageId)
-                }
-            }
-        }
-
-    suspend fun deleteManga(mangaId: String): Result<String> =
-        resultWrap { it.deleteManga(mangaId) }
-
-    suspend fun updateMangaMetadata(
-        mangaId: String,
-        metadata: MetadataDetail
-    ): Result<MangaDetail> =
-        resultWrap {
-            it.updateMangaMetadata(mangaId, metadata).apply {
-                cover = "${url}library/mangas/${mangaId}/cover"
-            }
-        }
-
-    suspend fun createMangaSource(
-        mangaId: String,
+    suspend fun unsubscribe(
         providerId: String,
-        sourceMangaId: String,
-        keepAfterCompleted: Boolean
-    ) = resultWrap {
-        it.createMangaSource(
-            mangaId,
-            RemoteLibraryService.CreateMangaSourceBody(
-                providerId,
-                sourceMangaId,
-                keepAfterCompleted
-            )
-        )
+        mangaId: String
+    ): Result<String> = resultWrap { it.unsubscribe(providerId, mangaId) }
+
+    suspend fun search(
+        page: Int,
+        keywords: String
+    ): Result<List<MangaDto>> = resultWrap { server ->
+        server.search(page, keywords)
+            .map { it.copy(cover = processCover(it.providerId, it.id, it.cover)) }
     }
 
-    suspend fun deleteMangaSource(mangaId: String) = resultWrap {
-        it.deleteMangaSource(mangaId)
-    }
-
-    suspend fun syncMangaSource(mangaId: String) = resultWrap {
-        it.syncMangaSource(mangaId)
-    }
-
-    suspend fun updateMangaCover(
-        mangaId: String,
-        requestBody: RequestBody
-    ): Result<MangaDetail> =
-        resultWrap {
-            it.updateMangaCover(mangaId, requestBody).apply {
-                cover = "${url}library/mangas/${mangaId}/cover"
-            }
-        }
-
-    suspend fun getChapterContent(
-        mangaId: String,
-        collectionId: String,
-        chapterId: String
-    ): Result<List<String>> =
-        resultWrap { service ->
-            val content =
-                if (collectionId.isBlank())
-                    if (chapterId.isBlank()) service.getChapter(mangaId)
-                    else service.getChapter(mangaId, chapterId)
-                else service.getChapter(mangaId, collectionId, chapterId)
-            content.map { makeImageUrl(mangaId, collectionId, chapterId, it) }
-        }
-
-    private fun makeImageUrl(
-        mangaId: String,
-        collectionId: String?,
-        chapterId: String?,
-        imageId: String
-    ): String {
-        val collectionPath = if (collectionId.isNullOrBlank()) "" else "$collectionId/"
-        val chapterPath = if (chapterId.isNullOrBlank()) "" else "$chapterId/"
-        return "${url}library/mangas/$mangaId/images/$collectionPath$chapterPath$imageId"
+    private fun processCover(providerId: String, mangaId: String, cover: String?): String {
+        val imageId = cover?.let { URLEncoder.encode(it, "UTF-8") }
+        return "${url}provider/${providerId}/manga/${mangaId}/cover?imageId=${imageId}"
     }
 }

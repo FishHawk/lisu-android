@@ -27,7 +27,7 @@ class ExploreViewModel @Inject constructor(
 
     val lastUsedProvider =
         combine(_providers, PR.lastUsedProvider.flow) { list, name ->
-            list.find { it.name == name }
+            list.find { it.id == name }
         }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     init {

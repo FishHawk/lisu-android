@@ -16,8 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaStatus
-import com.fishhawk.driftinglibraryandroid.data.remote.model.TagGroup
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
@@ -27,7 +25,7 @@ import com.google.accompanist.insets.ui.TopAppBar
 fun GalleryEditScreen(navController: NavHostController) {
     Scaffold(
         topBar = { ToolBar(navController) },
-        content = { ApplicationTransition { Content(navController) } }
+        content = { ApplicationTransition { /*Content(navController)*/ } }
     )
 }
 
@@ -50,95 +48,95 @@ private fun ToolBar(navController: NavHostController) {
     )
 }
 
-@Composable
-private fun Content(navController: NavHostController) {
-    val viewModel = hiltViewModel<GalleryViewModel>(navController.getBackStackEntry("detail"))
-    val detail = viewModel.detail.value
+//@Composable
+//private fun Content(navController: NavHostController) {
+//    val viewModel = hiltViewModel<GalleryViewModel>(navController.getBackStackEntry("detail"))
+//    val detail = viewModel.detail.value
+//
+//    Card(modifier = Modifier.padding(16.dp)) {
+//        Column(
+//            verticalArrangement = Arrangement.spacedBy(16.dp)
+//        ) {
+//            val title = remember { mutableStateOf(detail.title) }
+//            TextField(
+//                value = title.value,
+//                onValueChange = { title.value = it },
+//                label = { Text("Title") },
+//                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
+//            )
+//
+//            val status = remember { mutableStateOf(detail.metadata.status ?: MangaStatus.UNKNOWN) }
+//            Row(modifier = Modifier.fillMaxWidth()) {
+//                enumValues<MangaStatus>().forEach {
+//                    RadioButton(
+//                        selected = (it == status.value),
+//                        onClick = { status.value = it }
+//                    )
+//                    Text(
+//                        text = it.toString(),
+//                        style = MaterialTheme.typography.body1,
+//                        modifier = Modifier.padding(start = 16.dp)
+//                    )
+//                }
+//            }
+//
+//            val authors = remember { mutableStateOf(detail.metadata.authors ?: listOf()) }
+//            MangaTagGroup(TagGroup("", authors.value))
+//
+//            val newAuthor = remember { mutableStateOf("") }
+//            TextField(
+//                value = newAuthor.value,
+//                onValueChange = { newAuthor.value = it },
+//                label = { Text("new author") },
+//                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
+//                keyboardActions = KeyboardActions(onDone = {
+////                authors.addTag(binding.authorInput.text.toString())
+//                    newAuthor.value = ""
+//                })
+//            )
+//
+//            val tags = remember { mutableStateOf(detail.metadata.tags ?: listOf()) }
+//            MangaTagGroups(tags.value)
+//
+//            val newTag = remember { mutableStateOf("") }
+//            TextField(
+//                value = newTag.value,
+//                onValueChange = { newTag.value = it },
+//                label = { Text("new tag") },
+//                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
+//                keyboardActions = KeyboardActions(onDone = {
+////                tags.addTag(binding.tagInput.text.toString())
+//                    newTag.value = ""
+//                })
+//            )
+//
+//            val description = remember { mutableStateOf(detail.metadata.description ?: "") }
+//            TextField(
+//                value = description.value,
+//                onValueChange = { description.value = it },
+//                label = { Text("description") },
+//                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
+//            )
+//        }
+//    }
+//}
 
-    Card(modifier = Modifier.padding(16.dp)) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            val title = remember { mutableStateOf(detail.title) }
-            TextField(
-                value = title.value,
-                onValueChange = { title.value = it },
-                label = { Text("Title") },
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
-            )
-
-            val status = remember { mutableStateOf(detail.metadata.status ?: MangaStatus.UNKNOWN) }
-            Row(modifier = Modifier.fillMaxWidth()) {
-                enumValues<MangaStatus>().forEach {
-                    RadioButton(
-                        selected = (it == status.value),
-                        onClick = { status.value = it }
-                    )
-                    Text(
-                        text = it.toString(),
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
-                }
-            }
-
-            val authors = remember { mutableStateOf(detail.metadata.authors ?: listOf()) }
-            MangaTagGroup(TagGroup("", authors.value))
-
-            val newAuthor = remember { mutableStateOf("") }
-            TextField(
-                value = newAuthor.value,
-                onValueChange = { newAuthor.value = it },
-                label = { Text("new author") },
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
-                keyboardActions = KeyboardActions(onDone = {
-//                authors.addTag(binding.authorInput.text.toString())
-                    newAuthor.value = ""
-                })
-            )
-
-            val tags = remember { mutableStateOf(detail.metadata.tags ?: listOf()) }
-            MangaTagGroups(tags.value)
-
-            val newTag = remember { mutableStateOf("") }
-            TextField(
-                value = newTag.value,
-                onValueChange = { newTag.value = it },
-                label = { Text("new tag") },
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
-                keyboardActions = KeyboardActions(onDone = {
-//                tags.addTag(binding.tagInput.text.toString())
-                    newTag.value = ""
-                })
-            )
-
-            val description = remember { mutableStateOf(detail.metadata.description ?: "") }
-            TextField(
-                value = description.value,
-                onValueChange = { description.value = it },
-                label = { Text("description") },
-                colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
-            )
-        }
-    }
-}
-
-////    private fun buildMetadata(): MetadataDetail {
-////        val title = binding.title.text.toString()
-////        val authors = authorsAdapter.list
-////        val status = when (binding.status.checkedRadioButtonId) {
-////            binding.radioCompleted.id -> MangaStatus.COMPLETED
-////            binding.radioOngoing.id -> MangaStatus.ONGOING
-////            else -> MangaStatus.UNKNOWN
-////        }
-////        val tagsMap = mutableMapOf<String, MutableList<String>>()
-////        tagsAdapter.list.forEach {
-////            val key = it.substringBefore(':', "")
-////            val value = it.substringAfter(':')
-////            tagsMap.getOrPut(key) { mutableListOf() }.add(value)
-////        }
-////        val tags = tagsMap.map { TagGroup(it.key, it.value) }
-////        val description = binding.description.text.toString()
-////
-////        return MetadataDetail(title, authors, status, description, tags)
-////    }
+//    private fun buildMetadata(): MetadataDetail {
+//        val title = binding.title.text.toString()
+//        val authors = authorsAdapter.list
+//        val status = when (binding.status.checkedRadioButtonId) {
+//            binding.radioCompleted.id -> MangaStatus.COMPLETED
+//            binding.radioOngoing.id -> MangaStatus.ONGOING
+//            else -> MangaStatus.UNKNOWN
+//        }
+//        val tagsMap = mutableMapOf<String, MutableList<String>>()
+//        tagsAdapter.list.forEach {
+//            val key = it.substringBefore(':', "")
+//            val value = it.substringAfter(':')
+//            tagsMap.getOrPut(key) { mutableListOf() }.add(value)
+//        }
+//        val tags = tagsMap.map { TagGroup(it.key, it.value) }
+//        val description = binding.description.text.toString()
+//
+//        return MetadataDetail(title, authors, status, description, tags)
+//    }

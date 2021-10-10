@@ -94,9 +94,9 @@ dependencies {
 
     implementation("androidx.navigation:navigation-compose:2.4.0-alpha07")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0-beta01")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0-rc01")
 
-    implementation("androidx.paging:paging-compose:1.0.0-alpha12")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha13")
 
     implementation("com.google.dagger:hilt-android:2.39")
     kapt("com.google.dagger:hilt-android-compiler:2.39")
@@ -106,25 +106,26 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    implementation("androidx.room:room-runtime:2.4.0-alpha04")
-    implementation("androidx.room:room-ktx:2.4.0-alpha04")
-    kapt("androidx.room:room-compiler:2.4.0-alpha04")
+    implementation("androidx.room:room-runtime:2.4.0-alpha05")
+    implementation("androidx.room:room-ktx:2.4.0-alpha05")
+    kapt("androidx.room:room-compiler:2.4.0-alpha05")
 
 
-    implementation("com.google.accompanist:accompanist-flowlayout:0.18.0")
-    implementation("com.google.accompanist:accompanist-insets:0.18.0")
-    implementation("com.google.accompanist:accompanist-insets-ui:0.18.0")
+    implementation("com.google.accompanist:accompanist-flowlayout:0.19.0")
+    implementation("com.google.accompanist:accompanist-insets:0.19.0")
+    implementation("com.google.accompanist:accompanist-insets-ui:0.19.0")
     implementation("com.google.accompanist:accompanist-pager:0.18.0")
     implementation("com.google.accompanist:accompanist-pager-indicators:0.18.0")
-    implementation("com.google.accompanist:accompanist-placeholder-material:0.18.0")
-    implementation("com.google.accompanist:accompanist-swiperefresh:0.18.0")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.18.0")
+    implementation("com.google.accompanist:accompanist-placeholder-material:0.19.0")
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.19.0")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.19.0")
 
-    implementation("io.coil-kt:coil:1.3.2")
-    implementation("io.coil-kt:coil-compose:1.3.2")
+    implementation("io.coil-kt:coil:1.4.0")
+    implementation("io.coil-kt:coil-compose:1.4.0")
 
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
 
 
@@ -132,7 +133,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.2")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.3")
 
     // implementation("com.quickbirdstudios:opencv:4.1.0")
 }

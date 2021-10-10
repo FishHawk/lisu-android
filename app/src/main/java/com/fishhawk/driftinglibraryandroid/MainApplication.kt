@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.*
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -76,6 +77,7 @@ object AppModule {
                     Result.success(
                         Retrofit.Builder()
                             .baseUrl(url)
+                            .addConverterFactory(ScalarsConverterFactory.create())
                             .addConverterFactory(GsonConverterFactory.create())
                             .build()
                     )

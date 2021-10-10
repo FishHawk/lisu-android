@@ -8,8 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,10 +17,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.datastore.OptionGroup
+import com.fishhawk.driftinglibraryandroid.data.datastore.BoardFilter
 import com.fishhawk.driftinglibraryandroid.data.datastore.get
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDto
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.ui.activity.setArgument
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableMangaList
@@ -40,17 +37,30 @@ fun ProviderScreen(navController: NavHostController) {
     navController.setArgument<Provider>("provider")
 
     val viewModel = hiltViewModel<ProviderViewModel>()
-    val initialPage = remember { runBlocking { viewModel.pageHistory.get().coerceIn(0, 2) } }
-    val pagerState = rememberPagerState(pageCount = 3, initialPage = initialPage)
+    val boards = viewModel.boards
+    val boardHistory = remember { runBlocking { viewModel.pageHistory.get() } }
+
+    val pagerState = rememberPagerState(
+        pageCount = viewModel.boards.size,
+        initialPage = boards.indexOf(boardHistory).coerceAtLeast(0)
+    )
     LaunchedEffect(pagerState.currentPage) {
-        viewModel.pageHistory.set(pagerState.currentPage)
+        viewModel.pageHistory.set(boards[pagerState.currentPage])
     }
 
     Scaffold(
-        topBar = { ToolBar(pagerState, navController) },
+        topBar = { ToolBar(viewModel.provider.id, boards, pagerState, navController) },
         content = {
             ApplicationTransition {
-                Content(pagerState, navController)
+                HorizontalPager(state = pagerState) { page ->
+                    val boardId = boards[page]
+                    ProviderPanel(
+                        navController,
+                        boardId,
+                        viewModel.boardMangaLists[boardId]!!.collectAsLazyPagingItems(),
+                        viewModel.boardFilters[boardId]!!
+                    )
+                }
             }
         }
     )
@@ -58,54 +68,23 @@ fun ProviderScreen(navController: NavHostController) {
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun Content(
+private fun ToolBar(
+    providerId: String,
+    boards: List<String>,
     pagerState: PagerState,
     navController: NavHostController
 ) {
-    val viewModel = hiltViewModel<ProviderViewModel>()
-
-    HorizontalPager(state = pagerState) { page ->
-        when (page) {
-            0 -> ProviderPanel(
-                navController,
-                0,
-                viewModel.popularMangaList.collectAsLazyPagingItems(),
-                viewModel.popularOptionModel
-            )
-            1 -> ProviderPanel(
-                navController,
-                1,
-                viewModel.latestMangaList.collectAsLazyPagingItems(),
-                viewModel.latestOptionModel
-            )
-            2 -> ProviderPanel(
-                navController,
-                2,
-                viewModel.categoryMangaList.collectAsLazyPagingItems(),
-                viewModel.categoryOptionModel
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-private fun ToolBar(pagerState: PagerState, navController: NavHostController) {
-    val viewModel = hiltViewModel<ProviderViewModel>()
-
     Surface(elevation = AppBarDefaults.TopAppBarElevation) {
         Column {
             ApplicationToolBar(
-                title = viewModel.provider.name,
+                title = providerId,
                 navController = navController,
                 elevation = 0.dp
             ) {
                 IconButton(onClick = {
                     navController.currentBackStackEntry?.arguments =
-                        bundleOf(
-                            "provider" to viewModel.provider
-                        )
-                    navController.navigate("search/${viewModel.provider.name}")
+                        bundleOf("providerId" to providerId)
+                    navController.navigate("search/${providerId}")
                 }) { Icon(Icons.Filled.Search, contentDescription = "search") }
             }
 
@@ -120,13 +99,9 @@ private fun ToolBar(pagerState: PagerState, navController: NavHostController) {
                 selectedTabIndex = pagerState.currentPage,
                 backgroundColor = MaterialTheme.colors.surface
             ) {
-                listOf(
-                    R.string.label_popular,
-                    R.string.label_latest,
-                    R.string.label_category
-                ).forEachIndexed { index, title ->
+                boards.forEachIndexed { index, title ->
                     Tab(
-                        text = { Text(stringResource(title)) },
+                        text = { Text(title) },
                         selected = pagerState.currentPage == index,
                         onClick = { scope.launch { pagerState.scrollToPage(index) } },
                     )
@@ -140,26 +115,20 @@ private fun ToolBar(pagerState: PagerState, navController: NavHostController) {
 @Composable
 private fun ProviderPanel(
     navController: NavHostController,
-    page: Int,
-    mangaList: LazyPagingItems<MangaOutline>,
-    optionModelFlow: StateFlow<List<OptionGroup>?>
+    boardId: String,
+    mangaList: LazyPagingItems<MangaDto>,
+    optionModelFlow: StateFlow<List<BoardFilter>?>
 ) {
-    val viewModel = hiltViewModel<ProviderViewModel>()
-
     Column {
         val optionGroup by optionModelFlow.collectAsState()
         if (!optionGroup.isNullOrEmpty())
-            OptionGroupList(page = page, optionGroup = optionGroup!!)
+            OptionGroupList(boardId, optionGroup = optionGroup!!)
 
-        val context = LocalContext.current
         RefreshableMangaList(
             mangaList = mangaList,
             onCardClick = {
                 navController.currentBackStackEntry?.arguments =
-                    bundleOf(
-                        "outline" to it,
-                        "provider" to viewModel.provider
-                    )
+                    bundleOf("manga" to it)
                 navController.navigate("gallery/${it.id}")
             },
             onCardLongClick = {
@@ -184,8 +153,8 @@ private fun ProviderPanel(
 
 @Composable
 private fun OptionGroupList(
-    page: Int,
-    optionGroup: List<OptionGroup>
+    boardId: String,
+    optionGroup: List<BoardFilter>
 ) {
     val viewModel = hiltViewModel<ProviderViewModel>()
 
@@ -195,7 +164,7 @@ private fun OptionGroupList(
                 options.mapIndexed { index, option ->
                     Text(
                         modifier = Modifier.clickable {
-                            viewModel.updateOptionHistory(page, name, index)
+                            viewModel.updateFilterHistory(boardId, name, index)
                         },
                         style = TextStyle(fontSize = 12.sp).merge(),
                         text = option,

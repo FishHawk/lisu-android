@@ -22,11 +22,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.driftinglibraryandroid.R
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MetadataOutline
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDto
 import com.fishhawk.driftinglibraryandroid.ui.base.EmptyView
 import com.fishhawk.driftinglibraryandroid.ui.base.MangaCover
-import com.fishhawk.driftinglibraryandroid.ui.base.navToReaderActivity
+import com.fishhawk.driftinglibraryandroid.ui.reader.navToReaderActivity
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import java.time.LocalDate
@@ -54,19 +53,20 @@ fun HistoryScreen(navController: NavHostController) {
             is HistoryAction.NavToGallery -> with(action.history) {
                 navController.currentBackStackEntry?.arguments =
                     bundleOf(
-                        "outline" to MangaOutline(
-                            mangaId, cover, null, null,
-                            MetadataOutline(title, authors = authors?.let { listOf(it) }, null),
-                            null
-                        ),
-                        "provider" to provider
+                        "manga" to MangaDto(
+                            providerId = providerId,
+                            id = mangaId,
+                            cover = cover,
+                            title = title,
+                            authors = authors?.let { listOf(it) }
+                        )
                     )
                 navController.navigate("gallery/${mangaId}")
             }
             is HistoryAction.NavToReader -> with(action.history) {
                 context.navToReaderActivity(
-                    mangaId, provider?.name,
-                    collection, chapterId, page
+                    mangaId, providerId,
+                    collectionId, chapterId, page
                 )
             }
             is HistoryAction.Delete -> viewModel.delete(action.history)
@@ -100,7 +100,7 @@ private fun HistoryList(
     LazyColumn {
         histories.forEach { (date, list) ->
             item { HistoryListHeader(date) }
-            items(list, key = { Pair(it.provider?.name, it.mangaId) }) {
+            items(list, key = { Pair(it.providerId, it.mangaId) }) {
                 HistoryListItem(it, onAction)
             }
         }
@@ -176,7 +176,7 @@ private fun HistoryListItem(
                     )
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         val seen = listOf(
-                            history.collection,
+                            history.collectionId,
                             history.chapterName,
                             stringResource(R.string.history_card_page, history.page.plus(1))
                         ).filter { it.isNotBlank() }.joinToString("-")
@@ -186,9 +186,7 @@ private fun HistoryListItem(
                             val date = history.date.toLocalTime()
                                 .format(DateTimeFormatter.ofPattern("H:mm"))
                             Text(text = date, style = MaterialTheme.typography.body2)
-                            history.provider?.let {
-                                Text(text = it.name, style = MaterialTheme.typography.body2)
-                            }
+                            Text(text = history.providerId, style = MaterialTheme.typography.body2)
                         }
                     }
                 }

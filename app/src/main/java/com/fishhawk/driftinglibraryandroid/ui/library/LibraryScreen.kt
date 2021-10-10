@@ -13,6 +13,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.driftinglibraryandroid.R
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDto
 import com.fishhawk.driftinglibraryandroid.ui.base.RefreshableMangaList
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
@@ -41,24 +42,24 @@ private fun ToolBar() {
 private fun Content(navController: NavHostController) {
     val viewModel = hiltViewModel<LibraryViewModel>()
     val isOpen = remember { mutableStateOf(false) }
-    val id = remember { mutableStateOf("") }
+    val mangaWaitToDelete = remember { mutableStateOf<MangaDto?>(null) }
     RefreshableMangaList(
         mangaList = viewModel.mangaList.collectAsLazyPagingItems(),
         onCardClick = {
             navController.currentBackStackEntry?.arguments =
-                bundleOf("outline" to it)
+                bundleOf("manga" to it)
             navController.navigate("gallery/${it.id}")
         },
         onCardLongClick = {
-            id.value = it.id
+            mangaWaitToDelete.value = it
             isOpen.value = true
         }
     )
-    DeleteMangaDialog(isOpen, id.value)
+    mangaWaitToDelete.value?.let { DeleteMangaDialog(isOpen, it) }
 }
 
 @Composable
-private fun DeleteMangaDialog(isOpen: MutableState<Boolean>, id: String) {
+private fun DeleteMangaDialog(isOpen: MutableState<Boolean>, manga: MangaDto) {
     val viewModel = hiltViewModel<LibraryViewModel>()
     if (isOpen.value) {
         AlertDialog(
@@ -67,7 +68,7 @@ private fun DeleteMangaDialog(isOpen: MutableState<Boolean>, id: String) {
             confirmButton = {
                 TextButton(
                     onClick = {
-                        viewModel.deleteManga(id)
+                        viewModel.deleteManga(manga)
                         isOpen.value = false
                     }) {
                     Text("ok")

@@ -14,12 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.fishhawk.driftinglibraryandroid.data.remote.model.TagGroup
 import com.google.accompanist.flowlayout.FlowRow
 
 @Composable
 fun MangaTagGroups(
-    tagGroups: List<TagGroup>,
+    tagGroups: Map<String, List<String>>,
     onTagClick: (String) -> Unit = {},
     onTagLongClick: (String) -> Unit = {},
     onTagClose: () -> Unit = {}
@@ -27,30 +26,36 @@ fun MangaTagGroups(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        tagGroups.map { MangaTagGroup(it, onTagClick, onTagLongClick, onTagClose) }
+        tagGroups.onEach {
+            TagGroup(
+                it.key, it.value,
+                onTagClick, onTagLongClick, onTagClose
+            )
+        }
     }
 }
 
 @Composable
-fun MangaTagGroup(
-    group: TagGroup,
+fun TagGroup(
+    name: String,
+    tags: List<String>,
     onTagClick: (String) -> Unit = {},
     onTagLongClick: (String) -> Unit = {},
     onTagClose: () -> Unit = {}
 ) {
     Row {
-        if (group.key.isNotBlank()) Tag(group.key)
+        if (name.isNotBlank()) Tag(name)
         FlowRow(
             modifier = Modifier.padding(bottom = 8.dp),
             mainAxisSpacing = 4.dp,
             crossAxisSpacing = 4.dp
         ) {
-            group.value.map { value ->
+            tags.map { tag ->
                 val fullTag =
-                    if (group.key.isBlank()) value
-                    else "${group.key}:$value"
+                    if (name.isBlank()) tag
+                    else "$name:$tag"
                 Tag(
-                    value,
+                    tag,
                     onTagClick = { onTagClick(fullTag) },
                     onTagLongClick = { onTagLongClick(fullTag) },
                     onTagClose = onTagClose
@@ -63,7 +68,7 @@ fun MangaTagGroup(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun Tag(
-    value: String,
+    tag: String,
     onTagClick: (String) -> Unit = {},
     onTagLongClick: (String) -> Unit = {},
     onTagClose: () -> Unit = {}
@@ -76,10 +81,10 @@ private fun Tag(
             modifier = Modifier
                 .padding(horizontal = 12.dp, vertical = 4.dp)
                 .combinedClickable(
-                    onClick = { onTagClick(value) },
-                    onLongClick = { onTagLongClick(value) }
+                    onClick = { onTagClick(tag) },
+                    onLongClick = { onTagLongClick(tag) }
                 ),
-            text = value,
+            text = tag,
             style = MaterialTheme.typography.body2.copy(fontSize = 12.sp)
         )
     }

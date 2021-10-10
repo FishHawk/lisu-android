@@ -19,7 +19,7 @@ class PreferenceRepository(context: Context) {
     private val Context.store by preferencesDataStore(name = "preference")
     private val store = context.store
 
-    val serverAddress by store.get("serverAddress", "")
+    val serverAddress by store.get("serverAddress", "192.168.1.100:8080")
 
     val lastUsedProvider by store.get("last_used_provider", "")
 

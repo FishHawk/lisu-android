@@ -24,7 +24,7 @@ import androidx.paging.compose.LazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaOutline
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDto
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.fade
 import com.google.accompanist.placeholder.material.placeholder
@@ -33,9 +33,9 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun RefreshableMangaList(
-    mangaList: LazyPagingItems<MangaOutline>,
-    onCardClick: (outline: MangaOutline) -> Unit = {},
-    onCardLongClick: (outline: MangaOutline) -> Unit = {}
+    mangaList: LazyPagingItems<MangaDto>,
+    onCardClick: (manga: MangaDto) -> Unit = {},
+    onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
     val state = mangaList.loadState.refresh
     StateView(
@@ -61,9 +61,9 @@ fun RefreshableMangaList(
 
 @Composable
 fun MangaList(
-    mangaList: LazyPagingItems<MangaOutline>,
-    onCardClick: (outline: MangaOutline) -> Unit = {},
-    onCardLongClick: (outline: MangaOutline) -> Unit = {}
+    mangaList: LazyPagingItems<MangaDto>,
+    onCardClick: (manga: MangaDto) -> Unit = {},
+    onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -108,18 +108,18 @@ fun MangaList(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MangaListCard(
-    outline: MangaOutline?,
-    onCardClick: (outline: MangaOutline) -> Unit = {},
-    onCardLongClick: (outline: MangaOutline) -> Unit = {}
+    manga: MangaDto?,
+    onCardClick: (manga: MangaDto) -> Unit = {},
+    onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
     Card(
         modifier = Modifier.combinedClickable(
-            onClick = { outline?.let { onCardClick(it) } },
-            onLongClick = { outline?.let { onCardLongClick(it) } }
+            onClick = { manga?.let { onCardClick(it) } },
+            onLongClick = { manga?.let { onCardLongClick(it) } }
         )
     ) {
         Box {
-            MangaCover(cover = outline?.cover)
+            MangaCover(cover = manga?.cover)
             Box(modifier = Modifier.matchParentSize()) {
                 Box(
                     modifier = Modifier
@@ -136,7 +136,7 @@ fun MangaListCard(
                         modifier = Modifier
                             .padding(8.dp)
                             .align(Alignment.BottomStart),
-                        text = outline?.title ?: "",
+                        text = manga?.title ?: manga?.id ?: "",
                         style = MaterialTheme.typography.subtitle2.copy(
                             shadow = Shadow(Color.White, Offset.Zero, 2f)
                         ),

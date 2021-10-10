@@ -6,9 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,14 +17,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.fishhawk.driftinglibraryandroid.R
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetailDto
 import com.google.accompanist.insets.statusBarsPadding
 
 internal val MangaHeaderHeight = 220.dp
 
 @Composable
 internal fun MangaHeader(
-    detail: MangaDetail,
+    detail: MangaDetailDto,
     onAction: GalleryActionHandler
 ) {
     Box(
@@ -38,7 +36,6 @@ internal fun MangaHeader(
             crossfade(true)
             crossfade(500)
         }
-
         Image(
             modifier = Modifier.matchParentSize(),
             painter = painter,
@@ -75,16 +72,16 @@ internal fun MangaHeader(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MangaInfo(
-    detail: MangaDetail,
+    detail: MangaDetailDto,
     onAction: GalleryActionHandler
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(vertical = 16.dp),
+            .padding(vertical = 2.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        detail.title.let {
+        (detail.title ?: detail.id).let {
             Box(modifier = Modifier.weight(1f)) {
                 MangaInfoTitle(
                     modifier = Modifier
@@ -99,20 +96,22 @@ private fun MangaInfo(
                 )
             }
         }
-        detail.metadata.authors?.joinToString(separator = ";")?.let {
-            MangaInfoSubtitle(
-                modifier = Modifier.combinedClickable(
-                    onClick = { onAction(GalleryAction.NavToGlobalSearch(it)) },
-                    onLongClick = {
-                        onAction(GalleryAction.Copy(it, R.string.toast_manga_author_copied))
-                    }
-                ),
-                text = it
-            )
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            detail.metadata.status?.let { MangaInfoSubtitle(text = it.toString()) }
-            detail.provider?.apply { MangaInfoSubtitle(text = "$name($lang)") }
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            detail.authors?.joinToString(separator = ";")?.let {
+                MangaInfoSubtitle(
+                    modifier = Modifier.combinedClickable(
+                        onClick = { onAction(GalleryAction.NavToGlobalSearch(it)) },
+                        onLongClick = {
+                            onAction(GalleryAction.Copy(it, R.string.toast_manga_author_copied))
+                        }
+                    ),
+                    text = it
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                detail.isFinished?.let { MangaInfoSubtitle(text = if (it) "Finished" else "Ongoing") }
+                MangaInfoSubtitle(text = detail.providerId)
+            }
         }
     }
 }

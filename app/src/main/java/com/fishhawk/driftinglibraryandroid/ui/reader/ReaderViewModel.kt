@@ -1,5 +1,8 @@
 package com.fishhawk.driftinglibraryandroid.ui.reader
 
+import android.content.Context
+import android.content.Intent
+import androidx.core.os.bundleOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.driftinglibraryandroid.R
@@ -7,8 +10,8 @@ import com.fishhawk.driftinglibraryandroid.data.database.ReadingHistoryRepositor
 import com.fishhawk.driftinglibraryandroid.data.database.model.ReadingHistory
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteLibraryRepository
 import com.fishhawk.driftinglibraryandroid.data.remote.RemoteProviderRepository
-import com.fishhawk.driftinglibraryandroid.data.remote.model.Chapter
-import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetail
+import com.fishhawk.driftinglibraryandroid.data.remote.model.ChapterDto
+import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDetailDto
 import com.fishhawk.driftinglibraryandroid.ui.base.FeedbackViewModel
 import com.fishhawk.driftinglibraryandroid.ui.base.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,10 +20,46 @@ import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
+fun Context.navToReaderActivity(
+    mangaId: String,
+    providerId: String,
+    collectionId: String,
+    chapterId: String,
+    page: Int = 0
+) {
+    val bundle = bundleOf(
+        "mangaId" to mangaId,
+        "providerId" to providerId,
+        "collectionId" to collectionId,
+        "chapterId" to chapterId,
+        "page" to page
+    )
+    val intent = Intent(this, ReaderActivity::class.java)
+    intent.putExtras(bundle)
+    startActivity(intent)
+}
+
+fun Context.navToReaderActivity(
+    detail: MangaDetailDto,
+    collectionId: String,
+    chapterId: String,
+    page: Int
+) {
+    val bundle = bundleOf(
+        "detail" to detail,
+        "collectionId" to collectionId,
+        "chapterId" to chapterId,
+        "page" to page
+    )
+    val intent = Intent(this, ReaderActivity::class.java)
+    intent.putExtras(bundle)
+    startActivity(intent)
+}
+
 class ReaderChapter(
     val collectionId: String,
     val index: Int,
-    chapter: Chapter
+    chapter: ChapterDto
 ) {
     val id = chapter.id
     val title = chapter.title
@@ -38,15 +77,15 @@ class ReaderViewModel @Inject constructor(
 ) : FeedbackViewModel() {
 
     private val mangaId =
-        savedStateHandle.get<MangaDetail>("detail")?.id
-            ?: savedStateHandle.get<String>("id")!!
+        savedStateHandle.get<MangaDetailDto>("detail")?.id
+            ?: savedStateHandle.get<String>("mangaId")!!
 
     private val providerId =
-        savedStateHandle.get<MangaDetail>("detail")?.provider?.name
-            ?: savedStateHandle.get<String>("providerId")
+        savedStateHandle.get<MangaDetailDto>("detail")?.providerId
+            ?: savedStateHandle.get<String>("providerId")!!
 
     private val mangaDetail = MutableStateFlow(
-        savedStateHandle.get<MangaDetail>("detail")?.let { Result.success(it) }
+        savedStateHandle.get<MangaDetailDto>("detail")?.let { Result.success(it) }
     )
 
     val mangaLoadState = mangaDetail
@@ -58,21 +97,33 @@ class ReaderViewModel @Inject constructor(
     val mangaTitle = mangaDetail
         .map { it?.getOrNull() }
         .filterNotNull()
-        .map { it.title }
+        .map { it.title ?: it.id }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), mangaId)
 
     private val chapterList = mangaDetail
         .map { it?.getOrNull() }
         .filterNotNull()
         .map { detail ->
-            val collectionId = savedStateHandle.get<String>("collection")
-            val collection = detail.collections.run { find { it.id == collectionId } ?: first() }
-            collection.chapters.mapIndexed { index, chapter ->
-                ReaderChapter(collection.id, index, chapter)
+            val collectionId = savedStateHandle.get<String>("collectionId")!!
+            val chapterId = savedStateHandle.get<String>("chapterId")!!
+            when {
+                collectionId.isNotBlank() -> {
+                    detail.collections!![collectionId]!!.mapIndexed { index, chapter ->
+                        ReaderChapter(collectionId, index, chapter)
+                    }
+                }
+                chapterId.isNotBlank() -> {
+                    detail.chapters!!.mapIndexed { index, chapter ->
+                        ReaderChapter(collectionId, index, chapter)
+                    }
+                }
+                else -> {
+                    listOf(ReaderChapter(collectionId, 0, ChapterDto(id = " ", name = "", title = "")))
+                }
             }
         }
         .onEach { chapters ->
-            val chapterId = savedStateHandle.get<String>("chapter")
+            val chapterId = savedStateHandle.get<String>("chapterId")
             val chapterIndex = chapters.indexOfFirst { it.id == chapterId }
             chapterPointer = MutableStateFlow(
                 ReaderChapterPointer(
@@ -113,11 +164,12 @@ class ReaderViewModel @Inject constructor(
         if (chapter.state == ViewState.Loaded) return
         chapter.state = ViewState.Loading
 
-        val result =
-            if (providerId != null)
-                remoteProviderRepository.getChapterContent(providerId, mangaId, chapter.id)
-            else
-                remoteLibraryRepository.getChapterContent(mangaId, chapter.collectionId, chapter.id)
+        val result = remoteProviderRepository.getContent(
+            providerId,
+            mangaId,
+            chapter.collectionId,
+            chapter.id
+        )
 
         fun refreshPointerIfNeed() {
             chapterPointer.value.let { pointer ->
@@ -146,9 +198,7 @@ class ReaderViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
     fun refreshReader() = viewModelScope.launch {
-        val result =
-            if (providerId == null) remoteLibraryRepository.getManga(mangaId)
-            else remoteProviderRepository.getManga(providerId, mangaId)
+        val result = remoteProviderRepository.getManga(providerId, mangaId)
         if (mangaLoadState.value != ViewState.Loaded) {
             mangaDetail.value = result
         }
@@ -204,13 +254,13 @@ class ReaderViewModel @Inject constructor(
         val detail = mangaDetail.value!!.getOrNull()!!
         val chapter = chapterPointer.value.currChapter
         val readingHistory = ReadingHistory(
+            providerId = detail.providerId,
             mangaId = mangaId,
             cover = detail.cover,
             title = detail.title,
-            authors = detail.metadata.authors?.joinToString(separator = ";"),
-            provider = detail.provider,
+            authors = detail.authors?.joinToString(separator = ";"),
             date = Calendar.getInstance().time.time,
-            collection = chapter.collectionId,
+            collectionId = chapter.collectionId,
             chapterId = chapter.id,
             chapterName = chapter.name,
             page = page
