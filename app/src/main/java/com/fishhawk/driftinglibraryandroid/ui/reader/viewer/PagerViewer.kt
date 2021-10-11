@@ -39,26 +39,6 @@ import com.google.accompanist.pager.HorizontalPager
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 
-//        reader.onPageLongClicked = { position, url ->
-//            if (P.isLongTapDialogEnabled.get())
-//                ReaderPageSheet(this, object : ReaderPageSheet.Listener {
-//                    override fun onRefresh() {
-//                        reader.refreshPage(position)
-//                    }
-//
-//                    override fun onSave() {
-//                        val prefix = viewModel.makeImageFilenamePrefix()
-//                            ?: return toast(R.string.toast_chapter_not_loaded)
-//                        saveImage(url, "$prefix-$position")
-//                    }
-//
-//                    override fun onShare() {
-//                        val prefix = viewModel.makeImageFilenamePrefix()
-//                            ?: return toast(R.string.toast_chapter_not_loaded)
-//                        lifecycleScope.shareImage(this, url, "$prefix-$position")
-//                    }
-//                }).show()
-
 @OptIn(ExperimentalPagerApi::class, ExperimentalComposeUiApi::class, InternalCoroutinesApi::class)
 @Composable
 internal fun PagerViewer(
@@ -87,6 +67,7 @@ internal fun PagerViewer(
 
     val useVolumeKey by PR.useVolumeKey.collectAsState()
     val invertVolumeKey by PR.invertVolumeKey.collectAsState()
+    val isLongTapDialogEnabled by PR.isLongTapDialogEnabled.collectAsState()
 
     val focusRequester = remember { FocusRequester() }
 
@@ -165,7 +146,10 @@ internal fun PagerViewer(
                             else -> viewModel.isMenuOpened.value = !viewModel.isMenuOpened.value
                         }
                     },
-                    onLongPress = { onAction(ReaderAction.OpenPageSheet(it)) }
+                    onLongPress = {
+                        if (isLongTapDialogEnabled)
+                            onAction(ReaderAction.OpenPageSheet(it))
+                    }
                 )
             }
         }

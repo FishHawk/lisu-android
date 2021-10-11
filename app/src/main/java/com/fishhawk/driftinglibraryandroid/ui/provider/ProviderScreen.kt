@@ -18,7 +18,7 @@ import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.driftinglibraryandroid.data.datastore.BoardFilter
-import com.fishhawk.driftinglibraryandroid.data.datastore.get
+import com.fishhawk.driftinglibraryandroid.data.datastore.getBlocking
 import com.fishhawk.driftinglibraryandroid.data.remote.model.MangaDto
 import com.fishhawk.driftinglibraryandroid.data.remote.model.Provider
 import com.fishhawk.driftinglibraryandroid.ui.activity.setArgument
@@ -27,9 +27,24 @@ import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationToolBar
 import com.fishhawk.driftinglibraryandroid.ui.theme.ApplicationTransition
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.pager.*
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+
+internal typealias ProviderActionHandler = (ProviderAction) -> Unit
+
+internal sealed interface ProviderAction {
+    object NavUp : ProviderAction
+    object NavToSearch : ProviderAction
+    data class NavToGallery(val manga: MangaDto) : ProviderAction
+
+    data class AddToLibrary(val manga: MangaDto) : ProviderAction
+    data class RemoveFromLibrary(val manga: MangaDto) : ProviderAction
+
+    data class SelectFilter(
+        val boardId: String,
+        val name: String,
+        val selected: Int
+    ) : ProviderAction
+}
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -38,10 +53,33 @@ fun ProviderScreen(navController: NavHostController) {
 
     val viewModel = hiltViewModel<ProviderViewModel>()
     val boards = viewModel.boards
-    val boardHistory = remember { runBlocking { viewModel.pageHistory.get() } }
+    val boardHistory = viewModel.pageHistory.getBlocking()
+
+    val onAction: ProviderActionHandler = { action ->
+        when (action) {
+            ProviderAction.NavUp -> navController.navigateUp()
+            ProviderAction.NavToSearch -> {
+                navController.currentBackStackEntry?.arguments =
+                    bundleOf("providerId" to viewModel.provider.id)
+                navController.navigate("search/${viewModel.provider.id}")
+            }
+            is ProviderAction.NavToGallery -> with(action) {
+                navController.currentBackStackEntry?.arguments =
+                    bundleOf("manga" to manga)
+                navController.navigate("gallery/${manga.id}")
+            }
+
+            is ProviderAction.AddToLibrary -> viewModel.addToLibrary(action.manga)
+            is ProviderAction.RemoveFromLibrary -> viewModel.removeFromLibrary(action.manga)
+
+            is ProviderAction.SelectFilter -> with(action) {
+                viewModel.updateFilterHistory(boardId, name, selected)
+            }
+        }
+    }
 
     val pagerState = rememberPagerState(
-        pageCount = viewModel.boards.size,
+        pageCount = boards.size,
         initialPage = boards.indexOf(boardHistory).coerceAtLeast(0)
     )
     LaunchedEffect(pagerState.currentPage) {
@@ -49,17 +87,14 @@ fun ProviderScreen(navController: NavHostController) {
     }
 
     Scaffold(
-        topBar = { ToolBar(viewModel.provider.id, boards, pagerState, navController) },
+        topBar = { ToolBar(viewModel.provider.id, boards, pagerState, onAction) },
         content = {
             ApplicationTransition {
                 HorizontalPager(state = pagerState) { page ->
                     val boardId = boards[page]
-                    ProviderPanel(
-                        navController,
-                        boardId,
-                        viewModel.boardMangaLists[boardId]!!.collectAsLazyPagingItems(),
-                        viewModel.boardFilters[boardId]!!
-                    )
+                    val filterList by viewModel.boardFilters[boardId]!!.collectAsState()
+                    val mangaList = viewModel.boardMangaLists[boardId]!!.collectAsLazyPagingItems()
+                    ProviderBoard(boardId, filterList, mangaList, onAction)
                 }
             }
         }
@@ -72,20 +107,18 @@ private fun ToolBar(
     providerId: String,
     boards: List<String>,
     pagerState: PagerState,
-    navController: NavHostController
+    onAction: ProviderActionHandler
 ) {
     Surface(elevation = AppBarDefaults.TopAppBarElevation) {
         Column {
             ApplicationToolBar(
                 title = providerId,
-                navController = navController,
-                elevation = 0.dp
+                elevation = 0.dp,
+                onNavigationIconClick = { onAction(ProviderAction.NavUp) }
             ) {
-                IconButton(onClick = {
-                    navController.currentBackStackEntry?.arguments =
-                        bundleOf("providerId" to providerId)
-                    navController.navigate("search/${providerId}")
-                }) { Icon(Icons.Filled.Search, contentDescription = "search") }
+                IconButton(onClick = { onAction(ProviderAction.NavToSearch) }) {
+                    Icon(Icons.Filled.Search, contentDescription = "search")
+                }
             }
 
             val scope = rememberCoroutineScope()
@@ -111,67 +144,41 @@ private fun ToolBar(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun ProviderPanel(
-    navController: NavHostController,
+private fun ProviderBoard(
     boardId: String,
+    filterList: List<BoardFilter>?,
     mangaList: LazyPagingItems<MangaDto>,
-    optionModelFlow: StateFlow<List<BoardFilter>?>
+    onAction: ProviderActionHandler
 ) {
-    Column {
-        val optionGroup by optionModelFlow.collectAsState()
-        if (!optionGroup.isNullOrEmpty())
-            OptionGroupList(boardId, optionGroup = optionGroup!!)
-
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        filterList?.forEach { BoardFilter(boardId, it, onAction) }
         RefreshableMangaList(
             mangaList = mangaList,
-            onCardClick = {
-                navController.currentBackStackEntry?.arguments =
-                    bundleOf("manga" to it)
-                navController.navigate("gallery/${it.id}")
-            },
-            onCardLongClick = {
-//                ProviderActionSheet(
-//                    context,
-//                    it,
-//                    viewModel.provider.id,
-//                    object : ProviderActionSheet.Listener {
-//                        override fun onReadClick(outline: MangaOutline, provider: String) {
-//                            context.navToReaderActivity(outline.id, viewModel.provider.id, 0, 0, 0)
-//                        }
-//
-//                        override fun onLibraryAddClick(outline: MangaOutline, provider: String) {
-//                            viewModel.addToLibrary(outline.id, outline.title)
-//                        }
-//                    }
-//                ).show()
-            }
+            onCardClick = { onAction(ProviderAction.NavToGallery(it)) },
+            onCardLongClick = { }
         )
     }
 }
 
 @Composable
-private fun OptionGroupList(
+private fun BoardFilter(
     boardId: String,
-    optionGroup: List<BoardFilter>
+    filter: BoardFilter,
+    onAction: ProviderActionHandler,
 ) {
-    val viewModel = hiltViewModel<ProviderViewModel>()
-
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        optionGroup.forEach { (name, options, selected) ->
-            FlowRow(mainAxisSpacing = 4.dp, crossAxisSpacing = 2.dp) {
-                options.mapIndexed { index, option ->
-                    Text(
-                        modifier = Modifier.clickable {
-                            viewModel.updateFilterHistory(boardId, name, index)
-                        },
-                        style = TextStyle(fontSize = 12.sp).merge(),
-                        text = option,
-                        color = MaterialTheme.colors.run { if (index != selected) onSurface else primary }
-                    )
+    FlowRow(mainAxisSpacing = 4.dp, crossAxisSpacing = 2.dp) {
+        filter.options.mapIndexed { index, text ->
+            Text(
+                modifier = Modifier.clickable {
+                    onAction(ProviderAction.SelectFilter(boardId, filter.name, index))
+                },
+                text = text,
+                style = TextStyle(fontSize = 12.sp).merge(),
+                color = MaterialTheme.colors.run {
+                    if (index != filter.selected) onSurface else primary
                 }
-            }
+            )
         }
     }
 }

@@ -36,7 +36,7 @@ class LibraryViewModel @Inject constructor(
         }
 
     fun deleteManga(manga: MangaDto) = viewModelScope.launch {
-        val result = repository.unsubscribe(manga.providerId, manga.id)
+        val result = repository.deleteManga(manga.providerId, manga.id)
         resultWarp(result) { source?.invalidate() }
     }
 

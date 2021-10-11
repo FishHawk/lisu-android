@@ -70,6 +70,23 @@ class ReaderActivity : BaseActivity() {
     }
 }
 
+//                ReaderPageSheet(this, object : ReaderPageSheet.Listener {
+//                    override fun onRefresh() {
+//                        reader.refreshPage(position)
+//                    }
+//
+//                    override fun onSave() {
+//                        val prefix = viewModel.makeImageFilenamePrefix()
+//                            ?: return toast(R.string.toast_chapter_not_loaded)
+//                        saveImage(url, "$prefix-$position")
+//                    }
+//
+//                    override fun onShare() {
+//                        val prefix = viewModel.makeImageFilenamePrefix()
+//                            ?: return toast(R.string.toast_chapter_not_loaded)
+//                        lifecycleScope.shareImage(this, url, "$prefix-$position")
+//                    }
+//                }).show()
 
 internal typealias ReaderActionHandler = (ReaderAction) -> Unit
 
@@ -80,6 +97,8 @@ internal sealed interface ReaderAction {
     object OpenColorFilterSheet : ReaderAction
     class OpenPageSheet(val url: String) : ReaderAction
 
+    object SharePage : ReaderAction
+    object SavePage : ReaderAction
 }
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
@@ -97,11 +116,14 @@ private fun ReaderScreen() {
 
             ReaderAction.OpenSettingSheet,
             ReaderAction.OpenColorFilterSheet,
-            is ReaderAction.OpenPageSheet ->
-                scope.launch {
-                    currentBottomSheet = action
-                    sheetState.show()
-                }
+            is ReaderAction.OpenPageSheet -> scope.launch {
+                currentBottomSheet = action
+                sheetState.show()
+            }
+            ReaderAction.SavePage -> {
+            }
+            ReaderAction.SharePage -> {
+            }
         }
     }
 
@@ -111,13 +133,13 @@ private fun ReaderScreen() {
             when (currentBottomSheet) {
                 ReaderAction.OpenColorFilterSheet -> ReaderOverlaySheet()
                 ReaderAction.OpenSettingSheet -> ReaderSettingsSheet()
-                is ReaderAction.OpenPageSheet -> ReaderPageSheet()
+                is ReaderAction.OpenPageSheet -> ReaderPageSheet(onAction)
                 else -> Text("test")
             }
         },
         scrimColor =
-            if (currentBottomSheet is ReaderAction.OpenColorFilterSheet) Color.Transparent
-            else ModalBottomSheetDefaults.scrimColor
+        if (currentBottomSheet is ReaderAction.OpenColorFilterSheet) Color.Transparent
+        else ModalBottomSheetDefaults.scrimColor
     ) {
         Surface(modifier = Modifier.fillMaxSize()) {
             val mangaViewState by viewModel.mangaLoadState.collectAsState()

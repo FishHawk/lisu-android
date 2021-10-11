@@ -20,7 +20,7 @@ import com.fishhawk.driftinglibraryandroid.R
 
 @Preview
 @Composable
-internal fun ReaderPageSheet() {
+internal fun ReaderPageSheet(onAction: ReaderActionHandler) {
     Column(modifier = Modifier.fillMaxWidth()) {
         SheetListItem(
             icon = Icons.Filled.Refresh,
@@ -29,11 +29,11 @@ internal fun ReaderPageSheet() {
         SheetListItem(
             icon = Icons.Default.SaveAlt,
             title = stringResource(R.string.page_action_save)
-        ) { }
+        ) { onAction(ReaderAction.SharePage) }
         SheetListItem(
             icon = Icons.Default.Share,
             title = stringResource(R.string.page_action_share)
-        ) { }
+        ) { onAction(ReaderAction.SharePage) }
     }
 }
 

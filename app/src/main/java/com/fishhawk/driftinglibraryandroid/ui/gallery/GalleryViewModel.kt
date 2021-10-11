@@ -64,14 +64,14 @@ class GalleryViewModel @Inject constructor(
     }
 
     fun addToLibrary() = viewModelScope.launch {
-        remoteLibraryRepository.subscribe(manga.providerId, manga.id).fold(
+        remoteLibraryRepository.createManga(manga.providerId, manga.id).fold(
             { _detail.value = _detail.value.copy(inLibrary = true) },
             {}
         )
     }
 
     fun removeFromLibrary() = viewModelScope.launch {
-        remoteLibraryRepository.unsubscribe(manga.providerId, manga.id).fold(
+        remoteLibraryRepository.deleteManga(manga.providerId, manga.id).fold(
             { _detail.value = _detail.value.copy(inLibrary = false) },
             {}
         )

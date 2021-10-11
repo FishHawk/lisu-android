@@ -46,14 +46,12 @@ class ProviderViewModel @Inject constructor(
         }.cachedIn(viewModelScope)
     }
 
-    fun addToLibrary(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
-//        val result = remoteLibraryRepository.createManga(
-//            targetMangaId,
-//            provider.name,
-//            sourceMangaId,
-//            true
-//        )
-//        resultWarp(result) { feed(R.string.successfully_add_to_library) }
+    fun addToLibrary(manga: MangaDto) = viewModelScope.launch {
+        remoteLibraryRepository.createManga(manga.providerId, manga.id).fold({}, {})
+    }
+
+    fun removeFromLibrary(manga: MangaDto) = viewModelScope.launch {
+        remoteLibraryRepository.deleteManga(manga.providerId, manga.id).fold({}, {})
     }
 
     val pageHistory = providerBrowseHistoryRepository.getBoardHistory(provider.id)
