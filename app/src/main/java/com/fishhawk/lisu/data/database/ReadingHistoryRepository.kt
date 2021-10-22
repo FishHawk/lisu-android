@@ -9,9 +9,9 @@ class ReadingHistoryRepository(private val dao: ReadingHistoryDao) {
 
     fun select(mangaId: String) = dao.select(mangaId)
 
-    suspend fun update(readingHistory: ReadingHistory) = dao.insert(readingHistory)
+    suspend fun update(history: ReadingHistory) = dao.insert(history)
 
-    suspend fun delete(readingHistory: ReadingHistory) = dao.delete(readingHistory)
+    suspend fun delete(history: ReadingHistory) = dao.delete(history)
 
     suspend fun clear() = dao.clear()
 }

@@ -17,7 +17,7 @@ import com.fishhawk.lisu.ui.base.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.util.*
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 fun Context.navToReaderActivity(
@@ -118,7 +118,13 @@ class ReaderViewModel @Inject constructor(
                     }
                 }
                 else -> {
-                    listOf(ReaderChapter(collectionId, 0, ChapterDto(id = " ", name = "", title = "")))
+                    listOf(
+                        ReaderChapter(
+                            collectionId,
+                            0,
+                            ChapterDto(id = " ", name = "", title = "")
+                        )
+                    )
                 }
             }
         }
@@ -259,7 +265,6 @@ class ReaderViewModel @Inject constructor(
             cover = detail.cover,
             title = detail.title,
             authors = detail.authors?.joinToString(separator = ";"),
-            date = Calendar.getInstance().time.time,
             collectionId = chapter.collectionId,
             chapterId = chapter.id,
             chapterName = chapter.name,

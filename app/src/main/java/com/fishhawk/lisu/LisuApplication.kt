@@ -9,6 +9,7 @@ import coil.ImageLoaderFactory
 import coil.util.CoilUtils
 import com.fishhawk.lisu.data.database.ApplicationDatabase
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
+import com.fishhawk.lisu.data.database.ServerHistoryRepository
 import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
@@ -65,7 +66,7 @@ object AppModule {
         return preferenceRepository.serverAddress.flow
             .map { address ->
                 address
-                    .let { if (it.isBlank()) null else it }
+                    .let { it.ifBlank { null } }
                     ?.let { if (URLUtil.isNetworkUrl(it)) it else "http://$it" }
                     ?.let { if (it.last() == '/') it else "$it/" }
             }
@@ -115,6 +116,11 @@ object AppModule {
     @Singleton
     fun provideReadingHistoryRepository(db: ApplicationDatabase) =
         ReadingHistoryRepository(db.readingHistoryDao())
+
+    @Provides
+    @Singleton
+    fun provideServerHistoryRepository(db: ApplicationDatabase) =
+        ServerHistoryRepository(db.serverHistoryDao())
 
     @Provides
     @Singleton

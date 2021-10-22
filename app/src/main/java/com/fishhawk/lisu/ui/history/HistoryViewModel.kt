@@ -9,15 +9,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.time.ZoneId
-import java.util.*
 import javax.inject.Inject
-
-internal fun Long.toLocalDate() =
-    Date(this).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-
-internal fun Long.toLocalTime() =
-    Date(this).toInstant().atZone(ZoneId.systemDefault()).toLocalTime()
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(

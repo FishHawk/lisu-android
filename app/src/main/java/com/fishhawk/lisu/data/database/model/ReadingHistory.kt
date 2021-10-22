@@ -1,6 +1,7 @@
 package com.fishhawk.lisu.data.database.model
 
 import androidx.room.Entity
+import java.time.LocalDateTime
 
 @Entity(primaryKeys = ["providerId", "mangaId"])
 data class ReadingHistory(
@@ -9,7 +10,7 @@ data class ReadingHistory(
     val cover: String?,
     val title: String?,
     val authors: String?,
-    var date: Long,
+    var date: LocalDateTime = LocalDateTime.now(),
     var collectionId: String,
     var chapterId: String,
     var chapterName: String,
