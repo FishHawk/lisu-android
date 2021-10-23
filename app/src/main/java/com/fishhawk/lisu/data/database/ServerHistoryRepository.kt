@@ -9,7 +9,7 @@ class ServerHistoryRepository(private val dao: ServerHistoryDao) {
 
     suspend fun update(history: ServerHistory) = dao.insert(history)
 
-    suspend fun delete(history: ServerHistory) = dao.delete(history)
+    suspend fun deleteByAddress(address: String) = dao.deleteByAddress(address)
 
     suspend fun clear() = dao.clear()
 }

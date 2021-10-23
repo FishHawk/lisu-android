@@ -1,6 +1,9 @@
 package com.fishhawk.lisu.data.database.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.fishhawk.lisu.data.database.model.ServerHistory
 import kotlinx.coroutines.flow.Flow
 
@@ -12,8 +15,8 @@ interface ServerHistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(history: ServerHistory)
 
-    @Delete
-    suspend fun delete(history: ServerHistory)
+    @Query("DELETE FROM ServerHistory WHERE address = :address")
+    suspend fun deleteByAddress(address: String)
 
     @Query("DELETE FROM ServerHistory")
     suspend fun clear()

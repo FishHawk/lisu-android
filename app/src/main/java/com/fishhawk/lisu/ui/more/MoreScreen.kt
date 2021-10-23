@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -21,6 +20,7 @@ import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.data.datastore.setBlocking
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.ui.widget.TextFieldWithSuggestions
 
 private typealias MoreActionHandler = (MoreAction) -> Unit
 
@@ -31,6 +31,7 @@ private sealed interface MoreAction {
     object NavToAbout : MoreAction
 
     data class SetServerAddress(val address: String) : MoreAction
+    data class DeleteSuggestion(val address: String) : MoreAction
 }
 
 @Composable
@@ -52,6 +53,9 @@ fun MoreScreen(navController: NavHostController) {
                 PR.serverAddress.setBlocking(action.address)
                 viewModel.update(action.address)
             }
+            is MoreAction.DeleteSuggestion -> {
+                viewModel.delete(action.address)
+            }
         }
     }
     Scaffold(
@@ -66,17 +70,21 @@ private fun Content(
     onAction: MoreActionHandler
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        val serverAddress = remember { mutableStateOf(PR.serverAddress.getBlocking()) }
+        var serverAddress by remember { mutableStateOf(PR.serverAddress.getBlocking()) }
         TextFieldWithSuggestions(
-            serverAddress,
-            suggestedAddresses,
+            value = serverAddress,
+            onValueChange = { serverAddress = it },
+            suggestions = suggestedAddresses,
             placeholder = { Text("Server address") },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Uri,
                 imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions {
-                onAction(MoreAction.SetServerAddress(serverAddress.value))
+                onAction(MoreAction.SetServerAddress(serverAddress))
+            },
+            onSuggestionDeleted = {
+                onAction(MoreAction.DeleteSuggestion(it))
             }
         )
 
@@ -103,57 +111,5 @@ private fun Content(
             icon = Icons.Filled.Error,
             title = stringResource(R.string.more_about)
         ) { onAction(MoreAction.NavToAbout) }
-    }
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-private fun TextFieldWithSuggestions(
-    state: MutableState<String>,
-    suggestions: List<String>,
-    placeholder: @Composable (() -> Unit)? = null,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions(),
-) {
-    var text by state
-    var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it && suggestions.isNotEmpty() }
-    ) {
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = text,
-            onValueChange = { text = it },
-            singleLine = true,
-            placeholder = placeholder,
-            leadingIcon = leadingIcon,
-            trailingIcon = {
-                if (expanded) IconButton(onClick = { text = "" }) {
-                    Icon(Icons.Default.Close, null)
-                } else trailingIcon?.invoke()
-            },
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            )
-        )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            suggestions
-                .filter { it.contains(text) }
-                .forEach { suggestion ->
-                    DropdownMenuItem(onClick = { text = suggestion }) {
-                        Text(text = suggestion)
-                    }
-                }
-        }
     }
 }

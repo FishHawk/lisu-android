@@ -2,10 +2,10 @@ import java.io.FileInputStream
 import java.util.*
 
 plugins {
+    kotlin("kapt")
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-parcelize")
-    id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
 }
 

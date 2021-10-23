@@ -7,7 +7,6 @@ import com.fishhawk.lisu.data.database.model.ServerHistory
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,5 +24,7 @@ class MoreViewModel @Inject constructor(
         repository.update(ServerHistory(address = address))
     }
 
-    fun clear() = viewModelScope.launch { repository.clear() }
+    fun delete(address: String) = viewModelScope.launch {
+        repository.deleteByAddress(address)
+    }
 }

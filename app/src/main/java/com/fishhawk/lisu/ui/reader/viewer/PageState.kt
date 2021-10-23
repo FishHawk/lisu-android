@@ -72,7 +72,7 @@ fun PageState(
             PageErrorState(
                 modifier = modifier,
                 position = position,
-                throwable = state.throwable
+                throwable = state.result.throwable
             )
         else -> Unit
     }
