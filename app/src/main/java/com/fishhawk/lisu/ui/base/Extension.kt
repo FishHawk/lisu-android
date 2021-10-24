@@ -5,6 +5,7 @@ import android.content.*
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.pm.PackageManager
 import android.graphics.Bitmap.CompressFormat
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
@@ -35,6 +36,13 @@ fun Context.checkPermission(permission: String): Boolean {
 fun Context.ensurePermission(permission: String): Boolean {
     return checkPermission(permission).also { isGrant ->
         if (!isGrant) (findActivity() as BaseActivity).requestPermission(permission)
+    }
+}
+
+fun Context.openWebPage(url:String) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    if (intent.resolveActivity(packageManager) != null) {
+        startActivity(intent)
     }
 }
 

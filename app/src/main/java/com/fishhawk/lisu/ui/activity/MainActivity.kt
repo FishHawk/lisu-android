@@ -111,13 +111,12 @@ private fun MainNavHost(
         composable("setting-reader") { SettingReaderScreen(navController) }
         composable("setting-advanced") { SettingAdvancedScreen(navController) }
         composable("about") { AboutScreen(navController) }
+        composable("open-source-license") { OpenSourceLicenseScreen(navController) }
 
         navigation(startDestination = "detail", route = "gallery/{mangaId}") {
             composable("detail") { GalleryScreen(navController) }
             composable("edit") { GalleryEditScreen(navController) }
         }
-
-        composable("test") { }
     }
 }
 

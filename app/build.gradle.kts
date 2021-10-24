@@ -7,6 +7,7 @@ plugins {
     id("kotlin-android")
     id("kotlin-parcelize")
     id("dagger.hilt.android.plugin")
+    id("com.mikepenz.aboutlibraries.plugin")
 }
 
 android {
@@ -128,6 +129,8 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
 
+    // Licenses
+    implementation("com.mikepenz:aboutlibraries-core:8.9.4")
 
     // UI Tests
     testImplementation("junit:junit:4.13.2")
