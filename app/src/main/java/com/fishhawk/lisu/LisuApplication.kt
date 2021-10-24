@@ -9,6 +9,7 @@ import coil.ImageLoaderFactory
 import coil.util.CoilUtils
 import com.fishhawk.lisu.data.database.ApplicationDatabase
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
+import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.database.ServerHistoryRepository
 import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
@@ -116,6 +117,11 @@ object AppModule {
     @Singleton
     fun provideReadingHistoryRepository(db: ApplicationDatabase) =
         ReadingHistoryRepository(db.readingHistoryDao())
+
+    @Provides
+    @Singleton
+    fun provideSearchHistoryRepository(db: ApplicationDatabase) =
+        SearchHistoryRepository(db.searchHistoryDao())
 
     @Provides
     @Singleton

@@ -1,6 +1,5 @@
 package com.fishhawk.lisu.ui.widget
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -16,12 +15,13 @@ fun TextFieldWithSuggestions(
     value: String,
     onValueChange: (String) -> Unit,
     suggestions: List<String>,
+    modifier: Modifier = Modifier,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
-    onSuggestionDeleted: (String) -> Unit
+    onSuggestionDeleted: ((String) -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
@@ -31,7 +31,7 @@ fun TextFieldWithSuggestions(
         TextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = modifier,
             singleLine = true,
             placeholder = placeholder,
             leadingIcon = leadingIcon,
@@ -59,8 +59,10 @@ fun TextFieldWithSuggestions(
             relativeSuggestions.forEach {
                 DropdownMenuItem(onClick = { onValueChange(it) }) {
                     Text(modifier = Modifier.weight(1f), text = it)
-                    IconButton(onClick = { onSuggestionDeleted(it) }) {
-                        Icon(Icons.Default.Close, null)
+                    if (onSuggestionDeleted != null) {
+                        IconButton(onClick = { onSuggestionDeleted(it) }) {
+                            Icon(Icons.Default.Close, null)
+                        }
                     }
                 }
             }

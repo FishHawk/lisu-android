@@ -3,18 +3,22 @@ package com.fishhawk.lisu.ui.search
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
+import com.fishhawk.lisu.data.database.SearchHistoryRepository
+import com.fishhawk.lisu.data.database.model.SearchHistory
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.FeedbackViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
+    private val searchHistoryRepository: SearchHistoryRepository,
     savedStateHandle: SavedStateHandle,
 ) : FeedbackViewModel() {
 
@@ -22,6 +26,17 @@ class SearchViewModel @Inject constructor(
 
     private val _keywords = MutableStateFlow(savedStateHandle.get<String>("keywords"))
     val keywords = _keywords.asStateFlow()
+
+    init {
+        keywords
+            .filterNotNull()
+            .onEach { searchHistoryRepository.update(SearchHistory(providerId, it)) }
+            .launchIn(viewModelScope)
+    }
+
+    val suggestions = searchHistoryRepository.listByProvider(providerId)
+        .map { list -> list.map { it.keywords }.distinct() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private var source: ProviderSearchMangaSource? = null
 
@@ -32,14 +47,17 @@ class SearchViewModel @Inject constructor(
     }.cachedIn(viewModelScope)
 
     init {
-        listOf(
-            keywords,
-            remoteProviderRepository.serviceFlow
-        ).forEach { it.onEach { source?.invalidate() }.launchIn(viewModelScope) }
+        listOf(keywords, remoteProviderRepository.serviceFlow).forEach {
+            it.onEach { source?.invalidate() }.launchIn(viewModelScope)
+        }
     }
 
     fun search(keywords: String) {
         _keywords.value = keywords
+    }
+
+    fun deleteSuggestion(keywords: String) = viewModelScope.launch {
+        searchHistoryRepository.deleteByKeywords(providerId, keywords)
     }
 
 //    fun addToLibrary(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {

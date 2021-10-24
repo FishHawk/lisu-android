@@ -3,6 +3,8 @@ package com.fishhawk.lisu.ui.globalsearch
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fishhawk.lisu.data.database.SearchHistoryRepository
+import com.fishhawk.lisu.data.database.model.SearchHistory
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.Provider
@@ -20,11 +22,23 @@ data class SearchResult(
 @HiltViewModel
 class GlobalSearchViewModel @Inject constructor(
     private val remoteLibraryRepository: RemoteProviderRepository,
+    private val searchHistoryRepository: SearchHistoryRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _keywords = MutableStateFlow(savedStateHandle.get<String>("keywords"))
     val keywords = _keywords.asStateFlow()
+
+    init {
+        keywords
+            .filterNotNull()
+            .onEach { searchHistoryRepository.update(SearchHistory("", it)) }
+            .launchIn(viewModelScope)
+    }
+
+    val suggestions = searchHistoryRepository.list()
+        .map { list -> list.map { it.keywords }.distinct() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private val providerList =
         flow { emit(remoteLibraryRepository.listProvider().getOrNull()) }.filterNotNull()

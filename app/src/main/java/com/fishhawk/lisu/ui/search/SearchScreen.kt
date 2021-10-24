@@ -4,17 +4,13 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -28,6 +24,7 @@ import com.fishhawk.lisu.ui.activity.setString
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.ui.widget.TextFieldWithSuggestions
 
 private typealias SearchActionHandler = (SearchAction) -> Unit
 
@@ -35,6 +32,7 @@ private sealed interface SearchAction {
     object NavUp : SearchAction
     data class NavToGallery(val manga: MangaDto) : SearchAction
     data class Search(val keywords: String) : SearchAction
+    data class DeleteSuggestion(val keywords: String) : SearchAction
     data class OpenSheet(val manga: MangaDto) : SearchAction
 }
 
@@ -44,7 +42,8 @@ fun SearchScreen(navController: NavHostController) {
     navController.setArgument<Provider>("provider")
 
     val viewModel = hiltViewModel<SearchViewModel>()
-    val initKeywords = viewModel.keywords.value
+    val keywords by viewModel.keywords.collectAsState()
+    val suggestions by viewModel.suggestions.collectAsState()
     val mangaList = viewModel.mangaList.collectAsLazyPagingItems()
     val onAction: SearchActionHandler = { action ->
         when (action) {
@@ -55,12 +54,13 @@ fun SearchScreen(navController: NavHostController) {
                 navigate("gallery/${action.manga.id}")
             }
             is SearchAction.Search -> viewModel.search(action.keywords)
+            is SearchAction.DeleteSuggestion -> viewModel.deleteSuggestion(action.keywords)
             is SearchAction.OpenSheet -> Unit
         }
     }
 
     Scaffold(
-        topBar = { ToolBar(initKeywords, onAction) },
+        topBar = { ToolBar(keywords, suggestions, onAction) },
         content = { LisuTransition { MangaList(mangaList, onAction) } }
     )
 }
@@ -68,30 +68,29 @@ fun SearchScreen(navController: NavHostController) {
 @Composable
 private fun ToolBar(
     initKeywords: String?,
+    suggestions: List<String>,
     onAction: SearchActionHandler
 ) {
     LisuToolBar(onNavigationIconClick = { onAction(SearchAction.NavUp) }) {
+        var keywords by remember { mutableStateOf(initKeywords ?: "") }
         val focusManager = LocalFocusManager.current
         val focusRequester = remember { FocusRequester() }
-        var keywords by remember { mutableStateOf(TextFieldValue(initKeywords ?: "")) }
-        TextField(
-            modifier = Modifier.focusRequester(focusRequester),
+
+        TextFieldWithSuggestions(
             value = keywords,
             onValueChange = { keywords = it },
-            singleLine = true,
+            suggestions = suggestions,
+            modifier = Modifier.focusRequester(focusRequester),
             placeholder = { Text(stringResource(R.string.menu_search_hint)) },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = {
-                onAction(SearchAction.Search(keywords.text))
+            keyboardActions = KeyboardActions {
+                onAction(SearchAction.Search(keywords))
                 focusManager.clearFocus()
-            }),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            )
+            },
+            onSuggestionDeleted = {
+                onAction(SearchAction.DeleteSuggestion(it))
+            }
         )
-
         DisposableEffect(Unit) {
             if (initKeywords == null) focusRequester.requestFocus()
             onDispose { }

@@ -14,11 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -31,6 +29,7 @@ import com.fishhawk.lisu.ui.base.MangaListCard
 import com.fishhawk.lisu.ui.base.ViewState
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.ui.widget.TextFieldWithSuggestions
 import kotlinx.coroutines.flow.StateFlow
 
 private typealias GlobalSearchActionHandler = (GlobalSearchAction) -> Unit
@@ -48,7 +47,8 @@ fun GlobalSearchScreen(navController: NavHostController) {
     navController.setString("keywords")
 
     val viewModel = hiltViewModel<GlobalSearchViewModel>()
-    val initKeywords = viewModel.keywords.value
+    val keywords by viewModel.keywords.collectAsState()
+    val suggestions by viewModel.suggestions.collectAsState()
     val searchResultList by viewModel.searchResultList.collectAsState()
     val onAction: GlobalSearchActionHandler = { action ->
         when (action) {
@@ -68,7 +68,7 @@ fun GlobalSearchScreen(navController: NavHostController) {
     }
 
     Scaffold(
-        topBar = { ToolBar(initKeywords, onAction) },
+        topBar = { ToolBar(keywords, suggestions, onAction) },
         content = { LisuTransition { SearchResultList(searchResultList, onAction) } }
     )
 }
@@ -76,28 +76,25 @@ fun GlobalSearchScreen(navController: NavHostController) {
 @Composable
 private fun ToolBar(
     initKeywords: String?,
+    suggestions: List<String>,
     onAction: GlobalSearchActionHandler
 ) {
     LisuToolBar(onNavigationIconClick = { onAction(GlobalSearchAction.NavUp) }) {
+        var keywords by remember { mutableStateOf(initKeywords ?: "") }
         val focusManager = LocalFocusManager.current
         val focusRequester = remember { FocusRequester() }
-        var keywords by remember { mutableStateOf(TextFieldValue(initKeywords ?: "")) }
-        TextField(
-            modifier = Modifier.focusRequester(focusRequester),
+
+        TextFieldWithSuggestions(
             value = keywords,
             onValueChange = { keywords = it },
-            singleLine = true,
+            suggestions = suggestions,
+            modifier = Modifier.focusRequester(focusRequester),
             placeholder = { Text(stringResource(R.string.menu_search_global_hint)) },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = {
-                onAction(GlobalSearchAction.Search(keywords.text))
+            keyboardActions = KeyboardActions {
+                onAction(GlobalSearchAction.Search(keywords))
                 focusManager.clearFocus()
-            }),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            )
+            }
         )
         DisposableEffect(Unit) {
             if (initKeywords == null) focusRequester.requestFocus()

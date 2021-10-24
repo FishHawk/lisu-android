@@ -2,8 +2,10 @@ package com.fishhawk.lisu.ui.more
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.database.ServerHistoryRepository
 import com.fishhawk.lisu.data.database.model.ServerHistory
+import com.fishhawk.lisu.data.datastore.getBlocking
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -15,16 +17,20 @@ import javax.inject.Inject
 class MoreViewModel @Inject constructor(
     private val repository: ServerHistoryRepository
 ) : ViewModel() {
+    val address = PR.serverAddress.let {
+        it.flow.stateIn(viewModelScope, SharingStarted.Eagerly, it.getBlocking())
+    }
 
-    val suggestedAddresses = repository.list()
+    val suggestions = repository.list()
         .map { list -> list.map { it.address } }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    fun update(address: String) = viewModelScope.launch {
+    fun updateAddress(address: String) = viewModelScope.launch {
+        PR.serverAddress.set(address)
         repository.update(ServerHistory(address = address))
     }
 
-    fun delete(address: String) = viewModelScope.launch {
+    fun deleteSuggestion(address: String) = viewModelScope.launch {
         repository.deleteByAddress(address)
     }
 }
