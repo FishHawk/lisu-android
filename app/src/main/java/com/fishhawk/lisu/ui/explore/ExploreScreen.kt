@@ -73,7 +73,7 @@ fun ExploreScreen(navController: NavHostController) {
 
 @Composable
 private fun ToolBar(onAction: ExploreActionHandler) {
-    LisuToolBar(stringResource(R.string.label_explore)) {
+    LisuToolBar(title = stringResource(R.string.label_explore)) {
         IconButton(onClick = { onAction(ExploreAction.NavToGlobalSearch) }) {
             Icon(Icons.Filled.Search, contentDescription = "search")
         }

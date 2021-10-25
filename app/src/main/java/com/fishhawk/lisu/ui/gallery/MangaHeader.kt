@@ -1,16 +1,18 @@
 package com.fishhawk.lisu.ui.gallery
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -18,9 +20,9 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
-import com.google.accompanist.insets.statusBarsPadding
+import com.fishhawk.lisu.ui.theme.LisuToolBar
 
-internal val MangaHeaderHeight = 220.dp
+internal val MangaHeaderHeight = 250.dp
 
 @Composable
 internal fun MangaHeader(
@@ -43,27 +45,47 @@ internal fun MangaHeader(
             contentScale = ContentScale.Crop,
             alpha = 0.2f
         )
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .statusBarsPadding(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Surface(
-                modifier = Modifier
-                    .aspectRatio(0.75f)
-                    .clickable { },
-                shape = RoundedCornerShape(4.dp),
-                elevation = 4.dp
-            ) {
-                Image(
-                    painter = painter,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
+        Column(
+            modifier = Modifier.background(
+                Brush.verticalGradient(
+                    colors = listOf(Color.Transparent, MaterialTheme.colors.background),
                 )
+            )
+        ) {
+            LisuToolBar(
+                onNavUp = { onAction(GalleryAction.NavUp) },
+                transparent = true,
+            ) {
+                if (detail.inLibrary) {
+                    IconButton(onClick = { onAction(GalleryAction.NavToEdit) }) {
+                        Icon(Icons.Default.Edit, contentDescription = "edit")
+                    }
+                }
+                IconButton(onClick = { onAction(GalleryAction.Share) }) {
+                    Icon(Icons.Default.Share, contentDescription = "share")
+                }
             }
-            MangaInfo(detail, onAction)
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Surface(
+                    modifier = Modifier
+                        .aspectRatio(0.75f)
+                        .clickable { },
+                    shape = RoundedCornerShape(4.dp),
+                    elevation = 4.dp
+                ) {
+                    Image(
+                        painter = painter,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                MangaInfo(detail, onAction)
+            }
         }
     }
 }

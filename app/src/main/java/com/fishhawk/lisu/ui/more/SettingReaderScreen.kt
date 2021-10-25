@@ -21,7 +21,7 @@ fun SettingReaderScreen(navController: NavHostController) {
         topBar = {
             LisuToolBar(
                 title = stringResource(R.string.label_settings_reader),
-                navController = navController
+                onNavUp = { navController.navigateUp() }
             )
         },
         content = { LisuTransition { Content() } }

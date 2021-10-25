@@ -113,8 +113,8 @@ private fun ToolBar(
         Column {
             LisuToolBar(
                 title = providerId,
-                elevation = 0.dp,
-                onNavigationIconClick = { onAction(ProviderAction.NavUp) }
+                onNavUp = { onAction(ProviderAction.NavUp) },
+                transparent = true,
             ) {
                 IconButton(onClick = { onAction(ProviderAction.NavToSearch) }) {
                     Icon(Icons.Filled.Search, contentDescription = "search")

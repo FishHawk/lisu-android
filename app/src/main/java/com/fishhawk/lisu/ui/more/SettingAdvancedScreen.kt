@@ -24,7 +24,7 @@ fun SettingAdvancedScreen(navController: NavHostController) {
         topBar = {
             LisuToolBar(
                 title = stringResource(R.string.label_settings_advanced),
-                navController = navController
+                onNavUp = { navController.navigateUp() }
             )
         },
         content = { LisuTransition { Content() } }

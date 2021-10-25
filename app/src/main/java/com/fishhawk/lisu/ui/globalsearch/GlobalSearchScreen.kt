@@ -79,7 +79,7 @@ private fun ToolBar(
     suggestions: List<String>,
     onAction: GlobalSearchActionHandler
 ) {
-    LisuToolBar(onNavigationIconClick = { onAction(GlobalSearchAction.NavUp) }) {
+    LisuToolBar(onNavUp = { onAction(GlobalSearchAction.NavUp) }) {
         var keywords by remember { mutableStateOf(initKeywords ?: "") }
         val focusManager = LocalFocusManager.current
         val focusRequester = remember { FocusRequester() }

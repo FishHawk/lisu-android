@@ -30,7 +30,7 @@ fun OpenSourceLicenseScreen(navController: NavHostController) {
         topBar = {
             LisuToolBar(
                 title = stringResource(R.string.label_open_source_license),
-                navController = navController
+                onNavUp = { navController.navigateUp() }
             )
         },
         content = {

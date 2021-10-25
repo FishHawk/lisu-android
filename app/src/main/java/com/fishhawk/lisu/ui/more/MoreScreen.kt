@@ -61,7 +61,7 @@ fun MoreScreen(navController: NavHostController) {
         }
     }
     Scaffold(
-        topBar = { LisuToolBar(stringResource(R.string.label_more)) },
+        topBar = { LisuToolBar(title = stringResource(R.string.label_more)) },
         content = { LisuTransition { Content(address, suggestions, onAction) } }
     )
 }

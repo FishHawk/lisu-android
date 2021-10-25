@@ -19,7 +19,7 @@ fun SettingGeneralScreen(navController: NavHostController) {
         topBar = {
             LisuToolBar(
                 title = stringResource(R.string.label_settings_general),
-                navController = navController
+                onNavUp = { navController.navigateUp() }
             )
         },
         content = { LisuTransition { Content() } }

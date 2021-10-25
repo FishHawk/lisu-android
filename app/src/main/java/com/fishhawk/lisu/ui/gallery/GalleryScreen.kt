@@ -160,7 +160,7 @@ private fun ToolBar(
     ) {
         LisuToolBar(
             title = title,
-            onNavigationIconClick = { onAction(GalleryAction.NavUp) }
+            onNavUp = { onAction(GalleryAction.NavUp) }
         ) {
             if (inLibrary) {
                 IconButton(onClick = { onAction(GalleryAction.NavToEdit) }) {

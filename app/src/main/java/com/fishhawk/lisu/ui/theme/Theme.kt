@@ -1,9 +1,12 @@
 package com.fishhawk.lisu.ui.theme
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -12,8 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
-import androidx.navigation.NavHostController
+import androidx.compose.ui.unit.dp
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.Theme
 import com.fishhawk.lisu.data.datastore.collectAsState
@@ -64,36 +66,29 @@ fun LisuTransition(
 
 @Composable
 fun LisuToolBar(
-    title: String? = null,
-    modifier: Modifier = Modifier,
-    navController: NavHostController? = null,
-    elevation: Dp = AppBarDefaults.TopAppBarElevation,
-    actions: @Composable RowScope.() -> Unit = {}
-) = LisuToolBar(
-    modifier = modifier,
-    title = title,
-    elevation = elevation,
-    onNavigationIconClick = navController?.let { { it.navigateUp() } },
-    actions = actions
-)
-
-@Composable
-fun LisuToolBar(
     modifier: Modifier = Modifier,
     title: String? = null,
-    elevation: Dp = AppBarDefaults.TopAppBarElevation,
-    onNavigationIconClick: (() -> Unit)? = null,
-    actions: @Composable RowScope.() -> Unit = {}
+    transparent: Boolean = false,
+    onNavUp: (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {},
 ) = TopAppBar(
     title = {
-        title?.let { Text(text = it, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+        title?.let {
+            Text(text = it, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
     },
     modifier = modifier,
     contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
-    navigationIcon = onNavigationIconClick?.let {
-        { IconButton(onClick = { it() }) { Icon(Icons.Filled.ArrowBack, "back") } }
+    navigationIcon = onNavUp?.let {
+        {
+            IconButton(onClick = { it() }) {
+                Icon(Icons.Filled.ArrowBack, "back")
+            }
+        }
     },
-    actions = { CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) { actions() } },
-    backgroundColor = MaterialTheme.colors.surface,
-    elevation = elevation
+    actions = {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) { actions() }
+    },
+    backgroundColor = if (transparent) Color.Transparent else MaterialTheme.colors.surface,
+    elevation = if (transparent) 0.dp else AppBarDefaults.TopAppBarElevation,
 )

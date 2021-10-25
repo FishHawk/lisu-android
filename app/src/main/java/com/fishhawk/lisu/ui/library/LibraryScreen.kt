@@ -31,7 +31,7 @@ fun LibraryScreen(navController: NavHostController) {
 
 @Composable
 private fun ToolBar() {
-    LisuToolBar(stringResource(R.string.label_library)) {
+    LisuToolBar(title = stringResource(R.string.label_library)) {
         IconButton(onClick = { }) {
             Icon(Icons.Filled.Search, contentDescription = "search")
         }

@@ -82,7 +82,7 @@ fun HistoryScreen(navController: NavHostController) {
 
 @Composable
 private fun ToolBar(onAction: HistoryActionHandler) {
-    LisuToolBar(stringResource(R.string.label_history)) {
+    LisuToolBar(title = stringResource(R.string.label_history)) {
         val isOpen = remember { mutableStateOf(false) }
         IconButton(onClick = { isOpen.value = true }) {
             Icon(Icons.Filled.ClearAll, stringResource(R.string.menu_history_clear))
