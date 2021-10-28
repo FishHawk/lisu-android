@@ -19,6 +19,10 @@ class RemoteLibraryRepository(retrofit: Flow<Result<Retrofit>?>) :
             .map { it.copy(cover = processCover(it.providerId, it.id, it.cover)) }
     }
 
+    suspend fun getRandomManga(): Result<MangaDto> = resultWrap { server ->
+        server.getRandomManga()
+    }
+
     suspend fun createManga(
         providerId: String,
         mangaId: String

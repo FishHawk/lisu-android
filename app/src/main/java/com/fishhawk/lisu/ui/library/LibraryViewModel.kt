@@ -35,6 +35,10 @@ class LibraryViewModel @Inject constructor(
             }.flow.cachedIn(viewModelScope)
         }
 
+    suspend fun getRandomManga(): Result<MangaDto> {
+        return repository.getRandomManga()
+    }
+
     fun deleteManga(manga: MangaDto) = viewModelScope.launch {
         val result = repository.deleteManga(manga.providerId, manga.id)
         resultWarp(result) { source?.invalidate() }

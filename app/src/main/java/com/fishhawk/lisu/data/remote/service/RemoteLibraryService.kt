@@ -10,6 +10,9 @@ interface RemoteLibraryService {
         @Query("keywords") keywords: String
     ): List<MangaDto>
 
+    @GET("/library/random-manga")
+    suspend fun getRandomManga(): MangaDto
+
     @POST("/library/manga/{providerId}/{mangaId}")
     suspend fun createManga(
         @Path("providerId") providerId: String,
