@@ -20,17 +20,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.Provider
-import com.fishhawk.lisu.ui.activity.setArgument
+import com.fishhawk.lisu.data.remote.model.ProviderDto
+import com.fishhawk.lisu.ui.*
 import com.fishhawk.lisu.ui.base.*
-import com.fishhawk.lisu.ui.reader.navToReaderActivity
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 
@@ -61,7 +59,7 @@ internal sealed interface GalleryAction {
 @Composable
 fun GalleryScreen(navController: NavHostController) {
     navController.setArgument<MangaDto>("manga")
-    navController.setArgument<Provider>("provider")
+    navController.setArgument<ProviderDto>("provider")
 
     val context = LocalContext.current
 
@@ -72,22 +70,16 @@ fun GalleryScreen(navController: NavHostController) {
 
     val onAction: GalleryActionHandler = { action ->
         when (action) {
-            GalleryAction.NavUp -> navController.navigateUp()
-            GalleryAction.NavToEdit -> navController.navigate("edit")
-            is GalleryAction.NavToGlobalSearch -> {
-                navController.currentBackStackEntry?.arguments =
-                    bundleOf("keywords" to action.keywords)
-                navController.navigate("global-search")
-            }
-            is GalleryAction.NavToSearch -> {
-                navController.currentBackStackEntry?.arguments =
-                    bundleOf("keywords" to action.keywords)
-                navController.navigate("search/${detail.providerId}")
-            }
-            is GalleryAction.NavToReader -> {
-                action.apply {
-                    context.navToReaderActivity(detail, collectionId, chapterId, page)
-                }
+            GalleryAction.NavUp ->
+                navController.navigateUp()
+            GalleryAction.NavToEdit ->
+                navController.navToGalleryEdit()
+            is GalleryAction.NavToGlobalSearch ->
+                navController.navToGlobalSearch(action.keywords)
+            is GalleryAction.NavToSearch ->
+                navController.navToSearch(detail.providerId, action.keywords)
+            is GalleryAction.NavToReader -> with(action) {
+                context.navToReader(detail, collectionId, chapterId, page)
             }
 
             GalleryAction.ShareCover -> {

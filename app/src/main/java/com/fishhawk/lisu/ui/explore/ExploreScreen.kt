@@ -15,26 +15,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
-import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.data.remote.model.Provider
+import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.base.EmptyView
 import com.fishhawk.lisu.ui.base.StateView
 import com.fishhawk.lisu.ui.base.ViewState
+import com.fishhawk.lisu.ui.navToGlobalSearch
+import com.fishhawk.lisu.ui.navToProvider
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
-import kotlinx.coroutines.launch
 import java.util.*
 
 private typealias ExploreActionHandler = (ExploreAction) -> Unit
 
 private sealed interface ExploreAction {
     object NavToGlobalSearch : ExploreAction
-    data class NavToProvider(val provider: Provider) : ExploreAction
+    data class NavToProvider(val provider: ProviderDto) : ExploreAction
 
     object Reload : ExploreAction
 }
@@ -46,17 +45,10 @@ fun ExploreScreen(navController: NavHostController) {
     val providers by viewModel.providers.collectAsState()
     val lastUsedProvider by viewModel.lastUsedProvider.collectAsState()
 
-    val scope = rememberCoroutineScope()
     val onAction: ExploreActionHandler = { action ->
         when (action) {
-            ExploreAction.NavToGlobalSearch -> navController.navigate("global-search")
-            is ExploreAction.NavToProvider -> {
-                val provider = action.provider
-                scope.launch { PR.lastUsedProvider.set(provider.id) }
-                navController.currentBackStackEntry?.arguments =
-                    bundleOf("provider" to provider)
-                navController.navigate("provider/${provider.id}")
-            }
+            ExploreAction.NavToGlobalSearch -> navController.navToGlobalSearch()
+            is ExploreAction.NavToProvider -> navController.navToProvider(action.provider)
             ExploreAction.Reload -> viewModel.reload()
         }
     }
@@ -83,8 +75,8 @@ private fun ToolBar(onAction: ExploreActionHandler) {
 @Composable
 private fun ProviderList(
     viewState: ViewState,
-    providers: Map<String, List<Provider>>,
-    lastUsedProvider: Provider?,
+    providers: Map<String, List<ProviderDto>>,
+    lastUsedProvider: ProviderDto?,
     onAction: ExploreActionHandler
 ) {
     StateView(
@@ -121,7 +113,7 @@ private fun ProviderListHeader(label: String) {
 
 @Composable
 private fun ProviderListItem(
-    provider: Provider,
+    provider: ProviderDto,
     onAction: ExploreActionHandler
 ) {
     Row(

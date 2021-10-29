@@ -7,14 +7,14 @@ import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.database.model.SearchHistory
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.Provider
+import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.base.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 data class SearchResult(
-    val provider: Provider,
+    val provider: ProviderDto,
     val viewState: ViewState,
     val mangas: List<MangaDto> = emptyList()
 )

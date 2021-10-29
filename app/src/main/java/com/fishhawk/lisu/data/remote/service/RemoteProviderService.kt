@@ -3,13 +3,13 @@ package com.fishhawk.lisu.data.remote.service
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MetadataDto
-import com.fishhawk.lisu.data.remote.model.Provider
+import com.fishhawk.lisu.data.remote.model.ProviderDto
 import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface RemoteProviderService {
     @GET("/provider")
-    suspend fun listProvider(): List<Provider>
+    suspend fun listProvider(): List<ProviderDto>
 
     @GET("/provider/{providerId}/search")
     suspend fun search(

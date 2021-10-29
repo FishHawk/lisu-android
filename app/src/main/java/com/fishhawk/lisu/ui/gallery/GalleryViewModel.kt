@@ -1,13 +1,13 @@
 package com.fishhawk.lisu.ui.gallery
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.ui.base.FeedbackViewModel
 import com.fishhawk.lisu.ui.base.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,7 +24,7 @@ class GalleryViewModel @Inject constructor(
     private val remoteProviderRepository: RemoteProviderRepository,
     readingHistoryRepository: ReadingHistoryRepository,
     savedStateHandle: SavedStateHandle
-) : FeedbackViewModel() {
+) : ViewModel() {
 
     private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
     val viewState = _viewState.asStateFlow()

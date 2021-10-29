@@ -12,9 +12,9 @@ import com.fishhawk.lisu.BuildConfig
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.base.copyToClipboard
 import com.fishhawk.lisu.ui.base.openWebPage
+import com.fishhawk.lisu.ui.navToOpenSourceLicense
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
-
 
 @Composable
 fun AboutScreen(navController: NavHostController) {
@@ -57,6 +57,6 @@ private fun Content(navController: NavHostController) {
 
         TextPreference(
             title = stringResource(R.string.about_open_source_licenses)
-        ) { navController.navigate("open-source-license") }
+        ) { navController.navToOpenSourceLicense() }
     }
 }

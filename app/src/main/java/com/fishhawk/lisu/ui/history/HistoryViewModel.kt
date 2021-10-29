@@ -15,11 +15,16 @@ import javax.inject.Inject
 class HistoryViewModel @Inject constructor(
     private val repository: ReadingHistoryRepository
 ) : ViewModel() {
+
     val histories = repository.list()
         .map { list -> list.groupBy { it.date.toLocalDate() } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
-    fun delete(history: ReadingHistory) = viewModelScope.launch { repository.delete(history) }
+    fun deleteHistory(history: ReadingHistory) = viewModelScope.launch {
+        repository.delete(history)
+    }
 
-    fun clear() = viewModelScope.launch { repository.clear() }
+    fun clearHistory() = viewModelScope.launch {
+        repository.clear()
+    }
 }

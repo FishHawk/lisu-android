@@ -1,8 +1,5 @@
 package com.fishhawk.lisu.ui.reader
 
-import android.content.Context
-import android.content.Intent
-import androidx.core.os.bundleOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.R
@@ -12,49 +9,13 @@ import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.ChapterDto
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
-import com.fishhawk.lisu.ui.base.FeedbackViewModel
+import com.fishhawk.lisu.ui.base.BaseViewModel
+import com.fishhawk.lisu.ui.base.Effect
 import com.fishhawk.lisu.ui.base.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 import javax.inject.Inject
-
-fun Context.navToReaderActivity(
-    mangaId: String,
-    providerId: String,
-    collectionId: String,
-    chapterId: String,
-    page: Int = 0
-) {
-    val bundle = bundleOf(
-        "mangaId" to mangaId,
-        "providerId" to providerId,
-        "collectionId" to collectionId,
-        "chapterId" to chapterId,
-        "page" to page
-    )
-    val intent = Intent(this, ReaderActivity::class.java)
-    intent.putExtras(bundle)
-    startActivity(intent)
-}
-
-fun Context.navToReaderActivity(
-    detail: MangaDetailDto,
-    collectionId: String,
-    chapterId: String,
-    page: Int
-) {
-    val bundle = bundleOf(
-        "detail" to detail,
-        "collectionId" to collectionId,
-        "chapterId" to chapterId,
-        "page" to page
-    )
-    val intent = Intent(this, ReaderActivity::class.java)
-    intent.putExtras(bundle)
-    startActivity(intent)
-}
 
 class ReaderChapter(
     val collectionId: String,
@@ -68,13 +29,17 @@ class ReaderChapter(
     var images: List<String> = listOf()
 }
 
+sealed interface ReaderEffect : Effect {
+    data class Message(val redId: Int) : ReaderEffect
+}
+
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
     private val readingHistoryRepository: ReadingHistoryRepository,
     private val savedStateHandle: SavedStateHandle
-) : FeedbackViewModel() {
+) : BaseViewModel<ReaderEffect>() {
 
     private val mangaId =
         savedStateHandle.get<MangaDetailDto>("detail")?.id
@@ -210,10 +175,16 @@ class ReaderViewModel @Inject constructor(
         }
     }
 
+    private fun sendMessage(resId: Int) {
+        viewModelScope.launch {
+            sendEffect(ReaderEffect.Message(resId))
+        }
+    }
+
     fun openNextChapter() {
         val pointer = chapterPointer.value
         val nextChapter = pointer.nextChapter
-            ?: return feed(R.string.toast_no_next_chapter)
+            ?: return sendMessage(R.string.toast_no_next_chapter)
         chapterPointer.value =
             ReaderChapterPointer(nextChapter.index, 0)
         loadChapterPointer()
@@ -222,7 +193,7 @@ class ReaderViewModel @Inject constructor(
     fun openPrevChapter() {
         val pointer = chapterPointer.value
         val prevChapter = pointer.prevChapter
-            ?: return feed(R.string.toast_no_prev_chapter)
+            ?: return sendMessage(R.string.toast_no_prev_chapter)
         chapterPointer.value =
             ReaderChapterPointer(prevChapter.index, 0)
         loadChapterPointer()
@@ -231,7 +202,7 @@ class ReaderViewModel @Inject constructor(
     fun moveToNextChapter() {
         val pointer = chapterPointer.value
         val nextChapter = pointer.nextChapter
-            ?: return feed(R.string.toast_no_next_chapter)
+            ?: return sendMessage(R.string.toast_no_next_chapter)
 
         if (nextChapter.state is ViewState.Loaded) {
             chapterPointer.value =
@@ -245,7 +216,7 @@ class ReaderViewModel @Inject constructor(
     fun moveToPrevChapter() {
         val pointer = chapterPointer.value
         val prevChapter = pointer.prevChapter
-            ?: return feed(R.string.toast_no_prev_chapter)
+            ?: return sendMessage(R.string.toast_no_prev_chapter)
 
         if (prevChapter.state is ViewState.Loaded) {
             chapterPointer.value =

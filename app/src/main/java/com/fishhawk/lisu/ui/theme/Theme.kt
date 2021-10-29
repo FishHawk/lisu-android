@@ -25,6 +25,8 @@ import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.TopAppBar
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
+val LisuIcons = Icons.Outlined
+
 @Composable
 fun LisuTheme(content: @Composable () -> Unit) {
     val theme by PR.theme.collectAsState()

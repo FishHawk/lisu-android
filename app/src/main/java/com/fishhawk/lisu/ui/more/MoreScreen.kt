@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.ui.*
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.TextFieldWithSuggestions
@@ -31,7 +32,6 @@ private sealed interface MoreAction {
     object NavToSettingReader : MoreAction
     object NavToSettingAdvanced : MoreAction
     object NavToAbout : MoreAction
-
     data class UpdateAddress(val address: String) : MoreAction
     data class DeleteSuggestion(val address: String) : MoreAction
 }
@@ -41,25 +41,18 @@ fun MoreScreen(navController: NavHostController) {
     val viewModel = hiltViewModel<MoreViewModel>()
     val address by viewModel.address.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
+
     val onAction: MoreActionHandler = { action ->
         when (action) {
-            MoreAction.NavToSettingGeneral ->
-                navController.navigate("setting-general")
-            MoreAction.NavToSettingReader ->
-                navController.navigate("setting-reader")
-            MoreAction.NavToSettingAdvanced ->
-                navController.navigate("setting-advanced")
-            MoreAction.NavToAbout ->
-                navController.navigate("about")
-
-            is MoreAction.UpdateAddress -> {
-                viewModel.updateAddress(action.address)
-            }
-            is MoreAction.DeleteSuggestion -> {
-                viewModel.deleteSuggestion(action.address)
-            }
+            MoreAction.NavToSettingGeneral -> navController.navToSettingGeneral()
+            MoreAction.NavToSettingReader -> navController.navToSettingReader()
+            MoreAction.NavToSettingAdvanced -> navController.navToSettingAdvanced()
+            MoreAction.NavToAbout -> navController.navToAbout()
+            is MoreAction.UpdateAddress -> viewModel.updateAddress(action.address)
+            is MoreAction.DeleteSuggestion -> viewModel.deleteSuggestion(action.address)
         }
     }
+
     Scaffold(
         topBar = { LisuToolBar(title = stringResource(R.string.label_more)) },
         content = { LisuTransition { Content(address, suggestions, onAction) } }

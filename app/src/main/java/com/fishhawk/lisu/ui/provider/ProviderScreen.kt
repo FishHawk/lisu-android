@@ -12,7 +12,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
@@ -20,9 +19,11 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.lisu.data.datastore.BoardFilter
 import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.Provider
-import com.fishhawk.lisu.ui.activity.setArgument
+import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
+import com.fishhawk.lisu.ui.navToGallery
+import com.fishhawk.lisu.ui.navToSearch
+import com.fishhawk.lisu.ui.setArgument
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.google.accompanist.flowlayout.FlowRow
@@ -49,7 +50,7 @@ internal sealed interface ProviderAction {
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ProviderScreen(navController: NavHostController) {
-    navController.setArgument<Provider>("provider")
+    navController.setArgument<ProviderDto>("provider")
 
     val viewModel = hiltViewModel<ProviderViewModel>()
     val boards = viewModel.boards
@@ -58,16 +59,8 @@ fun ProviderScreen(navController: NavHostController) {
     val onAction: ProviderActionHandler = { action ->
         when (action) {
             ProviderAction.NavUp -> navController.navigateUp()
-            ProviderAction.NavToSearch -> {
-                navController.currentBackStackEntry?.arguments =
-                    bundleOf("providerId" to viewModel.provider.id)
-                navController.navigate("search/${viewModel.provider.id}")
-            }
-            is ProviderAction.NavToGallery -> with(action) {
-                navController.currentBackStackEntry?.arguments =
-                    bundleOf("manga" to manga)
-                navController.navigate("gallery/${manga.id}")
-            }
+            ProviderAction.NavToSearch -> navController.navToSearch(viewModel.provider.id)
+            is ProviderAction.NavToGallery -> navController.navToGallery(action.manga)
 
             is ProviderAction.AddToLibrary -> viewModel.addToLibrary(action.manga)
             is ProviderAction.RemoveFromLibrary -> viewModel.removeFromLibrary(action.manga)

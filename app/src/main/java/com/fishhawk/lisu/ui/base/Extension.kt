@@ -16,7 +16,6 @@ import androidx.core.graphics.drawable.toBitmap
 import coil.imageLoader
 import coil.request.ImageRequest
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.ui.activity.BaseActivity
 import java.io.File
 import java.io.FileOutputStream
 
@@ -127,7 +126,7 @@ fun Context.shareImage(url: String, filename: String) {
     imageLoader.enqueue(request)
 }
 
-private fun Context.toast(message: String) {
+fun Context.toast(message: String) {
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 }
 

@@ -11,17 +11,15 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.Provider
-import com.fishhawk.lisu.ui.activity.setArgument
-import com.fishhawk.lisu.ui.activity.setString
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
+import com.fishhawk.lisu.ui.navToGallery
+import com.fishhawk.lisu.ui.setString
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.TextFieldWithSuggestions
@@ -39,20 +37,16 @@ private sealed interface SearchAction {
 @Composable
 fun SearchScreen(navController: NavHostController) {
     navController.setString("keywords")
-    navController.setArgument<Provider>("provider")
 
     val viewModel = hiltViewModel<SearchViewModel>()
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
     val mangaList = viewModel.mangaList.collectAsLazyPagingItems()
+
     val onAction: SearchActionHandler = { action ->
         when (action) {
             SearchAction.NavUp -> navController.navigateUp()
-            is SearchAction.NavToGallery -> navController.apply {
-                currentBackStackEntry?.arguments =
-                    bundleOf("manga" to action.manga)
-                navigate("gallery/${action.manga.id}")
-            }
+            is SearchAction.NavToGallery -> navController.navToGallery(action.manga)
             is SearchAction.Search -> viewModel.search(action.keywords)
             is SearchAction.DeleteSuggestion -> viewModel.deleteSuggestion(action.keywords)
             is SearchAction.OpenSheet -> Unit

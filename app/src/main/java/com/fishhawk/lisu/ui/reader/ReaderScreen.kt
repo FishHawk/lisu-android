@@ -1,10 +1,5 @@
 package com.fishhawk.lisu.ui.reader
 
-import android.content.pm.ActivityInfo
-import android.os.Bundle
-import android.view.WindowManager
-import android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
@@ -13,80 +8,20 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
-import com.fishhawk.lisu.data.datastore.ReaderOrientation
 import com.fishhawk.lisu.data.datastore.collectAsState
-import com.fishhawk.lisu.ui.activity.BaseActivity
 import com.fishhawk.lisu.ui.base.StateView
+import com.fishhawk.lisu.ui.base.toast
 import com.fishhawk.lisu.ui.reader.viewer.ListViewer
 import com.fishhawk.lisu.ui.reader.viewer.PagerViewer
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
-import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-
-@AndroidEntryPoint
-class ReaderActivity : BaseActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        PR.readerOrientation.flow
-            .onEach {
-                val newOrientation = when (it) {
-                    ReaderOrientation.Portrait -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    ReaderOrientation.Landscape -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                }
-                if (newOrientation != requestedOrientation) requestedOrientation = newOrientation
-            }
-            .launchIn(lifecycleScope)
-
-        PR.keepScreenOn.flow
-            .onEach { setFlag(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, it) }
-            .launchIn(lifecycleScope)
-
-        combine(
-            PR.enableCustomBrightness.flow,
-            PR.customBrightness.flow
-        ) { isEnabled, brightness ->
-            val attrBrightness =
-                if (isEnabled) brightness.coerceIn(0f, 1f)
-                else BRIGHTNESS_OVERRIDE_NONE
-            window.attributes = window.attributes.apply { screenBrightness = attrBrightness }
-        }.launchIn(lifecycleScope)
-
-        setContent {
-            LisuTheme {
-                ReaderScreen()
-            }
-        }
-    }
-}
-
-//                ReaderPageSheet(this, object : ReaderPageSheet.Listener {
-//                    override fun onRefresh() {
-//                        reader.refreshPage(position)
-//                    }
-//
-//                    override fun onSave() {
-//                        val prefix = viewModel.makeImageFilenamePrefix()
-//                            ?: return toast(R.string.toast_chapter_not_loaded)
-//                        saveImage(url, "$prefix-$position")
-//                    }
-//
-//                    override fun onShare() {
-//                        val prefix = viewModel.makeImageFilenamePrefix()
-//                            ?: return toast(R.string.toast_chapter_not_loaded)
-//                        lifecycleScope.shareImage(this, url, "$prefix-$position")
-//                    }
-//                }).show()
 
 internal typealias ReaderActionHandler = (ReaderAction) -> Unit
 
@@ -103,12 +38,13 @@ internal sealed interface ReaderAction {
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
 @Composable
-private fun ReaderScreen() {
+fun ReaderScreen() {
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val viewModel = viewModel<ReaderViewModel>()
-
     val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     var currentBottomSheet by remember { mutableStateOf<ReaderAction?>(null) }
+
+    val viewModel = viewModel<ReaderViewModel>()
 
     val onAction: ReaderActionHandler = { action ->
         when (action) {
@@ -121,8 +57,22 @@ private fun ReaderScreen() {
                 sheetState.show()
             }
             ReaderAction.SavePage -> {
+//                val prefix = viewModel.makeImageFilenamePrefix()
+//                    ?: return toast(R.string.toast_chapter_not_loaded)
+//                saveImage(url, "$prefix-$position")
             }
             ReaderAction.SharePage -> {
+//                val prefix = viewModel.makeImageFilenamePrefix()
+//                    ?: return toast(R.string.toast_chapter_not_loaded)
+//                lifecycleScope.shareImage(this, url, "$prefix-$position")
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is ReaderEffect.Message -> context.toast(effect.redId)
             }
         }
     }

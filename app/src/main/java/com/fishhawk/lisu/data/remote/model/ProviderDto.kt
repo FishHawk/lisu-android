@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 typealias BoardModel = Map<String, List<String>>
 
 @Parcelize
-data class Provider(
+data class ProviderDto(
     val id: String,
     val lang: String,
     var icon: String?,

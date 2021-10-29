@@ -1,4 +1,4 @@
-package com.fishhawk.lisu.ui.activity
+package com.fishhawk.lisu.ui.base
 
 import android.os.Bundle
 import android.view.WindowManager

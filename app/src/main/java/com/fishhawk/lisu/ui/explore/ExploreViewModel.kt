@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
-import com.fishhawk.lisu.data.remote.model.Provider
+import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.base.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -19,7 +19,7 @@ class ExploreViewModel @Inject constructor(
     private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
     val viewState = _viewState.asStateFlow()
 
-    private val _providers = MutableStateFlow(emptyList<Provider>())
+    private val _providers = MutableStateFlow(emptyList<ProviderDto>())
 
     val providers = _providers
         .map { list -> list.groupBy { it.lang } }

@@ -18,15 +18,16 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.ui.activity.setString
 import com.fishhawk.lisu.ui.base.LoadingItem
 import com.fishhawk.lisu.ui.base.MangaListCard
 import com.fishhawk.lisu.ui.base.ViewState
+import com.fishhawk.lisu.ui.navToGallery
+import com.fishhawk.lisu.ui.navToSearch
+import com.fishhawk.lisu.ui.setString
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.TextFieldWithSuggestions
@@ -53,16 +54,10 @@ fun GlobalSearchScreen(navController: NavHostController) {
     val onAction: GlobalSearchActionHandler = { action ->
         when (action) {
             GlobalSearchAction.NavUp -> navController.navigateUp()
-            is GlobalSearchAction.NavToGallery -> navController.apply {
-                currentBackStackEntry?.arguments =
-                    bundleOf("manga" to action.manga)
-                navigate("gallery/${action.manga.id}")
-            }
-            is GlobalSearchAction.NavToProviderSearch -> navController.apply {
-                currentBackStackEntry?.arguments =
-                    bundleOf("keywords" to viewModel.keywords.value)
-                navigate("search/${action.providerId}")
-            }
+            is GlobalSearchAction.NavToGallery ->
+                navController.navToGallery(action.manga)
+            is GlobalSearchAction.NavToProviderSearch ->
+                navController.navToSearch(action.providerId, keywords)
             is GlobalSearchAction.Search -> viewModel.search(action.keywords)
         }
     }

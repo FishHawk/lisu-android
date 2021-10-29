@@ -1,14 +1,14 @@
 package com.fishhawk.lisu.ui.provider
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.Provider
-import com.fishhawk.lisu.ui.base.FeedbackViewModel
+import com.fishhawk.lisu.data.remote.model.ProviderDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ProviderViewModel @Inject constructor(
@@ -26,9 +25,9 @@ class ProviderViewModel @Inject constructor(
     private val remoteProviderRepository: RemoteProviderRepository,
     private val providerBrowseHistoryRepository: ProviderBrowseHistoryRepository,
     savedStateHandle: SavedStateHandle
-) : FeedbackViewModel() {
+) : ViewModel() {
 
-    val provider: Provider = savedStateHandle.get("provider")!!
+    val provider: ProviderDto = savedStateHandle.get("provider")!!
 
     val boards = provider.boardModels.keys.toList()
 

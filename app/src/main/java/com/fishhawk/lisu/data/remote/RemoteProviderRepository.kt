@@ -3,7 +3,7 @@ package com.fishhawk.lisu.data.remote
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MetadataDto
-import com.fishhawk.lisu.data.remote.model.Provider
+import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.data.remote.service.RemoteProviderService
 import kotlinx.coroutines.flow.Flow
 import okhttp3.RequestBody
@@ -15,7 +15,7 @@ class RemoteProviderRepository(retrofit: Flow<Result<Retrofit>?>) :
 
     override val serviceType = RemoteProviderService::class.java
 
-    suspend fun listProvider(): Result<List<Provider>> = resultWrap {
+    suspend fun listProvider(): Result<List<ProviderDto>> = resultWrap {
         it.listProvider().map { info ->
             info.copy(icon = "${url}provider/${info.id}/icon")
         }

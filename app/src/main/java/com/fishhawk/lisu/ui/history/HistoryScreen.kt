@@ -6,8 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ClearAll
+import androidx.compose.material.icons.outlined.ClearAll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,7 +16,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
@@ -25,7 +23,9 @@ import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.EmptyView
 import com.fishhawk.lisu.ui.base.MangaCover
-import com.fishhawk.lisu.ui.reader.navToReaderActivity
+import com.fishhawk.lisu.ui.navToGallery
+import com.fishhawk.lisu.ui.navToReader
+import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import java.time.LocalDate
@@ -37,9 +37,8 @@ private typealias HistoryActionHandler = (HistoryAction) -> Unit
 private sealed interface HistoryAction {
     data class NavToGallery(val history: ReadingHistory) : HistoryAction
     data class NavToReader(val history: ReadingHistory) : HistoryAction
-
-    data class Delete(val history: ReadingHistory) : HistoryAction
-    object Clear : HistoryAction
+    data class DeleteHistory(val history: ReadingHistory) : HistoryAction
+    object ClearHistory : HistoryAction
 }
 
 @Composable
@@ -48,29 +47,26 @@ fun HistoryScreen(navController: NavHostController) {
 
     val viewModel = hiltViewModel<HistoryViewModel>()
     val histories by viewModel.histories.collectAsState()
+
     val onAction: HistoryActionHandler = { action ->
         when (action) {
             is HistoryAction.NavToGallery -> with(action.history) {
-                navController.currentBackStackEntry?.arguments =
-                    bundleOf(
-                        "manga" to MangaDto(
-                            providerId = providerId,
-                            id = mangaId,
-                            cover = cover,
-                            title = title,
-                            authors = authors?.let { listOf(it) }
-                        )
-                    )
-                navController.navigate("gallery/${mangaId}")
+                navController.navToGallery(MangaDto(
+                    providerId = providerId,
+                    id = mangaId,
+                    cover = cover,
+                    title = title,
+                    authors = authors?.let { listOf(it) }
+                ))
             }
             is HistoryAction.NavToReader -> with(action.history) {
-                context.navToReaderActivity(
+                context.navToReader(
                     mangaId, providerId,
                     collectionId, chapterId, page
                 )
             }
-            is HistoryAction.Delete -> viewModel.delete(action.history)
-            HistoryAction.Clear -> viewModel.clear()
+            is HistoryAction.DeleteHistory -> viewModel.deleteHistory(action.history)
+            HistoryAction.ClearHistory -> viewModel.clearHistory()
         }
     }
 
@@ -83,11 +79,16 @@ fun HistoryScreen(navController: NavHostController) {
 @Composable
 private fun ToolBar(onAction: HistoryActionHandler) {
     LisuToolBar(title = stringResource(R.string.label_history)) {
-        val isOpen = remember { mutableStateOf(false) }
-        IconButton(onClick = { isOpen.value = true }) {
-            Icon(Icons.Filled.ClearAll, stringResource(R.string.menu_history_clear))
+        var isOpen by remember { mutableStateOf(false) }
+        IconButton(onClick = { isOpen = true }) {
+            Icon(LisuIcons.ClearAll, stringResource(R.string.menu_history_clear))
+            if (isOpen) {
+                ClearHistoryDialog(
+                    onDismiss = { isOpen = false },
+                    onConfirm = { onAction(HistoryAction.ClearHistory) }
+                )
+            }
         }
-        ClearHistoryDialog(isOpen, onAction)
     }
 }
 
@@ -135,7 +136,7 @@ private fun HistoryListItem(
     val dismissState = rememberDismissState(
         confirmStateChange = {
             (it == DismissValue.DismissedToStart).also { confirmed ->
-                if (confirmed) onAction(HistoryAction.Delete(history))
+                if (confirmed) onAction(HistoryAction.DeleteHistory(history))
             }
         }
     )
@@ -197,18 +198,17 @@ private fun HistoryListItem(
 
 @Composable
 private fun ClearHistoryDialog(
-    isOpen: MutableState<Boolean>,
-    onAction: HistoryActionHandler
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
 ) {
-    if (!isOpen.value) return
     AlertDialog(
-        onDismissRequest = { isOpen.value = false },
+        onDismissRequest = { onDismiss() },
         title = { Text(text = stringResource(R.string.dialog_clear_history)) },
         confirmButton = {
             TextButton(
                 onClick = {
-                    onAction(HistoryAction.Clear)
-                    isOpen.value = false
+                    onConfirm()
+                    onDismiss()
                 }
             ) { Text(stringResource(R.string.dialog_clear_history_positive)) }
         }
