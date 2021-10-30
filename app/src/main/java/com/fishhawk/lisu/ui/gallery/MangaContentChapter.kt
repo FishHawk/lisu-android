@@ -3,10 +3,9 @@ package com.fishhawk.lisu.ui.gallery
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Sort
-import androidx.compose.material.icons.filled.ViewList
-import androidx.compose.material.icons.filled.ViewModule
+import androidx.compose.material.icons.outlined.Sort
+import androidx.compose.material.icons.outlined.ViewList
+import androidx.compose.material.icons.outlined.ViewModule
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -25,6 +24,7 @@ import com.fishhawk.lisu.data.datastore.ChapterDisplayOrder
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.setNext
 import com.fishhawk.lisu.data.remote.model.ChapterDto
+import com.fishhawk.lisu.ui.theme.LisuIcons
 import kotlinx.coroutines.launch
 
 @Composable
@@ -73,12 +73,12 @@ private fun MangaContentChapterHeader() {
         val mode by PR.chapterDisplayMode.collectAsState()
         val scope = rememberCoroutineScope()
         IconButton(onClick = { scope.launch { PR.chapterDisplayOrder.setNext() } }) {
-            Icon(Icons.Default.Sort, contentDescription = "Order")
+            Icon(LisuIcons.Sort, contentDescription = "Order")
         }
         IconButton(onClick = { scope.launch { PR.chapterDisplayMode.setNext() } }) {
             val icon = when (mode) {
-                ChapterDisplayMode.Grid -> Icons.Default.ViewModule
-                ChapterDisplayMode.Linear -> Icons.Default.ViewList
+                ChapterDisplayMode.Grid -> LisuIcons.ViewModule
+                ChapterDisplayMode.Linear -> LisuIcons.ViewList
             }
             Icon(icon, contentDescription = "Display mode")
         }

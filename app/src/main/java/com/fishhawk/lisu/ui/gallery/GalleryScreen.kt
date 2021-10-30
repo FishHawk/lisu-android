@@ -11,8 +11,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.AutoStories
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +31,7 @@ import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.*
 import com.fishhawk.lisu.ui.base.*
+import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 
@@ -155,24 +158,20 @@ private fun ToolBar(
             onNavUp = { onAction(GalleryAction.NavUp) }
         ) {
             if (inLibrary) {
-                IconButton(onClick = { onAction(GalleryAction.NavToEdit) }) {
-                    Icon(Icons.Default.Edit, contentDescription = "edit")
-                }
                 IconButton(onClick = { onAction(GalleryAction.RemoveFromLibrary) }) {
-                    Icon(Icons.Default.Favorite, contentDescription = "remove from library")
+                    Icon(LisuIcons.Favorite, contentDescription = "remove from library")
                 }
             } else {
                 IconButton(onClick = { onAction(GalleryAction.AddToLibrary) }) {
-                    Icon(Icons.Default.FavoriteBorder, contentDescription = "add to library")
+                    Icon(LisuIcons.FavoriteBorder, contentDescription = "add to library")
                 }
             }
             IconButton(onClick = { onAction(GalleryAction.Share) }) {
-                Icon(Icons.Default.Share, contentDescription = "share")
+                Icon(LisuIcons.Share, contentDescription = "share")
             }
         }
     }
 }
-
 
 @Composable
 private fun MangaDetail(
@@ -196,26 +195,26 @@ private fun MangaDetail(
             onRetry = { onAction(GalleryAction.Reload) }
         ) {
             Column(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Row {
                     if (detail.inLibrary)
                         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.primary) {
                             MangaActionButton(
-                                icon = Icons.Default.Favorite,
+                                icon = LisuIcons.Favorite,
                                 text = "In library"
                             ) { onAction(GalleryAction.RemoveFromLibrary) }
                         }
                     else CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         MangaActionButton(
-                            icon = Icons.Default.FavoriteBorder,
+                            icon = LisuIcons.FavoriteBorder,
                             text = "Add to library"
                         ) { onAction(GalleryAction.AddToLibrary) }
                     }
                     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                         MangaActionButton(
-                            icon = Icons.Default.AutoStories,
+                            icon = LisuIcons.AutoStories,
                             text = if (history == null) "Read" else "Continue"
                         ) {
                             onAction(
@@ -240,12 +239,7 @@ private fun MangaDetail(
                     MangaTagGroups(tags,
                         onTagClick = { onAction(GalleryAction.NavToSearch(it)) },
                         onTagLongClick = {
-                            onAction(
-                                GalleryAction.Copy(
-                                    it,
-                                    R.string.toast_manga_tag_saved
-                                )
-                            )
+                            onAction(GalleryAction.Copy(it, R.string.toast_manga_tag_saved))
                         }
                     )
                 }

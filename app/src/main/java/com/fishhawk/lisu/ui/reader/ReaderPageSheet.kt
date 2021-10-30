@@ -7,31 +7,31 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.SaveAlt
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.SaveAlt
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.ui.theme.LisuIcons
 
 @Preview
 @Composable
 internal fun ReaderPageSheet(onAction: ReaderActionHandler) {
     Column(modifier = Modifier.fillMaxWidth()) {
         SheetListItem(
-            icon = Icons.Filled.Refresh,
+            icon = LisuIcons.Refresh,
             title = stringResource(R.string.page_action_refresh)
         ) { }
         SheetListItem(
-            icon = Icons.Default.SaveAlt,
+            icon = LisuIcons.SaveAlt,
             title = stringResource(R.string.page_action_save)
         ) { onAction(ReaderAction.SharePage) }
         SheetListItem(
-            icon = Icons.Default.Share,
+            icon = LisuIcons.Share,
             title = stringResource(R.string.page_action_share)
         ) { onAction(ReaderAction.SharePage) }
     }

@@ -4,9 +4,8 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
+import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 
 internal val MangaHeaderHeight = 250.dp
@@ -43,26 +43,36 @@ internal fun MangaHeader(
             painter = painter,
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            alpha = 0.2f
+            alpha = 0.3f
         )
-        Column(
-            modifier = Modifier.background(
-                Brush.verticalGradient(
-                    colors = listOf(Color.Transparent, MaterialTheme.colors.background),
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .fillMaxWidth()
+                .fillMaxHeight(0.4f)
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            MaterialTheme.colors.background
+                        ),
+                    )
                 )
-            )
-        ) {
+        )
+
+        Column {
             LisuToolBar(
                 onNavUp = { onAction(GalleryAction.NavUp) },
                 transparent = true,
             ) {
                 if (detail.inLibrary) {
                     IconButton(onClick = { onAction(GalleryAction.NavToEdit) }) {
-                        Icon(Icons.Default.Edit, contentDescription = "edit")
+                        Icon(LisuIcons.Edit, contentDescription = "edit")
                     }
                 }
                 IconButton(onClick = { onAction(GalleryAction.Share) }) {
-                    Icon(Icons.Default.Share, contentDescription = "share")
+                    Icon(LisuIcons.Share, contentDescription = "share")
                 }
             }
             Row(
@@ -89,7 +99,6 @@ internal fun MangaHeader(
         }
     }
 }
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
