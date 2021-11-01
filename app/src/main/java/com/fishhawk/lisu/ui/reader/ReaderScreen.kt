@@ -114,26 +114,23 @@ fun ReaderScreen() {
                         var startPage by remember(pointer) {
                             mutableStateOf(pointer.startPage.coerceAtMost(size - 1))
                         }
-
-                        if (mode == ReaderMode.Continuous) {
-                            readerState = ViewerState.List(
+                        readerState =
+                            if (mode == ReaderMode.Continuous) ViewerState.List(
                                 rememberSaveable(pointer, mode, saver = LazyListState.Saver) {
                                     LazyListState(firstVisibleItemIndex = startPage)
                                 }
                             ).also {
                                 ListViewer(it, pointer, onAction)
                             }
-                        } else {
-                            readerState = ViewerState.Pager(
+                            else ViewerState.Pager(
                                 rememberSaveable(pointer, mode, saver = PagerState.Saver) {
                                     PagerState(currentPage = startPage)
                                 }
                             ).also {
                                 PagerViewer(it, pointer, mode == ReaderMode.Rtl, onAction)
                             }
-                        }
-                        LaunchedEffect(readerState!!.position) {
-                            readerState!!.position.let {
+                        LaunchedEffect(readerState) {
+                            snapshotFlow { readerState!!.position }.collect {
                                 startPage = it
                                 viewModel.updateReadingHistory(it)
                                 pointer.currChapter.images
