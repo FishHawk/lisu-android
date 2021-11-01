@@ -80,7 +80,7 @@ fun GalleryScreen(navController: NavHostController) {
             is GalleryAction.NavToGlobalSearch ->
                 navController.navToGlobalSearch(action.keywords)
             is GalleryAction.NavToSearch ->
-                navController.navToSearch(detail.providerId, action.keywords)
+                navController.navToProviderSearch(detail.providerId, action.keywords)
             is GalleryAction.NavToReader -> with(action) {
                 context.navToReader(detail, collectionId, chapterId, page)
             }

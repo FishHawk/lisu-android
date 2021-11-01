@@ -13,7 +13,7 @@ class RemoteLibraryRepository(retrofit: Flow<Result<Retrofit>?>) :
 
     suspend fun search(
         page: Int,
-        keywords: String
+        keywords: String = ""
     ): Result<List<MangaDto>> = resultWrap { server ->
         server.search(page, keywords)
             .map { it.copy(cover = processCover(it.providerId, it.id, it.cover)) }

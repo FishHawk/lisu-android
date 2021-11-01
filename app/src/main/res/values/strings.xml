@@ -128,7 +128,7 @@
     <!-- menu -->
     <string name="menu_search">Search</string>
     <string name="menu_search_hint">Search…</string>
-    <string name="menu_search_global">Search global</string>
+    <string name="menu_search_library_hint">Search library…</string>
     <string name="menu_search_global_hint">Search global…</string>
     <string name="menu_display_mode">Display mode</string>
     <string name="menu_filter">Filter</string>

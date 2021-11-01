@@ -26,7 +26,7 @@ import com.fishhawk.lisu.ui.base.LoadingItem
 import com.fishhawk.lisu.ui.base.MangaListCard
 import com.fishhawk.lisu.ui.base.ViewState
 import com.fishhawk.lisu.ui.navToGallery
-import com.fishhawk.lisu.ui.navToSearch
+import com.fishhawk.lisu.ui.navToProviderSearch
 import com.fishhawk.lisu.ui.setString
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
@@ -37,7 +37,6 @@ private typealias GlobalSearchActionHandler = (GlobalSearchAction) -> Unit
 
 private sealed interface GlobalSearchAction {
     object NavUp : GlobalSearchAction
-
     data class NavToGallery(val manga: MangaDto) : GlobalSearchAction
     data class NavToProviderSearch(val providerId: String) : GlobalSearchAction
     data class Search(val keywords: String) : GlobalSearchAction
@@ -57,7 +56,7 @@ fun GlobalSearchScreen(navController: NavHostController) {
             is GlobalSearchAction.NavToGallery ->
                 navController.navToGallery(action.manga)
             is GlobalSearchAction.NavToProviderSearch ->
-                navController.navToSearch(action.providerId, keywords)
+                navController.navToProviderSearch(action.providerId, keywords)
             is GlobalSearchAction.Search -> viewModel.search(action.keywords)
         }
     }

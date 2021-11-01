@@ -22,7 +22,7 @@ import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.navToGallery
-import com.fishhawk.lisu.ui.navToSearch
+import com.fishhawk.lisu.ui.navToProviderSearch
 import com.fishhawk.lisu.ui.setArgument
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
@@ -59,7 +59,7 @@ fun ProviderScreen(navController: NavHostController) {
     val onAction: ProviderActionHandler = { action ->
         when (action) {
             ProviderAction.NavUp -> navController.navigateUp()
-            ProviderAction.NavToSearch -> navController.navToSearch(viewModel.provider.id)
+            ProviderAction.NavToSearch -> navController.navToProviderSearch(viewModel.provider.id)
             is ProviderAction.NavToGallery -> navController.navToGallery(action.manga)
 
             is ProviderAction.AddToLibrary -> viewModel.addToLibrary(action.manga)

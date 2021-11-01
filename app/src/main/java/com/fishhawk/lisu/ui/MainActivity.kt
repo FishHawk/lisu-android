@@ -13,7 +13,8 @@ import androidx.compose.material.icons.filled.CollectionsBookmark
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -37,9 +38,10 @@ import com.fishhawk.lisu.ui.gallery.GalleryScreen
 import com.fishhawk.lisu.ui.globalsearch.GlobalSearchScreen
 import com.fishhawk.lisu.ui.history.HistoryScreen
 import com.fishhawk.lisu.ui.library.LibraryScreen
+import com.fishhawk.lisu.ui.library.LibrarySearchScreen
 import com.fishhawk.lisu.ui.more.*
 import com.fishhawk.lisu.ui.provider.ProviderScreen
-import com.fishhawk.lisu.ui.search.SearchScreen
+import com.fishhawk.lisu.ui.provider.ProviderSearchScreen
 import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.google.accompanist.insets.ui.BottomNavigation
 import com.google.accompanist.insets.ui.Scaffold
@@ -102,11 +104,11 @@ private fun MainNavHost(
         composable(Screen.Explore.route) { ExploreScreen(navController) }
         composable(Screen.More.route) { MoreScreen(navController) }
 
-        composable("library-search") { LibraryScreen(navController) }
+        composable("provider/{providerId}") { ProviderScreen(navController) }
 
         composable("global-search") { GlobalSearchScreen(navController) }
-        composable("provider/{providerId}") { ProviderScreen(navController) }
-        composable("search/{providerId}") { SearchScreen(navController) }
+        composable("library-search") { LibrarySearchScreen(navController) }
+        composable("provider-search/{providerId}") { ProviderSearchScreen(navController) }
 
         composable("setting-general") { SettingGeneralScreen(navController) }
         composable("setting-reader") { SettingReaderScreen(navController) }

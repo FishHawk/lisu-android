@@ -10,6 +10,12 @@ import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.ProviderDto
 
+fun NavHostController.navToLibrarySearch(keywords: String? = null) {
+    currentBackStackEntry?.arguments =
+        bundleOf("keywords" to keywords)
+    navigate("library-search")
+}
+
 fun NavHostController.navToProvider(provider: ProviderDto) {
     currentBackStackEntry?.arguments =
         bundleOf("provider" to provider)
@@ -17,10 +23,10 @@ fun NavHostController.navToProvider(provider: ProviderDto) {
     PR.lastUsedProvider.setBlocking(provider.id)
 }
 
-fun NavHostController.navToSearch(providerId: String, keywords: String? = null) {
+fun NavHostController.navToProviderSearch(providerId: String, keywords: String? = null) {
     currentBackStackEntry?.arguments =
         bundleOf("keywords" to keywords)
-    navigate("search/${providerId}")
+    navigate("provider-search/${providerId}")
 }
 
 fun NavHostController.navToGlobalSearch(keywords: String? = null) {

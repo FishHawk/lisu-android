@@ -1,4 +1,4 @@
-package com.fishhawk.lisu.ui.search
+package com.fishhawk.lisu.ui.provider
 
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,6 +19,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.navToGallery
+import com.fishhawk.lisu.ui.setArgument
 import com.fishhawk.lisu.ui.setString
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
@@ -35,10 +36,8 @@ private sealed interface SearchAction {
 }
 
 @Composable
-fun SearchScreen(navController: NavHostController) {
-    navController.setString("keywords")
-
-    val viewModel = hiltViewModel<SearchViewModel>()
+fun ProviderSearchScreen(navController: NavHostController) {
+    val viewModel = hiltViewModel<ProviderSearchViewModel>()
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
     val mangaList = viewModel.mangaList.collectAsLazyPagingItems()

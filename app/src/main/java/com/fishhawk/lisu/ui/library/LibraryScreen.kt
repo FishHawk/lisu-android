@@ -15,6 +15,7 @@ import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.base.toast
 import com.fishhawk.lisu.ui.navToGallery
+import com.fishhawk.lisu.ui.navToLibrarySearch
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
@@ -23,9 +24,9 @@ import kotlinx.coroutines.flow.collect
 private typealias LibraryActionHandler = (LibraryAction) -> Unit
 
 private sealed interface LibraryAction {
+    object NavToSearch : LibraryAction
     data class NavToGallery(val manga: MangaDto) : LibraryAction
     data class Delete(val manga: MangaDto) : LibraryAction
-    data class Search(val keywords: String) : LibraryAction
     object Random : LibraryAction
 }
 
@@ -38,9 +39,9 @@ fun LibraryScreen(navController: NavHostController) {
 
     val onAction: LibraryActionHandler = { action ->
         when (action) {
+            LibraryAction.NavToSearch -> navController.navToLibrarySearch()
             is LibraryAction.NavToGallery -> navController.navToGallery(action.manga)
             is LibraryAction.Delete -> viewModel.deleteManga(action.manga)
-            is LibraryAction.Search -> Unit
             LibraryAction.Random -> viewModel.getRandomManga()
         }
     }
@@ -66,7 +67,7 @@ private fun ToolBar(onAction: LibraryActionHandler) {
         IconButton(onClick = { onAction(LibraryAction.Random) }) {
             Icon(LisuIcons.Casino, contentDescription = "random-pick")
         }
-        IconButton(onClick = { }) {
+        IconButton(onClick = { onAction(LibraryAction.NavToSearch) }) {
             Icon(LisuIcons.Search, contentDescription = "search")
         }
     }
