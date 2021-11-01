@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.imageLoader
+import coil.request.ImageRequest
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
 import com.fishhawk.lisu.data.datastore.collectAsState
@@ -124,11 +126,7 @@ fun ReaderScreen() {
                         } else {
                             readerState = ViewerState.Pager(
                                 rememberSaveable(pointer, mode, saver = PagerState.Saver) {
-                                    PagerState(
-                                        pageCount = size,
-                                        currentPage = startPage,
-                                        offscreenLimit = 3,
-                                    )
+                                    PagerState(currentPage = startPage)
                                 }
                             ).also {
                                 PagerViewer(it, pointer, mode == ReaderMode.Rtl, onAction)
@@ -138,6 +136,17 @@ fun ReaderScreen() {
                             readerState!!.position.let {
                                 startPage = it
                                 viewModel.updateReadingHistory(it)
+                                pointer.currChapter.images
+                                    .slice(
+                                        (it - 3).coerceAtLeast(0)..
+                                                (it + 5).coerceAtMost(readerState!!.size - 1)
+                                    )
+                                    .forEach { url ->
+                                        val request = ImageRequest.Builder(context)
+                                            .data(url)
+                                            .build()
+                                        context.imageLoader.enqueue(request)
+                                    }
                             }
                         }
                     }

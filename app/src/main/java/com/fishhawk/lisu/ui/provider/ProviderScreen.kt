@@ -72,7 +72,6 @@ fun ProviderScreen(navController: NavHostController) {
     }
 
     val pagerState = rememberPagerState(
-        pageCount = boards.size,
         initialPage = boards.indexOf(boardHistory).coerceAtLeast(0)
     )
     LaunchedEffect(pagerState.currentPage) {
@@ -83,7 +82,10 @@ fun ProviderScreen(navController: NavHostController) {
         topBar = { ToolBar(viewModel.provider.id, boards, pagerState, onAction) },
         content = {
             LisuTransition {
-                HorizontalPager(state = pagerState) { page ->
+                HorizontalPager(
+                    count = boards.size,
+                    state = pagerState
+                ) { page ->
                     val boardId = boards[page]
                     val filterList by viewModel.boardFilters[boardId]!!.collectAsState()
                     val mangaList = viewModel.boardMangaLists[boardId]!!.collectAsLazyPagingItems()
