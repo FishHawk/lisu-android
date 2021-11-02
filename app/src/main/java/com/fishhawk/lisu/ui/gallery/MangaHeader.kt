@@ -17,6 +17,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
+import coil.size.OriginalSize
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.ui.theme.LisuIcons
@@ -35,6 +36,7 @@ internal fun MangaHeader(
             .height(MangaHeaderHeight)
     ) {
         val painter = rememberImagePainter(detail.cover) {
+            size(OriginalSize)
             crossfade(true)
             crossfade(500)
         }

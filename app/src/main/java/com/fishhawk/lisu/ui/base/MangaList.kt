@@ -24,6 +24,7 @@ import androidx.paging.compose.LazyPagingItems
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
+import coil.size.OriginalSize
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.fade
@@ -154,6 +155,7 @@ fun MangaListCard(
 @Composable
 fun MangaCover(modifier: Modifier = Modifier, cover: String?) {
     val painter = rememberImagePainter(cover) {
+        size(OriginalSize)
         crossfade(true)
         crossfade(500)
     }
