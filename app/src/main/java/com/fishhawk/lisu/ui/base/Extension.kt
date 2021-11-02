@@ -53,7 +53,7 @@ fun Context.saveImage(url: String, filename: String) {
     val imageLoader = imageLoader
     val request = ImageRequest.Builder(this)
         .data(url)
-        .listener(onError = { _, e -> toast(e) })
+        .listener(onError = { _, e -> toast(e.throwable) })
         .target(onSuccess = {
             try {
                 val contentValues = ContentValues().apply {
@@ -95,7 +95,7 @@ fun Context.shareImage(url: String, filename: String) {
     val imageLoader = imageLoader
     val request = ImageRequest.Builder(this)
         .data(url)
-        .listener(onError = { _, e -> toast(e) })
+        .listener(onError = { _, e -> toast(e.throwable) })
         .target(onSuccess = {
             try {
                 val dir = File(cacheDir, "shared_image")

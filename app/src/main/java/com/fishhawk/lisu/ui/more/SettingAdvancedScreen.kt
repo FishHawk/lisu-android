@@ -41,8 +41,8 @@ private fun Content() {
             summary = stringResource(R.string.settings_clear_image_cache_summary)
         ) {
             scope.launch {
-                context.imageLoader.memoryCache.clear()
-                CoilUtils.createDefaultCache(context).directory.deleteRecursively()
+                context.imageLoader.memoryCache?.clear()
+                context.imageLoader.diskCache?.clear()
                 context.toast(R.string.toast_cache_cleared)
             }
         }

@@ -6,7 +6,6 @@ import android.webkit.URLUtil
 import androidx.room.Room
 import coil.ImageLoader
 import coil.ImageLoaderFactory
-import coil.util.CoilUtils
 import com.fishhawk.lisu.data.database.ApplicationDatabase
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
 import com.fishhawk.lisu.data.database.SearchHistoryRepository
@@ -49,7 +48,6 @@ class LisuApplication : Application(), ImageLoaderFactory {
         return ImageLoader.Builder(applicationContext)
             .okHttpClient {
                 OkHttpClient.Builder()
-                    .cache(CoilUtils.createDefaultCache(applicationContext))
                     .addInterceptor(ProgressInterceptor())
                     .build()
             }

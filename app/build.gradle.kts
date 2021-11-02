@@ -73,7 +73,9 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
-        freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
+        freeCompilerArgs = freeCompilerArgs +
+                "-Xopt-in=kotlin.RequiresOptIn" +
+                "-Xjvm-default=all"
     }
 
     composeOptions {
@@ -125,7 +127,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
 
-    val coilVersion = "1.4.0"
+    val coilVersion = "2.0.0-alpha02"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
 
