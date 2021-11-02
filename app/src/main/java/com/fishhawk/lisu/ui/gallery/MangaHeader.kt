@@ -13,15 +13,20 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
+import coil.imageLoader
+import coil.request.ImageRequest
 import coil.size.OriginalSize
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuToolBar
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
 
 internal val MangaHeaderHeight = 250.dp
 
@@ -35,7 +40,23 @@ internal fun MangaHeader(
             .fillMaxWidth()
             .height(MangaHeaderHeight)
     ) {
-        val painter = rememberImagePainter(detail.cover) {
+        val context = LocalContext.current
+        var loadedCover by remember { mutableStateOf(detail.cover) }
+        LaunchedEffect(detail) {
+            // Prevent the image flickering when the cover changes
+            snapshotFlow { detail.cover }
+                .filterNotNull()
+                .collect {
+                    val request = ImageRequest.Builder(context)
+                        .data(it)
+                        .size(OriginalSize)
+                        .listener(onSuccess = { _, _ -> loadedCover = it })
+                        .build()
+                    context.imageLoader.enqueue(request)
+                }
+        }
+
+        val painter = rememberImagePainter(loadedCover) {
             size(OriginalSize)
             crossfade(true)
             crossfade(500)
