@@ -227,7 +227,7 @@ private fun MangaDetail(
                     MangaTagGroups(tags,
                         onTagClick = { onAction(GalleryAction.NavToSearch(it)) },
                         onTagLongClick = {
-                            onAction(GalleryAction.Copy(it, R.string.toast_manga_tag_saved))
+                            onAction(GalleryAction.Copy(it, R.string.tag_copied))
                         }
                     )
                 }

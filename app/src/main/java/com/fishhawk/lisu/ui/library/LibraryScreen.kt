@@ -1,5 +1,8 @@
 package com.fishhawk.lisu.ui.library
 
+import android.os.Handler
+import android.os.Looper
+import androidx.activity.compose.BackHandler
 import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.Casino
 import androidx.compose.material.icons.outlined.Search
@@ -13,8 +16,10 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.collectAsState
+import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
+import com.fishhawk.lisu.ui.base.findActivity
 import com.fishhawk.lisu.ui.base.toast
 import com.fishhawk.lisu.ui.navToGallery
 import com.fishhawk.lisu.ui.navToLibrarySearch
@@ -61,6 +66,20 @@ fun LibraryScreen(navController: NavHostController) {
         topBar = { ToolBar(onAction) },
         content = { LisuTransition { Content(mangaList, onAction) } }
     )
+
+    var exitPressedOnce by remember { mutableStateOf(false) }
+    val isConfirmExitEnabled = PR.isConfirmExitEnabled.getBlocking()
+    BackHandler(isConfirmExitEnabled) {
+        if (exitPressedOnce) {
+            context.findActivity().finish()
+        } else {
+            exitPressedOnce = true
+            context.toast(R.string.confirm_exit)
+            Handler(Looper.getMainLooper()).postDelayed({
+                exitPressedOnce = false
+            }, 2000)
+        }
+    }
 }
 
 @Composable

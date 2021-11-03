@@ -35,7 +35,6 @@ sealed interface ReaderEffect : Effect {
 
 @HiltViewModel
 class ReaderViewModel @Inject constructor(
-    private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
     private val readingHistoryRepository: ReadingHistoryRepository,
     private val savedStateHandle: SavedStateHandle
@@ -184,7 +183,7 @@ class ReaderViewModel @Inject constructor(
     fun openNextChapter() {
         val pointer = chapterPointer.value
         val nextChapter = pointer.nextChapter
-            ?: return sendMessage(R.string.toast_no_next_chapter)
+            ?: return sendMessage(R.string.no_next_chapter)
         chapterPointer.value =
             ReaderChapterPointer(nextChapter.index, 0)
         loadChapterPointer()
@@ -193,7 +192,7 @@ class ReaderViewModel @Inject constructor(
     fun openPrevChapter() {
         val pointer = chapterPointer.value
         val prevChapter = pointer.prevChapter
-            ?: return sendMessage(R.string.toast_no_prev_chapter)
+            ?: return sendMessage(R.string.no_prev_chapter)
         chapterPointer.value =
             ReaderChapterPointer(prevChapter.index, 0)
         loadChapterPointer()
@@ -202,7 +201,7 @@ class ReaderViewModel @Inject constructor(
     fun moveToNextChapter() {
         val pointer = chapterPointer.value
         val nextChapter = pointer.nextChapter
-            ?: return sendMessage(R.string.toast_no_next_chapter)
+            ?: return sendMessage(R.string.no_next_chapter)
 
         if (nextChapter.state is ViewState.Loaded) {
             chapterPointer.value =
@@ -216,7 +215,7 @@ class ReaderViewModel @Inject constructor(
     fun moveToPrevChapter() {
         val pointer = chapterPointer.value
         val prevChapter = pointer.prevChapter
-            ?: return sendMessage(R.string.toast_no_prev_chapter)
+            ?: return sendMessage(R.string.no_prev_chapter)
 
         if (prevChapter.state is ViewState.Loaded) {
             chapterPointer.value =

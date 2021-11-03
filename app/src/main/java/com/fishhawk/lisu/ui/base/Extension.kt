@@ -68,14 +68,14 @@ fun Context.saveImage(image: Drawable, filename: String) {
     try {
         val uri = contentResolver.run {
             insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-        } ?: return toast(R.string.toast_image_already_exist)
+        } ?: return toast(R.string.image_already_exist)
 
         contentResolver.openFileDescriptor(uri, "w", null).use { pfd ->
             val outputStream = FileOutputStream(pfd!!.fileDescriptor)
             image.toBitmap().compress(CompressFormat.PNG, 100, outputStream)
             outputStream.flush()
             outputStream.close()
-            toast(R.string.toast_image_saved)
+            toast(R.string.image_saved)
         }
     } catch (e: Throwable) {
         return toast(e)
@@ -127,7 +127,7 @@ fun Context.toast(resId: Int) = toast(getString(resId))
 
 fun Context.toast(throwable: Throwable) =
     throwable.message?.let { toast(it) }
-        ?: toast(R.string.toast_unknown_error)
+        ?: toast(R.string.unknown_error)
 
 fun Context.copyToClipboard(text: String, hintResId: Int? = null) {
     val clip = ClipData.newPlainText("simple text", text)

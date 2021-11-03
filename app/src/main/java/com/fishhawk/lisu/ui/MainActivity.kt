@@ -1,6 +1,8 @@
 package com.fishhawk.lisu.ui
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.Parcelable
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
@@ -32,6 +34,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.StartScreen
 import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.ui.base.BaseActivity
+import com.fishhawk.lisu.ui.base.toast
 import com.fishhawk.lisu.ui.explore.ExploreScreen
 import com.fishhawk.lisu.ui.gallery.GalleryEditScreen
 import com.fishhawk.lisu.ui.gallery.GalleryScreen

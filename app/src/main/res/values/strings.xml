@@ -13,11 +13,7 @@
     <string name="label_settings_advanced">Advanced</string>
     <string name="label_about">About</string>
     <string name="label_open_source_license">Open source license</string>
-
-    <string name="label_popular">Popular</string>
-    <string name="label_latest">Latest</string>
-    <string name="label_category">Category</string>
-    <string name="label_search">Search</string>
+    <string name="label_gallery_edit">Edit metadata</string>
 
 
     <!-- history screen -->
@@ -31,7 +27,6 @@
     <string name="explore_last_used">Last used</string>
 
     <!-- more screen -->
-    <string name="more_server">Manage server</string>
     <string name="more_setting_general">Setting general</string>
     <string name="more_setting_reader">Setting reader</string>
     <string name="more_setting_advanced">Setting advanced</string>
@@ -48,7 +43,6 @@
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
 
-    <string name="settings_display_mode">Display mode</string>
     <string name="settings_chapter_display_mode">Chapter display mode</string>
     <string name="settings_display_mode_gird">Grid</string>
     <string name="settings_display_mode_linear">Linear</string>
@@ -57,11 +51,8 @@
     <string name="settings_display_order_ascend">Ascend</string>
     <string name="settings_display_order_descend">Descend</string>
 
-    <string name="settings_history_filter">History filter</string>
-    <string name="settings_history_filter_all">All</string>
-    <string name="settings_history_filter_from_library">From library</string>
-    <string name="settings_history_filter_from_provider">From provider</string>
-
+    <string name="settings_enable_confirm_exit">Confirm exit</string>
+    <string name="settings_enable_random_button">Enable random button</string>
 
     <!-- setting reader screen -->
     <string name="settings_reader_mode">Reading direction</string>
@@ -118,22 +109,16 @@
 
     <!-- gallery screen -->
     <string name="gallery_no_chapters_hint">No chapters</string>
-    <string name="gallery_read_button_hint">Read</string>
-
-
-    <!-- reader screen -->
-    <string name="image_unknown_error_hint">Unknown error</string>
 
 
     <!-- menu -->
-    <string name="menu_search">Search</string>
     <string name="menu_search_hint">Search…</string>
     <string name="menu_search_library_hint">Search library…</string>
     <string name="menu_search_global_hint">Search global…</string>
-    <string name="menu_display_mode">Display mode</string>
     <string name="menu_filter">Filter</string>
     <string name="menu_history_clear">Clear history</string>
     <string name="menu_add">Add</string>
+    <string name="menu_publish">Submit</string>
 
 
     <!-- dialog -->
@@ -144,38 +129,30 @@
     <string name="page_action_share">Share image</string>
     <string name="page_action_save">Save image</string>
 
-    <string name="cover_action_read">Read</string>
-    <string name="cover_action_library_add">Add to library</string>
-
 
     <!-- toast -->
+    <string name="confirm_exit">Press back again to exit</string>
+
     <string name="error_hint_empty_refresh_result">List is empty.</string>
     <string name="error_hint_empty_fetch_more_result">No more result.</string>
     <string name="successfully_add_to_library">Successfully added to library.</string>
     <string name="successfully_create_sync_task">Successfully create the sync task.</string>
     <string name="successfully_delete_source">Successfully delete source.</string>
 
-    <string name="toast_unknown_error">Unknown error.</string>
+    <string name="unknown_error">Unknown error.</string>
 
-    <string name="toast_cache_cleared">Cache cleared.</string>
+    <string name="cache_cleared">Cache cleared.</string>
 
-    <string name="toast_manga_not_loaded">Manga not loaded.</string>
-    <string name="toast_manga_no_cover">Manga has no cover.</string>
-    <string name="toast_manga_cover_updated">Manga cover has been updated.</string>
-    <string name="toast_manga_metadata_updated">Manga metadata has been updated.</string>
-    <string name="toast_manga_title_copied">Copy title to clipboard.</string>
-    <string name="toast_manga_author_copied">Copy author to clipboard.</string>
-    <string name="toast_manga_tag_saved">Copy tag to clipboard.</string>
+    <string name="cover_updated">Manga cover has been updated.</string>
+    <string name="metadata_updated">Manga metadata has been updated.</string>
+    <string name="title_copied">Copy title to clipboard.</string>
+    <string name="author_copied">Copy author to clipboard.</string>
+    <string name="tag_copied">Copy tag to clipboard.</string>
 
-    <string name="toast_chapter_not_loaded">Chapter not loaded.</string>
-    <string name="toast_no_prev_chapter">Already at the beginning.</string>
-    <string name="toast_no_next_chapter">Already at the end.</string>
+    <string name="chapter_not_loaded">Chapter not loaded.</string>
+    <string name="no_prev_chapter">Already at the beginning.</string>
+    <string name="no_next_chapter">Already at the end.</string>
 
-    <string name="toast_image_already_exist">Image already exist.</string>
-    <string name="toast_image_saved">Image saved.</string>
-
-    <string name="dialog_filter_history">Filter reading history</string>
-    <string name="menu_publish">Submit</string>
-    <string name="label_gallery_edit">Edit metadata</string>
-    <string name="settings_enable_random_button">Enable random button</string>
+    <string name="image_already_exist">Image already exist.</string>
+    <string name="image_saved">Image saved.</string>
 </resources>

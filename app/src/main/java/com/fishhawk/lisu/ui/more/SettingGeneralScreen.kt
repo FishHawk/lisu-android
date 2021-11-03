@@ -74,6 +74,11 @@ private fun Content() {
         }
 
         SwitchPreference(
+            title = stringResource(R.string.settings_enable_confirm_exit),
+            preference = PR.isConfirmExitEnabled
+        )
+
+        SwitchPreference(
             title = stringResource(R.string.settings_enable_random_button),
             preference = PR.isRandomButtonEnabled
         )

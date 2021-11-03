@@ -134,12 +134,8 @@ internal fun MangaHeader(
                     isFinished = detail.isFinished,
                     onTitleClick = { onAction(GalleryAction.NavToGlobalSearch(it)) },
                     onAuthorClick = { onAction(GalleryAction.NavToGlobalSearch(it)) },
-                    onTitleLongClick = {
-                        onAction(GalleryAction.Copy(it, R.string.toast_manga_title_copied))
-                    },
-                    onAuthorLongClick = {
-                        onAction(GalleryAction.Copy(it, R.string.toast_manga_author_copied))
-                    }
+                    onTitleLongClick = { onAction(GalleryAction.Copy(it, R.string.title_copied)) },
+                    onAuthorLongClick = { onAction(GalleryAction.Copy(it, R.string.author_copied)) }
                 )
             }
         }

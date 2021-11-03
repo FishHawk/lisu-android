@@ -59,7 +59,7 @@ private fun ErrorView(
         ) {
             Text(
                 text = throwable.localizedMessage
-                    ?: stringResource(R.string.toast_unknown_error),
+                    ?: stringResource(R.string.unknown_error),
                 style = typography.subtitle2,
                 textAlign = TextAlign.Center
             )
@@ -103,7 +103,7 @@ fun ErrorItem(
     ) {
         Text(
             text = throwable.localizedMessage
-                ?: stringResource(R.string.toast_unknown_error),
+                ?: stringResource(R.string.unknown_error),
             modifier = Modifier.weight(1f),
             style = typography.subtitle2,
             textAlign = TextAlign.Center

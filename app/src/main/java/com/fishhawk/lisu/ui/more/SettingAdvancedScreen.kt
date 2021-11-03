@@ -10,7 +10,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import coil.imageLoader
-import coil.util.CoilUtils
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.base.toast
@@ -43,7 +42,7 @@ private fun Content() {
             scope.launch {
                 context.imageLoader.memoryCache?.clear()
                 context.imageLoader.diskCache?.clear()
-                context.toast(R.string.toast_cache_cleared)
+                context.toast(R.string.cache_cleared)
             }
         }
 

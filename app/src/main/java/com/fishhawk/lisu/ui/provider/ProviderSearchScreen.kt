@@ -19,8 +19,6 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.navToGallery
-import com.fishhawk.lisu.ui.setArgument
-import com.fishhawk.lisu.ui.setString
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.TextFieldWithSuggestions

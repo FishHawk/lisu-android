@@ -39,7 +39,7 @@ class ProviderViewModel @Inject constructor(
     val boardMangaLists = boardFilters.mapValues { (boardId, filters) ->
         filters.filterNotNull().flatMapLatest { groups ->
             Pager(PagingConfig(pageSize = 20)) {
-                val option = groups.map { it.name to it.selected }.toMap()
+                val option = groups.associate { it.name to it.selected }
                 ProviderMangaSource(boardId, option)
             }.flow
         }.cachedIn(viewModelScope)
