@@ -10,7 +10,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.base.toast
@@ -64,8 +66,11 @@ fun LibraryScreen(navController: NavHostController) {
 @Composable
 private fun ToolBar(onAction: LibraryActionHandler) {
     LisuToolBar(title = stringResource(R.string.label_library)) {
-        IconButton(onClick = { onAction(LibraryAction.Random) }) {
-            Icon(LisuIcons.Casino, contentDescription = "random-pick")
+        val isRandomButtonEnabled by PR.isRandomButtonEnabled.collectAsState()
+        if (isRandomButtonEnabled) {
+            IconButton(onClick = { onAction(LibraryAction.Random) }) {
+                Icon(LisuIcons.Casino, contentDescription = "random-pick")
+            }
         }
         IconButton(onClick = { onAction(LibraryAction.NavToSearch) }) {
             Icon(LisuIcons.Search, contentDescription = "search")

@@ -9,7 +9,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.data.datastore.*
+import com.fishhawk.lisu.data.datastore.ChapterDisplayMode
+import com.fishhawk.lisu.data.datastore.ChapterDisplayOrder
+import com.fishhawk.lisu.data.datastore.StartScreen
+import com.fishhawk.lisu.data.datastore.Theme
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 
@@ -69,5 +72,10 @@ private fun Content() {
                 ChapterDisplayOrder.Descend -> R.string.settings_display_order_descend
             }
         }
+
+        SwitchPreference(
+            title = stringResource(R.string.settings_enable_random_button),
+            preference = PR.isRandomButtonEnabled
+        )
     }
 }

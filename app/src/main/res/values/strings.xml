@@ -177,4 +177,5 @@
     <string name="dialog_filter_history">Filter reading history</string>
     <string name="menu_publish">Submit</string>
     <string name="label_gallery_edit">Edit metadata</string>
+    <string name="settings_enable_random_button">Enable random button</string>
 </resources>

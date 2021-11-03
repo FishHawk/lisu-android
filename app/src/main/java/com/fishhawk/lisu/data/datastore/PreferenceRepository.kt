@@ -30,6 +30,7 @@ class PreferenceRepository(context: Context) {
     val startScreen by store.get("start_screen", StartScreen.Library)
     val chapterDisplayMode by store.get("chapter_display_mode", ChapterDisplayMode.Grid)
     val chapterDisplayOrder by store.get("chapter_display_order", ChapterDisplayOrder.Ascend)
+    val isRandomButtonEnabled by store.get("is_random_button_enabled", false)
 
 
     val readerMode by store.get("reader_mode", ReaderMode.Ltr)
