@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.ui.gallery
 
+import android.graphics.drawable.Drawable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
@@ -48,8 +49,8 @@ internal sealed interface GalleryAction {
         val page: Int
     ) : GalleryAction
 
-    object ShareCover : GalleryAction
-    object SaveCover : GalleryAction
+    data class ShareCover(val cover: Drawable) : GalleryAction
+    data class SaveCover(val cover: Drawable) : GalleryAction
     object EditCover : GalleryAction
 
     object Reload : GalleryAction
@@ -85,24 +86,10 @@ fun GalleryScreen(navController: NavHostController) {
                 context.navToReader(detail, collectionId, chapterId, page)
             }
 
-            GalleryAction.ShareCover -> {
-                if (viewState is ViewState.Loaded) {
-                    context.toast(R.string.toast_manga_not_loaded)
-                } else {
-                    val url = detail.cover
-                    if (url == null) context.toast(R.string.toast_manga_no_cover)
-                    else context.shareImage(url, "${detail.id}-cover")
-                }
-            }
-            GalleryAction.SaveCover -> {
-                if (viewState is ViewState.Loaded) {
-                    context.toast(R.string.toast_manga_not_loaded)
-                } else {
-                    val url = detail.cover
-                    if (url == null) context.toast(R.string.toast_manga_no_cover)
-                    else context.saveImage(url, "${detail.id}-cover")
-                }
-            }
+            is GalleryAction.ShareCover ->
+                context.shareImage("Share cover via",action.cover, "${detail.title ?: detail.id}-cover")
+            is GalleryAction.SaveCover ->
+                context.saveImage(action.cover, "${detail.title ?: detail.id}-cover")
             GalleryAction.EditCover -> {
 //        val context = LocalContext.current
 //            val newCover = remember { mutableStateOf<Uri?>(null) }
@@ -124,7 +111,8 @@ fun GalleryScreen(navController: NavHostController) {
             }
 
             GalleryAction.Reload -> viewModel.reloadManga()
-            GalleryAction.Share -> Unit
+            GalleryAction.Share ->
+                context.shareText("Share manga via", detail.title ?: detail.id)
             GalleryAction.AddToLibrary -> viewModel.addToLibrary()
             GalleryAction.RemoveFromLibrary -> viewModel.removeFromLibrary()
             is GalleryAction.Copy -> context.copyToClipboard(action.text, action.hintResId)

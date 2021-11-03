@@ -1,6 +1,9 @@
 package com.fishhawk.lisu.ui.gallery
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -17,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -30,6 +34,7 @@ import kotlinx.coroutines.flow.filterNotNull
 
 internal val MangaHeaderHeight = 250.dp
 
+@OptIn(ExperimentalFoundationApi::class, coil.annotation.ExperimentalCoilApi::class)
 @Composable
 internal fun MangaHeader(
     detail: MangaDetailDto,
@@ -105,11 +110,16 @@ internal fun MangaHeader(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Surface(
-                    modifier = Modifier
-                        .aspectRatio(0.75f)
-                        .clickable { },
+                    modifier = Modifier.aspectRatio(0.75f).let { modifier ->
+                        (painter.state as? ImagePainter.State.Success)?.result?.drawable?.let {
+                            modifier.combinedClickable(
+                                onClick = { onAction(GalleryAction.SaveCover(it)) },
+                                onLongClick = { onAction(GalleryAction.ShareCover(it)) }
+                            )
+                        } ?: modifier
+                    },
                     shape = RoundedCornerShape(4.dp),
-                    elevation = 4.dp
+                    elevation = 4.dp,
                 ) {
                     Image(
                         painter = painter,
@@ -117,7 +127,20 @@ internal fun MangaHeader(
                         contentScale = ContentScale.Crop
                     )
                 }
-                MangaInfo(detail, onAction)
+                MangaInfo(
+                    providerId = detail.providerId,
+                    title = (detail.title ?: detail.id),
+                    author = detail.authors?.joinToString(separator = ";"),
+                    isFinished = detail.isFinished,
+                    onTitleClick = { onAction(GalleryAction.NavToGlobalSearch(it)) },
+                    onAuthorClick = { onAction(GalleryAction.NavToGlobalSearch(it)) },
+                    onTitleLongClick = {
+                        onAction(GalleryAction.Copy(it, R.string.toast_manga_title_copied))
+                    },
+                    onAuthorLongClick = {
+                        onAction(GalleryAction.Copy(it, R.string.toast_manga_author_copied))
+                    }
+                )
             }
         }
     }
@@ -126,8 +149,14 @@ internal fun MangaHeader(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MangaInfo(
-    detail: MangaDetailDto,
-    onAction: GalleryActionHandler
+    providerId: String,
+    title: String,
+    author: String?,
+    isFinished: Boolean?,
+    onTitleClick: (String) -> Unit,
+    onAuthorClick: (String) -> Unit,
+    onTitleLongClick: (String) -> Unit,
+    onAuthorLongClick: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -135,36 +164,32 @@ private fun MangaInfo(
             .padding(vertical = 2.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        (detail.title ?: detail.id).let {
+        title.let {
             Box(modifier = Modifier.weight(1f)) {
                 MangaInfoTitle(
+                    text = it,
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .combinedClickable(
-                            onClick = { onAction(GalleryAction.NavToGlobalSearch(it)) },
-                            onLongClick = {
-                                onAction(GalleryAction.Copy(it, R.string.toast_manga_title_copied))
-                            }
-                        ),
-                    text = it
+                            onClick = { onTitleClick(it) },
+                            onLongClick = { onTitleLongClick(it) }
+                        )
                 )
             }
         }
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            detail.authors?.joinToString(separator = ";")?.let {
+            author?.let {
                 MangaInfoSubtitle(
+                    text = it,
                     modifier = Modifier.combinedClickable(
-                        onClick = { onAction(GalleryAction.NavToGlobalSearch(it)) },
-                        onLongClick = {
-                            onAction(GalleryAction.Copy(it, R.string.toast_manga_author_copied))
-                        }
-                    ),
-                    text = it
+                        onClick = { onAuthorClick(it) },
+                        onLongClick = { onAuthorLongClick(it) }
+                    )
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                detail.isFinished?.let { MangaInfoSubtitle(text = if (it) "Finished" else "Ongoing") }
-                MangaInfoSubtitle(text = detail.providerId)
+                isFinished?.let { MangaInfoSubtitle(text = if (it) "Finished" else "Ongoing") }
+                MangaInfoSubtitle(text = providerId)
             }
         }
     }

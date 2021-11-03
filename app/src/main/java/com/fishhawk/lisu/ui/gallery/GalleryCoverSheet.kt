@@ -12,7 +12,6 @@ import androidx.compose.material.icons.outlined.SaveAlt
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.fishhawk.lisu.ui.theme.LisuIcons
 
@@ -29,13 +28,13 @@ internal fun GalleryCoverSheet(onAction: GalleryActionHandler) {
                 Text("Edit cover")
             }
         }
-        TextButton(onClick = { onAction(GalleryAction.SaveCover) }) {
+        TextButton(onClick = { /*onAction(GalleryAction.SaveCover)*/ }) {
             Row {
                 Icon(LisuIcons.SaveAlt, "save cover")
                 Text("Save cover")
             }
         }
-        TextButton(onClick = { onAction(GalleryAction.ShareCover) }) {
+        TextButton(onClick = { /*onAction(GalleryAction.ShareCover)*/ }) {
             Row {
                 Icon(LisuIcons.Share, "share cover")
                 Text("Share cover")
