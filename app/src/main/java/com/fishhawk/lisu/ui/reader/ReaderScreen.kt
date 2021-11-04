@@ -60,12 +60,10 @@ fun ReaderScreen() {
             }
             ReaderAction.SavePage -> {
 //                val prefix = viewModel.makeImageFilenamePrefix()
-//                    ?: return toast(R.string.toast_chapter_not_loaded)
 //                saveImage(url, "$prefix-$position")
             }
             ReaderAction.SharePage -> {
 //                val prefix = viewModel.makeImageFilenamePrefix()
-//                    ?: return toast(R.string.toast_chapter_not_loaded)
 //                lifecycleScope.shareImage(this, url, "$prefix-$position")
             }
         }

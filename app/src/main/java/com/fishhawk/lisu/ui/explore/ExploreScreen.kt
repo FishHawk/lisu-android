@@ -6,8 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.TravelExplore
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +24,7 @@ import com.fishhawk.lisu.ui.base.StateView
 import com.fishhawk.lisu.ui.base.ViewState
 import com.fishhawk.lisu.ui.navToGlobalSearch
 import com.fishhawk.lisu.ui.navToProvider
+import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import java.util.*
@@ -67,7 +67,7 @@ fun ExploreScreen(navController: NavHostController) {
 private fun ToolBar(onAction: ExploreActionHandler) {
     LisuToolBar(title = stringResource(R.string.label_explore)) {
         IconButton(onClick = { onAction(ExploreAction.NavToGlobalSearch) }) {
-            Icon(Icons.Filled.Search, contentDescription = "search")
+            Icon(LisuIcons.TravelExplore, contentDescription = "global search")
         }
     }
 }
