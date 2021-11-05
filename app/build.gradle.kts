@@ -79,7 +79,7 @@ android {
     }
 
     composeOptions {
-        val composeVersion = "1.1.0-beta01"
+        val composeVersion = "1.1.0-beta02"
         kotlinCompilerExtensionVersion = composeVersion
     }
 }
@@ -89,7 +89,7 @@ dependencies {
 
     implementation("androidx.activity:activity-compose:1.4.0")
 
-    val composeVersion = "1.1.0-beta01"
+    val composeVersion = "1.1.0-beta02"
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
@@ -117,7 +117,7 @@ dependencies {
     kapt("androidx.room:room-compiler:$roomVersion")
 
 
-    val accompanistVersion = "0.21.0-beta"
+    val accompanistVersion = "0.21.2-beta"
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
@@ -143,7 +143,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.4")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.5")
 
     // implementation("com.quickbirdstudios:opencv:4.1.0")
 }
