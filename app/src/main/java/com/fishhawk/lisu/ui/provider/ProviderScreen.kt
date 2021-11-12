@@ -117,22 +117,24 @@ private fun ToolBar(
             }
 
             val scope = rememberCoroutineScope()
-            TabRow(
-                modifier = Modifier.zIndex(2f),
-                indicator = { tabPositions ->
-                    TabRowDefaults.Indicator(
-                        Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
-                    )
-                },
-                selectedTabIndex = pagerState.currentPage,
-                backgroundColor = MaterialTheme.colors.surface
-            ) {
-                boards.forEachIndexed { index, title ->
-                    Tab(
-                        text = { Text(title) },
-                        selected = pagerState.currentPage == index,
-                        onClick = { scope.launch { pagerState.scrollToPage(index) } },
-                    )
+            if (boards.size > 1) {
+                TabRow(
+                    modifier = Modifier.zIndex(2f),
+                    indicator = { tabPositions ->
+                        TabRowDefaults.Indicator(
+                            Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+                        )
+                    },
+                    selectedTabIndex = pagerState.currentPage,
+                    backgroundColor = MaterialTheme.colors.surface
+                ) {
+                    boards.forEachIndexed { index, title ->
+                        Tab(
+                            text = { Text(title) },
+                            selected = pagerState.currentPage == index,
+                            onClick = { scope.launch { pagerState.scrollToPage(index) } },
+                        )
+                    }
                 }
             }
         }
