@@ -1,7 +1,9 @@
 package com.fishhawk.lisu.ui.gallery
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material.icons.outlined.ViewList
@@ -11,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontWeight
@@ -26,6 +29,10 @@ import com.fishhawk.lisu.data.datastore.setNext
 import com.fishhawk.lisu.data.remote.model.ChapterDto
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 @Composable
 internal fun MangaContentCollections(
@@ -138,6 +145,7 @@ private fun ChapterListGrid(
     }
 }
 
+
 @Composable
 private fun ChapterGrid(
     chapter: ChapterDto,
@@ -145,25 +153,32 @@ private fun ChapterGrid(
     onChapterClick: () -> Unit = {},
 ) {
     Surface(
-        modifier = Modifier.clickable { onChapterClick() },
+        modifier = Modifier.clickable { if (chapter.isLocked != true) onChapterClick() },
         shape = RectangleShape,
         elevation = 2.dp,
         color = MaterialTheme.colors.run { if (isMarked) primary else surface }
     ) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 2.dp, vertical = 8.dp),
-            text = chapter.name,
-            style = MaterialTheme.typography.body1.copy(fontSize = 12.sp),
-            color = if (isMarked) Color.White else MaterialTheme.colors.onSurface,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center
-        )
+        Box {
+            ChapterNewMark(
+                modifier = Modifier
+                    .size(8.dp)
+                    .align(Alignment.TopStart),
+                updateTime = chapter.updateTime
+            )
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 2.dp, vertical = 8.dp),
+                text = chapter.name,
+                style = MaterialTheme.typography.body1.copy(fontSize = 12.sp),
+                color = if (isMarked) Color.White else MaterialTheme.colors.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
-
 
 @Composable
 private fun ChapterListLinear(
@@ -186,23 +201,44 @@ private fun ChapterLinear(
     isMarked: Boolean,
     onChapterClick: () -> Unit = {},
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onChapterClick() },
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            modifier = Modifier.padding(vertical = 16.dp),
-            text = chapter.name,
-            style = MaterialTheme.typography.subtitle2,
-            color = if (isMarked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
-        )
-        Text(
-            modifier = Modifier.padding(vertical = 16.dp),
-            text = chapter.title,
-            style = MaterialTheme.typography.subtitle2
+    Box {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { if (chapter.isLocked != true) onChapterClick() },
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                modifier = Modifier.padding(vertical = 16.dp),
+                text = chapter.name,
+                style = MaterialTheme.typography.subtitle2,
+                color = if (isMarked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
+            )
+            Text(
+                modifier = Modifier.padding(vertical = 16.dp),
+                text = chapter.title,
+                style = MaterialTheme.typography.subtitle2
+            )
+        }
+    }
+}
+
+private val TriangleShape = GenericShape { size, _ ->
+    lineTo(0f, size.height)
+    lineTo(size.width, 0f)
+}
+
+@Composable
+private fun ChapterNewMark(modifier: Modifier, updateTime: Long?) {
+    updateTime?.let {
+        val date = Instant.ofEpochSecond(updateTime).atZone(ZoneId.systemDefault()).toLocalDate()
+        val days = ChronoUnit.DAYS.between(date, LocalDate.now())
+        if (days <= 5L) Box(
+            modifier = modifier
+                .clip(TriangleShape)
+                .background(MaterialTheme.colors.primary)
         )
     }
 }
+

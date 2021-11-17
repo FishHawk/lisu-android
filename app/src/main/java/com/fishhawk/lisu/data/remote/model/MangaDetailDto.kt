@@ -4,15 +4,6 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class ChapterDto(
-    val id: String,
-    val name: String,
-    val title: String,
-    val isLocked: Boolean? = null,
-    val updateTime: Long? = null
-) : Parcelable
-
-@Parcelize
 data class MetadataDto(
     val title: String? = null,
     val authors: List<String>? = null,
