@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.ui.gallery
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -28,6 +29,7 @@ import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.setNext
 import com.fishhawk.lisu.data.remote.model.ChapterDto
 import com.fishhawk.lisu.ui.theme.LisuIcons
+import com.fishhawk.lisu.ui.widget.VerticalGrid
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
@@ -75,7 +77,7 @@ private fun MangaContentChapterHeader() {
             "Chapters:",
             style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium)
         )
-        Spacer(modifier = Modifier.weight(1f, fill = true))
+        Spacer(modifier = Modifier.weight(1f))
 
         val mode by PR.chapterDisplayMode.collectAsState()
         val scope = rememberCoroutineScope()
@@ -99,52 +101,38 @@ private fun ChapterList(
     onChapterClick: (String) -> Unit = {}
 ) {
     val mode by PR.chapterDisplayMode.collectAsState()
+    val order by PR.chapterDisplayOrder.collectAsState()
+    val orderedChapters = when (order) {
+        ChapterDisplayOrder.Ascend -> chapters
+        ChapterDisplayOrder.Descend -> chapters.reversed()
+    }
     when (mode) {
-        ChapterDisplayMode.Grid -> ChapterListGrid(chapters, isMarked, onChapterClick)
-        ChapterDisplayMode.Linear -> ChapterListLinear(chapters, isMarked, onChapterClick)
+        ChapterDisplayMode.Grid -> ChapterListGrid(orderedChapters, isMarked, onChapterClick)
+        ChapterDisplayMode.Linear -> ChapterListLinear(orderedChapters, isMarked, onChapterClick)
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ChapterListGrid(
     chapters: List<ChapterDto>,
     isMarked: (String) -> Boolean,
     onChapterClick: (String) -> Unit = {}
 ) {
-    Column(
+    VerticalGrid(
+        items = chapters,
+        nColumns = 4,
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        val order by PR.chapterDisplayOrder.collectAsState()
-        val nColumns = 4
-        val rows = (chapters.size + nColumns - 1) / nColumns
-        (0..rows).map { rowIndex ->
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                for (columnIndex in 0 until nColumns) {
-                    val cellIndex = rowIndex * nColumns + columnIndex
-                    if (cellIndex < chapters.size) {
-                        val chapterIndex = when (order) {
-                            ChapterDisplayOrder.Ascend -> cellIndex
-                            ChapterDisplayOrder.Descend -> chapters.size - cellIndex - 1
-                        }
-                        Box(
-                            modifier = Modifier.weight(1f),
-                            propagateMinConstraints = true
-                        ) {
-                            val chapter = chapters[chapterIndex]
-                            ChapterGrid(chapter, isMarked(chapter.id)) {
-                                onChapterClick(chapter.id)
-                            }
-                        }
-                    } else {
-                        Spacer(Modifier.weight(1f, fill = true))
-                    }
-                }
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) { _, it ->
+        Box(modifier = Modifier.weight(1f)) {
+            ChapterGrid(it, isMarked(it.id)) {
+                onChapterClick(it.id)
             }
         }
     }
 }
-
 
 @Composable
 private fun ChapterGrid(
@@ -186,12 +174,12 @@ private fun ChapterListLinear(
     isMarked: (String) -> Boolean,
     onChapterClick: (String) -> Unit = {}
 ) {
-    val order by PR.chapterDisplayOrder.collectAsState()
     Column(modifier = Modifier.fillMaxWidth()) {
-        when (order) {
-            ChapterDisplayOrder.Ascend -> chapters
-            ChapterDisplayOrder.Descend -> chapters.reversed()
-        }.map { ChapterLinear(it, isMarked(it.id)) { onChapterClick(it.id) } }
+        chapters.onEach {
+            ChapterLinear(it, isMarked(it.id)) {
+                onChapterClick(it.id)
+            }
+        }
     }
 }
 
@@ -201,26 +189,24 @@ private fun ChapterLinear(
     isMarked: Boolean,
     onChapterClick: () -> Unit = {},
 ) {
-    Box {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { if (chapter.isLocked != true) onChapterClick() },
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                modifier = Modifier.padding(vertical = 16.dp),
-                text = chapter.name,
-                style = MaterialTheme.typography.subtitle2,
-                color = if (isMarked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
-            )
-            Text(
-                modifier = Modifier.padding(vertical = 16.dp),
-                text = chapter.title,
-                style = MaterialTheme.typography.subtitle2
-            )
-        }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { if (chapter.isLocked != true) onChapterClick() },
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier.padding(vertical = 16.dp),
+            text = chapter.name,
+            style = MaterialTheme.typography.subtitle2,
+            color = if (isMarked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
+        )
+        Text(
+            modifier = Modifier.padding(vertical = 16.dp),
+            text = chapter.title,
+            style = MaterialTheme.typography.subtitle2
+        )
     }
 }
 

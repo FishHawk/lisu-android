@@ -1,9 +1,11 @@
 package com.fishhawk.lisu.ui.history
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.ClearAll
@@ -92,6 +94,7 @@ private fun ToolBar(onAction: HistoryActionHandler) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HistoryList(
     histories: Map<LocalDate, List<ReadingHistory>>,
@@ -108,8 +111,9 @@ private fun HistoryList(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun HistoryListHeader(date: LocalDate) {
+private fun LazyItemScope.HistoryListHeader(date: LocalDate) {
     val now = LocalDate.now()
     val days = ChronoUnit.DAYS.between(date, now)
     val dateString = when {
@@ -121,17 +125,19 @@ private fun HistoryListHeader(date: LocalDate) {
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Text(
             text = dateString,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp),
+            modifier = Modifier
+                .padding(horizontal = 8.dp, vertical = 12.dp)
+                .animateItemPlacement(),
             style = MaterialTheme.typography.subtitle2
         )
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
-private fun HistoryListItem(
+private fun LazyItemScope.HistoryListItem(
     history: ReadingHistory,
-    onAction: HistoryActionHandler
+    onAction: HistoryActionHandler = {}
 ) {
     val dismissState = rememberDismissState(
         confirmStateChange = {
@@ -141,6 +147,7 @@ private fun HistoryListItem(
         }
     )
     SwipeToDismiss(
+        modifier = Modifier.animateItemPlacement(),
         state = dismissState,
         directions = setOf(DismissDirection.EndToStart),
         dismissThresholds = { FractionalThreshold(0.4f) },

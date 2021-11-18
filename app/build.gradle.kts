@@ -79,7 +79,7 @@ android {
     }
 
     composeOptions {
-        val composeVersion = "1.1.0-beta02"
+        val composeVersion = "1.1.0-beta03"
         kotlinCompilerExtensionVersion = composeVersion
     }
 }
@@ -89,7 +89,7 @@ dependencies {
 
     implementation("androidx.activity:activity-compose:1.4.0")
 
-    val composeVersion = "1.1.0-beta02"
+    val composeVersion = "1.1.0-beta03"
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
@@ -103,15 +103,15 @@ dependencies {
 
     implementation("androidx.paging:paging-compose:1.0.0-alpha14")
 
-    implementation("com.google.dagger:hilt-android:2.39.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.39.1")
+    implementation("com.google.dagger:hilt-android:2.40.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.40.1")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    val roomVersion = "2.4.0-beta01"
+    val roomVersion = "2.4.0-beta02"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
@@ -127,7 +127,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
 
-    val coilVersion = "2.0.0-alpha02"
+    val coilVersion = "2.0.0-alpha03"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
 

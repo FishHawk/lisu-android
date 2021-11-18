@@ -10,34 +10,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
+import com.fishhawk.lisu.ui.widget.VerticalGrid
 
 @Composable
 internal fun MangaContentPreview(
-    preview: List<String>,
+    previews: List<String>,
     onPageClick: (Int) -> Unit = {}
 ) {
-    val nColumns = 3
-    Column(
+    VerticalGrid(
+        items = previews,
+        nColumns = 3,
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        val rows = (preview.size + nColumns - 1) / nColumns
-        (0..rows).map { rowIndex ->
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                for (columnIndex in 0 until nColumns) {
-                    val itemIndex = rowIndex * nColumns + columnIndex
-                    if (itemIndex < preview.size) {
-                        Box(
-                            modifier = Modifier.weight(1f, fill = true),
-                            propagateMinConstraints = true
-                        ) { PreviewPage(preview[itemIndex], itemIndex.plus(1), onPageClick) }
-                    } else {
-                        Spacer(Modifier.weight(1f, fill = true))
-                    }
-                }
-            }
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) { index, it ->
+        Box(
+            modifier = Modifier.weight(1f),
+            propagateMinConstraints = true
+        ) {
+            PreviewPage(it, index + 1, onPageClick)
         }
     }
 }
