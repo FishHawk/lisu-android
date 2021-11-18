@@ -6,10 +6,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.material.icons.outlined.LocalLibrary
 import androidx.compose.material.icons.outlined.TravelExplore
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -124,9 +129,12 @@ private fun ProviderListItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        val painter =
+            if (provider.lang == "local") rememberVectorPainter(LisuIcons.LocalLibrary)
+            else rememberImagePainter(provider.icon) { crossfade(true) }
         Image(
             modifier = Modifier.size(32.dp),
-            painter = rememberImagePainter(provider.icon) { crossfade(true) },
+            painter = painter,
             contentDescription = null
         )
         Text(
