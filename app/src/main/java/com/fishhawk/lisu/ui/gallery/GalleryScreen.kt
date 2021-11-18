@@ -6,20 +6,16 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.material.icons.outlined.AutoStories
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -87,7 +83,11 @@ fun GalleryScreen(navController: NavHostController) {
             }
 
             is GalleryAction.ShareCover ->
-                context.shareImage("Share cover via",action.cover, "${detail.title ?: detail.id}-cover")
+                context.shareImage(
+                    "Share cover via",
+                    action.cover,
+                    "${detail.title ?: detail.id}-cover"
+                )
             is GalleryAction.SaveCover ->
                 context.saveImage(action.cover, "${detail.title ?: detail.id}-cover")
             GalleryAction.EditCover -> {
@@ -174,7 +174,7 @@ private fun MangaDetail(
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        MangaHeader(detail, onAction)
+        MangaHeader(detail, history, onAction)
         StateView(
             modifier = Modifier
                 .fillMaxWidth()
@@ -186,40 +186,6 @@ private fun MangaDetail(
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Row {
-                    if (detail.inLibrary)
-                        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.primary) {
-                            MangaActionButton(
-                                icon = LisuIcons.Favorite,
-                                text = "In library"
-                            ) { onAction(GalleryAction.RemoveFromLibrary) }
-                        }
-                    else CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                        MangaActionButton(
-                            icon = LisuIcons.FavoriteBorder,
-                            text = "Add to library"
-                        ) { onAction(GalleryAction.AddToLibrary) }
-                    }
-                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                        MangaActionButton(
-                            icon = LisuIcons.AutoStories,
-                            text = if (history == null) "Read" else "Continue"
-                        ) {
-                            onAction(
-                                GalleryAction.NavToReader(
-                                    collectionId = history?.collectionId
-                                        ?: detail.collections?.keys?.first() ?: " ",
-                                    chapterId = history?.chapterId
-                                        ?: detail.collections?.values?.first()?.first()?.id
-                                        ?: detail.chapters?.first()?.id
-                                        ?: " ",
-                                    page = history?.page ?: 0
-                                )
-                            )
-                        }
-                    }
-                }
-
                 if (!detail.description.isNullOrBlank()) {
                     MangaDescription(detail.description)
                 }
@@ -234,28 +200,6 @@ private fun MangaDetail(
                 MangaContent(detail, history, onAction)
             }
         }
-    }
-}
-
-@Composable
-private fun RowScope.MangaActionButton(
-    icon: ImageVector,
-    text: String,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .weight(1f)
-            .clickable(onClick = onClick)
-            .padding(vertical = 4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            icon,
-            modifier = Modifier.size(24.dp),
-            contentDescription = text
-        )
-        Text(text, style = MaterialTheme.typography.caption)
     }
 }
 

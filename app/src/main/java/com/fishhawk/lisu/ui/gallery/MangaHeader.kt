@@ -1,20 +1,17 @@
 package com.fishhawk.lisu.ui.gallery
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
@@ -26,18 +23,20 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import coil.size.OriginalSize
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 
-internal val MangaHeaderHeight = 250.dp
+internal val MangaHeaderHeight = 290.dp
 
 @OptIn(ExperimentalFoundationApi::class, coil.annotation.ExperimentalCoilApi::class)
 @Composable
 internal fun MangaHeader(
     detail: MangaDetailDto,
+    history: ReadingHistory?,
     onAction: GalleryActionHandler
 ) {
     Box(
@@ -78,7 +77,7 @@ internal fun MangaHeader(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .fillMaxWidth()
-                .fillMaxHeight(0.4f)
+                .fillMaxHeight(0.5f)
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
@@ -105,7 +104,7 @@ internal fun MangaHeader(
             }
             Row(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
                     .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -138,6 +137,8 @@ internal fun MangaHeader(
                     onAuthorLongClick = { onAction(GalleryAction.Copy(it, R.string.author_copied)) }
                 )
             }
+
+            MangaActionButtons(detail, history, onAction)
         }
     }
 }
@@ -233,4 +234,67 @@ private fun MangaInfoSubtitle(
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )
+}
+
+@Composable
+private fun MangaActionButtons(
+    detail: MangaDetailDto,
+    history: ReadingHistory?,
+    onAction: GalleryActionHandler
+) {
+    Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+        if (detail.inLibrary)
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.primary) {
+                MangaActionButton(
+                    icon = LisuIcons.Favorite,
+                    text = "In library"
+                ) { onAction(GalleryAction.RemoveFromLibrary) }
+            }
+        else CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            MangaActionButton(
+                icon = LisuIcons.FavoriteBorder,
+                text = "Add to library"
+            ) { onAction(GalleryAction.AddToLibrary) }
+        }
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            MangaActionButton(
+                icon = LisuIcons.AutoStories,
+                text = if (history == null) "Read" else "Continue"
+            ) {
+                onAction(
+                    GalleryAction.NavToReader(
+                        collectionId = history?.collectionId
+                            ?: detail.collections?.keys?.first() ?: " ",
+                        chapterId = history?.chapterId
+                            ?: detail.collections?.values?.first()?.first()?.id
+                            ?: detail.chapters?.first()?.id
+                            ?: " ",
+                        page = history?.page ?: 0
+                    )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RowScope.MangaActionButton(
+    icon: ImageVector,
+    text: String,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .clickable(onClick = onClick)
+            .padding(vertical = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            icon,
+            modifier = Modifier.size(24.dp),
+            contentDescription = text
+        )
+        Text(text, style = MaterialTheme.typography.caption)
+    }
 }
