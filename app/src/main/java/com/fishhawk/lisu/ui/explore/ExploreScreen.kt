@@ -15,13 +15,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.OriginalSize
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.base.EmptyView
@@ -131,7 +134,14 @@ private fun ProviderListItem(
     ) {
         val painter =
             if (provider.lang == "local") rememberVectorPainter(LisuIcons.LocalLibrary)
-            else rememberImagePainter(provider.icon) { crossfade(true) }
+            else rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(provider.icon)
+                    .size(OriginalSize)
+                    .crossfade(true)
+                    .build()
+            )
+
         Image(
             modifier = Modifier.size(32.dp),
             painter = painter,

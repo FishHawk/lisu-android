@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.ui.reader
 
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,13 +15,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.theme.LisuIcons
 
-@Preview
 @Composable
-internal fun ReaderPageSheet(onAction: ReaderActionHandler) {
+internal fun ReaderPageSheet(
+    drawable: Drawable,
+    position: Int,
+    onAction: ReaderActionHandler
+) {
     Column(modifier = Modifier.fillMaxWidth()) {
         SheetListItem(
             icon = LisuIcons.Refresh,
@@ -29,11 +32,11 @@ internal fun ReaderPageSheet(onAction: ReaderActionHandler) {
         SheetListItem(
             icon = LisuIcons.SaveAlt,
             title = stringResource(R.string.page_action_save)
-        ) { onAction(ReaderAction.SharePage) }
+        ) { onAction(ReaderAction.SavePage(drawable, position)) }
         SheetListItem(
             icon = LisuIcons.Share,
             title = stringResource(R.string.page_action_share)
-        ) { onAction(ReaderAction.SharePage) }
+        ) { onAction(ReaderAction.SharePage(drawable, position)) }
     }
 }
 

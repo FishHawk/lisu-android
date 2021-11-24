@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.ui.reader
 
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
@@ -16,6 +17,8 @@ import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.ui.base.StateView
+import com.fishhawk.lisu.ui.base.saveImage
+import com.fishhawk.lisu.ui.base.shareImage
 import com.fishhawk.lisu.ui.base.toast
 import com.fishhawk.lisu.ui.reader.viewer.ListViewer
 import com.fishhawk.lisu.ui.reader.viewer.PagerViewer
@@ -32,10 +35,13 @@ internal sealed interface ReaderAction {
 
     object OpenSettingSheet : ReaderAction
     object OpenColorFilterSheet : ReaderAction
-    class OpenPageSheet(val url: String) : ReaderAction
+    class OpenPageSheet(val drawable: Drawable, val position: Int) : ReaderAction
 
-    object SharePage : ReaderAction
-    object SavePage : ReaderAction
+    data class SavePage(val drawable: Drawable, val position: Int) : ReaderAction
+    data class SharePage(val drawable: Drawable, val position: Int) : ReaderAction
+
+    object OpenPrevChapter : ReaderAction
+    object OpenNextChapter : ReaderAction
 }
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
@@ -47,6 +53,7 @@ fun ReaderScreen() {
     var currentBottomSheet by remember { mutableStateOf<ReaderAction?>(null) }
 
     val viewModel = viewModel<ReaderViewModel>()
+    val mangaTitle by viewModel.mangaTitle.collectAsState()
 
     val onAction: ReaderActionHandler = { action ->
         when (action) {
@@ -58,14 +65,19 @@ fun ReaderScreen() {
                 currentBottomSheet = action
                 sheetState.show()
             }
-            ReaderAction.SavePage -> {
-//                val prefix = viewModel.makeImageFilenamePrefix()
-//                saveImage(url, "$prefix-$position")
-            }
-            ReaderAction.SharePage -> {
-//                val prefix = viewModel.makeImageFilenamePrefix()
-//                lifecycleScope.shareImage(this, url, "$prefix-$position")
-            }
+            is ReaderAction.SavePage ->
+                context.saveImage(
+                    action.drawable,
+                    "${mangaTitle}-${action.position}"
+                )
+            is ReaderAction.SharePage ->
+                context.shareImage(
+                    "Share page via",
+                    action.drawable,
+                    "${mangaTitle}-${action.position}"
+                )
+            ReaderAction.OpenPrevChapter -> viewModel.openPrevChapter()
+            ReaderAction.OpenNextChapter -> viewModel.openNextChapter()
         }
     }
 
@@ -83,7 +95,11 @@ fun ReaderScreen() {
             when (currentBottomSheet) {
                 ReaderAction.OpenColorFilterSheet -> ReaderOverlaySheet()
                 ReaderAction.OpenSettingSheet -> ReaderSettingsSheet()
-                is ReaderAction.OpenPageSheet -> ReaderPageSheet(onAction)
+                is ReaderAction.OpenPageSheet -> ReaderPageSheet(
+                    (currentBottomSheet as ReaderAction.OpenPageSheet).drawable,
+                    (currentBottomSheet as ReaderAction.OpenPageSheet).position,
+                    onAction
+                )
                 else -> Text("test")
             }
         },
@@ -149,9 +165,22 @@ fun ReaderScreen() {
                     val name = pointer.currChapter.name
                     val title = pointer.currChapter.title
 
-                    ReaderInfoBar(name, title, readerState)
+                    val isMenuOpened by viewModel.isMenuOpened.collectAsState()
+                    val showInfoBar by PR.showInfoBar.collectAsState()
+                    val isOnlyOneChapter by viewModel.isOnlyOneChapter.collectAsState()
+
+                    if (showInfoBar && !isMenuOpened)
+                        ReaderInfoBar(name, title, readerState)
                     ReaderColorFilterOverlay()
-                    ReaderMenu(name, title, readerState, onAction)
+                    ReaderMenu(
+                        isMenuOpened,
+                        mangaTitle,
+                        name,
+                        title,
+                        isOnlyOneChapter,
+                        readerState,
+                        onAction
+                    )
                 }
             }
         }

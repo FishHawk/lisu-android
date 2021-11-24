@@ -17,8 +17,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.ImagePainter
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.size.OriginalSize
@@ -60,11 +60,14 @@ internal fun MangaHeader(
                 }
         }
 
-        val painter = rememberImagePainter(loadedCover) {
-            size(OriginalSize)
-            crossfade(true)
-            crossfade(500)
-        }
+        val painter = rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current)
+                .data(loadedCover)
+                .size(OriginalSize)
+                .crossfade(true)
+                .crossfade(500)
+                .build()
+        )
         Image(
             modifier = Modifier.matchParentSize(),
             painter = painter,
@@ -110,7 +113,7 @@ internal fun MangaHeader(
             ) {
                 Surface(
                     modifier = Modifier.aspectRatio(0.75f).let { modifier ->
-                        (painter.state as? ImagePainter.State.Success)?.result?.drawable?.let {
+                        (painter.state as? AsyncImagePainter.State.Success)?.result?.drawable?.let {
                             modifier.combinedClickable(
                                 onClick = { onAction(GalleryAction.SaveCover(it)) },
                                 onLongClick = { onAction(GalleryAction.ShareCover(it)) }

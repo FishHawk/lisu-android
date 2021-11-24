@@ -103,8 +103,8 @@ dependencies {
 
     implementation("androidx.paging:paging-compose:1.0.0-alpha14")
 
-    implementation("com.google.dagger:hilt-android:2.40.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.40.1")
+    implementation("com.google.dagger:hilt-android:2.40.2")
+    kapt("com.google.dagger:hilt-android-compiler:2.40.2")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
@@ -117,7 +117,7 @@ dependencies {
     kapt("androidx.room:room-compiler:$roomVersion")
 
 
-    val accompanistVersion = "0.21.2-beta"
+    val accompanistVersion = "0.21.3-beta"
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
@@ -127,14 +127,14 @@ dependencies {
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
 
-    val coilVersion = "2.0.0-alpha03"
+    val coilVersion = "2.0.0-alpha04"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
 
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.3")
 
     // Licenses
     implementation("com.mikepenz:aboutlibraries-core:8.9.4")

@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.ui.reader.viewer
 
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -19,11 +20,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.annotation.ExperimentalCoilApi
-import coil.compose.ImagePainter
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.size.OriginalSize
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.collectAsState
@@ -56,6 +59,7 @@ internal fun ListViewer(
 
     val useVolumeKey by PR.useVolumeKey.collectAsState()
     val invertVolumeKey by PR.invertVolumeKey.collectAsState()
+    val isLongTapDialogEnabled by PR.isLongTapDialogEnabled.collectAsState()
 
     val focusRequester = remember { FocusRequester() }
 
@@ -118,7 +122,10 @@ internal fun ListViewer(
                     onTap = {
                         viewModel.isMenuOpened.value = !viewModel.isMenuOpened.value
                     },
-                    onLongPress = { onAction(ReaderAction.OpenPageSheet(it)) }
+                    onLongPress = { drawable, position ->
+                        if (isLongTapDialogEnabled)
+                            onAction(ReaderAction.OpenPageSheet(drawable, position))
+                    }
                 )
             }
         }
@@ -136,9 +143,17 @@ private fun Page(
     position: Int,
     url: String,
     onTap: ((Offset) -> Unit),
-    onLongPress: ((String) -> Unit)
+    onLongPress: ((drawable: Drawable, position: Int) -> Unit)
 ) {
-    val painter = rememberImagePainter(url) { size(OriginalSize) }
+    var retryHash by remember { mutableStateOf(0) }
+    val painter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current)
+            .data(url)
+            .size(OriginalSize)
+            .setParameter("retry_hash", retryHash, cacheKey = null)
+            .build()
+    )
+
     var layout: LayoutCoordinates? = null
 
     Box(
@@ -150,8 +165,8 @@ private fun Page(
                     onPress = { /* Called when the gesture starts */ },
                     onDoubleTap = { /* Called on Double Tap */ },
                     onLongPress = {
-                        if (painter.state is ImagePainter.State.Success)
-                            onLongPress(url)
+                        (painter.state as? AsyncImagePainter.State.Success)
+                            ?.let { onLongPress(it.result.drawable, position) }
                     },
                     onTap = { offset ->
                         onTap(
@@ -178,7 +193,8 @@ private fun Page(
                 .align(Alignment.Center),
             state = painter.state,
             position = position,
-            url = url
+            url = url,
+            onRetry = { retryHash++ }
         )
     }
 }

@@ -45,8 +45,8 @@ internal sealed interface GalleryAction {
         val page: Int
     ) : GalleryAction
 
-    data class ShareCover(val cover: Drawable) : GalleryAction
     data class SaveCover(val cover: Drawable) : GalleryAction
+    data class ShareCover(val cover: Drawable) : GalleryAction
     object EditCover : GalleryAction
 
     object Reload : GalleryAction
@@ -82,14 +82,14 @@ fun GalleryScreen(navController: NavHostController) {
                 context.navToReader(detail, collectionId, chapterId, page)
             }
 
+            is GalleryAction.SaveCover ->
+                context.saveImage(action.cover, "${detail.title ?: detail.id}-cover")
             is GalleryAction.ShareCover ->
                 context.shareImage(
                     "Share cover via",
                     action.cover,
                     "${detail.title ?: detail.id}-cover"
                 )
-            is GalleryAction.SaveCover ->
-                context.saveImage(action.cover, "${detail.title ?: detail.id}-cover")
             GalleryAction.EditCover -> {
 //        val context = LocalContext.current
 //            val newCover = remember { mutableStateOf<Uri?>(null) }

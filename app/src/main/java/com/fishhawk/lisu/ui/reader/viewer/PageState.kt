@@ -16,7 +16,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import coil.annotation.ExperimentalCoilApi
-import coil.compose.ImagePainter
+import coil.compose.AsyncImagePainter
 import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import com.fishhawk.lisu.util.interceptor.ProgressInterceptor
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -57,22 +57,24 @@ fun nestedScrollConnection(
 @Composable
 fun PageState(
     modifier: Modifier,
-    state: ImagePainter.State,
+    state: AsyncImagePainter.State,
     position: Int,
-    url: String
+    url: String,
+    onRetry: () -> Unit
 ) {
     when (state) {
-        is ImagePainter.State.Loading ->
+        is AsyncImagePainter.State.Loading ->
             PageLoadingState(
                 modifier = modifier,
                 position = position,
                 url = url
             )
-        is ImagePainter.State.Error ->
+        is AsyncImagePainter.State.Error ->
             PageErrorState(
                 modifier = modifier,
                 position = position,
-                throwable = state.result.throwable
+                throwable = state.result.throwable,
+                onRetry = onRetry
             )
         else -> Unit
     }
@@ -106,7 +108,12 @@ private fun PageLoadingState(modifier: Modifier, position: Int, url: String) {
 }
 
 @Composable
-private fun PageErrorState(modifier: Modifier, position: Int, throwable: Throwable) {
+private fun PageErrorState(
+    modifier: Modifier,
+    position: Int,
+    throwable: Throwable,
+    onRetry: () -> Unit
+) {
     Box(modifier = modifier) {
         Column(
             modifier = Modifier.align(Alignment.Center),
@@ -121,7 +128,7 @@ private fun PageErrorState(modifier: Modifier, position: Int, throwable: Throwab
                 text = throwable.message ?: "",
                 style = MaterialTheme.typography.body1
             )
-            TextButton(onClick = { }) { Text("retry") }
+            TextButton(onClick = { onRetry() }) { Text("retry") }
         }
     }
 }

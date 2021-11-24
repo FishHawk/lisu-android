@@ -3,7 +3,6 @@ package com.fishhawk.lisu.ui.reader
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,8 +23,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
 import com.fishhawk.lisu.data.datastore.collectAsState
@@ -35,86 +32,73 @@ import com.fishhawk.lisu.ui.reader.viewer.ViewerState
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @Composable
 internal fun BoxScope.ReaderInfoBar(
-    name: String,
-    title: String,
+    chapterName: String,
+    chapterTitle: String,
     readerState: ViewerState?
 ) {
-    val viewModel = viewModel<ReaderViewModel>()
-    val isMenuOpened by viewModel.isMenuOpened.collectAsState()
-
-    val showInfoBar by PR.showInfoBar.collectAsState()
-    if (!showInfoBar || isMenuOpened) return
-
     val infoBarText =
-        if (readerState != null) "$name $title ${readerState.position + 1}/${readerState.size}"
-        else "$name $title"
-
-    Box(
-        modifier = Modifier
-            .align(Alignment.BottomEnd)
-            .background(Color(0xAA000000))
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+        "$chapterName $chapterTitle" +
+                readerState?.let { " ${it.position + 1}/${it.size}" }
+    ReaderMenuSurface(
+        modifier = Modifier.align(Alignment.BottomEnd)
     ) {
-        Text(text = infoBarText, color = Color.White)
+        Text(
+            text = infoBarText,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            color = Color.White
+        )
     }
 }
 
 @Composable
 internal fun BoxScope.ReaderMenu(
-    name: String,
-    title: String,
+    isOpened: Boolean,
+    mangaTitle: String,
+    chapterName: String,
+    chapterTitle: String,
+    isOnlyOneChapter: Boolean,
     viewerState: ViewerState?,
     onAction: ReaderActionHandler
 ) {
-    val viewModel = viewModel<ReaderViewModel>()
-    val isMenuOpened by viewModel.isMenuOpened.collectAsState()
-
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = MaterialTheme.colors.isLight
-    LaunchedEffect(isMenuOpened) {
+    LaunchedEffect(isOpened) {
         systemUiController.setStatusBarColor(
             Color.Transparent,
-            darkIcons = useDarkIcons && !isMenuOpened
+            darkIcons = useDarkIcons && !isOpened
         )
     }
 
     AnimatedVisibility(
         modifier = Modifier.align(Alignment.TopCenter),
-        visible = isMenuOpened,
+        visible = isOpened,
         enter = slideInVertically(initialOffsetY = { -it }),
         exit = slideOutVertically(targetOffsetY = { -it })
     ) {
-        ReaderMenuTop(name, title)
+        ReaderMenuTop(mangaTitle, chapterName, chapterTitle)
     }
 
     AnimatedVisibility(
         modifier = Modifier.align(Alignment.BottomCenter),
-        visible = isMenuOpened,
+        visible = isOpened,
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it })
     ) {
-        ReaderMenuBottom(viewerState, onAction)
+        ReaderMenuBottom(isOnlyOneChapter, viewerState, onAction)
     }
 }
 
-@Composable
-private fun ReaderMenuSurface(
-    modifier: Modifier = Modifier,
-    shape: Shape = RectangleShape,
-    content: @Composable () -> Unit
-) = Surface(
-    modifier = modifier,
-    shape = shape,
-    color = Color(0xFF333333).copy(alpha = 0.8f),
-    contentColor = Color.White,
-    content = content
-)
 
 @Composable
-private fun ReaderMenuTop(name: String, title: String) {
+private fun ReaderMenuTop(
+    mangaTitle: String,
+    chapterName: String,
+    chapterTitle: String
+) {
     ReaderMenuSurface {
         Row(
             modifier = Modifier
@@ -132,8 +116,6 @@ private fun ReaderMenuTop(name: String, title: String) {
                     .weight(1f)
                     .padding(8.dp)
             ) {
-                val viewModel = viewModel<ReaderViewModel>()
-                val mangaTitle by viewModel.mangaTitle.collectAsState()
                 Text(
                     text = mangaTitle,
                     style = MaterialTheme.typography.subtitle1.copy(fontSize = 18.sp),
@@ -142,7 +124,7 @@ private fun ReaderMenuTop(name: String, title: String) {
                 )
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     Text(
-                        text = "$name $title",
+                        text = "$chapterName $chapterTitle",
                         style = MaterialTheme.typography.body2,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -155,12 +137,11 @@ private fun ReaderMenuTop(name: String, title: String) {
 
 @Composable
 private fun ReaderMenuBottom(
+    isOnlyOneChapter: Boolean,
     viewerState: ViewerState?,
     onAction: ReaderActionHandler
 ) {
     Column {
-        val viewModel = viewModel<ReaderViewModel>()
-
         val readingDirection by PR.readerMode.collectAsState()
         val layoutDirection =
             if (readingDirection == ReaderMode.Rtl) LayoutDirection.Rtl
@@ -172,13 +153,12 @@ private fun ReaderMenuBottom(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                val isOnlyOneChapter by viewModel.isOnlyOneChapter.collectAsState()
                 if (!isOnlyOneChapter)
                     ReaderMenuSurface(
                         modifier = Modifier.size(48.dp),
                         shape = CircleShape
                     ) {
-                        IconButton(onClick = { viewModel.openPrevChapter() }) {
+                        IconButton(onClick = { onAction(ReaderAction.OpenPrevChapter) }) {
                             Icon(
                                 if (LocalLayoutDirection.current == LayoutDirection.Ltr)
                                     Icons.Filled.SkipPrevious else Icons.Filled.SkipNext,
@@ -239,7 +219,7 @@ private fun ReaderMenuBottom(
                         modifier = Modifier.size(48.dp),
                         shape = CircleShape
                     ) {
-                        IconButton(onClick = { viewModel.openNextChapter() }) {
+                        IconButton(onClick = { onAction(ReaderAction.OpenNextChapter) }) {
                             Icon(
                                 if (LocalLayoutDirection.current == LayoutDirection.Ltr)
                                     Icons.Filled.SkipNext else Icons.Filled.SkipPrevious,
@@ -255,10 +235,8 @@ private fun ReaderMenuBottom(
                 modifier = Modifier.padding(top = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val context = LocalContext.current
-
                 IconButton(modifier = Modifier.weight(1f), onClick = {
-                    viewModel.viewModelScope.launch { PR.readerMode.setNext() }
+                    runBlocking { PR.readerMode.setNext() }
                 }) {
                     val icon = when (readingDirection) {
                         ReaderMode.Ltr -> Icons.Filled.ArrowForward
@@ -269,7 +247,7 @@ private fun ReaderMenuBottom(
                 }
 
                 IconButton(modifier = Modifier.weight(1f), onClick = {
-                    viewModel.viewModelScope.launch { PR.readerOrientation.setNext() }
+                    runBlocking { PR.readerOrientation.setNext() }
                 }) { Icon(Icons.Filled.ScreenRotation, null) }
 
                 IconButton(modifier = Modifier.weight(1f), onClick = {
@@ -283,3 +261,16 @@ private fun ReaderMenuBottom(
         }
     }
 }
+
+@Composable
+private fun ReaderMenuSurface(
+    modifier: Modifier = Modifier,
+    shape: Shape = RectangleShape,
+    content: @Composable () -> Unit
+) = Surface(
+    modifier = modifier,
+    shape = shape,
+    color = Color(0xFF333333).copy(alpha = 0.8f),
+    contentColor = Color.White,
+    content = content
+)

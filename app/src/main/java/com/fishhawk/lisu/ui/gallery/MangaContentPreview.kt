@@ -8,8 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.OriginalSize
 import com.fishhawk.lisu.ui.widget.VerticalGrid
 
 @Composable
@@ -44,10 +47,14 @@ private fun PreviewPage(
             modifier = Modifier
                 .aspectRatio(0.75f)
                 .clickable { onPageClick(page) },
-            painter = rememberImagePainter(url) {
-                crossfade(true)
-                crossfade(500)
-            },
+            painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(url)
+                    .size(OriginalSize)
+                    .crossfade(true)
+                    .crossfade(500)
+                    .build()
+            ),
             contentDescription = null,
             contentScale = ContentScale.Crop
         )

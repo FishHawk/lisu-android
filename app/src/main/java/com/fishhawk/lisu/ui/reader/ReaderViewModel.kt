@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
 import com.fishhawk.lisu.data.database.model.ReadingHistory
-import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.ChapterDto
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
@@ -242,9 +241,4 @@ class ReaderViewModel @Inject constructor(
         )
         readingHistoryRepository.update(readingHistory)
     }
-
-//    fun makeImageFilenamePrefix(): String? {
-//        val pointer = chapterPointer.value
-//        return "${mangaDetail.title}-$collectionId-${pointer.currChapter.title}"
-//    }
 }

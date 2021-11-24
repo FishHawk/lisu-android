@@ -19,13 +19,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import coil.annotation.ExperimentalCoilApi
-import coil.compose.ImagePainter
-import coil.compose.rememberImagePainter
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import coil.size.OriginalSize
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.google.accompanist.placeholder.PlaceholderHighlight
@@ -146,16 +148,20 @@ fun MangaCover(
     cover: String?,
     modifier: Modifier = Modifier
 ) {
-    val painter = rememberImagePainter(cover) {
-        size(OriginalSize)
-        crossfade(true)
-        crossfade(500)
-    }
+    val painter = rememberAsyncImagePainter(
+        ImageRequest.Builder(LocalContext.current)
+            .data(cover)
+            .size(OriginalSize)
+            .crossfade(true)
+            .crossfade(500)
+            .build()
+    )
+
     Image(
         modifier = modifier
             .aspectRatio(0.75f)
             .placeholder(
-                visible = painter.state is ImagePainter.State.Loading,
+                visible = painter.state is AsyncImagePainter.State.Loading,
                 highlight = PlaceholderHighlight.fade()
             ),
         painter = painter,
