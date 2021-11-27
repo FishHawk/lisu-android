@@ -46,6 +46,7 @@ import com.fishhawk.lisu.ui.more.*
 import com.fishhawk.lisu.ui.provider.ProviderScreen
 import com.fishhawk.lisu.ui.provider.ProviderSearchScreen
 import com.fishhawk.lisu.ui.theme.LisuTheme
+import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.ui.BottomNavigation
 import com.google.accompanist.insets.ui.Scaffold
 import dagger.hilt.android.AndroidEntryPoint
@@ -74,6 +75,7 @@ private fun MainApp() {
     LisuTheme {
         val navController = rememberNavController()
         Scaffold(
+            modifier = Modifier.navigationBarsPadding(),
             bottomBar = { BottomNavigationBar(navController) }
         ) { innerPadding ->
             MainNavHost(
