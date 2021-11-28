@@ -97,7 +97,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-core:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-alpha07")
+    implementation("androidx.navigation:navigation-compose:2.4.0-beta02")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0")
 
@@ -106,7 +106,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.40.2")
     kapt("com.google.dagger:hilt-android-compiler:2.40.2")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-alpha03")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-beta01")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")

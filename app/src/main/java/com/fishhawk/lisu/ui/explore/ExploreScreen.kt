@@ -56,7 +56,7 @@ fun ExploreScreen(navController: NavHostController) {
     val onAction: ExploreActionHandler = { action ->
         when (action) {
             ExploreAction.NavToGlobalSearch -> navController.navToGlobalSearch()
-            is ExploreAction.NavToProvider -> navController.navToProvider(action.provider)
+            is ExploreAction.NavToProvider -> navController.navToProvider(action.provider.id)
             ExploreAction.Reload -> viewModel.reload()
         }
     }

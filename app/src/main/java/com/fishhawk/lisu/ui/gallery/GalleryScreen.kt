@@ -58,9 +58,6 @@ internal sealed interface GalleryAction {
 
 @Composable
 fun GalleryScreen(navController: NavHostController) {
-    navController.setArgument<MangaDto>("manga")
-    navController.setArgument<ProviderDto>("provider")
-
     val context = LocalContext.current
 
     val viewModel = hiltViewModel<GalleryViewModel>()

@@ -15,11 +15,15 @@ class RemoteProviderRepository(retrofit: Flow<Result<Retrofit>?>) :
 
     override val serviceType = RemoteProviderService::class.java
 
-    suspend fun listProvider(): Result<List<ProviderDto>> = resultWrap {
-        it.listProvider().map { info ->
-            info.copy(icon = "${url}provider/${info.id}/icon")
-        }
+    private var cachedProviderList: List<ProviderDto>? = null
+
+    suspend fun listProvider(): Result<List<ProviderDto>> = resultWrap { service ->
+        cachedProviderList ?: service.listProvider()
+            .map { info -> info.copy(icon = "${url}provider/${info.id}/icon") }
+            .also { cachedProviderList = it }
     }
+
+    fun getProvider(id: String): ProviderDto = cachedProviderList?.find { it.id == id }!!
 
     suspend fun getBoard(
         providerId: String,

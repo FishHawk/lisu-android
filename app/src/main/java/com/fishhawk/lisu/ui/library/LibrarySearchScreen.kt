@@ -19,7 +19,6 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.navToGallery
-import com.fishhawk.lisu.ui.setString
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.TextFieldWithSuggestions
@@ -34,8 +33,6 @@ private sealed interface SearchAction {
 
 @Composable
 fun LibrarySearchScreen(navController: NavHostController) {
-    navController.setString("keywords")
-
     val viewModel = hiltViewModel<LibrarySearchViewModel>()
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()

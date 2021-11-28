@@ -27,7 +27,6 @@ import com.fishhawk.lisu.ui.base.MangaListCard
 import com.fishhawk.lisu.ui.base.ViewState
 import com.fishhawk.lisu.ui.navToGallery
 import com.fishhawk.lisu.ui.navToProviderSearch
-import com.fishhawk.lisu.ui.setString
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.TextFieldWithSuggestions
@@ -44,8 +43,6 @@ private sealed interface GlobalSearchAction {
 
 @Composable
 fun GlobalSearchScreen(navController: NavHostController) {
-    navController.setString("keywords")
-
     val viewModel = hiltViewModel<GlobalSearchViewModel>()
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()

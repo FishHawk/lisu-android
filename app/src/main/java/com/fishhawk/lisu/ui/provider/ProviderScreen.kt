@@ -19,11 +19,9 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.lisu.data.datastore.BoardFilter
 import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.navToGallery
 import com.fishhawk.lisu.ui.navToProviderSearch
-import com.fishhawk.lisu.ui.setArgument
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.google.accompanist.flowlayout.FlowRow
@@ -50,8 +48,6 @@ internal sealed interface ProviderAction {
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ProviderScreen(navController: NavHostController) {
-    navController.setArgument<ProviderDto>("provider")
-
     val viewModel = hiltViewModel<ProviderViewModel>()
     val boards = viewModel.boards
     val boardHistory = viewModel.pageHistory.getBlocking()

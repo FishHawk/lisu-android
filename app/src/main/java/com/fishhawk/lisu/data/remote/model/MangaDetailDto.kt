@@ -3,14 +3,13 @@ package com.fishhawk.lisu.data.remote.model
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
-@Parcelize
 data class MetadataDto(
     val title: String? = null,
     val authors: List<String>? = null,
     val isFinished: Boolean? = null,
     val description: String? = null,
     val tags: Map<String, List<String>>? = null
-) : Parcelable
+)
 
 @Parcelize
 data class MangaDetailDto(

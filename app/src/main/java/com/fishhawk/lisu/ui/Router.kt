@@ -2,46 +2,58 @@ package com.fishhawk.lisu.ui
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.setBlocking
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.ProviderDto
+import com.google.gson.Gson
 
-fun NavHostController.navToLibrarySearch(keywords: String? = null) {
-    currentBackStackEntry?.arguments =
-        bundleOf("keywords" to keywords)
-    navigate("library-search")
+object MangaNavType : NavType<MangaDto>(isNullableAllowed = true) {
+    override fun get(bundle: Bundle, key: String): MangaDto? {
+        return bundle.getParcelable(key)
+    }
+
+    override fun parseValue(value: String): MangaDto {
+        return Gson().fromJson(value, MangaDto::class.java)
+    }
+
+    override fun put(bundle: Bundle, key: String, value: MangaDto) {
+        bundle.putParcelable(key, value)
+    }
 }
 
-fun NavHostController.navToProvider(provider: ProviderDto) {
-    currentBackStackEntry?.arguments =
-        bundleOf("provider" to provider)
-    navigate("provider/${provider.id}")
-    PR.lastUsedProvider.setBlocking(provider.id)
+fun NavHostController.navToProvider(id: String) {
+    navigate("provider/${id}")
+    PR.lastUsedProvider.setBlocking(id)
+}
+
+fun NavHostController.navToLibrarySearch(keywords: String? = null) {
+    val query = keywords?.let { "?keywords=${Uri.encode(keywords)}" } ?: ""
+    navigate("library/search$query")
 }
 
 fun NavHostController.navToProviderSearch(providerId: String, keywords: String? = null) {
-    currentBackStackEntry?.arguments =
-        bundleOf("keywords" to keywords)
-    navigate("provider-search/${providerId}")
+    val query = keywords?.let { "?keywords=${Uri.encode(keywords)}" } ?: ""
+    navigate("provider/${providerId}/search$query")
 }
 
 fun NavHostController.navToGlobalSearch(keywords: String? = null) {
-    currentBackStackEntry?.arguments =
-        bundleOf("keywords" to keywords)
-    navigate("global-search")
+    val query = keywords?.let { "?keywords=${Uri.encode(keywords)}" } ?: ""
+    navigate("global-search$query")
 }
 
 fun NavHostController.navToGallery(manga: MangaDto) {
-    currentBackStackEntry?.arguments =
-        bundleOf("manga" to manga)
-    navigate("gallery/${manga.id}")
+    val json = Uri.encode(Gson().toJson(manga))
+    navigate("gallery/${manga.id}/detail?manga=${json}")
 }
 
 fun NavHostController.navToGalleryEdit() = navigate("edit")
+
 
 fun NavHostController.navToSettingGeneral() = navigate("setting-general")
 fun NavHostController.navToSettingReader() = navigate("setting-reader")

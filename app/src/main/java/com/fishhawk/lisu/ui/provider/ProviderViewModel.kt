@@ -8,9 +8,7 @@ import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.ProviderDto
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -18,7 +16,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ProviderViewModel @Inject constructor(
     private val remoteLibraryRepository: RemoteLibraryRepository,
@@ -27,7 +24,9 @@ class ProviderViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val provider: ProviderDto = savedStateHandle.get("provider")!!
+    val provider = remoteProviderRepository.getProvider(
+        savedStateHandle.get("providerId")!!
+    )
 
     val boards = provider.boardModels.keys.toList()
 
