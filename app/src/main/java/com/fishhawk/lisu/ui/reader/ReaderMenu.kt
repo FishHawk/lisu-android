@@ -29,6 +29,7 @@ import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.setNext
 import com.fishhawk.lisu.ui.base.findActivity
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
+import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
@@ -141,7 +142,7 @@ private fun ReaderMenuBottom(
     viewerState: ViewerState?,
     onAction: ReaderActionHandler
 ) {
-    Column {
+    Column(modifier = Modifier.navigationBarsPadding()) {
         val readingDirection by PR.readerMode.collectAsState()
         val layoutDirection =
             if (readingDirection == ReaderMode.Rtl) LayoutDirection.Rtl

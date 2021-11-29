@@ -25,6 +25,7 @@ import com.fishhawk.lisu.ui.reader.viewer.PagerViewer
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -54,6 +55,13 @@ fun ReaderScreen() {
 
     val viewModel = viewModel<ReaderViewModel>()
     val mangaTitle by viewModel.mangaTitle.collectAsState()
+    val isMenuOpened by viewModel.isMenuOpened.collectAsState()
+    val systemUiController = rememberSystemUiController()
+    SideEffect {
+        systemUiController.setNavigationBarColor(
+            color = Color(0xFF333333).copy(alpha = 0.8f)
+        )
+    }
 
     val onAction: ReaderActionHandler = { action ->
         when (action) {
@@ -165,7 +173,6 @@ fun ReaderScreen() {
                     val name = pointer.currChapter.name
                     val title = pointer.currChapter.title
 
-                    val isMenuOpened by viewModel.isMenuOpened.collectAsState()
                     val showInfoBar by PR.showInfoBar.collectAsState()
                     val isOnlyOneChapter by viewModel.isOnlyOneChapter.collectAsState()
 
