@@ -1,6 +1,6 @@
 package com.fishhawk.lisu.ui.globalsearch
 
-import androidx.lifecycle.SavedStateHandle
+import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.SearchHistoryRepository
@@ -9,9 +9,7 @@ import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.base.ViewState
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
-import javax.inject.Inject
 
 data class SearchResult(
     val provider: ProviderDto,
@@ -19,14 +17,13 @@ data class SearchResult(
     val mangas: List<MangaDto> = emptyList()
 )
 
-@HiltViewModel
-class GlobalSearchViewModel @Inject constructor(
+class GlobalSearchViewModel(
+    args: Bundle,
     private val remoteLibraryRepository: RemoteProviderRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
-    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _keywords = MutableStateFlow(savedStateHandle.get<String>("keywords"))
+    private val _keywords = MutableStateFlow(args.getString("keywords"))
     val keywords = _keywords.asStateFlow()
 
     init {

@@ -18,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
@@ -30,6 +29,7 @@ import com.fishhawk.lisu.ui.navToReader
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import org.koin.androidx.compose.viewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -47,7 +47,7 @@ private sealed interface HistoryAction {
 fun HistoryScreen(navController: NavHostController) {
     val context = LocalContext.current
 
-    val viewModel = hiltViewModel<HistoryViewModel>()
+    val viewModel by viewModel<HistoryViewModel>()
     val histories by viewModel.histories.collectAsState()
 
     val onAction: HistoryActionHandler = { action ->

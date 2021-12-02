@@ -19,18 +19,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
-import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.ProviderDto
-import com.fishhawk.lisu.ui.*
 import com.fishhawk.lisu.ui.base.*
+import com.fishhawk.lisu.ui.navToGalleryEdit
+import com.fishhawk.lisu.ui.navToGlobalSearch
+import com.fishhawk.lisu.ui.navToProviderSearch
+import com.fishhawk.lisu.ui.navToReader
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import org.koin.androidx.compose.viewModel
+import org.koin.core.parameter.parametersOf
 
 internal typealias GalleryActionHandler = (GalleryAction) -> Unit
 
@@ -58,12 +60,14 @@ internal sealed interface GalleryAction {
 
 @Composable
 fun GalleryScreen(navController: NavHostController) {
-    val context = LocalContext.current
-
-    val viewModel = hiltViewModel<GalleryViewModel>()
+    val viewModel by viewModel<GalleryViewModel> {
+        parametersOf(navController.currentBackStackEntry!!.arguments!!)
+    }
     val viewState by viewModel.viewState.collectAsState()
     val detail by viewModel.detail.collectAsState()
     val history by viewModel.history.collectAsState()
+
+    val context = LocalContext.current
 
     val onAction: GalleryActionHandler = { action ->
         when (action) {

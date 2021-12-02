@@ -7,7 +7,6 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.setBlocking
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
@@ -29,7 +28,6 @@ object MangaNavType : NavType<MangaDto>(isNullableAllowed = true) {
 
 fun NavHostController.navToProvider(id: String) {
     navigate("provider/${id}")
-    PR.lastUsedProvider.setBlocking(id)
 }
 
 fun NavHostController.navToLibrarySearch(keywords: String? = null) {

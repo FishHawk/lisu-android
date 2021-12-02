@@ -17,13 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.*
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.TextFieldWithSuggestions
+import org.koin.androidx.compose.viewModel
 
 private typealias MoreActionHandler = (MoreAction) -> Unit
 
@@ -38,7 +38,7 @@ private sealed interface MoreAction {
 
 @Composable
 fun MoreScreen(navController: NavHostController) {
-    val viewModel = hiltViewModel<MoreViewModel>()
+    val viewModel by viewModel<MoreViewModel>()
     val address by viewModel.address.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
 

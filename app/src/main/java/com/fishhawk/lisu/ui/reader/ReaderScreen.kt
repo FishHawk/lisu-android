@@ -10,16 +10,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.imageLoader
 import coil.request.ImageRequest
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
 import com.fishhawk.lisu.data.datastore.collectAsState
-import com.fishhawk.lisu.ui.base.StateView
-import com.fishhawk.lisu.ui.base.saveImage
-import com.fishhawk.lisu.ui.base.shareImage
-import com.fishhawk.lisu.ui.base.toast
+import com.fishhawk.lisu.ui.base.*
 import com.fishhawk.lisu.ui.reader.viewer.ListViewer
 import com.fishhawk.lisu.ui.reader.viewer.PagerViewer
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
@@ -28,6 +24,8 @@ import com.google.accompanist.pager.PagerState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.viewModel
+import org.koin.core.parameter.parametersOf
 
 internal typealias ReaderActionHandler = (ReaderAction) -> Unit
 
@@ -53,7 +51,10 @@ fun ReaderScreen() {
     val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     var currentBottomSheet by remember { mutableStateOf<ReaderAction?>(null) }
 
-    val viewModel = viewModel<ReaderViewModel>()
+    val viewModel by viewModel<ReaderViewModel> {
+        parametersOf(context.findActivity().intent.extras!!)
+    }
+
     val mangaTitle by viewModel.mangaTitle.collectAsState()
     val isMenuOpened by viewModel.isMenuOpened.collectAsState()
     val systemUiController = rememberSystemUiController()

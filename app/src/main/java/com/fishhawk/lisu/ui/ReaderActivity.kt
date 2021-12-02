@@ -5,17 +5,14 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
-import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderOrientation
 import com.fishhawk.lisu.ui.base.BaseActivity
 import com.fishhawk.lisu.ui.reader.ReaderScreen
 import com.fishhawk.lisu.ui.theme.LisuTheme
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-@AndroidEntryPoint
 class ReaderActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

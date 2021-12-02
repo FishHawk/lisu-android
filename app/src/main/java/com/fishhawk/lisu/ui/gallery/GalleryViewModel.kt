@@ -1,6 +1,6 @@
 package com.fishhawk.lisu.ui.gallery
 
-import androidx.lifecycle.SavedStateHandle
+import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
@@ -9,27 +9,24 @@ import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.ViewState
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class GalleryViewModel @Inject constructor(
+class GalleryViewModel(
+    args: Bundle,
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
     readingHistoryRepository: ReadingHistoryRepository,
-    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
     val viewState = _viewState.asStateFlow()
 
-    private val manga = savedStateHandle.get<MangaDto>("manga")!!
+    private val manga = args.getParcelable<MangaDto>("manga")!!
     private val _detail = MutableStateFlow(manga.let {
         MangaDetailDto(
             providerId = it.providerId,

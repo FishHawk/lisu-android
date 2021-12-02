@@ -20,12 +20,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.OriginalSize
+import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.data.datastore.setBlocking
 import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.base.EmptyView
 import com.fishhawk.lisu.ui.base.StateView
@@ -35,6 +36,7 @@ import com.fishhawk.lisu.ui.navToProvider
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import org.koin.androidx.compose.viewModel
 import java.util.*
 
 private typealias ExploreActionHandler = (ExploreAction) -> Unit
@@ -48,7 +50,7 @@ private sealed interface ExploreAction {
 
 @Composable
 fun ExploreScreen(navController: NavHostController) {
-    val viewModel = hiltViewModel<ExploreViewModel>()
+    val viewModel by viewModel<ExploreViewModel>()
     val viewState by viewModel.viewState.collectAsState()
     val providers by viewModel.providers.collectAsState()
     val lastUsedProvider by viewModel.lastUsedProvider.collectAsState()
@@ -127,7 +129,10 @@ private fun ProviderListItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onAction(ExploreAction.NavToProvider(provider)) }
+            .clickable {
+                onAction(ExploreAction.NavToProvider(provider))
+                PR.lastUsedProvider.setBlocking(provider.id)
+            }
             .padding(horizontal = 8.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)

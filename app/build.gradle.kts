@@ -2,11 +2,10 @@ import java.io.FileInputStream
 import java.util.*
 
 plugins {
-    kotlin("kapt")
+    id("com.google.devtools.ksp") version "1.6.0-1.0.1"
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-parcelize")
-    id("dagger.hilt.android.plugin")
     id("com.mikepenz.aboutlibraries.plugin")
 }
 
@@ -79,7 +78,7 @@ android {
     }
 
     composeOptions {
-        val composeVersion = "1.1.0-beta03"
+        val composeVersion = "1.1.0-beta04"
         kotlinCompilerExtensionVersion = composeVersion
     }
 }
@@ -89,7 +88,7 @@ dependencies {
 
     implementation("androidx.activity:activity-compose:1.4.0")
 
-    val composeVersion = "1.1.0-beta03"
+    val composeVersion = "1.1.0-beta04"
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
@@ -103,19 +102,18 @@ dependencies {
 
     implementation("androidx.paging:paging-compose:1.0.0-alpha14")
 
-    implementation("com.google.dagger:hilt-android:2.40.2")
-    kapt("com.google.dagger:hilt-android-compiler:2.40.2")
-    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0-beta01")
-    kapt("androidx.hilt:hilt-compiler:1.0.0")
-
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    val roomVersion = "2.4.0-beta02"
+    val roomVersion = "2.4.0-rc01"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
-    kapt("androidx.room:room-compiler:$roomVersion")
+    ksp("androidx.room:room-compiler:$roomVersion")
 
+
+    val koinVersion = "3.1.4"
+    implementation("io.insert-koin:koin-core:$koinVersion")
+    implementation("io.insert-koin:koin-android:$koinVersion")
+    implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
 
     val accompanistVersion = "0.21.3-beta"
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")

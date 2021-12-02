@@ -1,6 +1,6 @@
 package com.fishhawk.lisu.ui.reader
 
-import androidx.lifecycle.SavedStateHandle
+import android.os.Bundle
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
@@ -11,10 +11,8 @@ import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Effect
 import com.fishhawk.lisu.ui.base.ViewState
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class ReaderChapter(
     val collectionId: String,
@@ -32,23 +30,22 @@ sealed interface ReaderEffect : Effect {
     data class Message(val redId: Int) : ReaderEffect
 }
 
-@HiltViewModel
-class ReaderViewModel @Inject constructor(
+class ReaderViewModel(
+    args: Bundle,
     private val remoteProviderRepository: RemoteProviderRepository,
     private val readingHistoryRepository: ReadingHistoryRepository,
-    private val savedStateHandle: SavedStateHandle
 ) : BaseViewModel<ReaderEffect>() {
 
     private val mangaId =
-        savedStateHandle.get<MangaDetailDto>("detail")?.id
-            ?: savedStateHandle.get<String>("mangaId")!!
+        args.getParcelable<MangaDetailDto>("detail")?.id
+            ?: args.getString("mangaId")!!
 
     private val providerId =
-        savedStateHandle.get<MangaDetailDto>("detail")?.providerId
-            ?: savedStateHandle.get<String>("providerId")!!
+        args.getParcelable<MangaDetailDto>("detail")?.providerId
+            ?: args.getString("providerId")!!
 
     private val mangaDetail = MutableStateFlow(
-        savedStateHandle.get<MangaDetailDto>("detail")?.let { Result.success(it) }
+        args.getParcelable<MangaDetailDto>("detail")?.let { Result.success(it) }
     )
 
     val mangaLoadState = mangaDetail
@@ -67,8 +64,8 @@ class ReaderViewModel @Inject constructor(
         .map { it?.getOrNull() }
         .filterNotNull()
         .map { detail ->
-            val collectionId = savedStateHandle.get<String>("collectionId")!!
-            val chapterId = savedStateHandle.get<String>("chapterId")!!
+            val collectionId = args.getString("collectionId")!!
+            val chapterId = args.getString("chapterId")!!
             when {
                 collectionId.isNotBlank() -> {
                     detail.collections!![collectionId]!!.mapIndexed { index, chapter ->
@@ -92,12 +89,12 @@ class ReaderViewModel @Inject constructor(
             }
         }
         .onEach { chapters ->
-            val chapterId = savedStateHandle.get<String>("chapterId")
+            val chapterId = args.getString("chapterId")
             val chapterIndex = chapters.indexOfFirst { it.id == chapterId }
             chapterPointer = MutableStateFlow(
                 ReaderChapterPointer(
                     index = if (chapterIndex < 0) 0 else chapterIndex,
-                    startPage = savedStateHandle.get<Int>("page") ?: 0
+                    startPage = args.getInt("page", 0)
                 )
             )
         }

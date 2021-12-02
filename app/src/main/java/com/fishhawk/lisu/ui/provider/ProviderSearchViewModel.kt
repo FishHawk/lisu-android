@@ -1,6 +1,6 @@
 package com.fishhawk.lisu.ui.provider
 
-import androidx.lifecycle.SavedStateHandle
+import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
@@ -8,21 +8,18 @@ import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.database.model.SearchHistory
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ProviderSearchViewModel @Inject constructor(
+class ProviderSearchViewModel(
+    args: Bundle,
     private val remoteProviderRepository: RemoteProviderRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
-    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    val providerId: String = savedStateHandle.get("providerId")!!
+    val providerId = args.getString("providerId")!!
 
-    private val _keywords = MutableStateFlow(savedStateHandle.get<String>("keywords"))
+    private val _keywords = MutableStateFlow(args.getString("keywords"))
     val keywords = _keywords.asStateFlow()
 
     init {

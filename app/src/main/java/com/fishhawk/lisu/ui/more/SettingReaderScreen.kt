@@ -9,11 +9,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import com.fishhawk.lisu.data.datastore.ReaderMode
 import com.fishhawk.lisu.data.datastore.ReaderOrientation
 import com.fishhawk.lisu.data.datastore.ScaleType
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import org.koin.androidx.compose.get
 
 @Composable
 fun SettingReaderScreen(navController: NavHostController) {

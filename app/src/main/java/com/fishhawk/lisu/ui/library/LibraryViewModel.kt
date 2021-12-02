@@ -6,19 +6,16 @@ import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Effect
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 sealed interface LibraryEffect : Effect {
     data class Toast(val message: String) : LibraryEffect
     data class NavToGallery(val manga: MangaDto) : LibraryEffect
 }
 
-@HiltViewModel
-class LibraryViewModel @Inject constructor(
+class LibraryViewModel(
     private val repository: RemoteLibraryRepository
 ) : BaseViewModel<LibraryEffect>() {
     private var source: LibraryMangaSource? = null

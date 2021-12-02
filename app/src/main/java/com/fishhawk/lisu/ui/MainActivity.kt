@@ -47,9 +47,7 @@ import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.ui.BottomNavigation
 import com.google.accompanist.insets.ui.Scaffold
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,24 +98,22 @@ private fun MainNavHost(
             navArgument("keywords") { nullable = true }
         )) { GlobalSearchScreen(navController) }
 
-        composable(
-            "library/search",
-            listOf(navArgument("keywords") { nullable = true })
-        ) { LibrarySearchScreen(navController) }
+        composable("library/search?keywords={keywords}", listOf(
+            navArgument("keywords") { nullable = true }
+        )) { LibrarySearchScreen(navController) }
 
         composable("provider/{providerId}") { ProviderScreen(navController) }
 
-        composable("provider/{providerId}/search", listOf(
+        composable("provider/{providerId}/search?keywords={keywords}", listOf(
             navArgument("keywords") { nullable = true }
         )) { ProviderSearchScreen(navController) }
 
-        composable(
-            "gallery/{mangaId}/detail?manga={manga}",
-            listOf(navArgument("manga") {
+        composable("gallery/{mangaId}/detail?manga={manga}", listOf(
+            navArgument("manga") {
                 nullable = true
                 type = MangaNavType
-            })
-        ) { GalleryScreen(navController) }
+            }
+        )) { GalleryScreen(navController) }
 
         composable("edit") { GalleryEditScreen(navController) }
 

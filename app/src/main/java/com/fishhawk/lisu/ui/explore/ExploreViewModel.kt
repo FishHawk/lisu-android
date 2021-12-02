@@ -6,13 +6,10 @@ import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.base.ViewState
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ExploreViewModel @Inject constructor(
+class ExploreViewModel (
     private val repository: RemoteProviderRepository
 ) : ViewModel() {
 

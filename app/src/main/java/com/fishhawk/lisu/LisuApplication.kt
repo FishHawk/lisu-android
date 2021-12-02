@@ -1,7 +1,6 @@
 package com.fishhawk.lisu
 
 import android.app.Application
-import android.content.Context
 import android.webkit.URLUtil
 import androidx.room.Room
 import coil.ImageLoader
@@ -14,34 +13,46 @@ import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
+import com.fishhawk.lisu.ui.explore.ExploreViewModel
+import com.fishhawk.lisu.ui.gallery.GalleryViewModel
+import com.fishhawk.lisu.ui.globalsearch.GlobalSearchViewModel
+import com.fishhawk.lisu.ui.history.HistoryViewModel
+import com.fishhawk.lisu.ui.library.LibrarySearchViewModel
+import com.fishhawk.lisu.ui.library.LibraryViewModel
+import com.fishhawk.lisu.ui.more.MoreViewModel
+import com.fishhawk.lisu.ui.provider.ProviderSearchViewModel
+import com.fishhawk.lisu.ui.provider.ProviderViewModel
+import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import com.fishhawk.lisu.util.interceptor.ProgressInterceptor
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.HiltAndroidApp
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 import okhttp3.OkHttpClient
+import org.koin.android.ext.koin.androidApplication
+import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
-import javax.inject.Inject
-import javax.inject.Singleton
 
 lateinit var PR: PreferenceRepository
 
-@HiltAndroidApp
 class LisuApplication : Application(), ImageLoaderFactory {
-    @Inject
-    lateinit var pr: PreferenceRepository
-
     override fun onCreate() {
         super.onCreate()
-        PR = pr
+        startKoin {
+            androidContext(this@LisuApplication)
+            modules(appModule)
+        }
+
+        PR = object : KoinComponent {
+            val pr by inject<PreferenceRepository>()
+        }.pr
     }
 
     override fun newImageLoader(): ImageLoader {
@@ -55,14 +66,12 @@ class LisuApplication : Application(), ImageLoaderFactory {
     }
 }
 
-@Module
-@InstallIn(SingletonComponent::class)
-object AppModule {
+val appModule = module {
+    single { PreferenceRepository(androidApplication()) }
+    single { ProviderBrowseHistoryRepository(androidApplication()) }
 
-    @Singleton
-    @Provides
-    fun provideRetrofit(preferenceRepository: PreferenceRepository): Flow<Result<Retrofit>?> {
-        return preferenceRepository.serverAddress.flow
+    single<Flow<Result<Retrofit>?>> {
+        get<PreferenceRepository>().serverAddress.flow
             .map { address ->
                 address
                     .let { it.ifBlank { null } }
@@ -92,47 +101,31 @@ object AppModule {
             )
     }
 
-    @Provides
-    @Singleton
-    fun provideLibraryRepository(retrofit: Flow<Result<Retrofit>?>) =
-        RemoteLibraryRepository(retrofit)
+    single { RemoteLibraryRepository(get()) }
+    single { RemoteProviderRepository(get()) }
 
-    @Provides
-    @Singleton
-    fun provideProviderRepository(retrofit: Flow<Result<Retrofit>?>) =
-        RemoteProviderRepository(retrofit)
-
-    @Provides
-    @Singleton
-    fun database(@ApplicationContext applicationContext: Context) =
+    single {
         Room.databaseBuilder(
-            applicationContext,
+            androidApplication(),
             ApplicationDatabase::class.java,
             "Test.db"
         ).build()
+    }
 
-    @Provides
-    @Singleton
-    fun provideReadingHistoryRepository(db: ApplicationDatabase) =
-        ReadingHistoryRepository(db.readingHistoryDao())
+    single { ReadingHistoryRepository(get<ApplicationDatabase>().readingHistoryDao()) }
+    single { SearchHistoryRepository(get<ApplicationDatabase>().searchHistoryDao()) }
+    single { ServerHistoryRepository(get<ApplicationDatabase>().serverHistoryDao()) }
 
-    @Provides
-    @Singleton
-    fun provideSearchHistoryRepository(db: ApplicationDatabase) =
-        SearchHistoryRepository(db.searchHistoryDao())
+    viewModel { LibraryViewModel(get()) }
+    viewModel { LibrarySearchViewModel(get(), get(), get()) }
+    viewModel { HistoryViewModel(get()) }
+    viewModel { ExploreViewModel(get()) }
+    viewModel { MoreViewModel(get()) }
+    viewModel { GlobalSearchViewModel(get(), get(), get()) }
+    viewModel { ProviderViewModel(get(), get(), get(), get()) }
+    viewModel { ProviderSearchViewModel(get(), get(), get()) }
 
-    @Provides
-    @Singleton
-    fun provideServerHistoryRepository(db: ApplicationDatabase) =
-        ServerHistoryRepository(db.serverHistoryDao())
+    viewModel { GalleryViewModel(get(), get(), get(), get()) }
 
-    @Provides
-    @Singleton
-    fun preferenceRepository(@ApplicationContext applicationContext: Context) =
-        PreferenceRepository(applicationContext)
-
-    @Provides
-    @Singleton
-    fun provideProviderBrowseHistoryRepository(@ApplicationContext applicationContext: Context) =
-        ProviderBrowseHistoryRepository(applicationContext)
+    viewModel { ReaderViewModel(get(), get(), get()) }
 }

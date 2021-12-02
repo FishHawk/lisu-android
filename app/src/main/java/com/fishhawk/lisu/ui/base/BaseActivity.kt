@@ -6,11 +6,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
-import com.fishhawk.lisu.PR
+import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.koin.android.ext.android.inject
 
 open class BaseActivity : ComponentActivity() {
+    val PR by inject<PreferenceRepository>()
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {}

@@ -6,15 +6,12 @@ import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.database.ServerHistoryRepository
 import com.fishhawk.lisu.data.database.model.ServerHistory
 import com.fishhawk.lisu.data.datastore.getBlocking
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class MoreViewModel @Inject constructor(
+class MoreViewModel (
     private val repository: ServerHistoryRepository
 ) : ViewModel() {
     val address = PR.serverAddress.let {

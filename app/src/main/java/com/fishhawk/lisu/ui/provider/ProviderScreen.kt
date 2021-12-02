@@ -12,7 +12,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -27,6 +26,8 @@ import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.viewModel
+import org.koin.core.parameter.parametersOf
 
 internal typealias ProviderActionHandler = (ProviderAction) -> Unit
 
@@ -48,7 +49,9 @@ internal sealed interface ProviderAction {
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ProviderScreen(navController: NavHostController) {
-    val viewModel = hiltViewModel<ProviderViewModel>()
+    val viewModel by viewModel<ProviderViewModel> {
+        parametersOf(navController.currentBackStackEntry!!.arguments!!)
+    }
     val boards = viewModel.boards
     val boardHistory = viewModel.pageHistory.getBlocking()
 

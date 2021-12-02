@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDto
@@ -31,6 +30,8 @@ import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.TextFieldWithSuggestions
 import kotlinx.coroutines.flow.StateFlow
+import org.koin.androidx.compose.viewModel
+import org.koin.core.parameter.parametersOf
 
 private typealias GlobalSearchActionHandler = (GlobalSearchAction) -> Unit
 
@@ -43,7 +44,9 @@ private sealed interface GlobalSearchAction {
 
 @Composable
 fun GlobalSearchScreen(navController: NavHostController) {
-    val viewModel = hiltViewModel<GlobalSearchViewModel>()
+    val viewModel by viewModel<GlobalSearchViewModel> {
+        parametersOf(navController.currentBackStackEntry!!.arguments!!)
+    }
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
     val searchResultList by viewModel.searchResultList.collectAsState()

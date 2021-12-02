@@ -1,24 +1,21 @@
 package com.fishhawk.lisu.ui.library
 
-import androidx.lifecycle.SavedStateHandle
+import android.os.Bundle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
-import javax.inject.Inject
 
-@HiltViewModel
-class LibrarySearchViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+class LibrarySearchViewModel(
+    args: Bundle,
     private val remoteLibraryRepository: RemoteLibraryRepository,
     searchHistoryRepository: SearchHistoryRepository,
 ) : BaseViewModel<LibraryEffect>() {
 
-    private val _keywords = MutableStateFlow(savedStateHandle.get<String>("keywords"))
+    private val _keywords = MutableStateFlow(args.getString("keywords"))
     val keywords = _keywords.asStateFlow()
 
     val suggestions = searchHistoryRepository.list()

@@ -11,7 +11,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -22,6 +21,8 @@ import com.fishhawk.lisu.ui.navToGallery
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.TextFieldWithSuggestions
+import org.koin.androidx.compose.viewModel
+import org.koin.core.parameter.parametersOf
 
 private typealias SearchActionHandler = (SearchAction) -> Unit
 
@@ -35,7 +36,9 @@ private sealed interface SearchAction {
 
 @Composable
 fun ProviderSearchScreen(navController: NavHostController) {
-    val viewModel = hiltViewModel<ProviderSearchViewModel>()
+    val viewModel by viewModel<ProviderSearchViewModel> {
+        parametersOf(navController.currentBackStackEntry!!.arguments!!)
+    }
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
     val mangaList = viewModel.mangaList.collectAsLazyPagingItems()

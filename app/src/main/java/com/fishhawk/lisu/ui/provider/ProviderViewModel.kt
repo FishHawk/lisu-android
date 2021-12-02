@@ -1,6 +1,6 @@
 package com.fishhawk.lisu.ui.provider
 
-import androidx.lifecycle.SavedStateHandle
+import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
@@ -8,25 +8,20 @@ import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ProviderViewModel @Inject constructor(
+class ProviderViewModel(
+    args: Bundle,
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
-    private val providerBrowseHistoryRepository: ProviderBrowseHistoryRepository,
-    savedStateHandle: SavedStateHandle
+    private val providerBrowseHistoryRepository: ProviderBrowseHistoryRepository
 ) : ViewModel() {
 
-    val provider = remoteProviderRepository.getProvider(
-        savedStateHandle.get("providerId")!!
-    )
+    val provider = remoteProviderRepository.getProvider(args.getString("providerId")!!)
 
     val boards = provider.boardModels.keys.toList()
 
