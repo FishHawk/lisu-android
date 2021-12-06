@@ -92,7 +92,6 @@ class RemoteProviderRepository(retrofit: Flow<Result<Retrofit>?>) :
     }
 
     private fun processCover(providerId: String, mangaId: String, cover: String?): String {
-        val imageId = cover?.let { URLEncoder.encode(it, "UTF-8") }
-        return "${url}provider/${providerId}/manga/${mangaId}/cover?imageId=${imageId}"
+        return "${url}provider/${providerId}/manga/${mangaId}/cover?imageId=${cover}"
     }
 }

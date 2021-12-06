@@ -7,7 +7,6 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import com.fishhawk.lisu.data.datastore.setBlocking
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.google.gson.Gson
