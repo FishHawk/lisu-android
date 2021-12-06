@@ -31,10 +31,14 @@ internal fun MangaContent(
     val onPageClick = { page: Int ->
         onAction(GalleryAction.NavToReader(" ", " ", page))
     }
-    detail.collections?.also { MangaContentCollections(it, isMarked, onChapterClick) }
-        ?: detail.chapters?.also { MangaContentChapters(it, isMarked, onChapterClick) }
-        ?: detail.preview?.also { MangaContentPreview(it, onPageClick) }
-        ?: MangaNoChapter()
+
+    if (!detail.collections.isNullOrEmpty())
+        MangaContentCollections(detail.collections, isMarked, onChapterClick)
+    else if (!detail.chapters.isNullOrEmpty())
+        MangaContentChapters(detail.chapters, isMarked, onChapterClick)
+    else if (!detail.preview.isNullOrEmpty())
+        MangaContentPreview(detail.preview!!, onPageClick)
+    else MangaNoChapter()
 }
 
 @Composable
