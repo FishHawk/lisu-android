@@ -4,19 +4,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
@@ -26,9 +20,9 @@ import com.fishhawk.lisu.ui.base.MangaListCard
 import com.fishhawk.lisu.ui.base.ViewState
 import com.fishhawk.lisu.ui.navToGallery
 import com.fishhawk.lisu.ui.navToProviderSearch
-import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
-import com.fishhawk.lisu.ui.widget.TextFieldWithSuggestions
+import com.fishhawk.lisu.ui.widget.LisuSearchToolBar
+import com.fishhawk.lisu.ui.widget.SuggestionList
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
@@ -47,9 +41,12 @@ fun GlobalSearchScreen(navController: NavHostController) {
     val viewModel by viewModel<GlobalSearchViewModel> {
         parametersOf(navController.currentBackStackEntry!!.arguments!!)
     }
-    val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
     val searchResultList by viewModel.searchResultList.collectAsState()
+
+    var keywords by remember { mutableStateOf(viewModel.keywords.value ?: "") }
+    var editing by remember { mutableStateOf(viewModel.keywords.value == null) }
+
     val onAction: GlobalSearchActionHandler = { action ->
         when (action) {
             GlobalSearchAction.NavUp -> navController.navigateUp()
@@ -62,39 +59,32 @@ fun GlobalSearchScreen(navController: NavHostController) {
     }
 
     Scaffold(
-        topBar = { ToolBar(keywords, suggestions, onAction) },
-        content = { LisuTransition { SearchResultList(searchResultList, onAction) } }
-    )
-}
-
-@Composable
-private fun ToolBar(
-    initKeywords: String?,
-    suggestions: List<String>,
-    onAction: GlobalSearchActionHandler
-) {
-    LisuToolBar(onNavUp = { onAction(GlobalSearchAction.NavUp) }) {
-        var keywords by remember { mutableStateOf(initKeywords ?: "") }
-        val focusManager = LocalFocusManager.current
-        val focusRequester = remember { FocusRequester() }
-
-        TextFieldWithSuggestions(
-            value = keywords,
-            onValueChange = { keywords = it },
-            suggestions = suggestions,
-            modifier = Modifier.focusRequester(focusRequester),
-            placeholder = { Text(stringResource(R.string.menu_search_global_hint)) },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions {
-                onAction(GlobalSearchAction.Search(keywords))
-                focusManager.clearFocus()
+        topBar = {
+            LisuSearchToolBar(
+                onSearch = { onAction(GlobalSearchAction.Search(keywords)) },
+                value = keywords,
+                onValueChange = { keywords = it },
+                editing = editing,
+                onEditingChange = { editing = it },
+                placeholder = { Text(stringResource(R.string.menu_search_global_hint)) },
+                onNavUp = { onAction(GlobalSearchAction.NavUp) }
+            )
+        },
+        content = {
+            LisuTransition {
+                SearchResultList(searchResultList, onAction)
+                if (editing) {
+                    val relativeSuggestions = suggestions.filter {
+                        it.contains(keywords) && it != keywords
+                    }
+                    SuggestionList(
+                        suggestions = relativeSuggestions,
+                        onSuggestionSelected = { keywords = it }
+                    )
+                }
             }
-        )
-        DisposableEffect(Unit) {
-            if (initKeywords == null) focusRequester.requestFocus()
-            onDispose { }
         }
-    }
+    )
 }
 
 @Composable
