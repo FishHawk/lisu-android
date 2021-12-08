@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -110,19 +111,30 @@ fun MangaListCard(
             onLongClick = { manga?.let { onCardLongClick(it) } }
         )
     ) {
-        Box(Modifier.height(IntrinsicSize.Max)) {
+        Box(
+            modifier = Modifier
+                .width(IntrinsicSize.Min)
+                .height(IntrinsicSize.Max)
+        ) {
             MangaCover(manga?.cover)
+
+            val textStyle = MaterialTheme.typography.subtitle2.copy(
+                shadow = Shadow(Color.White, Offset.Zero, 2f)
+            )
+            val textLineHeight = with(LocalDensity.current) {
+                (textStyle.fontSize * 4 / 3).toDp() + 4.dp
+            }
             Box(
-                Modifier
+                modifier = Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
-                    .fillMaxHeight(0.4f)
+                    .height(textLineHeight * 2)
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
                                 Color.Transparent,
                                 Color(0xAA000000)
-                            ),
+                            )
                         )
                     )
             )
