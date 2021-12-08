@@ -9,10 +9,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.data.datastore.*
+import com.fishhawk.lisu.data.datastore.ChapterDisplayMode
+import com.fishhawk.lisu.data.datastore.ChapterDisplayOrder
+import com.fishhawk.lisu.data.datastore.StartScreen
+import com.fishhawk.lisu.data.datastore.Theme
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
-import org.koin.androidx.compose.get
 
 @Composable
 fun SettingGeneralScreen(navController: NavHostController) {

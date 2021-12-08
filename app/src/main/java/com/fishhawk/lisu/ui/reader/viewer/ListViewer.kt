@@ -29,13 +29,11 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.OriginalSize
 import com.fishhawk.lisu.PR
-import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.ui.reader.ReaderAction
 import com.fishhawk.lisu.ui.reader.ReaderActionHandler
 import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

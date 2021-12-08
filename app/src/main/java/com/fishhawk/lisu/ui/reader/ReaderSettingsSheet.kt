@@ -8,11 +8,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import com.fishhawk.lisu.data.datastore.ScaleType
 import com.fishhawk.lisu.ui.more.ListPreference
 import com.fishhawk.lisu.ui.more.SwitchPreference
-import org.koin.androidx.compose.get
 
 @Composable
 fun ReaderSettingsSheet() {

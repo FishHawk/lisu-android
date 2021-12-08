@@ -42,6 +42,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 
 lateinit var PR: PreferenceRepository
 
+@Suppress("unused")
 class LisuApplication : Application(), ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()

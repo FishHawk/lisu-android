@@ -14,7 +14,6 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.data.remote.model.MangaDto
@@ -27,7 +26,6 @@ import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import kotlinx.coroutines.flow.collect
-import org.koin.androidx.compose.get
 import org.koin.androidx.compose.viewModel
 
 private typealias LibraryActionHandler = (LibraryAction) -> Unit

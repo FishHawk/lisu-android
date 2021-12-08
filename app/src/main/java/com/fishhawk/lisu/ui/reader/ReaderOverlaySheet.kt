@@ -17,11 +17,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.data.datastore.*
+import com.fishhawk.lisu.data.datastore.ColorFilterMode
+import com.fishhawk.lisu.data.datastore.Preference
+import com.fishhawk.lisu.data.datastore.collectAsState
+import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.ui.more.ListPreference
 import com.fishhawk.lisu.ui.more.SwitchPreference
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
 
 @OptIn(ExperimentalGraphicsApi::class)
 @Composable

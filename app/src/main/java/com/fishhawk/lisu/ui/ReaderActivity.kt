@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
+import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderOrientation
 import com.fishhawk.lisu.ui.base.BaseActivity
 import com.fishhawk.lisu.ui.reader.ReaderScreen
