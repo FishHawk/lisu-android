@@ -44,7 +44,7 @@ fun GlobalSearchScreen(navController: NavHostController) {
     val suggestions by viewModel.suggestions.collectAsState()
     val searchResultList by viewModel.searchResultList.collectAsState()
 
-    var keywords by remember { mutableStateOf(viewModel.keywords.value ?: "") }
+    var editingKeywords by remember { mutableStateOf(viewModel.keywords.value ?: "") }
     var editing by remember { mutableStateOf(viewModel.keywords.value == null) }
 
     val onAction: GlobalSearchActionHandler = { action ->
@@ -53,7 +53,7 @@ fun GlobalSearchScreen(navController: NavHostController) {
             is GlobalSearchAction.NavToGallery ->
                 navController.navToGallery(action.manga)
             is GlobalSearchAction.NavToProviderSearch ->
-                navController.navToProviderSearch(action.providerId, keywords)
+                navController.navToProviderSearch(action.providerId, editingKeywords)
             is GlobalSearchAction.Search -> viewModel.search(action.keywords)
         }
     }
@@ -61,9 +61,9 @@ fun GlobalSearchScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             LisuSearchToolBar(
-                onSearch = { onAction(GlobalSearchAction.Search(keywords)) },
-                value = keywords,
-                onValueChange = { keywords = it },
+                onSearch = { onAction(GlobalSearchAction.Search(editingKeywords)) },
+                value = editingKeywords,
+                onValueChange = { editingKeywords = it },
                 editing = editing,
                 onEditingChange = { editing = it },
                 placeholder = { Text(stringResource(R.string.menu_search_global_hint)) },
@@ -73,15 +73,12 @@ fun GlobalSearchScreen(navController: NavHostController) {
         content = {
             LisuTransition {
                 SearchResultList(searchResultList, onAction)
-                if (editing) {
-                    val relativeSuggestions = suggestions.filter {
-                        it.contains(keywords) && it != keywords
-                    }
-                    SuggestionList(
-                        suggestions = relativeSuggestions,
-                        onSuggestionSelected = { keywords = it }
-                    )
-                }
+                SuggestionList(
+                    editing = editing,
+                    keywords = editingKeywords,
+                    suggestions = suggestions,
+                    onSuggestionSelected = { editingKeywords = it }
+                )
             }
         }
     )

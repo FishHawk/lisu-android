@@ -1,9 +1,11 @@
 package com.fishhawk.lisu.ui.widget
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,9 +23,16 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.fishhawk.lisu.ui.theme.LisuToolBar
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.imePadding
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -86,7 +95,6 @@ fun TextFieldWithSuggestions(
     }
 }
 
-
 @Composable
 fun LisuSearchToolBar(
     onSearch: () -> Unit,
@@ -116,8 +124,11 @@ fun LisuSearchToolBar(
             },
             trailingIcon = {
                 if (value.isNotEmpty()) {
-                    IconButton(onClick = { onValueChange("") }) {
-                        Icon(Icons.Default.Close, "clear search")
+                    IconButton(onClick = {
+                        onValueChange("")
+                        focusRequester.requestFocus()
+                    }) {
+                        Icon(Icons.Default.Close, "clear")
                     }
                 }
             },
@@ -136,31 +147,54 @@ fun LisuSearchToolBar(
         LaunchedEffect(Unit) {
             if (editing) focusRequester.requestFocus()
         }
+
+        // hack, see https://stackoverflow.com/questions/68389802/how-to-clear-textfield-focus-when-closing-the-keyboard-and-prevent-two-back-pres
+        var imeIsVisiblePrev by remember { mutableStateOf(false) }
+        val imeIsVisible = LocalWindowInsets.current.ime.isVisible
+        LaunchedEffect(imeIsVisible) {
+            if (!imeIsVisible && imeIsVisiblePrev) {
+                focusManager.clearFocus()
+            }
+            imeIsVisiblePrev = imeIsVisible
+        }
     }
 }
 
-
 @Composable
 fun SuggestionList(
+    editing: Boolean,
+    keywords: String,
     suggestions: List<String>,
     onSuggestionSelected: ((String) -> Unit) = {},
     onSuggestionDeleted: ((String) -> Unit)? = null
 ) {
-    Surface {
-        LazyColumn {
-            items(suggestions) {
-                SuggestionItem(
-                    suggestion = it,
-                    onSuggestionSelected = onSuggestionSelected,
-                    onSuggestionDeleted = onSuggestionDeleted
-                )
+    AnimatedVisibility(
+        editing,
+        modifier = Modifier.imePadding(),
+        enter = fadeIn(),
+        exit = fadeOut(),
+    ) {
+        val relativeSuggestions = suggestions.filter {
+            it.contains(keywords) && it != keywords
+        }
+        Surface {
+            LazyColumn {
+                items(relativeSuggestions) {
+                    SuggestionItem(
+                        keywords = keywords,
+                        suggestion = it,
+                        onSuggestionSelected = onSuggestionSelected,
+                        onSuggestionDeleted = onSuggestionDeleted
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun SuggestionItem(
+private fun SuggestionItem(
+    keywords: String,
     suggestion: String,
     onSuggestionSelected: ((String) -> Unit) = {},
     onSuggestionDeleted: ((String) -> Unit)? = null
@@ -168,14 +202,18 @@ fun SuggestionItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp)
             .clickable { onSuggestionSelected(suggestion) }
-            .padding(horizontal = 16.dp),
+            .padding(start = 64.dp, end = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            modifier = Modifier.weight(1f),
-            text = suggestion,
+            text = buildHighlightedSuggestion(
+                keywords = keywords,
+                suggestion = suggestion
+            ),
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 12.dp),
             style = MaterialTheme.typography.subtitle1
         )
         if (onSuggestionDeleted != null) {
@@ -183,5 +221,25 @@ fun SuggestionItem(
                 Icon(Icons.Default.Close, null)
             }
         }
+    }
+}
+
+private fun buildHighlightedSuggestion(
+    keywords: String,
+    suggestion: String
+): AnnotatedString {
+    return buildAnnotatedString {
+        if (keywords.isEmpty()) {
+            append(suggestion)
+            return@buildAnnotatedString
+        }
+        Regex("((?<=%1\$s)|(?=%1\$s))".format(keywords))
+            .split(suggestion)
+            .onEach {
+                if (it == keywords) withStyle(
+                    style = SpanStyle(fontWeight = FontWeight.Bold)
+                ) { append(it) }
+                else append(it)
+            }
     }
 }
