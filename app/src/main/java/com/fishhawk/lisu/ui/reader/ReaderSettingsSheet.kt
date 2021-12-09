@@ -11,9 +11,17 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.ScaleType
 import com.fishhawk.lisu.ui.more.ListPreference
 import com.fishhawk.lisu.ui.more.SwitchPreference
+import com.fishhawk.lisu.ui.widget.BottomSheet
+
+object ReaderSettingsSheet : BottomSheet() {
+    @Composable
+    override fun Content() {
+        ReaderSettingsSheetContent()
+    }
+}
 
 @Composable
-fun ReaderSettingsSheet() {
+private fun ReaderSettingsSheetContent() {
     Column(modifier = Modifier.padding(8.dp)) {
         ListPreference(
             title = stringResource(R.string.settings_scale_type),

@@ -1,44 +1,46 @@
 package com.fishhawk.lisu.ui.gallery
 
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.SaveAlt
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.theme.LisuIcons
+import com.fishhawk.lisu.ui.widget.BottomSheet
+import com.fishhawk.lisu.ui.widget.SheetListItem
+
+internal class GalleryCoverSheet(
+    private val drawable: Drawable,
+    private val onAction: GalleryActionHandler
+) : BottomSheet() {
+    @Composable
+    override fun Content() {
+        GalleryCoverSheetContent(drawable, onAction)
+    }
+}
 
 @Composable
-internal fun GalleryCoverSheet(onAction: GalleryActionHandler) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        TextButton(onClick = { onAction(GalleryAction.EditCover) }) {
-            Row {
-                Icon(LisuIcons.Edit, "edit cover")
-                Text("Edit cover")
-            }
-        }
-        TextButton(onClick = { /*onAction(GalleryAction.SaveCover)*/ }) {
-            Row {
-                Icon(LisuIcons.SaveAlt, "save cover")
-                Text("Save cover")
-            }
-        }
-        TextButton(onClick = { /*onAction(GalleryAction.ShareCover)*/ }) {
-            Row {
-                Icon(LisuIcons.Share, "share cover")
-                Text("Share cover")
-            }
-        }
+private fun GalleryCoverSheetContent(
+    cover: Drawable,
+    onAction: GalleryActionHandler
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        SheetListItem(
+            icon = LisuIcons.Refresh,
+            title = stringResource(R.string.cover_action_edit)
+        ) { onAction(GalleryAction.EditCover) }
+        SheetListItem(
+            icon = LisuIcons.SaveAlt,
+            title = stringResource(R.string.cover_action_save)
+        ) { onAction(GalleryAction.SaveCover(cover)) }
+        SheetListItem(
+            icon = LisuIcons.Share,
+            title = stringResource(R.string.cover_action_share)
+        ) { onAction(GalleryAction.ShareCover(cover)) }
     }
 }

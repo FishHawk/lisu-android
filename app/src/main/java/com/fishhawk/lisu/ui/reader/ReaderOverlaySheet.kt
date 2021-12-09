@@ -23,6 +23,7 @@ import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.ui.more.ListPreference
 import com.fishhawk.lisu.ui.more.SwitchPreference
+import com.fishhawk.lisu.ui.widget.BottomSheet
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalGraphicsApi::class)
@@ -58,8 +59,19 @@ fun ReaderColorFilterOverlay() {
     }
 }
 
+object ReaderOverlaySheet : BottomSheet() {
+    override val scrimColor: Color
+        @Composable
+        get() = Color.Transparent
+
+    @Composable
+    override fun Content() {
+        ReaderOverlaySheetContent()
+    }
+}
+
 @Composable
-fun ReaderOverlaySheet() {
+private fun ReaderOverlaySheetContent() {
     Column(modifier = Modifier.padding(8.dp)) {
         val colorFilterEnabled by PR.enabledColorFilter.collectAsState()
         SwitchPreference(title = "Custom color filter", preference = PR.enabledColorFilter)

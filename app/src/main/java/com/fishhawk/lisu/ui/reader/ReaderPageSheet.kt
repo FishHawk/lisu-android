@@ -17,9 +17,22 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.theme.LisuIcons
+import com.fishhawk.lisu.ui.widget.BottomSheet
+import com.fishhawk.lisu.ui.widget.SheetListItem
+
+internal class ReaderPageSheet(
+    private val drawable: Drawable,
+    private val position: Int,
+    private val onAction: ReaderActionHandler
+) : BottomSheet() {
+    @Composable
+    override fun Content() {
+        ReaderPageSheetContent(drawable, position, onAction)
+    }
+}
 
 @Composable
-internal fun ReaderPageSheet(
+private fun ReaderPageSheetContent(
     drawable: Drawable,
     position: Int,
     onAction: ReaderActionHandler
@@ -38,18 +51,4 @@ internal fun ReaderPageSheet(
             title = stringResource(R.string.page_action_share)
         ) { onAction(ReaderAction.SharePage(drawable, position)) }
     }
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-private fun SheetListItem(
-    icon: ImageVector,
-    title: String,
-    onClick: () -> Unit
-) {
-    ListItem(
-        modifier = Modifier.clickable(onClick = { onClick() }),
-        icon = { Icon(icon, contentDescription = "") },
-        text = { Text(text = title) }
-    )
 }

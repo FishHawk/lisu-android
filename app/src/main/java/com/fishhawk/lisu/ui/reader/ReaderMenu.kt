@@ -29,6 +29,7 @@ import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.setNext
 import com.fishhawk.lisu.ui.base.findActivity
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
+import com.fishhawk.lisu.ui.widget.LocalBottomSheetHelper
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -251,12 +252,14 @@ private fun ReaderMenuBottom(
                     runBlocking { PR.readerOrientation.setNext() }
                 }) { Icon(Icons.Filled.ScreenRotation, null) }
 
+                val bottomSheetHelper = LocalBottomSheetHelper.current
+                val scope = rememberCoroutineScope()
                 IconButton(modifier = Modifier.weight(1f), onClick = {
-                    onAction(ReaderAction.OpenColorFilterSheet)
+                    scope.launch { bottomSheetHelper.open(ReaderSettingsSheet) }
                 }) { Icon(Icons.Filled.BrightnessMedium, "color-filter") }
 
                 IconButton(modifier = Modifier.weight(1f), onClick = {
-                    onAction(ReaderAction.OpenSettingSheet)
+                    scope.launch { bottomSheetHelper.open(ReaderOverlaySheet) }
                 }) { Icon(Icons.Filled.Settings, "setting") }
             }
         }

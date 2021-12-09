@@ -1,6 +1,9 @@
 package com.fishhawk.lisu.ui
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -13,11 +16,11 @@ import androidx.compose.material.icons.filled.CollectionsBookmark
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -31,8 +34,11 @@ import androidx.navigation.navArgument
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.StartScreen
+import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.ui.base.BaseActivity
+import com.fishhawk.lisu.ui.base.findActivity
+import com.fishhawk.lisu.ui.base.toast
 import com.fishhawk.lisu.ui.explore.ExploreScreen
 import com.fishhawk.lisu.ui.gallery.GalleryEditScreen
 import com.fishhawk.lisu.ui.gallery.GalleryScreen
@@ -44,6 +50,7 @@ import com.fishhawk.lisu.ui.more.*
 import com.fishhawk.lisu.ui.provider.ProviderScreen
 import com.fishhawk.lisu.ui.provider.ProviderSearchScreen
 import com.fishhawk.lisu.ui.theme.LisuTheme
+import com.fishhawk.lisu.ui.widget.LisuModalBottomSheetLayout
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.ui.BottomNavigation
 import com.google.accompanist.insets.ui.Scaffold
@@ -58,15 +65,35 @@ class MainActivity : BaseActivity() {
 @Composable
 private fun MainApp() {
     LisuTheme {
-        val navController = rememberNavController()
-        Scaffold(
-            modifier = Modifier.navigationBarsPadding(),
-            bottomBar = { BottomBar(navController) }
-        ) { innerPadding ->
-            MainNavHost(
-                navController = navController,
-                modifier = Modifier.padding(innerPadding)
-            )
+        LisuModalBottomSheetLayout {
+            val navController = rememberNavController()
+            Scaffold(
+                modifier = Modifier.navigationBarsPadding(),
+                bottomBar = { BottomBar(navController) }
+            ) { innerPadding ->
+                MainNavHost(
+                    navController = navController,
+                    modifier = Modifier.padding(innerPadding)
+                )
+            }
+
+            val context = LocalContext.current
+            var exitPressedOnce by remember { mutableStateOf(false) }
+            val isConfirmExitEnabled by PR.isConfirmExitEnabled.collectAsState()
+            BackHandler(
+                navController.backQueue.size <= 1
+                        && isConfirmExitEnabled
+            ) {
+                if (exitPressedOnce) {
+                    context.findActivity().finish()
+                } else {
+                    exitPressedOnce = true
+                    context.toast(R.string.confirm_exit)
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        exitPressedOnce = false
+                    }, 2000)
+                }
+            }
         }
     }
 }

@@ -27,8 +27,10 @@ import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuToolBar
+import com.fishhawk.lisu.ui.widget.LocalBottomSheetHelper
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
 
 internal val MangaHeaderHeight = 290.dp
 
@@ -111,13 +113,16 @@ internal fun MangaHeader(
                     .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                val scope = rememberCoroutineScope()
+                val bottomSheetHelper = LocalBottomSheetHelper.current
+                val drawable = (painter.state as? AsyncImagePainter.State.Success)?.result?.drawable
                 Surface(
                     modifier = Modifier.aspectRatio(0.75f).let { modifier ->
-                        (painter.state as? AsyncImagePainter.State.Success)?.result?.drawable?.let {
-                            modifier.combinedClickable(
-                                onClick = { onAction(GalleryAction.SaveCover(it)) },
-                                onLongClick = { onAction(GalleryAction.ShareCover(it)) }
-                            )
+                        drawable?.let {
+                            modifier.clickable {
+                                val sheet = GalleryCoverSheet(it, onAction)
+                                scope.launch { bottomSheetHelper.open(sheet) }
+                            }
                         } ?: modifier
                     },
                     shape = RoundedCornerShape(4.dp),

@@ -38,8 +38,6 @@ import coil.size.OriginalSize
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ScaleType
 import com.fishhawk.lisu.data.datastore.collectAsState
-import com.fishhawk.lisu.ui.reader.ReaderAction
-import com.fishhawk.lisu.ui.reader.ReaderActionHandler
 import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -51,7 +49,7 @@ internal fun PagerViewer(
     state: ViewerState.Pager,
     pointer: ReaderViewModel.ReaderChapterPointer,
     isRtl: Boolean,
-    onAction: ReaderActionHandler
+    onLongPress: ((drawable: Drawable, position: Int) -> Unit)
 ) {
     val viewModel = viewModel<ReaderViewModel>()
     val scope = rememberCoroutineScope()
@@ -73,7 +71,6 @@ internal fun PagerViewer(
 
     val useVolumeKey by PR.useVolumeKey.collectAsState()
     val invertVolumeKey by PR.invertVolumeKey.collectAsState()
-    val isLongTapDialogEnabled by PR.isLongTapDialogEnabled.collectAsState()
 
     val focusRequester = remember { FocusRequester() }
 
@@ -153,10 +150,7 @@ internal fun PagerViewer(
                             else -> viewModel.isMenuOpened.value = !viewModel.isMenuOpened.value
                         }
                     },
-                    onLongPress = { drawable, position ->
-                        if (isLongTapDialogEnabled)
-                            onAction(ReaderAction.OpenPageSheet(drawable, position))
-                    }
+                    onLongPress = onLongPress
                 )
             }
         }

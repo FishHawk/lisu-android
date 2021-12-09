@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 internal fun ListViewer(
     state: ViewerState.List,
     pointer: ReaderViewModel.ReaderChapterPointer,
-    onAction: ReaderActionHandler
+    onLongPress: ((drawable: Drawable, position: Int) -> Unit)
 ) {
     val viewModel = viewModel<ReaderViewModel>()
     val scope = rememberCoroutineScope()
@@ -59,7 +59,6 @@ internal fun ListViewer(
 
     val useVolumeKey by PR.useVolumeKey.collectAsState()
     val invertVolumeKey by PR.invertVolumeKey.collectAsState()
-    val isLongTapDialogEnabled by PR.isLongTapDialogEnabled.collectAsState()
 
     val focusRequester = remember { FocusRequester() }
 
@@ -122,10 +121,7 @@ internal fun ListViewer(
                     onTap = {
                         viewModel.isMenuOpened.value = !viewModel.isMenuOpened.value
                     },
-                    onLongPress = { drawable, position ->
-                        if (isLongTapDialogEnabled)
-                            onAction(ReaderAction.OpenPageSheet(drawable, position))
-                    }
+                    onLongPress = onLongPress
                 )
             }
         }

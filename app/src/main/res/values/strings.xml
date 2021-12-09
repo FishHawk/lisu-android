@@ -129,6 +129,10 @@
     <string name="page_action_share">Share image</string>
     <string name="page_action_save">Save image</string>
 
+    <string name="cover_action_edit">Edit cover</string>
+    <string name="cover_action_share">Share cover</string>
+    <string name="cover_action_save">Save cover</string>
+
 
     <!-- toast -->
     <string name="confirm_exit">Press back again to exit</string>
