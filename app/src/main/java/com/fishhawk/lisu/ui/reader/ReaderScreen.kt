@@ -33,6 +33,7 @@ internal typealias ReaderActionHandler = (ReaderAction) -> Unit
 internal sealed interface ReaderAction {
     object NavUp : ReaderAction
 
+    data class SetAsImage(val drawable: Drawable) : ReaderAction
     data class SavePage(val drawable: Drawable, val position: Int) : ReaderAction
     data class SharePage(val drawable: Drawable, val position: Int) : ReaderAction
 
@@ -60,7 +61,8 @@ fun ReaderScreen() {
 
     val onAction: ReaderActionHandler = { action ->
         when (action) {
-            ReaderAction.NavUp -> Unit
+            ReaderAction.NavUp -> context.findActivity().finish()
+            is ReaderAction.SetAsImage -> viewModel.updateCover(action.drawable)
             is ReaderAction.SavePage ->
                 context.saveImage(
                     action.drawable,

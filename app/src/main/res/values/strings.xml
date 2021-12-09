@@ -125,7 +125,7 @@
     <string name="dialog_clear_history">Clear all history?</string>
     <string name="dialog_clear_history_positive">Clear</string>
 
-    <string name="page_action_refresh">Refresh image</string>
+    <string name="page_action_set_as_cover">Set as cover</string>
     <string name="page_action_share">Share image</string>
     <string name="page_action_save">Save image</string>
 

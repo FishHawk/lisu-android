@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.ui.reader
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.R
@@ -237,5 +238,8 @@ class ReaderViewModel(
             page = page
         )
         readingHistoryRepository.update(readingHistory)
+    }
+
+    fun updateCover(drawable: Drawable) = viewModelScope.launch {
     }
 }
