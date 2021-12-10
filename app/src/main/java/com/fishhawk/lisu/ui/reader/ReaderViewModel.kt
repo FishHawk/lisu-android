@@ -1,7 +1,9 @@
 package com.fishhawk.lisu.ui.reader
 
+import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
@@ -14,6 +16,7 @@ import com.fishhawk.lisu.ui.base.Effect
 import com.fishhawk.lisu.ui.widget.ViewState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 
 class ReaderChapter(
     val collectionId: String,
@@ -223,7 +226,7 @@ class ReaderViewModel(
         }
     }
 
-    suspend fun updateReadingHistory(page: Int) {
+    fun updateReadingHistory(page: Int) = viewModelScope.launch {
         val detail = mangaDetail.value!!.getOrNull()!!
         val chapter = chapterPointer.value.currChapter
         val readingHistory = ReadingHistory(
@@ -241,5 +244,11 @@ class ReaderViewModel(
     }
 
     fun updateCover(drawable: Drawable) = viewModelScope.launch {
+        val stream = ByteArrayOutputStream()
+        drawable.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream)
+        val byteArray = stream.toByteArray()
+        remoteProviderRepository.updateMangaCover(providerId, mangaId, byteArray)
+            .onSuccess { sendEffect(ReaderEffect.Message(R.string.cover_updated)) }
+            .onFailure { sendEffect(ReaderEffect.Message(R.string.cover_update_failed)) }
     }
 }

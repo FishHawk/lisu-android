@@ -15,7 +15,10 @@ import coil.request.ImageRequest
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
 import com.fishhawk.lisu.data.datastore.collectAsState
-import com.fishhawk.lisu.ui.base.*
+import com.fishhawk.lisu.ui.base.findActivity
+import com.fishhawk.lisu.ui.base.saveImage
+import com.fishhawk.lisu.ui.base.shareImage
+import com.fishhawk.lisu.ui.base.toast
 import com.fishhawk.lisu.ui.reader.viewer.ListViewer
 import com.fishhawk.lisu.ui.reader.viewer.PagerViewer
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
@@ -40,6 +43,8 @@ internal sealed interface ReaderAction {
 
     object OpenPrevChapter : ReaderAction
     object OpenNextChapter : ReaderAction
+
+    data class UpdateHistory(val page: Int) : ReaderAction
 }
 
 @OptIn(ExperimentalPagerApi::class)
@@ -57,8 +62,10 @@ fun ReaderScreen() {
         parametersOf(context.findActivity().intent.extras!!)
     }
 
+    val mangaViewState by viewModel.mangaLoadState.collectAsState()
     val mangaTitle by viewModel.mangaTitle.collectAsState()
     val isMenuOpened by viewModel.isMenuOpened.collectAsState()
+    val isOnlyOneChapter by viewModel.isOnlyOneChapter.collectAsState()
 
     val onAction: ReaderActionHandler = { action ->
         when (action) {
@@ -77,6 +84,7 @@ fun ReaderScreen() {
                 )
             ReaderAction.OpenPrevChapter -> viewModel.openPrevChapter()
             ReaderAction.OpenNextChapter -> viewModel.openNextChapter()
+            is ReaderAction.UpdateHistory -> viewModel.updateReadingHistory(action.page)
         }
     }
 
@@ -88,9 +96,7 @@ fun ReaderScreen() {
         }
     }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
-        val mangaViewState by viewModel.mangaLoadState.collectAsState()
-
+    Surface {
         StateView(
             modifier = Modifier.fillMaxSize(),
             viewState = mangaViewState,
@@ -138,7 +144,7 @@ fun ReaderScreen() {
                     LaunchedEffect(readerState) {
                         snapshotFlow { readerState!!.position }.collect {
                             startPage = it
-                            viewModel.updateReadingHistory(it)
+                            onAction(ReaderAction.UpdateHistory(it))
                             pointer.currChapter.images
                                 .slice(
                                     (it - 3).coerceAtLeast(0)..
@@ -158,10 +164,9 @@ fun ReaderScreen() {
                 val title = pointer.currChapter.title
 
                 val showInfoBar by PR.showInfoBar.collectAsState()
-                val isOnlyOneChapter by viewModel.isOnlyOneChapter.collectAsState()
-
                 if (showInfoBar && !isMenuOpened)
                     ReaderInfoBar(name, title, readerState)
+
                 ReaderColorFilterOverlay()
                 ReaderMenu(
                     isMenuOpened,

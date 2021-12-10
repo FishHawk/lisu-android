@@ -147,7 +147,9 @@
 
     <string name="cache_cleared">Cache cleared.</string>
 
-    <string name="cover_updated">Manga cover has been updated.</string>
+    <string name="cover_updated">Cover has been updated.</string>
+    <string name="cover_update_failed">Cover update failed.</string>
+
     <string name="metadata_updated">Manga metadata has been updated.</string>
     <string name="title_copied">Copy title to clipboard.</string>
     <string name="author_copied">Copy author to clipboard.</string>
