@@ -13,7 +13,7 @@ import com.fishhawk.lisu.data.datastore.ChapterDisplayMode
 import com.fishhawk.lisu.data.datastore.ChapterDisplayOrder
 import com.fishhawk.lisu.data.datastore.StartScreen
 import com.fishhawk.lisu.data.datastore.Theme
-import com.fishhawk.lisu.ui.theme.LisuToolBar
+import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 
 @Composable

@@ -8,7 +8,7 @@ import com.fishhawk.lisu.data.database.model.SearchHistory
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.ProviderDto
-import com.fishhawk.lisu.ui.base.ViewState
+import com.fishhawk.lisu.ui.widget.ViewState
 import kotlinx.coroutines.flow.*
 
 data class SearchResult(

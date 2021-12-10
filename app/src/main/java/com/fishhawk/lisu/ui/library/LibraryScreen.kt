@@ -18,7 +18,7 @@ import com.fishhawk.lisu.ui.base.toast
 import com.fishhawk.lisu.ui.navToGallery
 import com.fishhawk.lisu.ui.navToLibrarySearch
 import com.fishhawk.lisu.ui.theme.LisuIcons
-import com.fishhawk.lisu.ui.theme.LisuToolBar
+import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.viewModel

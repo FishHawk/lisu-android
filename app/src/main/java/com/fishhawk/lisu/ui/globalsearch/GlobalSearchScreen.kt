@@ -15,14 +15,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.ui.base.LoadingItem
 import com.fishhawk.lisu.ui.base.MangaListCard
-import com.fishhawk.lisu.ui.base.ViewState
 import com.fishhawk.lisu.ui.navToGallery
 import com.fishhawk.lisu.ui.navToProviderSearch
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.LisuSearchToolBar
+import com.fishhawk.lisu.ui.widget.LoadingItem
 import com.fishhawk.lisu.ui.widget.SuggestionList
+import com.fishhawk.lisu.ui.widget.ViewState
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf

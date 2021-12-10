@@ -26,7 +26,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.ui.theme.LisuIcons
-import com.fishhawk.lisu.ui.theme.LisuToolBar
+import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.widget.LocalBottomSheetHelper
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull

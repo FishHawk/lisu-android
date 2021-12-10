@@ -11,7 +11,7 @@ import com.fishhawk.lisu.data.remote.model.ChapterDto
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Effect
-import com.fishhawk.lisu.ui.base.ViewState
+import com.fishhawk.lisu.ui.widget.ViewState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 

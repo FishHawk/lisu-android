@@ -13,7 +13,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.base.copyToClipboard
 import com.fishhawk.lisu.ui.base.openWebPage
 import com.fishhawk.lisu.ui.navToOpenSourceLicense
-import com.fishhawk.lisu.ui.theme.LisuToolBar
+import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 
 @Composable

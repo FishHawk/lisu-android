@@ -29,8 +29,10 @@ import com.fishhawk.lisu.ui.navToGlobalSearch
 import com.fishhawk.lisu.ui.navToProviderSearch
 import com.fishhawk.lisu.ui.navToReader
 import com.fishhawk.lisu.ui.theme.LisuIcons
-import com.fishhawk.lisu.ui.theme.LisuToolBar
+import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.ui.widget.StateView
+import com.fishhawk.lisu.ui.widget.ViewState
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 

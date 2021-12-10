@@ -1,4 +1,4 @@
-package com.fishhawk.lisu.ui.base
+package com.fishhawk.lisu.ui.widget
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator

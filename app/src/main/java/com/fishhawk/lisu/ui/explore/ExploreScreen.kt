@@ -28,14 +28,14 @@ import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.setBlocking
 import com.fishhawk.lisu.data.remote.model.ProviderDto
-import com.fishhawk.lisu.ui.base.EmptyView
-import com.fishhawk.lisu.ui.base.StateView
-import com.fishhawk.lisu.ui.base.ViewState
 import com.fishhawk.lisu.ui.navToGlobalSearch
 import com.fishhawk.lisu.ui.navToProvider
 import com.fishhawk.lisu.ui.theme.LisuIcons
-import com.fishhawk.lisu.ui.theme.LisuToolBar
+import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.ui.widget.EmptyView
+import com.fishhawk.lisu.ui.widget.StateView
+import com.fishhawk.lisu.ui.widget.ViewState
 import org.koin.androidx.compose.viewModel
 import java.util.*
 

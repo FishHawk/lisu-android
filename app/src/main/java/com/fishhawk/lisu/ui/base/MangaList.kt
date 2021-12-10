@@ -31,6 +31,10 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.OriginalSize
 import com.fishhawk.lisu.data.remote.model.MangaDto
+import com.fishhawk.lisu.ui.widget.ErrorItem
+import com.fishhawk.lisu.ui.widget.LoadingItem
+import com.fishhawk.lisu.ui.widget.StateView
+import com.fishhawk.lisu.ui.widget.ViewState
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.fade
 import com.google.accompanist.placeholder.material.placeholder

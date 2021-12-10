@@ -21,7 +21,7 @@ import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.navToGallery
 import com.fishhawk.lisu.ui.navToProviderSearch
-import com.fishhawk.lisu.ui.theme.LisuToolBar
+import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.pager.*
