@@ -10,42 +10,39 @@ import com.fishhawk.lisu.R
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 
-class AppUpdateNotification(private val context: Context) {
-    private val channel
-        get() = Notifications.appUpdateChannel
+object AppUpdateNotification {
+    internal const val channel = "app_apk_update_channel"
+    private const val id = 1
 
-    private val id
-        get() = Notifications.appUpdateId
+    private fun Context.notificationBuilder() =
+        NotificationCompat.Builder(this, channel)
 
-    private fun notificationBuilder() =
-        NotificationCompat.Builder(context, channel)
-
-    private fun NotificationCompat.Builder.show() =
+    private fun NotificationCompat.Builder.show(context: Context) =
         with(NotificationManagerCompat.from(context)) { notify(id, build()) }
 
-    fun onDownloadStart() {
+    fun onDownloadStart(context: Context) = with(context) {
         notificationBuilder()
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(context.getString(R.string.app_name))
             .setContentText(context.getString(R.string.notification_app_update_in_progress))
             .setOngoing(true)
-            .show()
+            .show(this)
     }
 
-    fun onProgressChange(progress: Float) {
+    fun onProgressChange(context: Context, progress: Float) = with(context) {
         notificationBuilder()
             .setSmallIcon(R.mipmap.ic_launcher)
             .setProgress(100, (progress * 100).toInt(), false)
             .setOnlyAlertOnce(true)
-            .show()
+            .show(this)
     }
 
-    fun onDownloadFinished(uri: Uri) {
+    fun onDownloadFinished(context: Context, uri: Uri) = with(context) {
         val intent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uri, "application/vnd.android.package-archive")
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
-        val installIntent = PendingIntent.getActivity(context, 0, intent, 0)
+        val installIntent = PendingIntent.getActivity(this, 0, intent, 0)
 
         notificationBuilder()
             .setContentText(context.getString(R.string.notification_app_update_complete))
@@ -64,10 +61,10 @@ class AppUpdateNotification(private val context: Context) {
                 context.getString(R.string.notification_app_update_action_cancel),
                 NotificationReceiver.dismissNotificationBroadcast(context, id)
             )
-            .show()
+            .show(this)
     }
 
-    fun onDownloadError(url: String) {
+    fun onDownloadError(context: Context, url: String) = with(context) {
         notificationBuilder()
             .setContentText(context.getString(R.string.notification_app_update_error))
             .setSmallIcon(R.mipmap.ic_launcher)
@@ -84,11 +81,9 @@ class AppUpdateNotification(private val context: Context) {
                 context.getString(R.string.notification_app_update_action_cancel),
                 NotificationReceiver.dismissNotificationBroadcast(context, id)
             )
-            .show()
+            .show(this)
     }
 
-    companion object {
-        internal val retryChannel = Channel<String>()
-        val retryFlow = retryChannel.receiveAsFlow()
-    }
+    internal val retryChannel = Channel<String>()
+    val retryFlow = retryChannel.receiveAsFlow()
 }

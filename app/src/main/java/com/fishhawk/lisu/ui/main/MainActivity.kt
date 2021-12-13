@@ -88,13 +88,13 @@ private fun MainApp() {
                 is MainEffect.StringMessage -> context.toast(effect.message)
                 is MainEffect.ShowUpdateDialog -> latestRelease = effect.release
                 MainEffect.NotifyDownloadStart ->
-                    AppUpdateNotification(context).onDownloadStart()
+                    AppUpdateNotification.onDownloadStart(context)
                 is MainEffect.NotifyDownloadProgress ->
-                    AppUpdateNotification(context).onProgressChange(effect.progress)
+                    AppUpdateNotification.onProgressChange(context, effect.progress)
                 is MainEffect.NotifyDownloadFinish ->
-                    AppUpdateNotification(context).onDownloadFinished(effect.file.toUriCompat(context))
+                    AppUpdateNotification.onDownloadFinished(context, effect.file.toUriCompat(context))
                 is MainEffect.NotifyDownloadError ->
-                    AppUpdateNotification(context).onDownloadError(effect.url)
+                    AppUpdateNotification.onDownloadError(context, effect.url)
             }
         }
     }

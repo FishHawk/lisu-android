@@ -7,15 +7,11 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.NotificationManagerCompat.IMPORTANCE_DEFAULT
 import com.fishhawk.lisu.R
 
-
 object Notifications {
-    internal const val appUpdateChannel = "app_apk_update_channel"
-    internal const val appUpdateId = 1
-
     fun createChannels(context: Context) = with(NotificationManagerCompat.from(context)) {
         createNotificationChannelsCompat(
             listOf(
-                buildNotificationChannel(appUpdateChannel, IMPORTANCE_DEFAULT) {
+                buildNotificationChannel(AppUpdateNotification.channel, IMPORTANCE_DEFAULT) {
                     setName(context.getString(R.string.channel_app_updates))
                 }
             )
