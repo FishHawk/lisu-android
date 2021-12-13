@@ -123,7 +123,7 @@ val appModule = module {
     single { SearchHistoryRepository(get<ApplicationDatabase>().searchHistoryDao()) }
     single { ServerHistoryRepository(get<ApplicationDatabase>().serverHistoryDao()) }
 
-    viewModel { MainViewModel(get()) }
+    single { MainViewModel(get()) }
 
     viewModel { LibraryViewModel(get()) }
     viewModel { LibrarySearchViewModel(get(), get(), get()) }
