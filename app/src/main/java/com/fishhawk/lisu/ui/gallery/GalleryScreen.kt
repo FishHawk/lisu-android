@@ -24,10 +24,10 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.ui.base.*
-import com.fishhawk.lisu.ui.navToGalleryEdit
-import com.fishhawk.lisu.ui.navToGlobalSearch
-import com.fishhawk.lisu.ui.navToProviderSearch
-import com.fishhawk.lisu.ui.navToReader
+import com.fishhawk.lisu.ui.main.navToGalleryEdit
+import com.fishhawk.lisu.ui.main.navToGlobalSearch
+import com.fishhawk.lisu.ui.main.navToProviderSearch
+import com.fishhawk.lisu.ui.main.navToReader
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition

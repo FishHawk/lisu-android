@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.fishhawk.lisu">
 
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -21,7 +22,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.fishhawk.lisu.fileprovider"
+            android:authorities="com.fishhawk.lisu.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -29,8 +30,12 @@
                 android:resource="@xml/provider_path" />
         </provider>
 
+        <receiver
+            android:name=".notification.NotificationReceiver"
+            android:exported="false" />
+
         <activity
-            android:name="com.fishhawk.lisu.ui.MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -40,7 +45,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.fishhawk.lisu.ui.ReaderActivity" />
+        <activity android:name=".ui.reader.ReaderActivity" />
     </application>
 
 </manifest>

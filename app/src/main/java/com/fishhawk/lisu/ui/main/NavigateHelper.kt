@@ -1,4 +1,4 @@
-package com.fishhawk.lisu.ui
+package com.fishhawk.lisu.ui.main
 
 import android.content.Context
 import android.content.Intent
@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
+import com.fishhawk.lisu.ui.reader.ReaderActivity
 import com.google.gson.Gson
 
 object MangaNavType : NavType<MangaDto>(isNullableAllowed = true) {

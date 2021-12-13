@@ -2,5 +2,8 @@
 <paths>
     <cache-path
         name="share"
-        path="shared_image" />
+        path="." />
+    <external-cache-path
+        name="ext_cache_files"
+        path="." />
 </paths>

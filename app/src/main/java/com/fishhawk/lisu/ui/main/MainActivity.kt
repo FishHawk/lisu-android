@@ -1,4 +1,4 @@
-package com.fishhawk.lisu.ui
+package com.fishhawk.lisu.ui.main
 
 import android.os.Bundle
 import android.os.Handler
@@ -9,6 +9,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -21,7 +22,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -36,6 +41,8 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.StartScreen
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.getBlocking
+import com.fishhawk.lisu.data.remote.model.GitHubReleaseDto
+import com.fishhawk.lisu.notification.AppUpdateNotification
 import com.fishhawk.lisu.ui.base.BaseActivity
 import com.fishhawk.lisu.ui.base.findActivity
 import com.fishhawk.lisu.ui.base.toast
@@ -51,9 +58,13 @@ import com.fishhawk.lisu.ui.provider.ProviderScreen
 import com.fishhawk.lisu.ui.provider.ProviderSearchScreen
 import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.ui.widget.LisuModalBottomSheetLayout
+import com.fishhawk.lisu.util.toUriCompat
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.ui.BottomNavigation
 import com.google.accompanist.insets.ui.Scaffold
+import kotlinx.coroutines.flow.collect
+import org.koin.androidx.compose.viewModel
+import java.io.File
 
 class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +75,45 @@ class MainActivity : BaseActivity() {
 
 @Composable
 private fun MainApp() {
+    val viewModel by viewModel<MainViewModel>()
+
+    var latestRelease by remember { mutableStateOf<GitHubReleaseDto?>(null) }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.effect.collect { effect ->
+            when (effect) {
+                is MainEffect.Message -> context.toast(context.getString(effect.messageId))
+                is MainEffect.StringMessage -> context.toast(effect.message)
+                is MainEffect.ShowUpdateDialog -> latestRelease = effect.release
+                MainEffect.NotifyDownloadStart ->
+                    AppUpdateNotification(context).onDownloadStart()
+                is MainEffect.NotifyDownloadProgress ->
+                    AppUpdateNotification(context).onProgressChange(effect.progress)
+                is MainEffect.NotifyDownloadFinish ->
+                    AppUpdateNotification(context).onDownloadFinished(effect.file.toUriCompat(context))
+                is MainEffect.NotifyDownloadError ->
+                    AppUpdateNotification(context).onDownloadError(effect.url)
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        AppUpdateNotification.retryFlow.collect {
+            viewModel.downloadApk(File(context.externalCacheDir, "update.apk"), it)
+        }
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(Unit) {
+        lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onResume(owner: LifecycleOwner) {
+                viewModel.checkForUpdate()
+            }
+        })
+    }
+
     LisuTheme {
         LisuModalBottomSheetLayout {
             val navController = rememberNavController()
@@ -77,7 +127,19 @@ private fun MainApp() {
                 )
             }
 
-            val context = LocalContext.current
+            latestRelease?.let {
+                NewVersionAvailableDialog(
+                    it,
+                    onDismiss = { latestRelease = null },
+                    onConfirm = {
+                        viewModel.downloadApk(
+                            File(context.externalCacheDir, "update.apk"),
+                            it.getDownloadLink()
+                        )
+                    }
+                )
+            }
+
             var exitPressedOnce by remember { mutableStateOf(false) }
             val isConfirmExitEnabled by PR.isConfirmExitEnabled.collectAsState()
             BackHandler(
@@ -201,3 +263,29 @@ private fun RowScope.BottomBarTab(
         }
     }
 )
+
+@Composable
+fun NewVersionAvailableDialog(
+    release: GitHubReleaseDto,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { },
+        title = { Text(text = stringResource(R.string.dialog_new_version_available)) },
+        text = { Text(text = release.info, modifier = Modifier.heightIn(max = 400.dp)) },
+        confirmButton = {
+            TextButton(onClick = {
+                onConfirm()
+                onDismiss()
+            }) {
+                Text(stringResource(R.string.dialog_new_version_available_download))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onDismiss() }) {
+                Text(stringResource(R.string.dialog_new_version_available_ignore))
+            }
+        }
+    )
+}

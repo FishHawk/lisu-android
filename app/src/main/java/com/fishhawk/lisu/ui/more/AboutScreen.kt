@@ -12,9 +12,12 @@ import com.fishhawk.lisu.BuildConfig
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.base.copyToClipboard
 import com.fishhawk.lisu.ui.base.openWebPage
-import com.fishhawk.lisu.ui.navToOpenSourceLicense
-import com.fishhawk.lisu.ui.widget.LisuToolBar
+import com.fishhawk.lisu.ui.base.toast
+import com.fishhawk.lisu.ui.main.MainViewModel
+import com.fishhawk.lisu.ui.main.navToOpenSourceLicense
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.ui.widget.LisuToolBar
+import org.koin.androidx.compose.viewModel
 
 @Composable
 fun AboutScreen(navController: NavHostController) {
@@ -31,6 +34,7 @@ fun AboutScreen(navController: NavHostController) {
 
 @Composable
 private fun Content(navController: NavHostController) {
+    val viewModel by viewModel<MainViewModel>()
     Column(modifier = Modifier.fillMaxWidth()) {
         val context = LocalContext.current
         val versionPrefix = if (BuildConfig.DEBUG) "Preview" else "Stable"
@@ -48,7 +52,10 @@ private fun Content(navController: NavHostController) {
 
         TextPreference(
             title = stringResource(R.string.about_check_for_updates)
-        ) {}
+        ) {
+            context.toast(context.getString(R.string.update_check_look_for_updates))
+            viewModel.checkForUpdate(true)
+        }
 
         val releaseUrl = "$githubUrl/releases/tag/v${BuildConfig.VERSION_NAME}"
         TextPreference(

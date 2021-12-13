@@ -19,7 +19,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.ui.*
+import com.fishhawk.lisu.ui.main.navToAbout
+import com.fishhawk.lisu.ui.main.navToSettingAdvanced
+import com.fishhawk.lisu.ui.main.navToSettingGeneral
+import com.fishhawk.lisu.ui.main.navToSettingReader
 import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.TextFieldWithSuggestions

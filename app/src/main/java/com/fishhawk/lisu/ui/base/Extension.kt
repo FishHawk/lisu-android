@@ -12,9 +12,9 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.util.toUriCompat
 import java.io.File
 import java.io.FileOutputStream
 
@@ -93,10 +93,7 @@ fun Context.shareText(title: String, text: String) {
 
 fun Context.shareImage(title: String, image: Drawable, filename: String) {
     val file = try {
-        val dir = File(cacheDir, "shared_image")
-        dir.mkdirs()
-
-        val outputFile = File(dir, "$filename.png")
+        val outputFile = File(cacheDir, "$filename.png")
         val outPutStream = FileOutputStream(outputFile)
         image.toBitmap().compress(CompressFormat.PNG, 100, outPutStream)
         outPutStream.flush()
@@ -105,12 +102,7 @@ fun Context.shareImage(title: String, image: Drawable, filename: String) {
     } catch (e: Throwable) {
         return toast(e)
     }
-
-    val uri = FileProvider.getUriForFile(
-        this,
-        "${packageName}.fileprovider",
-        file
-    )
+    val uri = file.toUriCompat(this)
     val shareIntent = Intent().apply {
         action = Intent.ACTION_SEND
         type = "image/png"

@@ -11,8 +11,11 @@ import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.database.ServerHistoryRepository
 import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
+import com.fishhawk.lisu.data.remote.GitHubRepository
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
+import com.fishhawk.lisu.notification.Notifications
+import com.fishhawk.lisu.ui.main.MainViewModel
 import com.fishhawk.lisu.ui.explore.ExploreViewModel
 import com.fishhawk.lisu.ui.gallery.GalleryViewModel
 import com.fishhawk.lisu.ui.globalsearch.GlobalSearchViewModel
@@ -54,6 +57,8 @@ class LisuApplication : Application(), ImageLoaderFactory {
         PR = object : KoinComponent {
             val pr by inject<PreferenceRepository>()
         }.pr
+
+        Notifications.createChannels(this)
     }
 
     override fun newImageLoader(): ImageLoader {
@@ -104,6 +109,7 @@ val appModule = module {
 
     single { RemoteLibraryRepository(get()) }
     single { RemoteProviderRepository(get()) }
+    single { GitHubRepository() }
 
     single {
         Room.databaseBuilder(
@@ -116,6 +122,8 @@ val appModule = module {
     single { ReadingHistoryRepository(get<ApplicationDatabase>().readingHistoryDao()) }
     single { SearchHistoryRepository(get<ApplicationDatabase>().searchHistoryDao()) }
     single { ServerHistoryRepository(get<ApplicationDatabase>().serverHistoryDao()) }
+
+    viewModel { MainViewModel(get()) }
 
     viewModel { LibraryViewModel(get()) }
     viewModel { LibrarySearchViewModel(get(), get(), get()) }

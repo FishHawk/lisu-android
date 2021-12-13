@@ -16,8 +16,8 @@ import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.MangaListCard
-import com.fishhawk.lisu.ui.navToGallery
-import com.fishhawk.lisu.ui.navToProviderSearch
+import com.fishhawk.lisu.ui.main.navToGallery
+import com.fishhawk.lisu.ui.main.navToProviderSearch
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.LisuSearchToolBar
 import com.fishhawk.lisu.ui.widget.LoadingItem
