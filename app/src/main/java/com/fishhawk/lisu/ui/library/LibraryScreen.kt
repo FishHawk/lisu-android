@@ -18,8 +18,8 @@ import com.fishhawk.lisu.ui.base.toast
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToLibrarySearch
 import com.fishhawk.lisu.ui.theme.LisuIcons
-import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.ui.widget.LisuToolBar
 import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.viewModel
 
@@ -69,11 +69,11 @@ private fun ToolBar(onAction: LibraryActionHandler) {
         val isRandomButtonEnabled by PR.isRandomButtonEnabled.collectAsState()
         if (isRandomButtonEnabled) {
             IconButton(onClick = { onAction(LibraryAction.Random) }) {
-                Icon(LisuIcons.Casino, contentDescription = "random-pick")
+                Icon(LisuIcons.Casino, stringResource(R.string.action_random_pick))
             }
         }
         IconButton(onClick = { onAction(LibraryAction.NavToSearch) }) {
-            Icon(LisuIcons.Search, contentDescription = "search")
+            Icon(LisuIcons.Search, stringResource(R.string.action_search))
         }
     }
 }

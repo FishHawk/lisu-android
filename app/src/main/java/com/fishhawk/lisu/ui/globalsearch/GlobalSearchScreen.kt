@@ -66,7 +66,7 @@ fun GlobalSearchScreen(navController: NavHostController) {
                 onValueChange = { editingKeywords = it },
                 editing = editing,
                 onEditingChange = { editing = it },
-                placeholder = { Text(stringResource(R.string.menu_search_global_hint)) },
+                placeholder = { Text(stringResource(R.string.search_global_hint)) },
                 onNavUp = { onAction(GlobalSearchAction.NavUp) }
             )
         },
@@ -115,7 +115,9 @@ private fun SearchResultItem(
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = {
                 onAction(GlobalSearchAction.NavToProviderSearch(searchResult.provider.id))
-            }) { Icon(Icons.Filled.ArrowForward, "Forward") }
+            }) {
+                Icon(Icons.Filled.ArrowForward, null)
+            }
         }
 
         when (searchResult.viewState) {

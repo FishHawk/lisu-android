@@ -18,19 +18,23 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
-import com.fishhawk.lisu.ui.base.*
+import com.fishhawk.lisu.ui.base.copyToClipboard
+import com.fishhawk.lisu.ui.base.saveImage
+import com.fishhawk.lisu.ui.base.shareImage
+import com.fishhawk.lisu.ui.base.shareText
 import com.fishhawk.lisu.ui.main.navToGalleryEdit
 import com.fishhawk.lisu.ui.main.navToGlobalSearch
 import com.fishhawk.lisu.ui.main.navToProviderSearch
 import com.fishhawk.lisu.ui.main.navToReader
 import com.fishhawk.lisu.ui.theme.LisuIcons
-import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.widget.StateView
 import com.fishhawk.lisu.ui.widget.ViewState
 import org.koin.androidx.compose.viewModel
@@ -150,15 +154,15 @@ private fun ToolBar(
         ) {
             if (inLibrary) {
                 IconButton(onClick = { onAction(GalleryAction.RemoveFromLibrary) }) {
-                    Icon(LisuIcons.Favorite, contentDescription = "remove from library")
+                    Icon(LisuIcons.Favorite, stringResource(R.string.action_remove_from_library))
                 }
             } else {
                 IconButton(onClick = { onAction(GalleryAction.AddToLibrary) }) {
-                    Icon(LisuIcons.FavoriteBorder, contentDescription = "add to library")
+                    Icon(LisuIcons.FavoriteBorder, stringResource(R.string.action_add_to_library))
                 }
             }
             IconButton(onClick = { onAction(GalleryAction.Share) }) {
-                Icon(LisuIcons.Share, contentDescription = "share")
+                Icon(LisuIcons.Share, stringResource(R.string.action_share_manga))
             }
         }
     }

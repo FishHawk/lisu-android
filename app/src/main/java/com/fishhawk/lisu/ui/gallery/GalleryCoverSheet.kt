@@ -32,15 +32,15 @@ private fun GalleryCoverSheetContent(
     Column(modifier = Modifier.fillMaxWidth()) {
         SheetListItem(
             icon = LisuIcons.Refresh,
-            title = stringResource(R.string.cover_action_edit)
+            title = stringResource(R.string.action_edit_cover)
         ) { onAction(GalleryAction.EditCover) }
         SheetListItem(
             icon = LisuIcons.SaveAlt,
-            title = stringResource(R.string.cover_action_save)
+            title = stringResource(R.string.action_save_cover)
         ) { onAction(GalleryAction.SaveCover(cover)) }
         SheetListItem(
             icon = LisuIcons.Share,
-            title = stringResource(R.string.cover_action_share)
+            title = stringResource(R.string.action_share_cover)
         ) { onAction(GalleryAction.ShareCover(cover)) }
     }
 }

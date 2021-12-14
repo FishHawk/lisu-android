@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.core.app.NotificationManagerCompat
 
 class NotificationReceiver : BroadcastReceiver() {
@@ -21,6 +22,14 @@ class NotificationReceiver : BroadcastReceiver() {
     }
 
     companion object {
+        internal val FLAG_IMMUTABLE =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                PendingIntent.FLAG_IMMUTABLE
+            else 0
+
+        private val FLAG_UPDATE_CURRENT =
+            FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+
         private const val NAME = "NotificationReceiver"
 
         private const val ACTION_DISMISS_NOTIFICATION = "$NAME.ACTION_DISMISS_NOTIFICATION"
@@ -33,7 +42,7 @@ class NotificationReceiver : BroadcastReceiver() {
                 action = ACTION_DISMISS_NOTIFICATION
                 putExtra(EXTRA_NOTIFICATION_ID, notificationId)
             }
-            return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            return PendingIntent.getBroadcast(context, 0, intent, FLAG_UPDATE_CURRENT)
         }
 
         private const val ACTION_RETRY_APP_UPDATE = "$NAME.ACTION_RETRY_APP_UPDATE"
@@ -46,7 +55,7 @@ class NotificationReceiver : BroadcastReceiver() {
                 action = ACTION_RETRY_APP_UPDATE
                 putExtra(EXTRA_DOWNLOAD_URL, url)
             }
-            return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            return PendingIntent.getBroadcast(context, 0, intent, FLAG_UPDATE_CURRENT)
         }
     }
 }

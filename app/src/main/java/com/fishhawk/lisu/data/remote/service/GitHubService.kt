@@ -2,7 +2,6 @@ package com.fishhawk.lisu.data.remote.service
 
 import com.fishhawk.lisu.data.remote.model.GitHubReleaseDto
 import okhttp3.ResponseBody
-import retrofit2.Call
 import retrofit2.http.*
 
 interface GitHubService {

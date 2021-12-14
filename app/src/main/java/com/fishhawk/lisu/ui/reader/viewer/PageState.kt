@@ -13,10 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.AsyncImagePainter
+import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import com.fishhawk.lisu.util.interceptor.ProgressInterceptor
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -128,7 +130,9 @@ private fun PageErrorState(
                 text = throwable.message ?: "",
                 style = MaterialTheme.typography.body1
             )
-            TextButton(onClick = { onRetry() }) { Text("retry") }
+            TextButton(onClick = { onRetry() }) {
+                Text(stringResource(R.string.action_retry))
+            }
         }
     }
 }

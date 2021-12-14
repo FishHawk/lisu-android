@@ -17,12 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fishhawk.lisu.PR
+import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.ChapterDisplayMode
 import com.fishhawk.lisu.data.datastore.ChapterDisplayOrder
 import com.fishhawk.lisu.data.datastore.collectAsState
@@ -82,14 +84,14 @@ private fun MangaContentChapterHeader() {
         val mode by PR.chapterDisplayMode.collectAsState()
         val scope = rememberCoroutineScope()
         IconButton(onClick = { scope.launch { PR.chapterDisplayOrder.setNext() } }) {
-            Icon(LisuIcons.Sort, contentDescription = "Order")
+            Icon(LisuIcons.Sort, stringResource(R.string.action_switch_display_mode))
         }
         IconButton(onClick = { scope.launch { PR.chapterDisplayMode.setNext() } }) {
             val icon = when (mode) {
                 ChapterDisplayMode.Grid -> LisuIcons.ViewModule
                 ChapterDisplayMode.Linear -> LisuIcons.ViewList
             }
-            Icon(icon, contentDescription = "Display mode")
+            Icon(icon, stringResource(R.string.action_switch_sort_mode))
         }
     }
 }

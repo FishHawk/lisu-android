@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -100,11 +101,11 @@ internal fun MangaHeader(
             ) {
                 if (detail.inLibrary) {
                     IconButton(onClick = { onAction(GalleryAction.NavToEdit) }) {
-                        Icon(LisuIcons.Edit, contentDescription = "edit")
+                        Icon(LisuIcons.Edit, stringResource(R.string.action_edit_manga))
                     }
                 }
                 IconButton(onClick = { onAction(GalleryAction.Share) }) {
-                    Icon(LisuIcons.Share, contentDescription = "share")
+                    Icon(LisuIcons.Share, stringResource(R.string.action_share_manga))
                 }
             }
             Row(

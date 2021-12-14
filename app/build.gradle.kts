@@ -87,7 +87,6 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
 
     implementation("androidx.activity:activity-compose:1.4.0")
-    implementation("com.android.support:support-compat:28.0.0")
 
     val composeVersion = "1.1.0-beta04"
     implementation("androidx.compose.ui:ui:$composeVersion")

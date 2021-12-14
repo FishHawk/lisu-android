@@ -34,15 +34,15 @@ private fun ReaderPageSheetContent(
     Column(modifier = Modifier.fillMaxWidth()) {
         SheetListItem(
             icon = LisuIcons.Image,
-            title = stringResource(R.string.page_action_set_as_cover)
+            title = stringResource(R.string.action_set_as_cover)
         ) { onAction(ReaderAction.SetAsImage(drawable)) }
         SheetListItem(
             icon = LisuIcons.SaveAlt,
-            title = stringResource(R.string.page_action_save)
+            title = stringResource(R.string.action_save_image)
         ) { onAction(ReaderAction.SavePage(drawable, position)) }
         SheetListItem(
             icon = LisuIcons.Share,
-            title = stringResource(R.string.page_action_share)
+            title = stringResource(R.string.action_share_image)
         ) { onAction(ReaderAction.SharePage(drawable, position)) }
     }
 }

@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -15,14 +16,15 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.BoardFilter
 import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToProviderSearch
-import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
@@ -111,7 +113,7 @@ private fun ToolBar(
                 transparent = true,
             ) {
                 IconButton(onClick = { onAction(ProviderAction.NavToSearch) }) {
-                    Icon(Icons.Filled.Search, contentDescription = "search")
+                    Icon(Icons.Filled.Search, stringResource(R.string.action_search))
                 }
             }
 

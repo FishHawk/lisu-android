@@ -52,7 +52,7 @@ fun LibrarySearchScreen(navController: NavHostController) {
                 onValueChange = { editingKeywords = it },
                 editing = editing,
                 onEditingChange = { editing = it },
-                placeholder = { Text(stringResource(R.string.menu_search_global_hint)) },
+                placeholder = { Text(stringResource(R.string.search_library_hint)) },
                 onNavUp = { onAction(SearchAction.NavUp) }
             )
         },

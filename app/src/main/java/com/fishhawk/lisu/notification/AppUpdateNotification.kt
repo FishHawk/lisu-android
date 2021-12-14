@@ -42,7 +42,10 @@ object AppUpdateNotification {
             setDataAndType(uri, "application/vnd.android.package-archive")
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
-        val installIntent = PendingIntent.getActivity(this, 0, intent, 0)
+        val installIntent = PendingIntent.getActivity(
+            this, 0, intent,
+            NotificationReceiver.FLAG_IMMUTABLE
+        )
 
         notificationBuilder()
             .setContentText(context.getString(R.string.notification_app_update_complete))
@@ -53,12 +56,12 @@ object AppUpdateNotification {
             .clearActions()
             .addAction(
                 R.drawable.ic_baseline_system_update_alt_24,
-                context.getString(R.string.notification_app_update_action_install),
+                context.getString(R.string.action_install),
                 installIntent
             )
             .addAction(
                 R.drawable.ic_baseline_close_24,
-                context.getString(R.string.notification_app_update_action_cancel),
+                context.getString(R.string.action_cancel),
                 NotificationReceiver.dismissNotificationBroadcast(context, id)
             )
             .show(this)
@@ -73,12 +76,12 @@ object AppUpdateNotification {
             .clearActions()
             .addAction(
                 R.drawable.ic_baseline_refresh_24,
-                context.getString(R.string.notification_app_update_action_retry),
+                context.getString(R.string.action_retry),
                 NotificationReceiver.retryAppUpdateBroadcast(context, url)
             )
             .addAction(
                 R.drawable.ic_baseline_close_24,
-                context.getString(R.string.notification_app_update_action_cancel),
+                context.getString(R.string.action_cancel),
                 NotificationReceiver.dismissNotificationBroadcast(context, id)
             )
             .show(this)

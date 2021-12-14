@@ -83,7 +83,7 @@ private fun ToolBar(onAction: HistoryActionHandler) {
     LisuToolBar(title = stringResource(R.string.label_history)) {
         var isOpen by remember { mutableStateOf(false) }
         IconButton(onClick = { isOpen = true }) {
-            Icon(LisuIcons.ClearAll, stringResource(R.string.menu_history_clear))
+            Icon(LisuIcons.ClearAll, stringResource(R.string.action_clear_history))
             if (isOpen) {
                 ClearHistoryDialog(
                     onDismiss = { isOpen = false },

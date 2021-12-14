@@ -31,9 +31,9 @@ import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.main.navToGlobalSearch
 import com.fishhawk.lisu.ui.main.navToProvider
 import com.fishhawk.lisu.ui.theme.LisuIcons
-import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.EmptyView
+import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.widget.StateView
 import com.fishhawk.lisu.ui.widget.ViewState
 import org.koin.androidx.compose.viewModel
@@ -77,7 +77,7 @@ fun ExploreScreen(navController: NavHostController) {
 private fun ToolBar(onAction: ExploreActionHandler) {
     LisuToolBar(title = stringResource(R.string.label_explore)) {
         IconButton(onClick = { onAction(ExploreAction.NavToGlobalSearch) }) {
-            Icon(LisuIcons.TravelExplore, contentDescription = "global search")
+            Icon(LisuIcons.TravelExplore, stringResource(R.string.action_global_search))
         }
     }
 }
@@ -134,8 +134,8 @@ private fun ProviderListItem(
                 PR.lastUsedProvider.setBlocking(provider.id)
             }
             .padding(horizontal = 8.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         val painter =
             if (provider.lang == "local") rememberVectorPainter(LisuIcons.LocalLibrary)
@@ -148,15 +148,15 @@ private fun ProviderListItem(
             )
 
         Image(
-            modifier = Modifier.size(32.dp),
             painter = painter,
-            contentDescription = null
+            contentDescription = provider.id,
+            modifier = Modifier.size(32.dp),
         )
         Text(
             text = provider.id,
-            style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
+            overflow = TextOverflow.Ellipsis,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium)
         )
     }
 }

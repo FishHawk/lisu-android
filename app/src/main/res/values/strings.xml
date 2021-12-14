@@ -58,7 +58,6 @@
     <string name="settings_reader_mode">Reading direction</string>
     <string name="settings_reader_mode_left_to_right">Left to right</string>
     <string name="settings_reader_mode_right_to_Left">Right to left</string>
-    <string name="settings_reader_mode_vertical">Vertical</string>
     <string name="settings_reader_mode_continuous">Continuous</string>
 
     <string name="settings_reader_orientation">Screen orientation</string>
@@ -111,15 +110,39 @@
     <string name="gallery_no_chapters_hint">No chapters</string>
 
 
-    <!-- menu -->
-    <string name="menu_search_hint">Search…</string>
-    <string name="menu_search_library_hint">Search library…</string>
-    <string name="menu_search_global_hint">Search global…</string>
-    <string name="menu_filter">Filter</string>
-    <string name="menu_history_clear">Clear history</string>
-    <string name="menu_add">Add</string>
-    <string name="menu_publish">Submit</string>
+    <string name="search_hint">Search…</string>
+    <string name="search_library_hint">Search library…</string>
+    <string name="search_global_hint">Search global…</string>
 
+
+    <!-- action -->
+    <string name="action_cancel">Cancel</string>
+    <string name="action_retry">Retry</string>
+
+    <string name="action_install">Install</string>
+
+    <string name="action_clear_history">Clear history</string>
+
+    <string name="action_search">Search</string>
+    <string name="action_global_search">Global search</string>
+    <string name="action_random_pick">Random pick</string>
+
+    <string name="action_edit_manga">Edit manga</string>
+    <string name="action_share_manga">Share manga</string>
+
+    <string name="action_add_to_library">Add to library</string>
+    <string name="action_remove_from_library">Remove from library</string>
+
+    <string name="action_switch_display_mode">Switch display mode</string>
+    <string name="action_switch_sort_mode">Switch sort mode</string>
+
+    <string name="action_set_as_cover">Set as cover</string>
+    <string name="action_share_image">Share image</string>
+    <string name="action_save_image">Save image</string>
+
+    <string name="action_edit_cover">Edit cover</string>
+    <string name="action_share_cover">Share cover</string>
+    <string name="action_save_cover">Save cover</string>
 
     <!-- dialog -->
     <string name="dialog_clear_history">Clear all history?</string>
@@ -131,30 +154,15 @@
     <string name="update_check_no_new_updates">No new updates available</string>
     <string name="update_check_look_for_updates">Searching for updates…</string>
 
-    <string name="page_action_set_as_cover">Set as cover</string>
-    <string name="page_action_share">Share image</string>
-    <string name="page_action_save">Save image</string>
-
-    <string name="cover_action_edit">Edit cover</string>
-    <string name="cover_action_share">Share cover</string>
-    <string name="cover_action_save">Save cover</string>
-
     <string name="notification_app_update_in_progress">Downloading…</string>
     <string name="notification_app_update_complete">Download complete</string>
     <string name="notification_app_update_error">Download error</string>
-    <string name="notification_app_update_action_install">Install</string>
-    <string name="notification_app_update_action_cancel">Cancel</string>
-    <string name="notification_app_update_action_retry">Retry</string>
 
 
     <!-- toast -->
     <string name="confirm_exit">Press back again to exit</string>
 
     <string name="error_hint_empty_refresh_result">List is empty.</string>
-    <string name="error_hint_empty_fetch_more_result">No more result.</string>
-    <string name="successfully_add_to_library">Successfully added to library.</string>
-    <string name="successfully_create_sync_task">Successfully create the sync task.</string>
-    <string name="successfully_delete_source">Successfully delete source.</string>
 
     <string name="unknown_error">Unknown error.</string>
 
