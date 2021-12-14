@@ -12,7 +12,7 @@ import androidx.navigation.NavHostController
 import coil.imageLoader
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.ui.base.toast
+import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import kotlinx.coroutines.launch

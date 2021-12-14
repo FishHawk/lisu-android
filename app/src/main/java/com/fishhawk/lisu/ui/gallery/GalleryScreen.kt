@@ -24,10 +24,10 @@ import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
-import com.fishhawk.lisu.ui.base.copyToClipboard
-import com.fishhawk.lisu.ui.base.saveImage
-import com.fishhawk.lisu.ui.base.shareImage
-import com.fishhawk.lisu.ui.base.shareText
+import com.fishhawk.lisu.util.copyToClipboard
+import com.fishhawk.lisu.util.saveImage
+import com.fishhawk.lisu.util.shareImage
+import com.fishhawk.lisu.util.shareText
 import com.fishhawk.lisu.ui.main.navToGalleryEdit
 import com.fishhawk.lisu.ui.main.navToGlobalSearch
 import com.fishhawk.lisu.ui.main.navToProviderSearch

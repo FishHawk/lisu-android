@@ -14,7 +14,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
-import com.fishhawk.lisu.ui.base.toast
+import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToLibrarySearch
 import com.fishhawk.lisu.ui.theme.LisuIcons

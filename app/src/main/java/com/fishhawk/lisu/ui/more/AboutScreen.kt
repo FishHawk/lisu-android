@@ -10,9 +10,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.BuildConfig
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.ui.base.copyToClipboard
-import com.fishhawk.lisu.ui.base.openWebPage
-import com.fishhawk.lisu.ui.base.toast
+import com.fishhawk.lisu.util.copyToClipboard
+import com.fishhawk.lisu.util.openWebPage
+import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.ui.main.MainViewModel
 import com.fishhawk.lisu.ui.main.navToOpenSourceLicense
 import com.fishhawk.lisu.ui.theme.LisuTransition

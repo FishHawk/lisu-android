@@ -1,4 +1,4 @@
-package com.fishhawk.lisu.ui.base
+package com.fishhawk.lisu.util
 
 import android.app.Activity
 import android.content.*
@@ -14,7 +14,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.util.toUriCompat
+import com.fishhawk.lisu.ui.base.BaseActivity
 import java.io.File
 import java.io.FileOutputStream
 

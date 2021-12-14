@@ -27,7 +27,7 @@ import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.setNext
-import com.fishhawk.lisu.ui.base.findActivity
+import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
 import com.fishhawk.lisu.ui.widget.LocalBottomSheetHelper
 import com.google.accompanist.insets.navigationBarsPadding

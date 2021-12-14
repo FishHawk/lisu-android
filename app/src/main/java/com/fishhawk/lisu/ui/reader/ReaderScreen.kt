@@ -15,10 +15,10 @@ import coil.request.ImageRequest
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
 import com.fishhawk.lisu.data.datastore.collectAsState
-import com.fishhawk.lisu.ui.base.findActivity
-import com.fishhawk.lisu.ui.base.saveImage
-import com.fishhawk.lisu.ui.base.shareImage
-import com.fishhawk.lisu.ui.base.toast
+import com.fishhawk.lisu.util.findActivity
+import com.fishhawk.lisu.util.saveImage
+import com.fishhawk.lisu.util.shareImage
+import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.ui.reader.viewer.ListViewer
 import com.fishhawk.lisu.ui.reader.viewer.PagerViewer
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState

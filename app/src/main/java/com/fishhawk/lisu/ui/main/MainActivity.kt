@@ -44,8 +44,8 @@ import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.data.remote.model.GitHubReleaseDto
 import com.fishhawk.lisu.notification.AppUpdateNotification
 import com.fishhawk.lisu.ui.base.BaseActivity
-import com.fishhawk.lisu.ui.base.findActivity
-import com.fishhawk.lisu.ui.base.toast
+import com.fishhawk.lisu.util.findActivity
+import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.ui.explore.ExploreScreen
 import com.fishhawk.lisu.ui.gallery.GalleryEditScreen
 import com.fishhawk.lisu.ui.gallery.GalleryScreen
