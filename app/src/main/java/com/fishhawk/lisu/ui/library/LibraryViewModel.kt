@@ -33,10 +33,10 @@ class LibraryViewModel(
             .onFailure { sendEffect(LibraryEffect.Toast(it.localizedMessage ?: "")) }
     }
 
-    fun deleteManga(manga: MangaDto) = viewModelScope.launch {
-        repository.deleteManga(manga.providerId, manga.id)
-            .onSuccess { source?.invalidate() }
-            .onFailure { sendEffect(LibraryEffect.Toast(it.localizedMessage ?: "")) }
+    fun deleteManga(mangaList: List<String>) = viewModelScope.launch {
+//        repository.deleteManga(manga.providerId, manga.id)
+//            .onSuccess { source?.invalidate() }
+//            .onFailure { sendEffect(LibraryEffect.Toast(it.localizedMessage ?: "")) }
     }
 
     inner class LibraryMangaSource : PagingSource<Int, MangaDto>() {

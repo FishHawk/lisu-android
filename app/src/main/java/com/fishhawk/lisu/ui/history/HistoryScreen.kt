@@ -26,9 +26,9 @@ import com.fishhawk.lisu.ui.base.MangaCover
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToReader
 import com.fishhawk.lisu.ui.theme.LisuIcons
-import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.EmptyView
+import com.fishhawk.lisu.ui.widget.LisuToolBar
 import org.koin.androidx.compose.viewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -212,12 +212,17 @@ private fun ClearHistoryDialog(
         onDismissRequest = { onDismiss() },
         title = { Text(text = stringResource(R.string.dialog_clear_history)) },
         confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirm()
-                    onDismiss()
-                }
-            ) { Text(stringResource(R.string.dialog_clear_history_positive)) }
+            TextButton(onClick = {
+                onConfirm()
+                onDismiss()
+            }) {
+                Text(stringResource(R.string.action_clear))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { onDismiss() }) {
+                Text(stringResource(R.string.action_cancel))
+            }
         }
     )
 }

@@ -1,9 +1,6 @@
 package com.fishhawk.lisu.ui.base
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.GridItemSpan
@@ -12,9 +9,11 @@ import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -44,6 +43,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 @Composable
 fun RefreshableMangaList(
     mangaList: LazyPagingItems<MangaDto>,
+    selectedMangaList: SnapshotStateList<String>? = null,
     onCardClick: (manga: MangaDto) -> Unit = {},
     onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
@@ -64,7 +64,7 @@ fun RefreshableMangaList(
             state = rememberSwipeRefreshState(isRefreshing),
             onRefresh = { mangaList.refresh() },
         ) {
-            MangaList(mangaList, onCardClick, onCardLongClick)
+            MangaList(mangaList, selectedMangaList, onCardClick, onCardLongClick)
         }
     }
 }
@@ -73,6 +73,7 @@ fun RefreshableMangaList(
 @Composable
 fun MangaList(
     mangaList: LazyPagingItems<MangaDto>,
+    selectedMangaList: SnapshotStateList<String>? = null,
     onCardClick: (manga: MangaDto) -> Unit = {},
     onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
@@ -84,10 +85,12 @@ fun MangaList(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(mangaList.itemCount) { index ->
+            val manga = mangaList[index]
             MangaListCard(
-                mangaList[index],
-                onCardClick,
-                onCardLongClick
+                manga = manga,
+                selected = selectedMangaList?.contains(manga?.id) ?: false,
+                onCardClick = onCardClick,
+                onCardLongClick = onCardLongClick
             )
         }
         fun itemFullWidth(content: @Composable () -> Unit) {
@@ -106,6 +109,7 @@ fun MangaList(
 @Composable
 fun MangaListCard(
     manga: MangaDto?,
+    selected: Boolean = true,
     onCardClick: (manga: MangaDto) -> Unit = {},
     onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
@@ -154,6 +158,17 @@ fun MangaListCard(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
+
+            if (selected) {
+                val color = MaterialTheme.colors.primary.copy(alpha = 0.3f)
+                Canvas(modifier = Modifier.matchParentSize()) {
+                    drawRect(
+                        color = color,
+                        size = size,
+                        blendMode = BlendMode.SrcOver
+                    )
+                }
+            }
         }
     }
 }

@@ -16,6 +16,10 @@
     <string name="label_gallery_edit">Edit metadata</string>
 
 
+    <!-- library screen -->
+    <string name="library_n_mangas_selected">%1$d mangas selected</string>
+    <string name="library_remove_n_mangas_from_library">Remove %1$d mangas from library?</string>
+
     <!-- history screen -->
     <string name="history_today">Today</string>
     <string name="history_yesterday">Yesterday</string>
@@ -116,11 +120,13 @@
 
 
     <!-- action -->
+    <string name="action_ok">OK</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_retry">Retry</string>
 
     <string name="action_install">Install</string>
 
+    <string name="action_clear">Clear</string>
     <string name="action_clear_history">Clear history</string>
 
     <string name="action_search">Search</string>
@@ -146,7 +152,6 @@
 
     <!-- dialog -->
     <string name="dialog_clear_history">Clear all history?</string>
-    <string name="dialog_clear_history_positive">Clear</string>
 
     <string name="dialog_new_version_available">New version available!</string>
     <string name="dialog_new_version_available_download">Download</string>
