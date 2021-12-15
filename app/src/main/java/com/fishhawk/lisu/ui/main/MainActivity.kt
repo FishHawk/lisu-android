@@ -44,8 +44,6 @@ import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.data.remote.model.GitHubReleaseDto
 import com.fishhawk.lisu.notification.AppUpdateNotification
 import com.fishhawk.lisu.ui.base.BaseActivity
-import com.fishhawk.lisu.util.findActivity
-import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.ui.explore.ExploreScreen
 import com.fishhawk.lisu.ui.gallery.GalleryEditScreen
 import com.fishhawk.lisu.ui.gallery.GalleryScreen
@@ -58,7 +56,9 @@ import com.fishhawk.lisu.ui.provider.ProviderScreen
 import com.fishhawk.lisu.ui.provider.ProviderSearchScreen
 import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.ui.widget.LisuModalBottomSheetLayout
+import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.util.toUriCompat
+import com.fishhawk.lisu.util.toast
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.ui.BottomNavigation
 import com.google.accompanist.insets.ui.Scaffold

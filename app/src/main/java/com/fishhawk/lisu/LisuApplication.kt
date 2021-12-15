@@ -14,14 +14,15 @@ import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.lisu.data.remote.GitHubRepository
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
+import com.fishhawk.lisu.data.remote.Connectivity
 import com.fishhawk.lisu.notification.Notifications
-import com.fishhawk.lisu.ui.main.MainViewModel
 import com.fishhawk.lisu.ui.explore.ExploreViewModel
 import com.fishhawk.lisu.ui.gallery.GalleryViewModel
 import com.fishhawk.lisu.ui.globalsearch.GlobalSearchViewModel
 import com.fishhawk.lisu.ui.history.HistoryViewModel
 import com.fishhawk.lisu.ui.library.LibrarySearchViewModel
 import com.fishhawk.lisu.ui.library.LibraryViewModel
+import com.fishhawk.lisu.ui.main.MainViewModel
 import com.fishhawk.lisu.ui.more.MoreViewModel
 import com.fishhawk.lisu.ui.provider.ProviderSearchViewModel
 import com.fishhawk.lisu.ui.provider.ProviderViewModel
@@ -73,6 +74,8 @@ class LisuApplication : Application(), ImageLoaderFactory {
 }
 
 val appModule = module {
+    single { Connectivity(get()) }
+
     single { PreferenceRepository(androidApplication()) }
     single { ProviderBrowseHistoryRepository(androidApplication()) }
 
@@ -128,7 +131,7 @@ val appModule = module {
     viewModel { LibraryViewModel(get()) }
     viewModel { LibrarySearchViewModel(get(), get(), get()) }
     viewModel { HistoryViewModel(get()) }
-    viewModel { ExploreViewModel(get()) }
+    viewModel { ExploreViewModel(get(), get()) }
     viewModel { MoreViewModel(get()) }
     viewModel { GlobalSearchViewModel(get(), get(), get()) }
     viewModel { ProviderViewModel(get(), get(), get(), get()) }

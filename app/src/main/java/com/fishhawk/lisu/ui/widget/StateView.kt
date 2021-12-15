@@ -12,11 +12,47 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fishhawk.lisu.R
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 sealed class ViewState {
     object Loading : ViewState()
     object Loaded : ViewState()
     data class Failure(val throwable: Throwable) : ViewState()
+}
+
+@OptIn(ExperimentalContracts::class)
+inline fun ViewState.onLoading(action: () -> Unit): ViewState {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this is ViewState.Loading) {
+        action()
+    }
+    return this
+}
+
+@OptIn(ExperimentalContracts::class)
+inline fun ViewState.onLoaded(action: () -> Unit): ViewState {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this is ViewState.Loaded) {
+        action()
+    }
+    return this
+}
+
+@OptIn(ExperimentalContracts::class)
+inline fun ViewState.onFailure(action: (exception: Throwable) -> Unit): ViewState {
+    contract {
+        callsInPlace(action, InvocationKind.AT_MOST_ONCE)
+    }
+    if (this is ViewState.Failure) {
+        action(throwable)
+    }
+    return this
 }
 
 @Composable

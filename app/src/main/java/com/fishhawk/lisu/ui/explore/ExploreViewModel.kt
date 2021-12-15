@@ -3,15 +3,24 @@ package com.fishhawk.lisu.ui.explore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.PR
+import com.fishhawk.lisu.data.remote.Connectivity
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.widget.ViewState
+import com.fishhawk.lisu.ui.widget.onFailure
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class ExploreViewModel (
-    private val repository: RemoteProviderRepository
+class ExploreViewModel(
+    private val repository: RemoteProviderRepository,
+    connectivity: Connectivity
 ) : ViewModel() {
+
+    init {
+        connectivity.interfaceName
+            .onEach { _viewState.value.onFailure { reload() } }
+            .launchIn(viewModelScope)
+    }
 
     private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
     val viewState = _viewState.asStateFlow()
