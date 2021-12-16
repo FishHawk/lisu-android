@@ -17,6 +17,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.base.BaseActivity
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 
 fun Context.findActivity(): Activity {
     var context = this
@@ -45,40 +46,38 @@ fun Context.openWebPage(url: String) {
 }
 
 fun Context.saveImage(image: Drawable, filename: String) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q &&
-        !ensurePermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    ) return
-
-    val contentValues = ContentValues().apply {
-        put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-        put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            put(
-                MediaStore.MediaColumns.RELATIVE_PATH,
-                "${Environment.DIRECTORY_PICTURES}/lisu/"
-            )
-        } else {
-            put(
-                MediaStore.MediaColumns.DATA,
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                    .toString() + "/lisu/${filename}.png"
-            )
-        }
-    }
     try {
-        val uri = contentResolver.run {
-            insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-        } ?: return toast(R.string.image_already_exist)
-
-        contentResolver.openFileDescriptor(uri, "w", null).use { pfd ->
-            val outputStream = FileOutputStream(pfd!!.fileDescriptor)
-            image.toBitmap().compress(CompressFormat.PNG, 100, outputStream)
-            outputStream.flush()
-            outputStream.close()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
+                put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+                put(
+                    MediaStore.MediaColumns.RELATIVE_PATH,
+                    Environment.DIRECTORY_PICTURES + File.separator + "Lisu"
+                )
+            }
+            val uri = contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                contentValues
+            ) ?: throw IOException("Failed to create new MediaStore record.")
+            contentResolver.openOutputStream(uri)
+        } else {
+            if (!ensurePermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                throw IOException("Do not have write permission.")
+            val imagesDir = File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                "Lisu"
+            )
+            if (!imagesDir.exists()) imagesDir.mkdirs()
+            val imageFile = File(imagesDir, "$filename.png")
+            FileOutputStream(imageFile)
+        }?.use {
+            if (!image.toBitmap().compress(CompressFormat.PNG, 100, it))
+                throw IOException("Failed to save bitmap.")
             toast(R.string.image_saved)
-        }
+        } ?: throw IOException("Failed to open output stream.")
     } catch (e: Throwable) {
-        return toast(e)
+        toast(e)
     }
 }
 
