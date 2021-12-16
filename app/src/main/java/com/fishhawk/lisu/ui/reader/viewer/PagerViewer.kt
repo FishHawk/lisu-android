@@ -34,7 +34,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import coil.size.OriginalSize
+import coil.size.Size as CoilSize
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ScaleType
 import com.fishhawk.lisu.data.datastore.collectAsState
@@ -174,7 +174,7 @@ private fun Page(
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current)
             .data(url)
-            .size(OriginalSize)
+            .size(CoilSize.ORIGINAL)
             .setParameter("retry_hash", retryHash, cacheKey = null)
             .build()
     )

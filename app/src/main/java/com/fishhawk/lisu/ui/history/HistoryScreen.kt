@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.ClearAll
@@ -103,19 +102,29 @@ private fun HistoryList(
     if (histories.isEmpty()) EmptyView()
     LazyColumn {
         histories.forEach { (date, list) ->
-            item { HistoryListHeader(date) }
+            item(key = date) {
+                HistoryListHeader(
+                    date = date,
+                    modifier = Modifier.animateItemPlacement()
+                )
+            }
             items(list, key = { Pair(it.providerId, it.mangaId) }) {
-                HistoryListItem(it, onAction)
+                HistoryListItem(
+                    history = it,
+                    modifier = Modifier.animateItemPlacement(),
+                    onAction = onAction
+                )
             }
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun LazyItemScope.HistoryListHeader(date: LocalDate) {
-    val now = LocalDate.now()
-    val days = ChronoUnit.DAYS.between(date, now)
+private fun HistoryListHeader(
+    date: LocalDate,
+    modifier: Modifier = Modifier
+) {
+    val days = ChronoUnit.DAYS.between(date, LocalDate.now())
     val dateString = when {
         days == 0L -> stringResource(R.string.history_today)
         days == 1L -> stringResource(R.string.history_yesterday)
@@ -125,31 +134,30 @@ private fun LazyItemScope.HistoryListHeader(date: LocalDate) {
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Text(
             text = dateString,
-            modifier = Modifier
-                .padding(horizontal = 8.dp, vertical = 12.dp)
-                .animateItemPlacement(),
+            modifier = modifier.padding(horizontal = 8.dp, vertical = 12.dp),
             style = MaterialTheme.typography.subtitle2
         )
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun LazyItemScope.HistoryListItem(
+private fun HistoryListItem(
     history: ReadingHistory,
+    modifier: Modifier = Modifier,
     onAction: HistoryActionHandler = {}
 ) {
     val dismissState = rememberDismissState(
         confirmStateChange = {
-            (it == DismissValue.DismissedToStart).also { confirmed ->
+            (it == DismissValue.DismissedToEnd).also { confirmed ->
                 if (confirmed) onAction(HistoryAction.DeleteHistory(history))
             }
         }
     )
     SwipeToDismiss(
-        modifier = Modifier.animateItemPlacement(),
         state = dismissState,
-        directions = setOf(DismissDirection.EndToStart),
+        modifier = modifier,
+        directions = setOf(DismissDirection.StartToEnd),
         dismissThresholds = { FractionalThreshold(0.4f) },
         background = {
             Box(
@@ -157,50 +165,51 @@ private fun LazyItemScope.HistoryListItem(
                     .fillMaxSize()
                     .background(Color.LightGray)
             )
-        },
-        dismissContent = {
-            Row(
+        }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colors.background)
+                .clickable { onAction(HistoryAction.NavToReader(history)) }
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            MangaCover(
+                cover = history.cover,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colors.background)
-                    .clickable { onAction(HistoryAction.NavToReader(history)) }
-                    .padding(horizontal = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                MangaCover(
-                    modifier = Modifier
-                        .height(92.dp)
-                        .padding(vertical = 2.dp)
-                        .clickable { onAction(HistoryAction.NavToGallery(history)) },
-                    cover = history.cover
+                    .height(92.dp)
+                    .padding(vertical = 2.dp)
+                    .clickable { onAction(HistoryAction.NavToGallery(history)) }
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    text = history.title ?: history.mangaId,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium)
                 )
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(
-                        text = history.title ?: history.mangaId,
-                        style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    ProvideTextStyle(value = MaterialTheme.typography.body2) {
                         val seen = listOf(
                             history.collectionId,
                             history.chapterName,
-                            stringResource(R.string.history_card_page, history.page.plus(1))
+                            stringResource(R.string.history_page_n, history.page + 1)
                         ).filter { it.isNotBlank() }.joinToString("-")
-                        Text(text = seen, style = MaterialTheme.typography.body2)
+                        Text(text = seen)
 
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            val date = history.date.toLocalTime()
-                                .format(DateTimeFormatter.ofPattern("H:mm"))
-                            Text(text = date, style = MaterialTheme.typography.body2)
-                            Text(text = history.providerId, style = MaterialTheme.typography.body2)
+                            val time = history.date.toLocalTime()
+                                .format(DateTimeFormatter.ofPattern(stringResource(R.string.history_time_format)))
+                            Text(text = time)
+                            Text(text = history.providerId)
                         }
                     }
                 }
             }
         }
-    )
+    }
 }
 
 @Composable
@@ -209,8 +218,8 @@ private fun ClearHistoryDialog(
     onConfirm: () -> Unit
 ) {
     AlertDialog(
-        onDismissRequest = { onDismiss() },
-        title = { Text(text = stringResource(R.string.dialog_clear_history)) },
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.dialog_clear_history)) },
         confirmButton = {
             TextButton(onClick = {
                 onConfirm()
@@ -220,7 +229,7 @@ private fun ClearHistoryDialog(
             }
         },
         dismissButton = {
-            TextButton(onClick = { onDismiss() }) {
+            TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.action_cancel))
             }
         }

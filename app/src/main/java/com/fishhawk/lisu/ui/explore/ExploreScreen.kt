@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import coil.size.OriginalSize
+import coil.size.Size
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.setBlocking
@@ -142,7 +142,7 @@ private fun ProviderListItem(
             else rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
                     .data(provider.icon)
-                    .size(OriginalSize)
+                    .size(Size.ORIGINAL)
                     .crossfade(true)
                     .build()
             )

@@ -28,7 +28,7 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import coil.size.OriginalSize
+import coil.size.Size
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaKeyDto
 import com.fishhawk.lisu.ui.widget.ErrorItem
@@ -183,7 +183,7 @@ fun MangaCover(
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current)
             .data(cover)
-            .size(OriginalSize)
+            .size(Size.ORIGINAL)
             .crossfade(true)
             .crossfade(500)
             .build()

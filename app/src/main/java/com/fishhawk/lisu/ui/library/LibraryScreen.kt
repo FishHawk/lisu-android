@@ -1,7 +1,9 @@
 package com.fishhawk.lisu.ui.library
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.Casino
 import androidx.compose.material.icons.outlined.Delete
@@ -140,11 +142,11 @@ private fun SelectingToolBar(
 
     AnimatedVisibility(
         visible = selectedMangaList.isNotEmpty(),
-        enter = fadeIn() + slideInVertically(),
-        exit = slideOutVertically() + fadeOut(),
+        enter = fadeIn(),
+        exit = fadeOut(),
     ) {
         LisuToolBar(
-            title = stringResource(R.string.library_n_mangas_selected).format(selectedMangaList.size),
+            title = stringResource(R.string.library_n_selected).format(selectedMangaList.size),
             onNavUp = { selectedMangaList.clear() }
         ) {
             IconButton(onClick = { isOpen = true }) {

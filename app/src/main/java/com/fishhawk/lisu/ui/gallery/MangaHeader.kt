@@ -22,7 +22,7 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
-import coil.size.OriginalSize
+import coil.size.Size
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
@@ -56,7 +56,7 @@ internal fun MangaHeader(
                 .collect {
                     val request = ImageRequest.Builder(context)
                         .data(it)
-                        .size(OriginalSize)
+                        .size(Size.ORIGINAL)
                         .listener(onSuccess = { _, _ -> loadedCover = it })
                         .build()
                     context.imageLoader.enqueue(request)
@@ -66,7 +66,7 @@ internal fun MangaHeader(
         val painter = rememberAsyncImagePainter(
             ImageRequest.Builder(LocalContext.current)
                 .data(loadedCover)
-                .size(OriginalSize)
+                .size(Size.ORIGINAL)
                 .crossfade(true)
                 .crossfade(500)
                 .build()

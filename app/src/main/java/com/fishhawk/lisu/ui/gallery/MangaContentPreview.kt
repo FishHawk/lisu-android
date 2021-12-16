@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import coil.size.OriginalSize
+import coil.size.Size
 import com.fishhawk.lisu.ui.widget.VerticalGrid
 
 @Composable
@@ -50,7 +50,7 @@ private fun PreviewPage(
             painter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
                     .data(url)
-                    .size(OriginalSize)
+                    .size(Size.ORIGINAL)
                     .crossfade(true)
                     .crossfade(500)
                     .build()

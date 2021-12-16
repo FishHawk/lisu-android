@@ -27,7 +27,7 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import coil.size.OriginalSize
+import coil.size.Size
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.ui.reader.ReaderViewModel
@@ -143,7 +143,7 @@ private fun Page(
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current)
             .data(url)
-            .size(OriginalSize)
+            .size(Size.ORIGINAL)
             .setParameter("retry_hash", retryHash, cacheKey = null)
             .build()
     )

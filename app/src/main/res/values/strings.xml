@@ -17,7 +17,7 @@
 
 
     <!-- library screen -->
-    <string name="library_n_mangas_selected">%1$d mangas selected</string>
+    <string name="library_n_selected">%1$d selected</string>
     <string name="library_remove_n_mangas_from_library">Remove %1$d mangas from library?</string>
 
     <!-- history screen -->
@@ -25,7 +25,8 @@
     <string name="history_yesterday">Yesterday</string>
     <string name="history_n_days_ago">%1$d days ago</string>
     <string name="history_date_format">MMM d,yyyy</string>
-    <string name="history_card_page">Page%1$d</string>
+    <string name="history_time_format">H:mm</string>
+    <string name="history_page_n">Page%1$d</string>
 
     <!-- explore screen -->
     <string name="explore_last_used">Last used</string>
