@@ -2,7 +2,9 @@ package com.fishhawk.lisu.ui.main
 
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.BuildConfig
+import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.data.datastore.get
 import com.fishhawk.lisu.data.remote.GitHubRepository
 import com.fishhawk.lisu.data.remote.model.GitHubReleaseDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
@@ -29,18 +31,30 @@ class MainViewModel(
     private val repo: GitHubRepository
 ) : BaseViewModel<MainEffect>() {
     fun checkForUpdate(isUserPrompt: Boolean = false) = viewModelScope.launch {
+        if (isUserPrompt.not() &&
+            Duration.between(
+                Instant.ofEpochSecond(PR.lastAppCheckTime.get()),
+                Instant.now()
+            ) < Duration.ofDays(1)
+        ) {
+            return@launch
+        }
+
         repo.getLatestRelease(lisuOwner, lisuRepo)
             .onSuccess {
-                if (isNewVersion(it.version))
+                if (isNewVersion(it.version)) {
                     sendEffect(MainEffect.ShowUpdateDialog(it))
-                else if (isUserPrompt)
+                } else if (isUserPrompt) {
                     sendEffect(MainEffect.Message(R.string.update_check_no_new_updates))
+                }
             }
             .onFailure {
                 val message = it.message
-                if (isUserPrompt && message != null)
+                if (isUserPrompt && message != null) {
                     sendEffect(MainEffect.StringMessage(message))
+                }
             }
+        PR.lastAppCheckTime.set(Instant.now().epochSecond)
     }
 
     private fun isNewVersion(versionTag: String): Boolean {
