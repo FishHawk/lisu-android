@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
+import com.fishhawk.lisu.data.remote.model.MangaKeyDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Effect
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,10 +34,10 @@ class LibraryViewModel(
             .onFailure { sendEffect(LibraryEffect.Toast(it.localizedMessage ?: "")) }
     }
 
-    fun deleteManga(mangaList: List<String>) = viewModelScope.launch {
-//        repository.deleteManga(manga.providerId, manga.id)
-//            .onSuccess { source?.invalidate() }
-//            .onFailure { sendEffect(LibraryEffect.Toast(it.localizedMessage ?: "")) }
+    fun deleteMultipleManga(mangas: List<MangaKeyDto>) = viewModelScope.launch {
+        repository.deleteMultipleMangas(mangas)
+            .onSuccess { source?.invalidate() }
+            .onFailure { sendEffect(LibraryEffect.Toast(it.localizedMessage ?: "")) }
     }
 
     inner class LibraryMangaSource : PagingSource<Int, MangaDto>() {

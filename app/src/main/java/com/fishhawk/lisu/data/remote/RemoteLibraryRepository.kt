@@ -1,6 +1,7 @@
 package com.fishhawk.lisu.data.remote
 
 import com.fishhawk.lisu.data.remote.model.MangaDto
+import com.fishhawk.lisu.data.remote.model.MangaKeyDto
 import com.fishhawk.lisu.data.remote.service.RemoteLibraryService
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Retrofit
@@ -31,6 +32,10 @@ class RemoteLibraryRepository(retrofit: Flow<Result<Retrofit>?>) :
         providerId: String,
         mangaId: String
     ): Result<String> = resultWrap { it.deleteManga(providerId, mangaId) }
+
+    suspend fun deleteMultipleMangas(
+        mangas: List<MangaKeyDto>
+    ): Result<String> = resultWrap { it.deleteMultipleMangas(mangas) }
 
     private fun processCover(providerId: String, mangaId: String, cover: String?): String {
         return "${url}provider/${providerId}/manga/${mangaId}/cover?imageId=${cover}"

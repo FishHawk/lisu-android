@@ -30,6 +30,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.OriginalSize
 import com.fishhawk.lisu.data.remote.model.MangaDto
+import com.fishhawk.lisu.data.remote.model.MangaKeyDto
 import com.fishhawk.lisu.ui.widget.ErrorItem
 import com.fishhawk.lisu.ui.widget.LoadingItem
 import com.fishhawk.lisu.ui.widget.StateView
@@ -43,7 +44,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 @Composable
 fun RefreshableMangaList(
     mangaList: LazyPagingItems<MangaDto>,
-    selectedMangaList: SnapshotStateList<String>? = null,
+    selectedMangaList: SnapshotStateList<MangaKeyDto>? = null,
     onCardClick: (manga: MangaDto) -> Unit = {},
     onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
@@ -73,7 +74,7 @@ fun RefreshableMangaList(
 @Composable
 fun MangaList(
     mangaList: LazyPagingItems<MangaDto>,
-    selectedMangaList: SnapshotStateList<String>? = null,
+    selectedMangaList: SnapshotStateList<MangaKeyDto>? = null,
     onCardClick: (manga: MangaDto) -> Unit = {},
     onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
@@ -88,7 +89,7 @@ fun MangaList(
             val manga = mangaList[index]
             MangaListCard(
                 manga = manga,
-                selected = selectedMangaList?.contains(manga?.id) ?: false,
+                selected = selectedMangaList?.contains(manga?.key) ?: false,
                 onCardClick = onCardClick,
                 onCardLongClick = onCardLongClick
             )

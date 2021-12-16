@@ -1,6 +1,7 @@
 package com.fishhawk.lisu.data.remote.service
 
 import com.fishhawk.lisu.data.remote.model.MangaDto
+import com.fishhawk.lisu.data.remote.model.MangaKeyDto
 import retrofit2.http.*
 
 interface RemoteLibraryService {
@@ -23,5 +24,10 @@ interface RemoteLibraryService {
     suspend fun deleteManga(
         @Path("providerId") providerId: String,
         @Path("mangaId") mangaId: String
+    ): String
+
+    @POST("/library/manga-delete")
+    suspend fun deleteMultipleMangas(
+        @Body mangas: List<MangaKeyDto>
     ): String
 }

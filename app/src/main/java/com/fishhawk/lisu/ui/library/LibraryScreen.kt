@@ -11,12 +11,12 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.remote.model.MangaDto
+import com.fishhawk.lisu.data.remote.model.MangaKeyDto
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToLibrarySearch
@@ -32,7 +32,7 @@ private typealias LibraryActionHandler = (LibraryAction) -> Unit
 private sealed interface LibraryAction {
     object NavToSearch : LibraryAction
     data class NavToGallery(val manga: MangaDto) : LibraryAction
-    data class RemoveFromLibrary(val mangaList: List<String>) : LibraryAction
+    data class RemoveFromLibrary(val mangaList: List<MangaKeyDto>) : LibraryAction
     object Random : LibraryAction
 }
 
@@ -47,7 +47,7 @@ fun LibraryScreen(navController: NavHostController) {
         when (action) {
             LibraryAction.NavToSearch -> navController.navToLibrarySearch()
             is LibraryAction.NavToGallery -> navController.navToGallery(action.manga)
-            is LibraryAction.RemoveFromLibrary -> viewModel.deleteManga(action.mangaList)
+            is LibraryAction.RemoveFromLibrary -> viewModel.deleteMultipleManga(action.mangaList)
             LibraryAction.Random -> viewModel.getRandomManga()
         }
     }
@@ -61,7 +61,7 @@ fun LibraryScreen(navController: NavHostController) {
         }
     }
 
-    val selectedMangaList = remember { mutableStateListOf<String>() }
+    val selectedMangaList = remember { mutableStateListOf<MangaKeyDto>() }
     Scaffold(
         topBar = {
             ToolBar(onAction)
@@ -76,20 +76,21 @@ fun LibraryScreen(navController: NavHostController) {
                         if (selectedMangaList.isEmpty()) {
                             onAction(LibraryAction.NavToGallery(it))
                         } else {
-                            if (selectedMangaList.contains(it.id)) {
-                                selectedMangaList.remove(it.id)
+                            val key = it.key
+                            if (selectedMangaList.contains(key)) {
+                                selectedMangaList.remove(key)
                             } else {
-                                selectedMangaList.add(it.id)
+                                selectedMangaList.add(key)
                             }
                         }
                     },
                     onCardLongClick = { manga ->
                         if (selectedMangaList.isEmpty()) {
-                            selectedMangaList.add(manga.id)
+                            selectedMangaList.add(manga.key)
                         } else {
-                            val list = mangaList.itemSnapshotList.mapNotNull { it?.id }
+                            val list = mangaList.itemSnapshotList.mapNotNull { it?.key }
                             val start = list.indexOf(selectedMangaList.last())
-                            val end = list.indexOf(manga.id)
+                            val end = list.indexOf(manga.key)
                             val pendingList = if (start > end) {
                                 list.slice(end..start).reversed()
                             } else {
@@ -125,7 +126,7 @@ private fun ToolBar(onAction: LibraryActionHandler) {
 
 @Composable
 private fun SelectingToolBar(
-    selectedMangaList: SnapshotStateList<String>,
+    selectedMangaList: SnapshotStateList<MangaKeyDto>,
     onAction: LibraryActionHandler
 ) {
     var isOpen by remember { mutableStateOf(false) }
