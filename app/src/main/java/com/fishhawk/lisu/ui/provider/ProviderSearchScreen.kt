@@ -1,7 +1,11 @@
 package com.fishhawk.lisu.ui.provider
 
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
@@ -13,6 +17,7 @@ import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.LisuSearchToolBar
+import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.widget.SuggestionList
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
@@ -32,11 +37,9 @@ fun ProviderSearchScreen(navController: NavHostController) {
     val viewModel by viewModel<ProviderSearchViewModel> {
         parametersOf(navController.currentBackStackEntry!!.arguments!!)
     }
+    val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
     val mangaList = viewModel.mangaList.collectAsLazyPagingItems()
-
-    var editingKeywords by remember { mutableStateOf(viewModel.keywords.value ?: "") }
-    var editing by remember { mutableStateOf(viewModel.keywords.value == null) }
 
     val onAction: SearchActionHandler = { action ->
         when (action) {
@@ -48,29 +51,46 @@ fun ProviderSearchScreen(navController: NavHostController) {
         }
     }
 
+    var editingKeywords by remember { mutableStateOf(viewModel.keywords.value) }
+    var editing by remember { mutableStateOf(viewModel.keywords.value.isBlank()) }
+
     Scaffold(
         topBar = {
+            LisuToolBar(
+                title = keywords,
+                onNavUp = { onAction(SearchAction.NavUp) },
+            ) {
+                IconButton(onClick = { editing = true }) {
+                    Icon(Icons.Default.Search, stringResource(R.string.action_search))
+                }
+            }
             LisuSearchToolBar(
-                onSearch = { onAction(SearchAction.Search(editingKeywords)) },
+                visible = editing,
                 value = editingKeywords,
                 onValueChange = { editingKeywords = it },
-                editing = editing,
-                onEditingChange = { editing = it },
-                placeholder = { Text(stringResource(R.string.search_hint)) },
-                onNavUp = { onAction(SearchAction.NavUp) }
+                onSearch = {
+                    onAction(SearchAction.Search(it))
+                    editing = false
+                },
+                onDismiss = {
+                    if (keywords.isBlank()) onAction(SearchAction.NavUp)
+                    else editing = false
+                },
+                placeholder = { Text(stringResource(R.string.search_hint)) }
             )
         },
         content = {
             LisuTransition {
-                MangaList(mangaList, onAction)
+                MangaList(
+                    mangaList = mangaList,
+                    onAction = onAction
+                )
                 SuggestionList(
                     editing = editing,
                     keywords = editingKeywords,
                     suggestions = suggestions,
                     onSuggestionSelected = { editingKeywords = it },
-                    onSuggestionDeleted = {
-                        onAction(SearchAction.DeleteSuggestion(it))
-                    }
+                    onSuggestionDeleted = { onAction(SearchAction.DeleteSuggestion(it)) }
                 )
             }
         }

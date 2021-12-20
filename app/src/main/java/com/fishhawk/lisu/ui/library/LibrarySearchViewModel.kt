@@ -15,7 +15,7 @@ class LibrarySearchViewModel(
     searchHistoryRepository: SearchHistoryRepository,
 ) : BaseViewModel<LibraryEffect>() {
 
-    private val _keywords = MutableStateFlow(args.getString("keywords"))
+    private val _keywords = MutableStateFlow(args.getString("keywords") ?: "")
     val keywords = _keywords.asStateFlow()
 
     val suggestions = searchHistoryRepository.list()
@@ -26,13 +26,17 @@ class LibrarySearchViewModel(
 
     val mangaList =
         combine(
-            _keywords.filterNotNull(),
+            _keywords.filter { it.isNotBlank() },
             remoteLibraryRepository.serviceFlow
         ) { keywords, _ -> keywords }.flatMapLatest {
             Pager(PagingConfig(pageSize = 20)) {
                 LibraryMangaSource(it).also { source = it }
             }.flow.cachedIn(viewModelScope)
         }
+
+    fun search(keywords: String) {
+        _keywords.value = keywords
+    }
 
     inner class LibraryMangaSource(private val keywords: String) : PagingSource<Int, MangaDto>() {
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MangaDto> {
@@ -44,9 +48,5 @@ class LibrarySearchViewModel(
         }
 
         override fun getRefreshKey(state: PagingState<Int, MangaDto>): Int = 0
-    }
-
-    fun search(keywords: String) {
-        _keywords.value = keywords
     }
 }

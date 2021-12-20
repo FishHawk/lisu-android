@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,10 +20,7 @@ import com.fishhawk.lisu.ui.base.MangaListCard
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToProviderSearch
 import com.fishhawk.lisu.ui.theme.LisuTransition
-import com.fishhawk.lisu.ui.widget.LisuSearchToolBar
-import com.fishhawk.lisu.ui.widget.LoadingItem
-import com.fishhawk.lisu.ui.widget.SuggestionList
-import com.fishhawk.lisu.ui.widget.ViewState
+import com.fishhawk.lisu.ui.widget.*
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
@@ -41,11 +39,9 @@ fun GlobalSearchScreen(navController: NavHostController) {
     val viewModel by viewModel<GlobalSearchViewModel> {
         parametersOf(navController.currentBackStackEntry!!.arguments!!)
     }
+    val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
     val searchResultList by viewModel.searchResultList.collectAsState()
-
-    var editingKeywords by remember { mutableStateOf(viewModel.keywords.value ?: "") }
-    var editing by remember { mutableStateOf(viewModel.keywords.value == null) }
 
     val onAction: GlobalSearchActionHandler = { action ->
         when (action) {
@@ -53,26 +49,45 @@ fun GlobalSearchScreen(navController: NavHostController) {
             is GlobalSearchAction.NavToGallery ->
                 navController.navToGallery(action.manga)
             is GlobalSearchAction.NavToProviderSearch ->
-                navController.navToProviderSearch(action.providerId, editingKeywords)
+                navController.navToProviderSearch(action.providerId, keywords)
             is GlobalSearchAction.Search -> viewModel.search(action.keywords)
         }
     }
 
+    var editing by remember { mutableStateOf(viewModel.keywords.value.isBlank()) }
+    var editingKeywords by remember { mutableStateOf(viewModel.keywords.value) }
+
     Scaffold(
         topBar = {
+            LisuToolBar(
+                title = keywords,
+                onNavUp = { onAction(GlobalSearchAction.NavUp) },
+            ) {
+                IconButton(onClick = { editing = true }) {
+                    Icon(Icons.Default.Search, stringResource(R.string.action_search))
+                }
+            }
             LisuSearchToolBar(
-                onSearch = { onAction(GlobalSearchAction.Search(editingKeywords)) },
+                visible = editing,
                 value = editingKeywords,
                 onValueChange = { editingKeywords = it },
-                editing = editing,
-                onEditingChange = { editing = it },
-                placeholder = { Text(stringResource(R.string.search_global_hint)) },
-                onNavUp = { onAction(GlobalSearchAction.NavUp) }
+                onSearch = {
+                    onAction(GlobalSearchAction.Search(it))
+                    editing = false
+                },
+                onDismiss = {
+                    if (keywords.isBlank()) onAction(GlobalSearchAction.NavUp)
+                    else editing = false
+                },
+                placeholder = { Text(stringResource(R.string.search_global_hint)) }
             )
         },
         content = {
             LisuTransition {
-                SearchResultList(searchResultList, onAction)
+                SearchResultList(
+                    searchResultList = searchResultList,
+                    onAction = onAction
+                )
                 SuggestionList(
                     editing = editing,
                     keywords = editingKeywords,

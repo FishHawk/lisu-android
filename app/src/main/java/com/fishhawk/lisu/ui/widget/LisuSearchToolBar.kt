@@ -20,9 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -35,65 +33,69 @@ import com.google.accompanist.insets.imePadding
 
 @Composable
 fun LisuSearchToolBar(
-    onSearch: () -> Unit,
+    visible: Boolean,
     value: String,
     onValueChange: (String) -> Unit,
-    editing: Boolean,
-    onEditingChange: (Boolean) -> Unit,
-    placeholder: @Composable (() -> Unit)? = null,
-    onNavUp: (() -> Unit) = {},
+    onSearch: (String) -> Unit,
+    onDismiss: () -> Unit,
+    placeholder: @Composable (() -> Unit)? = null
 ) {
-    LisuToolBar {
-        val focusManager = LocalFocusManager.current
-        val focusRequester = remember { FocusRequester() }
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        LisuToolBar {
+            val focusRequester = remember { FocusRequester() }
 
-        TextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { onEditingChange(it.hasFocus) }
-                .focusRequester(focusRequester),
-            singleLine = true,
-            leadingIcon = {
-                IconButton(onClick = { onNavUp() }) {
-                    Icon(Icons.Filled.ArrowBack, "back")
-                }
-            },
-            trailingIcon = {
-                if (value.isNotEmpty()) {
-                    IconButton(onClick = {
-                        onValueChange("")
-                        focusRequester.requestFocus()
-                    }) {
-                        Icon(Icons.Default.Close, "clear")
+            TextField(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
+                singleLine = true,
+                leadingIcon = {
+                    IconButton(onClick = { onDismiss() }) {
+                        Icon(Icons.Filled.ArrowBack, "back")
                     }
-                }
-            },
-            placeholder = placeholder,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions {
-                onSearch()
-                focusManager.clearFocus()
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
+                },
+                trailingIcon = {
+                    if (value.isNotEmpty()) {
+                        IconButton(onClick = {
+                            onValueChange("")
+                            focusRequester.requestFocus()
+                        }) {
+                            Icon(Icons.Default.Close, "clear")
+                        }
+                    }
+                },
+                placeholder = placeholder,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions {
+                    if (value.isNotBlank()) {
+                        onSearch(value)
+                    }
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
             )
-        )
-        LaunchedEffect(Unit) {
-            if (editing) focusRequester.requestFocus()
-        }
-
-        // hack, see https://stackoverflow.com/questions/68389802/how-to-clear-textfield-focus-when-closing-the-keyboard-and-prevent-two-back-pres
-        var imeIsVisiblePrev by remember { mutableStateOf(false) }
-        val imeIsVisible = LocalWindowInsets.current.ime.isVisible
-        LaunchedEffect(imeIsVisible) {
-            if (!imeIsVisible && imeIsVisiblePrev) {
-                focusManager.clearFocus()
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
             }
-            imeIsVisiblePrev = imeIsVisible
+
+            // hack, see https://stackoverflow.com/questions/68389802/how-to-clear-textfield-focus-when-closing-the-keyboard-and-prevent-two-back-pres
+            var imeIsVisiblePrev by remember { mutableStateOf(false) }
+            val imeIsVisible = LocalWindowInsets.current.ime.isVisible
+            LaunchedEffect(imeIsVisible) {
+                if (!imeIsVisible && imeIsVisiblePrev) {
+                    onDismiss()
+                }
+                imeIsVisiblePrev = imeIsVisible
+            }
         }
     }
 }

@@ -19,12 +19,12 @@ class ProviderSearchViewModel(
 
     val providerId = args.getString("providerId")!!
 
-    private val _keywords = MutableStateFlow(args.getString("keywords"))
+    private val _keywords = MutableStateFlow(args.getString("keywords") ?: "")
     val keywords = _keywords.asStateFlow()
 
     init {
         keywords
-            .filterNotNull()
+            .filter { it.isNotBlank() }
             .onEach { searchHistoryRepository.update(SearchHistory(providerId, it)) }
             .launchIn(viewModelScope)
     }
@@ -35,7 +35,7 @@ class ProviderSearchViewModel(
 
     private var source: ProviderSearchMangaSource? = null
 
-    val mangaList = keywords.filterNotNull().flatMapLatest { keywords ->
+    val mangaList = keywords.filter { it.isNotBlank() }.flatMapLatest { keywords ->
         Pager(PagingConfig(pageSize = 20)) {
             ProviderSearchMangaSource(keywords).also { source = it }
         }.flow

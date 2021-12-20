@@ -23,12 +23,12 @@ class GlobalSearchViewModel(
     private val searchHistoryRepository: SearchHistoryRepository,
 ) : ViewModel() {
 
-    private val _keywords = MutableStateFlow(args.getString("keywords"))
+    private val _keywords = MutableStateFlow(args.getString("keywords") ?: "")
     val keywords = _keywords.asStateFlow()
 
     init {
         keywords
-            .filterNotNull()
+            .filter { it.isNotBlank() }
             .onEach { searchHistoryRepository.update(SearchHistory("", it)) }
             .launchIn(viewModelScope)
     }
@@ -41,7 +41,10 @@ class GlobalSearchViewModel(
         flow { emit(remoteLibraryRepository.listProvider().getOrNull()) }.filterNotNull()
 
     val searchResultList =
-        combine(keywords.filterNotNull(), providerList) { keywords, providerList ->
+        combine(
+            keywords.filter { it.isNotBlank() },
+            providerList
+        ) { keywords, providerList ->
             providerList.map { provider ->
                 flow {
                     emit(
