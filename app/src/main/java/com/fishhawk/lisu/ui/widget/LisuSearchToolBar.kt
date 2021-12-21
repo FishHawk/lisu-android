@@ -23,11 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.fishhawk.lisu.R
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.imePadding
 
@@ -69,7 +71,7 @@ fun LisuSearchToolBar(
                 singleLine = true,
                 leadingIcon = {
                     IconButton(onClick = { onDismiss() }) {
-                        Icon(Icons.Filled.ArrowBack, "back")
+                        Icon(Icons.Filled.ArrowBack, stringResource(R.string.action_back))
                     }
                 },
                 trailingIcon = {
@@ -78,7 +80,7 @@ fun LisuSearchToolBar(
                             onValueChange("")
                             focusRequester.requestFocus()
                         }) {
-                            Icon(Icons.Default.Close, "clear")
+                            Icon(Icons.Default.Close, stringResource(R.string.action_clear))
                         }
                     }
                 },

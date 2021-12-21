@@ -100,7 +100,7 @@ private fun ErrorView(
                 textAlign = TextAlign.Center
             )
             TextButton(onClick = onRetry) {
-                Text(text = "Try again")
+                Text(text = stringResource(R.string.action_retry))
             }
         }
     }
@@ -145,7 +145,7 @@ fun ErrorItem(
             textAlign = TextAlign.Center
         )
         TextButton(onClick = onRetry) {
-            Text(text = "Try again")
+            Text(text = stringResource(R.string.action_retry))
         }
     }
 }

@@ -8,8 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.fishhawk.lisu.R
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.TopAppBar
@@ -32,7 +34,7 @@ fun LisuToolBar(
     navigationIcon = onNavUp?.let {
         {
             IconButton(onClick = { it() }) {
-                Icon(Icons.Filled.ArrowBack, "back")
+                Icon(Icons.Filled.ArrowBack, stringResource(R.string.action_back))
             }
         }
     },

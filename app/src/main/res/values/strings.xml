@@ -6,7 +6,6 @@
     <string name="label_library">Library</string>
     <string name="label_history">History</string>
     <string name="label_explore">Explore</string>
-    <string name="label_global_search">Global search</string>
     <string name="label_more">More</string>
     <string name="label_settings_general">General</string>
     <string name="label_settings_reader">Reader</string>
@@ -124,6 +123,7 @@
     <string name="action_ok">OK</string>
     <string name="action_cancel">Cancel</string>
     <string name="action_retry">Retry</string>
+    <string name="action_back">Back</string>
 
     <string name="action_install">Install</string>
 
@@ -168,8 +168,6 @@
     <!-- toast -->
     <string name="confirm_exit">Press back again to exit</string>
 
-    <string name="error_hint_empty_refresh_result">List is empty.</string>
-
     <string name="unknown_error">Unknown error.</string>
 
     <string name="cache_cleared">Cache cleared.</string>
@@ -182,11 +180,9 @@
     <string name="author_copied">Copy author to clipboard.</string>
     <string name="tag_copied">Copy tag to clipboard.</string>
 
-    <string name="chapter_not_loaded">Chapter not loaded.</string>
     <string name="no_prev_chapter">Already at the beginning.</string>
     <string name="no_next_chapter">Already at the end.</string>
 
-    <string name="image_already_exist">Image already exist.</string>
     <string name="image_saved">Image saved.</string>
     <string name="channel_app_updates">App updates</string>
 </resources>
