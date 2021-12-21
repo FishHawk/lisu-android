@@ -87,11 +87,11 @@ fun MangaList(
     ) {
         items(mangaList.itemCount) { index ->
             val manga = mangaList[index]
-            MangaListCard(
+            MangaCard(
                 manga = manga,
                 selected = selectedMangaList?.contains(manga?.key) ?: false,
-                onCardClick = onCardClick,
-                onCardLongClick = onCardLongClick
+                onClick = onCardClick,
+                onLongClick = onCardLongClick
             )
         }
         fun itemFullWidth(content: @Composable () -> Unit) {
@@ -108,16 +108,16 @@ fun MangaList(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MangaListCard(
+fun MangaCard(
     manga: MangaDto?,
-    selected: Boolean = true,
-    onCardClick: (manga: MangaDto) -> Unit = {},
-    onCardLongClick: (manga: MangaDto) -> Unit = {}
+    selected: Boolean = false,
+    onClick: (manga: MangaDto) -> Unit = {},
+    onLongClick: (manga: MangaDto) -> Unit = {}
 ) {
     Card(
         modifier = Modifier.combinedClickable(
-            onClick = { manga?.let { onCardClick(it) } },
-            onLongClick = { manga?.let { onCardLongClick(it) } }
+            onClick = { manga?.let { onClick(it) } },
+            onLongClick = { manga?.let { onLongClick(it) } }
         )
     ) {
         Box(

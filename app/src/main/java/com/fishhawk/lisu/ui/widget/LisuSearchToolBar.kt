@@ -21,12 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.imePadding
@@ -45,12 +43,24 @@ fun LisuSearchToolBar(
         enter = fadeIn(),
         exit = fadeOut()
     ) {
+        // When setting a new text, set the pointer at the end
+        var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
+        val textFieldValue = textFieldValueState.copy(
+            text = value,
+            selection = TextRange(value.length)
+        )
+
         LisuToolBar {
             val focusRequester = remember { FocusRequester() }
 
             TextField(
-                value = value,
-                onValueChange = onValueChange,
+                value = textFieldValue,
+                onValueChange = {
+                    textFieldValueState = it
+                    if (value != it.text) {
+                        onValueChange(it.text)
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .focusRequester(focusRequester),

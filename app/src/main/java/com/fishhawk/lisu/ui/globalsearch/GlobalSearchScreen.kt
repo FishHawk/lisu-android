@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.ui.base.MangaListCard
+import com.fishhawk.lisu.ui.base.MangaCard
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToProviderSearch
 import com.fishhawk.lisu.ui.theme.LisuTransition
@@ -145,7 +145,7 @@ private fun SearchResultItem(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(searchResult.mangas) {
-                        MangaListCard(it, onCardClick = { manga ->
+                        MangaCard(it, onClick = { manga ->
                             onAction(GlobalSearchAction.NavToGallery(manga))
                         })
                     }
