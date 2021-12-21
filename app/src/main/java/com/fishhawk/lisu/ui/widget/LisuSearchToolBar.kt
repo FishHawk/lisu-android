@@ -1,8 +1,10 @@
 package com.fishhawk.lisu.ui.widget
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,8 +42,8 @@ fun LisuSearchToolBar(
 ) {
     AnimatedVisibility(
         visible = visible,
-        enter = fadeIn(),
-        exit = fadeOut()
+        enter = fadeIn(spring()),
+        exit = fadeOut(spring())
     ) {
         // When setting a new text, set the pointer at the end
         var textFieldValueState by remember { mutableStateOf(TextFieldValue(text = value)) }
@@ -112,16 +114,16 @@ fun LisuSearchToolBar(
 
 @Composable
 fun SuggestionList(
-    editing: Boolean,
+    visible: Boolean,
     keywords: String,
     suggestions: List<String>,
     onSuggestionSelected: ((String) -> Unit) = {},
     onSuggestionDeleted: ((String) -> Unit)? = null
 ) {
     AnimatedVisibility(
-        editing,
+        visible,
         modifier = Modifier.imePadding(),
-        enter = fadeIn(),
+        enter = fadeIn() + slideInVertically(),
         exit = fadeOut(),
     ) {
         val relativeSuggestions = suggestions.filter {

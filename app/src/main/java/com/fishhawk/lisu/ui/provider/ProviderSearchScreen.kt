@@ -86,7 +86,7 @@ fun ProviderSearchScreen(navController: NavHostController) {
                     onAction = onAction
                 )
                 SuggestionList(
-                    editing = editing,
+                    visible = editing,
                     keywords = editingKeywords,
                     suggestions = suggestions,
                     onSuggestionSelected = { editingKeywords = it },

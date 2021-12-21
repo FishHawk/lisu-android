@@ -82,7 +82,7 @@ fun LibrarySearchScreen(navController: NavHostController) {
                     onCardLongClick = { }
                 )
                 SuggestionList(
-                    editing = editing,
+                    visible = editing,
                     keywords = editingKeywords,
                     suggestions = suggestions,
                     onSuggestionSelected = { editingKeywords = it }
