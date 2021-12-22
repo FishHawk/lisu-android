@@ -76,10 +76,7 @@ fun LisuSearchToolBar(
                 },
                 trailingIcon = {
                     if (value.isNotEmpty()) {
-                        IconButton(onClick = {
-                            onValueChange("")
-                            focusRequester.requestFocus()
-                        }) {
+                        IconButton(onClick = { onValueChange("") }) {
                             Icon(Icons.Default.Close, stringResource(R.string.action_clear))
                         }
                     }

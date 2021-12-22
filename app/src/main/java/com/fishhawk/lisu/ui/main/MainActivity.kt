@@ -50,7 +50,6 @@ import com.fishhawk.lisu.ui.gallery.GalleryScreen
 import com.fishhawk.lisu.ui.globalsearch.GlobalSearchScreen
 import com.fishhawk.lisu.ui.history.HistoryScreen
 import com.fishhawk.lisu.ui.library.LibraryScreen
-import com.fishhawk.lisu.ui.library.LibrarySearchScreen
 import com.fishhawk.lisu.ui.more.*
 import com.fishhawk.lisu.ui.provider.ProviderScreen
 import com.fishhawk.lisu.ui.provider.ProviderSearchScreen
@@ -186,10 +185,6 @@ private fun MainNavHost(
         composable("global-search?keywords={keywords}", listOf(
             navArgument("keywords") { nullable = true }
         )) { GlobalSearchScreen(navController) }
-
-        composable("library/search?keywords={keywords}", listOf(
-            navArgument("keywords") { nullable = true }
-        )) { LibrarySearchScreen(navController) }
 
         composable("provider/{providerId}") { ProviderScreen(navController) }
 

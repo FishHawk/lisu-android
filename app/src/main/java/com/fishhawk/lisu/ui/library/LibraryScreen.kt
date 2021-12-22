@@ -65,8 +65,8 @@ fun LibraryScreen(navController: NavHostController) {
         }
     }
 
-    var editingKeywords by remember { mutableStateOf(viewModel.keywords.value) }
-    var editing by remember { mutableStateOf(viewModel.keywords.value.isNotBlank()) }
+    var editingKeywords by remember { mutableStateOf(keywords) }
+    var editing by remember { mutableStateOf(false) }
     val selectedMangaList = remember { mutableStateListOf<MangaKeyDto>() }
 
     Scaffold(

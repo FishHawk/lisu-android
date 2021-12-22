@@ -11,16 +11,15 @@ import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.database.ServerHistoryRepository
 import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
+import com.fishhawk.lisu.data.remote.Connectivity
 import com.fishhawk.lisu.data.remote.GitHubRepository
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
-import com.fishhawk.lisu.data.remote.Connectivity
 import com.fishhawk.lisu.notification.Notifications
 import com.fishhawk.lisu.ui.explore.ExploreViewModel
 import com.fishhawk.lisu.ui.gallery.GalleryViewModel
 import com.fishhawk.lisu.ui.globalsearch.GlobalSearchViewModel
 import com.fishhawk.lisu.ui.history.HistoryViewModel
-import com.fishhawk.lisu.ui.library.LibrarySearchViewModel
 import com.fishhawk.lisu.ui.library.LibraryViewModel
 import com.fishhawk.lisu.ui.main.MainViewModel
 import com.fishhawk.lisu.ui.more.MoreViewModel
@@ -129,14 +128,13 @@ val appModule = module {
     single { MainViewModel(get()) }
 
     viewModel { LibraryViewModel(get(), get()) }
-    viewModel { LibrarySearchViewModel(get(), get(), get()) }
     viewModel { HistoryViewModel(get()) }
     viewModel { ExploreViewModel(get(), get()) }
     viewModel { MoreViewModel(get()) }
+
     viewModel { GlobalSearchViewModel(get(), get(), get()) }
     viewModel { ProviderViewModel(get(), get(), get(), get()) }
     viewModel { ProviderSearchViewModel(get(), get(), get()) }
-
     viewModel { GalleryViewModel(get(), get(), get(), get()) }
 
     viewModel { ReaderViewModel(get(), get(), get()) }

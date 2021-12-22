@@ -30,11 +30,6 @@ fun NavHostController.navToProvider(id: String) {
     navigate("provider/${id}")
 }
 
-fun NavHostController.navToLibrarySearch(keywords: String? = null) {
-    val query = keywords?.let { "?keywords=${Uri.encode(keywords)}" } ?: ""
-    navigate("library/search$query")
-}
-
 fun NavHostController.navToProviderSearch(providerId: String, keywords: String? = null) {
     val query = keywords?.let { "?keywords=${Uri.encode(keywords)}" } ?: ""
     navigate("provider/${providerId}/search$query")
