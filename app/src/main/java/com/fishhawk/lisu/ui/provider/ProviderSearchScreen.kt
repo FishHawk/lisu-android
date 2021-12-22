@@ -69,8 +69,10 @@ fun ProviderSearchScreen(navController: NavHostController) {
                 value = editingKeywords,
                 onValueChange = { editingKeywords = it },
                 onSearch = {
-                    onAction(SearchAction.Search(it))
-                    editing = false
+                    if (it.isNotBlank()) {
+                        onAction(SearchAction.Search(it))
+                        editing = false
+                    }
                 },
                 onDismiss = {
                     if (keywords.isBlank()) onAction(SearchAction.NavUp)

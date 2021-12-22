@@ -21,10 +21,11 @@ import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaKeyDto
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.main.navToGallery
-import com.fishhawk.lisu.ui.main.navToLibrarySearch
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.ui.widget.LisuSearchToolBar
 import com.fishhawk.lisu.ui.widget.LisuToolBar
+import com.fishhawk.lisu.ui.widget.SuggestionList
 import com.fishhawk.lisu.util.toast
 import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.viewModel
@@ -32,28 +33,29 @@ import org.koin.androidx.compose.viewModel
 private typealias LibraryActionHandler = (LibraryAction) -> Unit
 
 private sealed interface LibraryAction {
-    object NavToSearch : LibraryAction
     data class NavToGallery(val manga: MangaDto) : LibraryAction
+    data class Search(val keywords: String) : LibraryAction
     data class RemoveFromLibrary(val mangaList: List<MangaKeyDto>) : LibraryAction
     object Random : LibraryAction
 }
 
 @Composable
 fun LibraryScreen(navController: NavHostController) {
-    val context = LocalContext.current
-
     val viewModel by viewModel<LibraryViewModel>()
+    val keywords by viewModel.keywords.collectAsState()
+    val suggestions by viewModel.suggestions.collectAsState()
     val mangaList = viewModel.mangaList.collectAsLazyPagingItems()
 
     val onAction: LibraryActionHandler = { action ->
         when (action) {
-            LibraryAction.NavToSearch -> navController.navToLibrarySearch()
             is LibraryAction.NavToGallery -> navController.navToGallery(action.manga)
+            is LibraryAction.Search -> viewModel.search(action.keywords)
             is LibraryAction.RemoveFromLibrary -> viewModel.deleteMultipleManga(action.mangaList)
             LibraryAction.Random -> viewModel.getRandomManga()
         }
     }
 
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
@@ -63,10 +65,36 @@ fun LibraryScreen(navController: NavHostController) {
         }
     }
 
+    var editingKeywords by remember { mutableStateOf(viewModel.keywords.value) }
+    var editing by remember { mutableStateOf(viewModel.keywords.value.isNotBlank()) }
     val selectedMangaList = remember { mutableStateListOf<MangaKeyDto>() }
+
     Scaffold(
         topBar = {
-            ToolBar(onAction)
+            LisuToolBar(title = stringResource(R.string.label_library).let {
+                if (keywords.isBlank()) it else "$it - $keywords"
+            }) {
+                val isRandomButtonEnabled by PR.isRandomButtonEnabled.collectAsState()
+                if (isRandomButtonEnabled) {
+                    IconButton(onClick = { onAction(LibraryAction.Random) }) {
+                        Icon(LisuIcons.Casino, stringResource(R.string.action_random_pick))
+                    }
+                }
+                IconButton(onClick = { editing = true }) {
+                    Icon(LisuIcons.Search, stringResource(R.string.action_search))
+                }
+            }
+            LisuSearchToolBar(
+                visible = editing,
+                value = editingKeywords,
+                onValueChange = { editingKeywords = it },
+                onSearch = {
+                    onAction(LibraryAction.Search(it))
+                    editing = false
+                },
+                onDismiss = { editing = false },
+                placeholder = { Text(stringResource(R.string.search_library_hint)) }
+            )
             SelectingToolBar(selectedMangaList, onAction)
         },
         content = {
@@ -106,24 +134,15 @@ fun LibraryScreen(navController: NavHostController) {
                 BackHandler(selectedMangaList.isNotEmpty()) {
                     selectedMangaList.clear()
                 }
+                SuggestionList(
+                    visible = editing,
+                    keywords = editingKeywords,
+                    suggestions = suggestions,
+                    onSuggestionSelected = { editingKeywords = it }
+                )
             }
         }
     )
-}
-
-@Composable
-private fun ToolBar(onAction: LibraryActionHandler) {
-    LisuToolBar(title = stringResource(R.string.label_library)) {
-        val isRandomButtonEnabled by PR.isRandomButtonEnabled.collectAsState()
-        if (isRandomButtonEnabled) {
-            IconButton(onClick = { onAction(LibraryAction.Random) }) {
-                Icon(LisuIcons.Casino, stringResource(R.string.action_random_pick))
-            }
-        }
-        IconButton(onClick = { onAction(LibraryAction.NavToSearch) }) {
-            Icon(LisuIcons.Search, stringResource(R.string.action_search))
-        }
-    }
 }
 
 @Composable

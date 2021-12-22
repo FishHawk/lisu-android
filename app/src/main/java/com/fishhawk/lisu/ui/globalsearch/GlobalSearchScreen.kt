@@ -72,8 +72,10 @@ fun GlobalSearchScreen(navController: NavHostController) {
                 value = editingKeywords,
                 onValueChange = { editingKeywords = it },
                 onSearch = {
-                    onAction(GlobalSearchAction.Search(it))
-                    editing = false
+                    if (it.isNotBlank()) {
+                        onAction(GlobalSearchAction.Search(it))
+                        editing = false
+                    }
                 },
                 onDismiss = {
                     if (keywords.isBlank()) onAction(GlobalSearchAction.NavUp)

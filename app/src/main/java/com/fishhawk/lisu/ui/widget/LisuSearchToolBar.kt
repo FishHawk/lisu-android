@@ -86,11 +86,7 @@ fun LisuSearchToolBar(
                 },
                 placeholder = placeholder,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions {
-                    if (value.isNotBlank()) {
-                        onSearch(value)
-                    }
-                },
+                keyboardActions = KeyboardActions { onSearch(value) },
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,

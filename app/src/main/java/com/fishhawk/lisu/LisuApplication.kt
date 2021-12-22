@@ -128,7 +128,7 @@ val appModule = module {
 
     single { MainViewModel(get()) }
 
-    viewModel { LibraryViewModel(get()) }
+    viewModel { LibraryViewModel(get(), get()) }
     viewModel { LibrarySearchViewModel(get(), get(), get()) }
     viewModel { HistoryViewModel(get()) }
     viewModel { ExploreViewModel(get(), get()) }
