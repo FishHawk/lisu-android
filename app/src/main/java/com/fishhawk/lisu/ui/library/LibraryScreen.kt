@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.lisu.PR
@@ -138,6 +139,7 @@ fun LibraryScreen(navController: NavHostController) {
                     visible = editing,
                     keywords = editingKeywords,
                     suggestions = suggestions,
+                    additionalBottom= (-56).dp,
                     onSuggestionSelected = { editingKeywords = it }
                 )
             }

@@ -4,8 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,15 +23,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.fishhawk.lisu.R
+import com.google.accompanist.insets.Insets
 import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.imePadding
 
 @Composable
 fun LisuSearchToolBar(
@@ -112,13 +116,19 @@ fun SuggestionList(
     visible: Boolean,
     keywords: String,
     suggestions: List<String>,
+    additionalBottom: Dp = 0.dp,
     onSuggestionSelected: ((String) -> Unit) = {},
     onSuggestionDeleted: ((String) -> Unit)? = null
 ) {
     AnimatedVisibility(
         visible,
-        modifier = Modifier.imePadding(),
-        enter = fadeIn() + slideInVertically(),
+        modifier = Modifier.padding(
+            rememberInsetsPaddingValuesX(
+                insets = LocalWindowInsets.current.ime,
+                additionalBottom = additionalBottom
+            )
+        ),
+        enter = fadeIn(),
         exit = fadeOut(),
     ) {
         val relativeSuggestions = suggestions.filter {
@@ -189,4 +199,81 @@ private fun buildHighlightedSuggestion(
                 else append(it)
             }
     }
+}
+
+// hack, see https://github.com/google/accompanist/issues/938
+@Composable
+private fun rememberInsetsPaddingValuesX(
+    insets: Insets,
+    applyStart: Boolean = true,
+    applyTop: Boolean = true,
+    applyEnd: Boolean = true,
+    applyBottom: Boolean = true,
+    additionalStart: Dp = 0.dp,
+    additionalTop: Dp = 0.dp,
+    additionalEnd: Dp = 0.dp,
+    additionalBottom: Dp = 0.dp,
+): PaddingValues {
+    val density = LocalDensity.current
+
+    return remember(density, insets) {
+        InsetsPaddingValues(insets = insets, density = density)
+    }.apply {
+        this.applyStart = applyStart
+        this.applyTop = applyTop
+        this.applyEnd = applyEnd
+        this.applyBottom = applyBottom
+
+        this.additionalStart = additionalStart
+        this.additionalTop = additionalTop
+        this.additionalEnd = additionalEnd
+        this.additionalBottom = additionalBottom
+    }
+}
+
+private class InsetsPaddingValues(
+    private val insets: Insets,
+    private val density: Density,
+) : PaddingValues {
+    var applyStart: Boolean by mutableStateOf(false)
+    var applyTop: Boolean by mutableStateOf(false)
+    var applyEnd: Boolean by mutableStateOf(false)
+    var applyBottom: Boolean by mutableStateOf(false)
+
+    var additionalStart: Dp by mutableStateOf(0.dp)
+    var additionalTop: Dp by mutableStateOf(0.dp)
+    var additionalEnd: Dp by mutableStateOf(0.dp)
+    var additionalBottom: Dp by mutableStateOf(0.dp)
+
+    override fun calculateLeftPadding(layoutDirection: LayoutDirection): Dp {
+        return when (layoutDirection) {
+            LayoutDirection.Ltr -> {
+                additionalStart + if (applyStart) with(density) { insets.left.toDp() } else 0.dp
+            }
+            LayoutDirection.Rtl -> {
+                additionalEnd + if (applyEnd) with(density) { insets.left.toDp() } else 0.dp
+            }
+        }
+    }
+
+    override fun calculateTopPadding(): Dp = additionalTop + when {
+        applyTop -> with(density) { insets.top.toDp() }
+        else -> 0.dp
+    }
+
+    override fun calculateRightPadding(layoutDirection: LayoutDirection): Dp {
+        return when (layoutDirection) {
+            LayoutDirection.Ltr -> {
+                additionalEnd + if (applyEnd) with(density) { insets.right.toDp() } else 0.dp
+            }
+            LayoutDirection.Rtl -> {
+                additionalStart + if (applyStart) with(density) { insets.right.toDp() } else 0.dp
+            }
+        }
+    }
+
+    override fun calculateBottomPadding(): Dp = (additionalBottom + when {
+        applyBottom -> with(density) { insets.bottom.toDp() }
+        else -> 0.dp
+    }).coerceAtLeast(0.dp)
 }
