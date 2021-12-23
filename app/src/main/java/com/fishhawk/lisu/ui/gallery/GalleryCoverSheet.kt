@@ -21,6 +21,7 @@ internal class GalleryCoverSheet(
     @Composable
     override fun Content() {
         GalleryCoverSheetContent(drawable, onAction)
+        BackHandler()
     }
 }
 

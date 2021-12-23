@@ -18,6 +18,16 @@ open class BottomSheet {
     open fun Content() {
         Text("No content")
     }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    protected fun BackHandler() {
+        val helper = LocalBottomSheetHelper.current
+        val scope = rememberCoroutineScope()
+        BackHandler(helper.state.isVisible || helper.state.isAnimationRunning) {
+            scope.launch { helper.hide() }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -46,27 +56,17 @@ val LocalBottomSheetHelper = compositionLocalOf<BottomSheetHelper> {
 fun LisuModalBottomSheetLayout(
     content: @Composable () -> Unit
 ) {
-    val bottomSheetHelper = BottomSheetHelper(
+    val helper = BottomSheetHelper(
         remember { mutableStateOf(BottomSheet()) },
         rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     )
-    ModalBottomSheetLayout(
-        sheetState = bottomSheetHelper.state,
-        sheetContent = { bottomSheetHelper.sheet.Content() },
-        scrimColor = bottomSheetHelper.sheet.scrimColor
-    ) {
-        CompositionLocalProvider(
-            LocalBottomSheetHelper provides bottomSheetHelper,
+    CompositionLocalProvider(LocalBottomSheetHelper provides helper) {
+        ModalBottomSheetLayout(
+            sheetState = helper.state,
+            sheetContent = { helper.sheet.Content() },
+            scrimColor = helper.sheet.scrimColor,
             content = content
         )
-    }
-
-    val scope = rememberCoroutineScope()
-    BackHandler(
-        bottomSheetHelper.state.isVisible ||
-                bottomSheetHelper.state.isAnimationRunning
-    ) {
-        scope.launch { bottomSheetHelper.state.hide() }
     }
 }
 

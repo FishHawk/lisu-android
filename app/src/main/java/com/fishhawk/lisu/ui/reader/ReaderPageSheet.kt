@@ -22,6 +22,7 @@ internal class ReaderPageSheet(
     @Composable
     override fun Content() {
         ReaderPageSheetContent(drawable, position, onAction)
+        BackHandler()
     }
 }
 

@@ -67,6 +67,7 @@ object ReaderOverlaySheet : BottomSheet() {
     @Composable
     override fun Content() {
         ReaderOverlaySheetContent()
+        BackHandler()
     }
 }
 

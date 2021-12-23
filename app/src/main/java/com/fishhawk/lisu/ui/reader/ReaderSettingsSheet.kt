@@ -17,6 +17,7 @@ object ReaderSettingsSheet : BottomSheet() {
     @Composable
     override fun Content() {
         ReaderSettingsSheetContent()
+        BackHandler()
     }
 }
 
