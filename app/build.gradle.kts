@@ -2,7 +2,7 @@ import java.io.FileInputStream
 import java.util.*
 
 plugins {
-    id("com.google.devtools.ksp") version "1.6.0-1.0.1"
+    id("com.google.devtools.ksp") version "1.6.10-1.0.2"
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-parcelize")
@@ -78,7 +78,7 @@ android {
     }
 
     composeOptions {
-        val composeVersion = "1.1.0-rc01"
+        val composeVersion = "1.2.0-alpha01"
         kotlinCompilerExtensionVersion = composeVersion
     }
 }
@@ -88,7 +88,7 @@ dependencies {
 
     implementation("androidx.activity:activity-compose:1.4.0")
 
-    val composeVersion = "1.1.0-rc01"
+    val composeVersion = "1.2.0-alpha01"
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
@@ -104,18 +104,18 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    val roomVersion = "2.4.0"
+    val roomVersion = "2.4.1"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
 
 
-    val koinVersion = "3.1.4"
+    val koinVersion = "3.1.5"
     implementation("io.insert-koin:koin-core:$koinVersion")
     implementation("io.insert-koin:koin-android:$koinVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
 
-    val accompanistVersion = "0.21.4-beta"
+    val accompanistVersion = "0.24.0-alpha"
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
@@ -125,7 +125,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
 
-    val coilVersion = "2.0.0-alpha05"
+    val coilVersion = "2.0.0-alpha06"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
 
