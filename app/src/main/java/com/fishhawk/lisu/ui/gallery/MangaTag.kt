@@ -1,15 +1,11 @@
 package com.fishhawk.lisu.ui.gallery
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -65,7 +61,7 @@ fun TagGroup(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 private fun Tag(
     tag: String,
@@ -73,18 +69,16 @@ private fun Tag(
     onTagLongClick: (String) -> Unit = {},
     onTagClose: () -> Unit = {}
 ) {
-    Surface(
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colors.onSurface.copy(alpha = 0.12f)
+    Chip(
+        onClick = { },
+        modifier = Modifier.height(28.dp)
     ) {
         Text(
-            modifier = Modifier
-                .padding(horizontal = 12.dp, vertical = 4.dp)
-                .combinedClickable(
-                    onClick = { onTagClick(tag) },
-                    onLongClick = { onTagLongClick(tag) }
-                ),
             text = tag,
+            modifier = Modifier.combinedClickable(
+                onClick = { onTagClick(tag) },
+                onLongClick = { onTagLongClick(tag) }
+            ),
             style = MaterialTheme.typography.body2.copy(fontSize = 12.sp)
         )
     }

@@ -144,7 +144,7 @@ private fun Page(
         ImageRequest.Builder(LocalContext.current)
             .data(url)
             .size(Size.ORIGINAL)
-            .setParameter("retry_hash", retryHash, cacheKey = null)
+            .setParameter("retry_hash", retryHash, memoryCacheKey = null)
             .build()
     )
 
