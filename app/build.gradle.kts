@@ -31,6 +31,8 @@ android {
         }
     }
 
+    namespace = "com.fishhawk.lisu"
+
     compileSdk = 31
     buildToolsVersion = "30.0.3"
 
@@ -78,7 +80,7 @@ android {
     }
 
     composeOptions {
-        val composeVersion = "1.2.0-alpha03"
+        val composeVersion = "1.2.0-alpha04"
         kotlinCompilerExtensionVersion = composeVersion
     }
 }
@@ -86,9 +88,9 @@ android {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
 
-    implementation("androidx.activity:activity-compose:1.4.0")
+    implementation("androidx.activity:activity-compose:1.5.0-alpha03")
 
-    val composeVersion = "1.2.0-alpha03"
+    val composeVersion = "1.2.0-alpha04"
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
@@ -96,9 +98,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-core:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
 
-    implementation("androidx.navigation:navigation-compose:2.4.0-rc01")
+    implementation("androidx.navigation:navigation-compose:2.5.0-alpha03")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-alpha03")
 
     implementation("androidx.paging:paging-compose:1.0.0-alpha14")
 
@@ -115,7 +117,7 @@ dependencies {
     implementation("io.insert-koin:koin-android:$koinVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
 
-    val accompanistVersion = "0.24.0-alpha"
+    val accompanistVersion = "0.24.3-alpha"
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
@@ -125,7 +127,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
 
-    val coilVersion = "2.0.0-alpha08"
+    val coilVersion = "2.0.0-alpha09"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
 
@@ -141,7 +143,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.5")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.1")
 
     // implementation("com.quickbirdstudios:opencv:4.1.0")
 }
