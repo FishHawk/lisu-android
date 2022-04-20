@@ -3,6 +3,7 @@ package com.fishhawk.lisu.ui.provider
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -81,9 +82,10 @@ fun ProviderScreen(navController: NavHostController) {
 
     Scaffold(
         topBar = { ToolBar(viewModel.provider.id, boards, pagerState, onAction) },
-        content = {
+        content = { paddingValues ->
             LisuTransition {
                 HorizontalPager(
+                    modifier = Modifier.padding(paddingValues),
                     count = boards.size,
                     state = pagerState
                 ) { page ->

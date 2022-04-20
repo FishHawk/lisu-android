@@ -1,6 +1,7 @@
 package com.fishhawk.lisu.ui.more
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,8 +20,12 @@ fun OpenSourceLicenseScreen(navController: NavHostController) {
                 onNavUp = { navController.navigateUp() }
             )
         },
-        content = {
-            LibrariesContainer(modifier = Modifier.fillMaxSize())
+        content = { paddingValues ->
+            LibrariesContainer(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+            )
         }
     )
 }

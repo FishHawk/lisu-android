@@ -65,9 +65,17 @@ fun ExploreScreen(navController: NavHostController) {
 
     Scaffold(
         topBar = { ToolBar(onAction) },
-        content = {
+        content = { paddingValues ->
             LisuTransition {
-                ProviderList(viewState, providers, lastUsedProvider, onAction)
+                ProviderList(
+                    viewState,
+                    providers,
+                    lastUsedProvider,
+                    onAction,
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize()
+                )
             }
         }
     )
@@ -87,10 +95,11 @@ private fun ProviderList(
     viewState: ViewState,
     providers: Map<String, List<ProviderDto>>,
     lastUsedProvider: ProviderDto?,
-    onAction: ExploreActionHandler
+    onAction: ExploreActionHandler,
+    modifier: Modifier = Modifier
 ) {
     StateView(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         viewState = viewState,
         onRetry = { onAction(ExploreAction.Reload) }
     ) {

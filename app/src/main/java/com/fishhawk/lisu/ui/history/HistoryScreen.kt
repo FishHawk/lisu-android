@@ -73,7 +73,15 @@ fun HistoryScreen(navController: NavHostController) {
 
     Scaffold(
         topBar = { ToolBar(onAction) },
-        content = { LisuTransition { HistoryList(histories, onAction) } }
+        content = { paddingValues ->
+            LisuTransition {
+                HistoryList(
+                    histories,
+                    onAction,
+                    modifier = Modifier.padding(paddingValues)
+                )
+            }
+        }
     )
 }
 
@@ -97,10 +105,11 @@ private fun ToolBar(onAction: HistoryActionHandler) {
 @Composable
 private fun HistoryList(
     histories: Map<LocalDate, List<ReadingHistory>>,
-    onAction: HistoryActionHandler
+    onAction: HistoryActionHandler,
+    modifier: Modifier = Modifier
 ) {
     if (histories.isEmpty()) EmptyView()
-    LazyColumn {
+    LazyColumn(modifier = modifier) {
         histories.forEach { (date, list) ->
             item(key = date) {
                 HistoryListHeader(

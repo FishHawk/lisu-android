@@ -2,6 +2,7 @@ package com.fishhawk.lisu.ui.more
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Divider
@@ -58,7 +59,16 @@ fun MoreScreen(navController: NavHostController) {
 
     Scaffold(
         topBar = { LisuToolBar(title = stringResource(R.string.label_more)) },
-        content = { LisuTransition { Content(address, suggestions, onAction) } }
+        content = { paddingValues ->
+            LisuTransition {
+                Content(
+                    address, suggestions, onAction,
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxWidth()
+                )
+            }
+        }
     )
 }
 
@@ -66,9 +76,10 @@ fun MoreScreen(navController: NavHostController) {
 private fun Content(
     initAddress: String,
     suggestions: List<String>,
-    onAction: MoreActionHandler
+    onAction: MoreActionHandler,
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier) {
         var address by remember { mutableStateOf(initAddress) }
         TextFieldWithSuggestions(
             value = address,

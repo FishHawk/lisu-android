@@ -30,8 +30,6 @@ import com.fishhawk.lisu.data.datastore.setNext
 import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
 import com.fishhawk.lisu.ui.widget.LocalBottomSheetHelper
-import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking

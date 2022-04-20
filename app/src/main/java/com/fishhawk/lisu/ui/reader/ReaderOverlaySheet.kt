@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ExperimentalGraphicsApi
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.fishhawk.lisu.PR
@@ -26,7 +25,6 @@ import com.fishhawk.lisu.ui.more.SwitchPreference
 import com.fishhawk.lisu.ui.widget.BottomSheet
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalGraphicsApi::class)
 @Composable
 fun ReaderColorFilterOverlay() {
     val isEnabled by PR.enabledColorFilter.collectAsState()

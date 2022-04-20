@@ -2,6 +2,7 @@ package com.fishhawk.lisu.ui.more
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -25,13 +26,21 @@ fun SettingGeneralScreen(navController: NavHostController) {
                 onNavUp = { navController.navigateUp() }
             )
         },
-        content = { LisuTransition { Content() } }
+        content = { paddingValues ->
+            LisuTransition {
+                Content(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxWidth()
+                )
+            }
+        }
     )
 }
 
 @Composable
-private fun Content() {
-    Column(modifier = Modifier.fillMaxWidth()) {
+private fun Content(modifier: Modifier = Modifier) {
+    Column(modifier = modifier) {
         ListPreference(
             title = stringResource(R.string.settings_start_screen),
             preference = PR.startScreen

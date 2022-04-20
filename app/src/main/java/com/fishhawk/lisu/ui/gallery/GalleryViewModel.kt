@@ -9,7 +9,6 @@ import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.ui.widget.ViewState
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,7 +39,6 @@ class GalleryViewModel(
     })
     val detail = _detail.asStateFlow()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val history = readingHistoryRepository.select(manga.id)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 

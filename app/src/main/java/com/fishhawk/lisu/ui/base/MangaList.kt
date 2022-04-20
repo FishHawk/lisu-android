@@ -24,7 +24,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import coil.annotation.ExperimentalCoilApi
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -44,13 +43,14 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 @Composable
 fun RefreshableMangaList(
     mangaList: LazyPagingItems<MangaDto>,
+    modifier: Modifier = Modifier,
     selectedMangaList: SnapshotStateList<MangaKeyDto>? = null,
     onCardClick: (manga: MangaDto) -> Unit = {},
     onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
     val state = mangaList.loadState.refresh
     StateView(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         viewState = state.let {
             when (it) {
                 LoadState.Loading -> ViewState.Loading
@@ -70,7 +70,6 @@ fun RefreshableMangaList(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MangaList(
     mangaList: LazyPagingItems<MangaDto>,
@@ -152,8 +151,8 @@ fun MangaCard(
                     .align(Alignment.BottomStart)
                     .padding(8.dp),
                 text = manga?.title ?: manga?.id ?: "",
-                style = MaterialTheme.typography.subtitle2.copy(
-                    shadow = Shadow(Color.White, Offset.Zero, 2f)
+                style = MaterialTheme.typography.caption.copy(
+                    shadow = Shadow(Color.White, Offset.Zero, 1f)
                 ),
                 color = Color.White,
                 maxLines = 2,
@@ -174,7 +173,6 @@ fun MangaCard(
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun MangaCover(
     cover: String?,

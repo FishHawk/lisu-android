@@ -1,6 +1,9 @@
 package com.fishhawk.lisu.ui.widget
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -12,8 +15,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.fishhawk.lisu.R
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.TopAppBar
 
 @Composable
@@ -30,7 +31,7 @@ fun LisuToolBar(
         }
     },
     modifier = modifier,
-    contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
+    contentPadding = WindowInsets.statusBars.asPaddingValues(),
     navigationIcon = onNavUp?.let {
         {
             IconButton(onClick = { it() }) {

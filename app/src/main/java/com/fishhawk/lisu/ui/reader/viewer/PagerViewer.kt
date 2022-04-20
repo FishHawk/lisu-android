@@ -2,7 +2,6 @@ package com.fishhawk.lisu.ui.reader.viewer
 
 import android.graphics.drawable.Drawable
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.animateZoomBy
@@ -205,7 +204,6 @@ private const val maxScale = 3.0f
 private const val midScale = 1.5f
 private const val minScale = 1.0f
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 private fun ZoomableImage(
     painter: AsyncImagePainter,

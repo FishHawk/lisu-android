@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.Color
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.Theme
 import com.fishhawk.lisu.data.datastore.collectAsState
-import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 val LisuIcons = Icons.Outlined
@@ -39,10 +38,7 @@ fun LisuTheme(content: @Composable () -> Unit) {
                 systemUiController.setStatusBarColor(Color.Transparent, true)
                 systemUiController.setStatusBarColor(Color.Transparent, useDarkIcons)
             }
-
-            ProvideWindowInsets {
-                content()
-            }
+            content()
         }
     }
 }

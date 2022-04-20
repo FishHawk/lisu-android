@@ -2,6 +2,7 @@ package com.fishhawk.lisu.ui.more
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -28,14 +29,23 @@ fun AboutScreen(navController: NavHostController) {
                 onNavUp = { navController.navigateUp() }
             )
         },
-        content = { LisuTransition { Content(navController) } }
+        content = {paddingValues->
+            LisuTransition {
+                Content(
+                    navController,
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxWidth()
+                )
+            }
+        }
     )
 }
 
 @Composable
-private fun Content(navController: NavHostController) {
+private fun Content(navController: NavHostController, modifier: Modifier = Modifier) {
     val viewModel by viewModel<MainViewModel>()
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier) {
         val context = LocalContext.current
         val versionPrefix = if (BuildConfig.DEBUG) "Preview" else "Stable"
         val version = "$versionPrefix ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"

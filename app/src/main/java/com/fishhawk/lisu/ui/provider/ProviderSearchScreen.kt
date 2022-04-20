@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.ui.provider
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Scaffold
@@ -7,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
@@ -81,9 +83,10 @@ fun ProviderSearchScreen(navController: NavHostController) {
                 placeholder = { Text(stringResource(R.string.search_hint)) }
             )
         },
-        content = {
+        content = { paddingValues ->
             LisuTransition {
                 MangaList(
+                    modifier = Modifier.padding(paddingValues),
                     mangaList = mangaList,
                     onAction = onAction
                 )
@@ -102,9 +105,11 @@ fun ProviderSearchScreen(navController: NavHostController) {
 @Composable
 private fun MangaList(
     mangaList: LazyPagingItems<MangaDto>,
-    onAction: SearchActionHandler
+    onAction: SearchActionHandler,
+    modifier: Modifier = Modifier,
 ) {
     RefreshableMangaList(
+        modifier = modifier,
         mangaList = mangaList,
         onCardClick = { onAction(SearchAction.NavToGallery(it)) },
         onCardLongClick = { onAction(SearchAction.OpenSheet(it)) }

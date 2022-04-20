@@ -84,9 +84,12 @@ fun GlobalSearchScreen(navController: NavHostController) {
                 placeholder = { Text(stringResource(R.string.search_global_hint)) }
             )
         },
-        content = {
+        content = { paddingValues ->
             LisuTransition {
                 SearchResultList(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize(),
                     searchResultList = searchResultList,
                     onAction = onAction
                 )
@@ -104,10 +107,11 @@ fun GlobalSearchScreen(navController: NavHostController) {
 @Composable
 private fun SearchResultList(
     searchResultList: List<StateFlow<SearchResult>>,
-    onAction: GlobalSearchActionHandler
+    onAction: GlobalSearchActionHandler,
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {

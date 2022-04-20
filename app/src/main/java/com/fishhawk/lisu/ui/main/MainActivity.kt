@@ -10,6 +10,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -58,10 +59,8 @@ import com.fishhawk.lisu.ui.widget.LisuModalBottomSheetLayout
 import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.util.toUriCompat
 import com.fishhawk.lisu.util.toast
-import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.ui.BottomNavigation
 import com.google.accompanist.insets.ui.Scaffold
-import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.viewModel
 import java.io.File
 
@@ -91,7 +90,10 @@ private fun MainApp() {
                 is MainEffect.NotifyDownloadProgress ->
                     AppUpdateNotification.onProgressChange(context, effect.progress)
                 is MainEffect.NotifyDownloadFinish ->
-                    AppUpdateNotification.onDownloadFinished(context, effect.file.toUriCompat(context))
+                    AppUpdateNotification.onDownloadFinished(
+                        context,
+                        effect.file.toUriCompat(context)
+                    )
                 is MainEffect.NotifyDownloadError ->
                     AppUpdateNotification.onDownloadError(context, effect.url)
             }

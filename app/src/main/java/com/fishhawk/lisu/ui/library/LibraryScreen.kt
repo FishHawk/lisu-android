@@ -4,12 +4,14 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.Casino
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -28,7 +30,6 @@ import com.fishhawk.lisu.ui.widget.LisuSearchToolBar
 import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.widget.SuggestionList
 import com.fishhawk.lisu.util.toast
-import kotlinx.coroutines.flow.collect
 import org.koin.androidx.compose.viewModel
 
 private typealias LibraryActionHandler = (LibraryAction) -> Unit
@@ -98,9 +99,10 @@ fun LibraryScreen(navController: NavHostController) {
             )
             SelectingToolBar(selectedMangaList, onAction)
         },
-        content = {
+        content = { paddingValues ->
             LisuTransition {
                 RefreshableMangaList(
+                    modifier = Modifier.padding(paddingValues),
                     mangaList = mangaList,
                     selectedMangaList = selectedMangaList,
                     onCardClick = {
@@ -139,7 +141,7 @@ fun LibraryScreen(navController: NavHostController) {
                     visible = editing,
                     keywords = editingKeywords,
                     suggestions = suggestions,
-                    additionalBottom= (-56).dp,
+                    additionalBottom = (-56).dp,
                     onSuggestionSelected = { editingKeywords = it }
                 )
             }

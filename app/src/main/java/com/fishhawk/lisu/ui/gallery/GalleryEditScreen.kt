@@ -1,5 +1,8 @@
 package com.fishhawk.lisu.ui.gallery
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NavigateBefore
@@ -17,7 +20,9 @@ import com.google.accompanist.insets.ui.TopAppBar
 fun GalleryEditScreen(navController: NavHostController) {
     Scaffold(
         topBar = { ToolBar(navController) },
-        content = { LisuTransition { /*Content(navController)*/ } }
+        content = { paddingValues ->
+//            LisuTransition { /*Content(navController)*/ }
+        }
     )
 }
 
@@ -25,7 +30,7 @@ fun GalleryEditScreen(navController: NavHostController) {
 private fun ToolBar(navController: NavHostController) {
     TopAppBar(
         backgroundColor = MaterialTheme.colors.surface,
-        contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
+        contentPadding = WindowInsets.statusBars.asPaddingValues(),
         title = { Text(stringResource(R.string.label_gallery_edit)) },
         navigationIcon = {
             IconButton(onClick = { navController.navigateUp() }) {

@@ -1,6 +1,5 @@
 package com.fishhawk.lisu.ui.gallery
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -114,7 +113,6 @@ private fun ChapterList(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ChapterListGrid(
     chapters: List<ChapterDto>,

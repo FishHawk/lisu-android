@@ -16,7 +16,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import coil.annotation.ExperimentalCoilApi
 import coil.compose.AsyncImagePainter
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.reader.ReaderViewModel
@@ -55,7 +54,6 @@ fun nestedScrollConnection(
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun PageState(
     modifier: Modifier,

@@ -37,7 +37,6 @@ fun BasePreference(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TextPreference(
     icon: ImageVector? = null,
@@ -46,7 +45,6 @@ fun TextPreference(
     onClick: () -> Unit = {}
 ) = BasePreference(icon, title, summary, onClick)
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SwitchPreference(
     icon: ImageVector? = null,
@@ -66,7 +64,6 @@ fun SwitchPreference(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 inline fun <reified T : Enum<T>> ListPreference(
     icon: ImageVector? = null,
