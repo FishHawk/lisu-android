@@ -80,7 +80,7 @@ android {
     }
 
     composeOptions {
-        val composeVersion = "1.2.0-alpha04"
+        val composeVersion = "1.2.0-alpha07"
         kotlinCompilerExtensionVersion = composeVersion
     }
 }
@@ -90,7 +90,7 @@ dependencies {
 
     implementation("androidx.activity:activity-compose:1.5.0-alpha03")
 
-    val composeVersion = "1.2.0-alpha04"
+    val composeVersion = "1.2.0-alpha07"
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
@@ -117,7 +117,7 @@ dependencies {
     implementation("io.insert-koin:koin-android:$koinVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
 
-    val accompanistVersion = "0.24.3-alpha"
+    val accompanistVersion = "0.24.6-alpha"
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
@@ -127,17 +127,18 @@ dependencies {
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
 
-    val coilVersion = "2.0.0-alpha09"
+    val coilVersion = "2.0.0-rc03"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
 
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.3")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.6")
 
     // Licenses
-    implementation("com.mikepenz:aboutlibraries-core:8.9.4")
+    implementation("com.mikepenz:aboutlibraries-core:10.1.0")
+    implementation("com.mikepenz:aboutlibraries-compose:10.1.0")
 
     // UI Tests
     testImplementation("junit:junit:4.13.2")

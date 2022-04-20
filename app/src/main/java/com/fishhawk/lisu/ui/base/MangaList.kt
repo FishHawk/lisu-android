@@ -2,9 +2,9 @@ package com.fishhawk.lisu.ui.base
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.GridItemSpan
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -79,7 +79,7 @@ fun MangaList(
     onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
     LazyVerticalGrid(
-        cells = GridCells.Adaptive(minSize = 96.dp),
+        columns = GridCells.Adaptive(minSize = 96.dp),
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
