@@ -2,7 +2,7 @@ import java.io.FileInputStream
 import java.util.*
 
 plugins {
-    id("com.google.devtools.ksp") version "1.6.10-1.0.2"
+    id("com.google.devtools.ksp") version "1.6.20-1.0.5"
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-parcelize")
@@ -80,7 +80,7 @@ android {
     }
 
     composeOptions {
-        val composeVersion = "1.2.0-alpha07"
+        val composeVersion = "1.2.0-alpha08"
         kotlinCompilerExtensionVersion = composeVersion
     }
 }
@@ -90,7 +90,7 @@ dependencies {
 
     implementation("androidx.activity:activity-compose:1.5.0-alpha03")
 
-    val composeVersion = "1.2.0-alpha07"
+    val composeVersion = "1.2.0-alpha08"
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
