@@ -2,11 +2,11 @@ package com.fishhawk.lisu.util
 
 import android.app.Activity
 import android.content.*
-import android.content.Context.CLIPBOARD_SERVICE
 import android.content.pm.PackageManager
 import android.graphics.Bitmap.CompressFormat
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.net.nsd.NsdManager
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
@@ -122,7 +122,12 @@ fun Context.toast(throwable: Throwable) =
 
 fun Context.copyToClipboard(text: String, hintResId: Int? = null) {
     val clip = ClipData.newPlainText("simple text", text)
-    val manager = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-    manager.setPrimaryClip(clip)
+    clipboardManager.setPrimaryClip(clip)
     hintResId?.let { toast(it) }
 }
+
+val Context.nsdManager: NsdManager
+    get() = getSystemService(Context.NSD_SERVICE) as NsdManager
+
+val Context.clipboardManager: ClipboardManager
+    get() = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

@@ -31,6 +31,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -82,9 +84,13 @@ val appModule = module {
         get<PreferenceRepository>().serverAddress.flow
             .map { address ->
                 address
-                    .let { it.ifBlank { null } }
-                    ?.let { if (URLUtil.isNetworkUrl(it)) it else "http://$it" }
-                    ?.let { if (it.last() == '/') it else "$it/" }
+                    .ifBlank { null }
+                    ?.let {
+                        if (
+                            it.startsWith("https:", ignoreCase = true) ||
+                            it.startsWith("http:", ignoreCase = true)
+                        ) it else "http://$it"
+                    }
             }
             .distinctUntilChanged()
             .map { url ->
@@ -93,7 +99,7 @@ val appModule = module {
                 try {
                     Result.success(
                         Retrofit.Builder()
-                            .baseUrl(url)
+                            .baseUrl(url.toHttpUrl())
                             .addConverterFactory(ScalarsConverterFactory.create())
                             .addConverterFactory(GsonConverterFactory.create())
                             .build()
