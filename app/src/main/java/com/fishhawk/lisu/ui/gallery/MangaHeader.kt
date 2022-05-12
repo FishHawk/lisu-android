@@ -70,9 +70,9 @@ internal fun MangaHeader(
                 .build()
         )
         Image(
-            modifier = Modifier.matchParentSize(),
             painter = painter,
             contentDescription = null,
+            modifier = Modifier.matchParentSize(),
             contentScale = ContentScale.Crop,
             alpha = 0.3f
         )

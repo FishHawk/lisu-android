@@ -1,29 +1,28 @@
 import java.io.FileInputStream
 import java.util.*
 
+//val composeVersion by extra { "1.2.0-alpha08" }
+val composeVersion by extra { "1.2.0-beta01" }
+
 plugins {
-    id("com.google.devtools.ksp") version "1.6.20-1.0.5"
-    id("com.android.application")
-    id("kotlin-android")
-    id("kotlin-parcelize")
-    id("com.mikepenz.aboutlibraries.plugin")
+    id("com.android.application") version "7.2.0-rc01"
+    id("com.google.devtools.ksp") version "1.6.21-1.0.5"
+    id("org.jetbrains.kotlin.android") version "1.6.21"
+    id("org.jetbrains.kotlin.plugin.parcelize") version "1.6.21"
+    id("com.mikepenz.aboutlibraries.plugin") version "10.1.0"
 }
 
 android {
     signingConfigs {
+        val properties = Properties()
+        properties.load(FileInputStream(project.rootProject.file("local.properties")))
         getByName("debug") {
-            val properties = Properties()
-            properties.load(FileInputStream(project.rootProject.file("local.properties")))
-
             storeFile = file(properties.getProperty("signingConfigs.storeFile"))
             storePassword = properties.getProperty("signingConfigs.storePassword")
             keyAlias = properties.getProperty("signingConfigs.keyAlias")
             keyPassword = properties.getProperty("signingConfigs.keyPassword")
         }
         create("release") {
-            val properties = Properties()
-            properties.load(FileInputStream(project.rootProject.file("local.properties")))
-
             storeFile = file(properties.getProperty("signingConfigs.storeFile"))
             storePassword = properties.getProperty("signingConfigs.storePassword")
             keyAlias = properties.getProperty("signingConfigs.keyAlias")
@@ -32,19 +31,18 @@ android {
     }
 
     namespace = "com.fishhawk.lisu"
+    compileSdk = 32
 
-    compileSdk = 31
     buildToolsVersion = "30.0.3"
 
     defaultConfig {
         applicationId = "com.fishhawk.lisu"
         minSdk = 21
-        targetSdk = 30
+        targetSdk = 32
         versionCode = 5
         versionName = "0.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
         multiDexEnabled = true
 
 //        ndk {
@@ -53,7 +51,7 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -74,13 +72,10 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
-        freeCompilerArgs = freeCompilerArgs +
-                "-Xopt-in=kotlin.RequiresOptIn" +
-                "-Xjvm-default=all"
+        freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
     }
 
     composeOptions {
-        val composeVersion = "1.2.0-alpha08"
         kotlinCompilerExtensionVersion = composeVersion
     }
 }
@@ -90,7 +85,6 @@ dependencies {
 
     implementation("androidx.activity:activity-compose:1.5.0-alpha03")
 
-    val composeVersion = "1.2.0-alpha08"
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.foundation:foundation:$composeVersion")
@@ -112,12 +106,12 @@ dependencies {
     ksp("androidx.room:room-compiler:$roomVersion")
 
 
-    val koinVersion = "3.1.5"
+    val koinVersion = "3.1.6"
     implementation("io.insert-koin:koin-core:$koinVersion")
     implementation("io.insert-koin:koin-android:$koinVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
 
-    val accompanistVersion = "0.24.6-alpha"
+    val accompanistVersion = "0.24.8-beta"
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
@@ -127,17 +121,16 @@ dependencies {
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
 
-    val coilVersion = "2.0.0-rc03"
+    val coilVersion = "2.0.0"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
 
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.6")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.7")
 
     // Licenses
-    implementation("com.mikepenz:aboutlibraries-core:10.1.0")
     implementation("com.mikepenz:aboutlibraries-compose:10.1.0")
 
     // UI Tests

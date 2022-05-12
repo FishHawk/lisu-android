@@ -3,7 +3,6 @@ package com.fishhawk.lisu.ui.base
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -30,8 +29,6 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaKeyDto
-import com.fishhawk.lisu.ui.widget.ErrorItem
-import com.fishhawk.lisu.ui.widget.LoadingItem
 import com.fishhawk.lisu.ui.widget.StateView
 import com.fishhawk.lisu.ui.widget.ViewState
 import com.google.accompanist.placeholder.PlaceholderHighlight
@@ -93,15 +90,16 @@ fun MangaList(
                 onLongClick = onCardLongClick
             )
         }
-        fun itemFullWidth(content: @Composable () -> Unit) {
-            item(span = { GridItemSpan(maxCurrentLineSpan) }) { Box {} }
-            item(span = { GridItemSpan(maxCurrentLineSpan) }) { content() }
-        }
-        when (val state = mangaList.loadState.append) {
-            LoadState.Loading -> itemFullWidth { LoadingItem() }
-            is LoadState.Error -> itemFullWidth { ErrorItem(state.error) { mangaList.retry() } }
-            else -> Unit
-        }
+        // span does not work
+//        fun itemFullWidth(content: @Composable () -> Unit) {
+//            item(span = { GridItemSpan(maxCurrentLineSpan) }) { Box {} }
+//            item(span = { GridItemSpan(maxCurrentLineSpan) }) { content() }
+//        }
+//        when (val state = mangaList.loadState.append) {
+//            LoadState.Loading -> itemFullWidth { LoadingItem() }
+//            is LoadState.Error -> itemFullWidth { ErrorItem(state.error) { mangaList.retry() } }
+//            else -> Unit
+//        }
     }
 }
 
@@ -188,14 +186,14 @@ fun MangaCover(
     )
 
     Image(
+        painter = painter,
+        contentDescription = null,
         modifier = modifier
             .aspectRatio(0.75f)
             .placeholder(
                 visible = painter.state is AsyncImagePainter.State.Loading,
                 highlight = PlaceholderHighlight.fade()
             ),
-        painter = painter,
-        contentDescription = null,
         contentScale = ContentScale.Crop
     )
 }
