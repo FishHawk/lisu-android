@@ -73,7 +73,10 @@ internal fun MangaContentChapters(
 
 @Composable
 private fun MangaContentChapterHeader() {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
             "Chapters:",
             style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium)
@@ -122,7 +125,9 @@ private fun ChapterListGrid(
     VerticalGrid(
         items = chapters,
         nColumns = 4,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) { _, it ->
@@ -179,6 +184,9 @@ private fun ChapterListLinear(
             ChapterLinear(it, isMarked(it.id)) {
                 onChapterClick(it.id)
             }
+            if (it != chapters.lastOrNull()) {
+                Divider(color = MaterialTheme.colors.onSurface.copy(alpha = 0.06f))
+            }
         }
     }
 }
@@ -192,20 +200,15 @@ private fun ChapterLinear(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { if (chapter.isLocked != true) onChapterClick() },
+            .clickable { if (chapter.isLocked != true) onChapterClick() }
+            .padding(vertical = 12.dp, horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            modifier = Modifier.padding(vertical = 16.dp),
-            text = chapter.name,
-            style = MaterialTheme.typography.subtitle2,
-            color = if (isMarked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
-        )
-        Text(
-            modifier = Modifier.padding(vertical = 16.dp),
-            text = chapter.title,
-            style = MaterialTheme.typography.subtitle2
+            text = listOf("¶", chapter.name, chapter.title).joinToString(" "),
+            color = if (isMarked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface,
+            style = MaterialTheme.typography.caption,
         )
     }
 }

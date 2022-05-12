@@ -190,7 +190,7 @@ private fun MangaDetail(
             onRetry = { onAction(GalleryAction.Reload) }
         ) {
             Column(
-                modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                modifier = Modifier.padding(bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 if (!detail.description.isNullOrBlank()) {
@@ -216,6 +216,7 @@ private fun MangaDescription(description: String) {
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Text(
                 text = description,
+                modifier = Modifier.padding(horizontal = 16.dp),
                 style = MaterialTheme.typography.body2
             )
         }

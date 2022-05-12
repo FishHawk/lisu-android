@@ -18,7 +18,9 @@ fun MangaTagGroups(
     onTagClose: () -> Unit = {}
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
     ) {
         tagGroups.onEach {
             TagGroup(

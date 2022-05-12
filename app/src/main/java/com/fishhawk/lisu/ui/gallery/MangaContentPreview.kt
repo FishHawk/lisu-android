@@ -23,7 +23,9 @@ internal fun MangaContentPreview(
     VerticalGrid(
         items = previews,
         nColumns = 3,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) { index, it ->
