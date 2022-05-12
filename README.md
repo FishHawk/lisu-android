@@ -19,3 +19,22 @@
 - 支持在多个服务器之间切换。
 - 支持深色主题。
 
+## 高级用法
+
+### mDNS自动发现
+
+对于linux系统，创建`/etc/avahi/services/lisu.service`文件。内容如下：
+
+```xml
+<?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+<service-group>
+  <name replace-wildcards="yes">lisu %h</name>
+  <service>
+    <type>_lisu._tcp</type>
+    <port>8080</port>
+  </service>
+</service-group>
+```
+
+创建后，服务端会启动mDNS服务，从而让客户端能够自动发现lisu服务。服务名称和端口号可以自行修改。
