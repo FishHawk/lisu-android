@@ -2,12 +2,9 @@ package com.fishhawk.lisu.data.remote
 
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.MetadataDto
 import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.data.remote.service.RemoteProviderService
 import kotlinx.coroutines.flow.Flow
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Retrofit
 import java.net.URLEncoder
 
@@ -57,23 +54,6 @@ class RemoteProviderRepository(retrofit: Flow<Result<Retrofit>?>) :
                 }
             )
         }
-    }
-
-    suspend fun updateMangaMetadata(
-        providerId: String,
-        mangaId: String,
-        metadata: MetadataDto
-    ): Result<String> = resultWrap { it.updateMangaMetadata(providerId, mangaId, metadata) }
-
-    suspend fun updateMangaCover(
-        providerId: String,
-        mangaId: String,
-        cover: ByteArray
-    ): Result<String> = resultWrap {
-        it.updateMangaCover(
-            providerId, mangaId,
-            cover.toRequestBody("image/png".toMediaType())
-        )
     }
 
     suspend fun getContent(

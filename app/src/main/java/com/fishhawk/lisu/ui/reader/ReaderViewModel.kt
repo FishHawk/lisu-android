@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
 import com.fishhawk.lisu.data.database.model.ReadingHistory
+import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.ChapterDto
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
@@ -37,6 +38,7 @@ sealed interface ReaderEffect : Effect {
 class ReaderViewModel(
     args: Bundle,
     private val remoteProviderRepository: RemoteProviderRepository,
+    private val remoteLibraryRepository: RemoteLibraryRepository,
     private val readingHistoryRepository: ReadingHistoryRepository,
 ) : BaseViewModel<ReaderEffect>() {
 
@@ -247,7 +249,7 @@ class ReaderViewModel(
         val stream = ByteArrayOutputStream()
         drawable.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream)
         val byteArray = stream.toByteArray()
-        remoteProviderRepository.updateMangaCover(providerId, mangaId, byteArray)
+        remoteLibraryRepository.updateMangaCover(providerId, mangaId, byteArray)
             .onSuccess { sendEffect(ReaderEffect.Message(R.string.cover_updated)) }
             .onFailure { sendEffect(ReaderEffect.Message(R.string.cover_update_failed)) }
     }

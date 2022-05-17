@@ -21,10 +21,12 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.BoardFilter
 import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.data.remote.model.MangaDto
+import com.fishhawk.lisu.ui.base.MangaBadge
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToProviderSearch
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.ui.widget.LisuDialog
 import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.pager.*
@@ -39,14 +41,14 @@ internal sealed interface ProviderAction {
     object NavToSearch : ProviderAction
     data class NavToGallery(val manga: MangaDto) : ProviderAction
 
-    data class AddToLibrary(val manga: MangaDto) : ProviderAction
-    data class RemoveFromLibrary(val manga: MangaDto) : ProviderAction
-
     data class SelectFilter(
         val boardId: String,
         val name: String,
         val selected: Int
     ) : ProviderAction
+
+    data class AddToLibrary(val manga: MangaDto) : ProviderAction
+    data class RemoveFromLibrary(val manga: MangaDto) : ProviderAction
 }
 
 @OptIn(ExperimentalPagerApi::class)
@@ -57,6 +59,8 @@ fun ProviderScreen(navController: NavHostController) {
     }
     val boards = viewModel.boards
     val boardHistory = viewModel.pageHistory.getBlocking()
+    var addDialogManga by remember { mutableStateOf<MangaDto?>(null) }
+    var removeDialogManga by remember { mutableStateOf<MangaDto?>(null) }
 
     val onAction: ProviderActionHandler = { action ->
         when (action) {
@@ -64,12 +68,11 @@ fun ProviderScreen(navController: NavHostController) {
             ProviderAction.NavToSearch -> navController.navToProviderSearch(viewModel.provider.id)
             is ProviderAction.NavToGallery -> navController.navToGallery(action.manga)
 
-            is ProviderAction.AddToLibrary -> viewModel.addToLibrary(action.manga)
-            is ProviderAction.RemoveFromLibrary -> viewModel.removeFromLibrary(action.manga)
-
             is ProviderAction.SelectFilter -> with(action) {
                 viewModel.updateFilterHistory(boardId, name, selected)
             }
+            is ProviderAction.AddToLibrary -> viewModel.addToLibrary(action.manga)
+            is ProviderAction.RemoveFromLibrary -> viewModel.removeFromLibrary(action.manga)
         }
     }
 
@@ -92,11 +95,38 @@ fun ProviderScreen(navController: NavHostController) {
                     val boardId = boards[page]
                     val filterList by viewModel.boardFilters[boardId]!!.collectAsState()
                     val mangaList = viewModel.boardMangaLists[boardId]!!.collectAsLazyPagingItems()
-                    ProviderBoard(boardId, filterList, mangaList, onAction)
+                    ProviderBoard(
+                        boardId = boardId,
+                        filterList = filterList,
+                        mangaList = mangaList,
+                        onAction = onAction,
+                        onCardLongClick = {
+                            if (it.inLibrary) removeDialogManga = it
+                            else addDialogManga = it
+                        }
+                    )
                 }
             }
         }
     )
+
+    addDialogManga?.let {
+        LisuDialog(
+            title = it.titleOrId,
+            confirmText = "Add to library",
+            onConfirm = { onAction(ProviderAction.AddToLibrary(it)) },
+            onDismiss = { addDialogManga = null },
+        )
+    }
+
+    removeDialogManga?.let {
+        LisuDialog(
+            title = it.titleOrId,
+            confirmText = "Remove from library",
+            onConfirm = { onAction(ProviderAction.RemoveFromLibrary(it)) },
+            onDismiss = { removeDialogManga = null },
+        )
+    }
 }
 
 @OptIn(ExperimentalPagerApi::class)
@@ -149,14 +179,20 @@ private fun ProviderBoard(
     boardId: String,
     filterList: List<BoardFilter>?,
     mangaList: LazyPagingItems<MangaDto>,
-    onAction: ProviderActionHandler
+    onAction: ProviderActionHandler,
+    onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         filterList?.forEach { BoardFilter(boardId, it, onAction) }
         RefreshableMangaList(
             mangaList = mangaList,
+            decorator = {
+                if (it != null && it.inLibrary) {
+                    MangaBadge(text = "in library")
+                }
+            },
             onCardClick = { onAction(ProviderAction.NavToGallery(it)) },
-            onCardLongClick = { }
+            onCardLongClick = onCardLongClick
         )
     }
 }

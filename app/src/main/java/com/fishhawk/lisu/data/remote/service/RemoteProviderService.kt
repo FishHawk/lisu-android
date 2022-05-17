@@ -2,9 +2,7 @@ package com.fishhawk.lisu.data.remote.service
 
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.MetadataDto
 import com.fishhawk.lisu.data.remote.model.ProviderDto
-import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface RemoteProviderService {
@@ -31,21 +29,6 @@ interface RemoteProviderService {
         @Path("providerId") providerId: String,
         @Path("mangaId") id: String
     ): MangaDetailDto
-
-    @PUT("/provider/{providerId}/mangas/{mangaId}/metadata")
-    suspend fun updateMangaMetadata(
-        @Path("providerId") providerId: String,
-        @Path("mangaId") mangaId: String,
-        @Body metadata: MetadataDto
-    ): String
-
-    @Multipart
-    @PUT("/provider/{providerId}/manga/{mangaId}/cover")
-    suspend fun updateMangaCover(
-        @Path("providerId") providerId: String,
-        @Path("mangaId") mangaId: String,
-        @Part("cover\"; filename=\"cover\" ") cover: RequestBody
-    ): String
 
     @GET("/provider/{providerId}/manga/{mangaId}/content/{collectionId}/{chapterId}")
     suspend fun getContent(

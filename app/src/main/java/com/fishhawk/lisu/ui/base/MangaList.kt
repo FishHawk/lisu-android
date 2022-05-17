@@ -4,6 +4,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.Badge
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -42,6 +43,7 @@ fun RefreshableMangaList(
     mangaList: LazyPagingItems<MangaDto>,
     modifier: Modifier = Modifier,
     selectedMangaList: SnapshotStateList<MangaKeyDto>? = null,
+    decorator: @Composable BoxScope.(manga: MangaDto?) -> Unit = {},
     onCardClick: (manga: MangaDto) -> Unit = {},
     onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
@@ -62,7 +64,13 @@ fun RefreshableMangaList(
             state = rememberSwipeRefreshState(isRefreshing),
             onRefresh = { mangaList.refresh() },
         ) {
-            MangaList(mangaList, selectedMangaList, onCardClick, onCardLongClick)
+            MangaList(
+                mangaList = mangaList,
+                selectedMangaList = selectedMangaList,
+                badge = decorator,
+                onCardClick = onCardClick,
+                onCardLongClick = onCardLongClick
+            )
         }
     }
 }
@@ -71,6 +79,7 @@ fun RefreshableMangaList(
 fun MangaList(
     mangaList: LazyPagingItems<MangaDto>,
     selectedMangaList: SnapshotStateList<MangaKeyDto>? = null,
+    badge: @Composable BoxScope.(manga: MangaDto?) -> Unit = {},
     onCardClick: (manga: MangaDto) -> Unit = {},
     onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
@@ -83,12 +92,15 @@ fun MangaList(
     ) {
         items(mangaList.itemCount) { index ->
             val manga = mangaList[index]
-            MangaCard(
-                manga = manga,
-                selected = selectedMangaList?.contains(manga?.key) ?: false,
-                onClick = onCardClick,
-                onLongClick = onCardLongClick
-            )
+            Box {
+                MangaCard(
+                    manga = manga,
+                    selected = selectedMangaList?.contains(manga?.key) ?: false,
+                    onClick = onCardClick,
+                    onLongClick = onCardLongClick
+                )
+                badge(manga)
+            }
         }
         // span does not work
 //        fun itemFullWidth(content: @Composable () -> Unit) {
@@ -117,11 +129,7 @@ fun MangaCard(
             onLongClick = { manga?.let { onLongClick(it) } }
         )
     ) {
-        Box(
-            modifier = Modifier
-                .width(IntrinsicSize.Min)
-                .height(IntrinsicSize.Max)
-        ) {
+        Box {
             MangaCover(manga?.cover)
 
             val textStyle = MaterialTheme.typography.subtitle2.copy(
@@ -196,4 +204,20 @@ fun MangaCover(
             ),
         contentScale = ContentScale.Crop
     )
+}
+
+
+@Composable
+fun BoxScope.MangaBadge(
+    text: String,
+    backgroundColor: Color = MaterialTheme.colors.primary,
+) {
+    Badge(
+        modifier = Modifier
+            .align(Alignment.TopStart)
+            .padding(4.dp),
+        backgroundColor = backgroundColor
+    ) {
+        Text(text = text, modifier = Modifier.padding(2.dp))
+    }
 }

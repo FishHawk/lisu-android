@@ -1,7 +1,6 @@
 import java.io.FileInputStream
 import java.util.*
 
-//val composeVersion by extra { "1.2.0-alpha08" }
 val composeVersion by extra { "1.2.0-beta01" }
 
 plugins {
@@ -83,7 +82,7 @@ android {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
 
-    implementation("androidx.activity:activity-compose:1.5.0-alpha03")
+    implementation("androidx.activity:activity-compose:1.6.0-alpha03")
 
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
@@ -92,9 +91,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-core:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
 
-    implementation("androidx.navigation:navigation-compose:2.5.0-alpha03")
+    implementation("androidx.navigation:navigation-compose:2.5.0-rc01")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-alpha03")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-rc01")
 
     implementation("androidx.paging:paging-compose:1.0.0-alpha14")
 

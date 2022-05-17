@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.database.model.SearchHistory
+import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import kotlinx.coroutines.flow.*
@@ -13,6 +14,7 @@ import kotlinx.coroutines.launch
 
 class ProviderSearchViewModel(
     args: Bundle,
+    private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
 ) : ViewModel() {
@@ -55,15 +57,14 @@ class ProviderSearchViewModel(
         searchHistoryRepository.deleteByKeywords(providerId, keywords)
     }
 
-//    fun addToLibrary(sourceMangaId: String, targetMangaId: String) = viewModelScope.launch {
-//        val result = remoteLibraryRepository.createManga(
-//            targetMangaId,
-//            provider.id,
-//            sourceMangaId,
-//            false
-//        )
-//        resultWarp(result) { feed(R.string.successfully_add_to_library) }
-//    }
+    fun addToLibrary(manga: MangaDto) = viewModelScope.launch {
+        remoteLibraryRepository.createManga(manga.providerId, manga.id).fold({}, {})
+    }
+
+    fun removeFromLibrary(manga: MangaDto) = viewModelScope.launch {
+        remoteLibraryRepository.deleteManga(manga.providerId, manga.id).fold({}, {})
+    }
+
 
     inner class ProviderSearchMangaSource(
         private val keywords: String

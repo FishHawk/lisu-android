@@ -27,6 +27,7 @@ import com.fishhawk.lisu.ui.main.navToReader
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.EmptyView
+import com.fishhawk.lisu.ui.widget.LisuDialog
 import com.fishhawk.lisu.ui.widget.LisuToolBar
 import org.koin.androidx.compose.viewModel
 import java.time.LocalDate
@@ -92,9 +93,11 @@ private fun ToolBar(onAction: HistoryActionHandler) {
         IconButton(onClick = { isOpen = true }) {
             Icon(LisuIcons.ClearAll, stringResource(R.string.action_clear_history))
             if (isOpen) {
-                ClearHistoryDialog(
+                LisuDialog(
+                    title = stringResource(R.string.dialog_clear_history),
+                    confirmText = stringResource(R.string.action_clear),
+                    onConfirm = { onAction(HistoryAction.ClearHistory) },
                     onDismiss = { isOpen = false },
-                    onConfirm = { onAction(HistoryAction.ClearHistory) }
                 )
             }
         }
@@ -219,28 +222,4 @@ private fun HistoryListItem(
             }
         }
     }
-}
-
-@Composable
-private fun ClearHistoryDialog(
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.dialog_clear_history)) },
-        confirmButton = {
-            TextButton(onClick = {
-                onConfirm()
-                onDismiss()
-            }) {
-                Text(stringResource(R.string.action_clear))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.action_cancel))
-            }
-        }
-    )
 }

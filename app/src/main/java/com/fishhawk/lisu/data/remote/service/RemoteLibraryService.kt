@@ -2,6 +2,8 @@ package com.fishhawk.lisu.data.remote.service
 
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaKeyDto
+import com.fishhawk.lisu.data.remote.model.MangaMetadataDto
+import okhttp3.RequestBody
 import retrofit2.http.*
 
 interface RemoteLibraryService {
@@ -24,6 +26,21 @@ interface RemoteLibraryService {
     suspend fun deleteManga(
         @Path("providerId") providerId: String,
         @Path("mangaId") mangaId: String
+    ): String
+
+    @Multipart
+    @PUT("/provider/manga/{providerId}/{mangaId}/cover")
+    suspend fun updateMangaCover(
+        @Path("providerId") providerId: String,
+        @Path("mangaId") mangaId: String,
+        @Part("cover\"; filename=\"cover\" ") cover: RequestBody
+    ): String
+
+    @PUT("/library/mangas/{providerId}/{mangaId}/metadata")
+    suspend fun updateMangaMetadata(
+        @Path("providerId") providerId: String,
+        @Path("mangaId") mangaId: String,
+        @Body metadata: MangaMetadataDto
     ): String
 
     @POST("/library/manga-delete")

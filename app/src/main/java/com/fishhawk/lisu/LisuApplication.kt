@@ -140,8 +140,8 @@ val appModule = module {
 
     viewModel { GlobalSearchViewModel(get(), get(), get()) }
     viewModel { ProviderViewModel(get(), get(), get(), get()) }
-    viewModel { ProviderSearchViewModel(get(), get(), get()) }
+    viewModel { ProviderSearchViewModel(get(), get(), get(), get()) }
     viewModel { GalleryViewModel(get(), get(), get(), get()) }
 
-    viewModel { ReaderViewModel(get(), get(), get()) }
+    viewModel { ReaderViewModel(get(), get(), get(), get()) }
 }
