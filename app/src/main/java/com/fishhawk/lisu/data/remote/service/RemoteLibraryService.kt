@@ -36,7 +36,7 @@ interface RemoteLibraryService {
         @Part("cover\"; filename=\"cover\" ") cover: RequestBody
     ): String
 
-    @PUT("/library/mangas/{providerId}/{mangaId}/metadata")
+    @PUT("/library/manga/{providerId}/{mangaId}/metadata")
     suspend fun updateMangaMetadata(
         @Path("providerId") providerId: String,
         @Path("mangaId") mangaId: String,

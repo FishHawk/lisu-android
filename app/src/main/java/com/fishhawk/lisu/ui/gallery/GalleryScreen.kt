@@ -222,4 +222,3 @@ private fun MangaDescription(description: String) {
         }
     }
 }
-

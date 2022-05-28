@@ -1,13 +1,15 @@
 package com.fishhawk.lisu.ui.gallery
 
 import android.os.Bundle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
+import com.fishhawk.lisu.data.remote.model.MangaMetadataDto
+import com.fishhawk.lisu.ui.base.BaseViewModel
+import com.fishhawk.lisu.ui.base.Effect
 import com.fishhawk.lisu.ui.widget.ViewState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,12 +17,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+sealed interface GalleryEffect : Effect {
+    object MetadataUpdateSuccessfully : GalleryEffect
+    data class Failure(val exception: Throwable) : GalleryEffect
+}
+
 class GalleryViewModel(
     args: Bundle,
     private val remoteLibraryRepository: RemoteLibraryRepository,
     private val remoteProviderRepository: RemoteProviderRepository,
     readingHistoryRepository: ReadingHistoryRepository,
-) : ViewModel() {
+) : BaseViewModel<GalleryEffect>() {
 
     private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
     val viewState = _viewState.asStateFlow()
@@ -37,6 +44,7 @@ class GalleryViewModel(
             isFinished = it.isFinished,
         )
     })
+    val id = manga.id
     val detail = _detail.asStateFlow()
 
     val history = readingHistoryRepository.select(manga.id)
@@ -81,16 +89,14 @@ class GalleryViewModel(
 //            feed(R.string.toast_manga_cover_updated)
 //        }
 //    }
-//
-//    fun updateMetadata(metadata: MetadataDetail) = viewModelScope.launch {
-//        val result = remoteProviderRepository.updateMangaMetadata(
-//            manga.providerId, manga.id, metadata
-//        )
-//        result.onSuccess {
-//            _detail.value = it
-//            feed(R.string.toast_manga_metadata_updated)
-//        }.onFailure {
-//            result.exceptionOrNull()?.let { feed(it) }
-//        }
-//    }
+
+    fun updateMetadata(metadata: MangaMetadataDto) = viewModelScope.launch {
+        remoteLibraryRepository.updateMangaMetadata(
+            manga.providerId, manga.id, metadata
+        ).onSuccess {
+            sendEffect(GalleryEffect.MetadataUpdateSuccessfully)
+        }.onFailure {
+            sendEffect(GalleryEffect.Failure(it))
+        }
+    }
 }

@@ -47,4 +47,7 @@ data class MangaDetailDto(
     val collections: Map<String, List<ChapterDto>>? = null,
     val chapters: List<ChapterDto>? = null,
     var preview: List<String>? = null
-) : Parcelable
+) : Parcelable {
+    val titleOrId
+        get() = title ?: id
+}

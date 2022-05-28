@@ -20,3 +20,13 @@ data class ChapterMetadataDto(
     val name: String?,
     val title: String?,
 ) : Parcelable
+
+fun MangaDetailDto.toMetadataDetail(): MangaMetadataDto {
+    return MangaMetadataDto(
+        title = title,
+        authors = authors,
+        isFinished = isFinished,
+        description = description,
+        tags = tags,
+    )
+}
