@@ -26,6 +26,7 @@ import coil.size.Size
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
+import com.fishhawk.lisu.data.remote.model.MangaState
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.widget.LocalBottomSheetHelper
@@ -97,11 +98,6 @@ internal fun MangaHeader(
                 onNavUp = { onAction(GalleryAction.NavUp) },
                 transparent = true,
             ) {
-                if (detail.inLibrary) {
-                    IconButton(onClick = { onAction(GalleryAction.NavToEdit) }) {
-                        Icon(LisuIcons.Edit, stringResource(R.string.action_edit_manga))
-                    }
-                }
                 IconButton(onClick = { onAction(GalleryAction.Share) }) {
                     Icon(LisuIcons.Share, stringResource(R.string.action_share_manga))
                 }
@@ -250,18 +246,31 @@ private fun MangaActionButtons(
     onAction: GalleryActionHandler
 ) {
     Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-        if (detail.inLibrary)
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.primary) {
-                MangaActionButton(
-                    icon = LisuIcons.Favorite,
-                    text = "In library"
-                ) { onAction(GalleryAction.RemoveFromLibrary) }
+        when(detail.state) {
+            MangaState.Local -> {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    MangaActionButton(
+                        icon = LisuIcons.Edit,
+                        text = "Edit metadata"
+                    ) { onAction(GalleryAction.NavToEdit) }
+                }
             }
-        else CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            MangaActionButton(
-                icon = LisuIcons.FavoriteBorder,
-                text = "Add to library"
-            ) { onAction(GalleryAction.AddToLibrary) }
+            MangaState.Remote -> {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    MangaActionButton(
+                        icon = LisuIcons.FavoriteBorder,
+                        text = "Add to library"
+                    ) { onAction(GalleryAction.AddToLibrary) }
+                }
+            }
+            MangaState.RemoteInLibrary -> {
+                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.primary) {
+                    MangaActionButton(
+                        icon = LisuIcons.Favorite,
+                        text = "In library"
+                    ) { onAction(GalleryAction.RemoveFromLibrary) }
+                }
+            }
         }
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             MangaActionButton(

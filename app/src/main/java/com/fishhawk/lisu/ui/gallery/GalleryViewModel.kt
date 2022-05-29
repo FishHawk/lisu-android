@@ -5,9 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
-import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaMetadataDto
+import com.fishhawk.lisu.data.remote.model.MangaState
+import com.fishhawk.lisu.data.remote.model.toDetail
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Effect
 import com.fishhawk.lisu.ui.widget.ViewState
@@ -33,17 +34,7 @@ class GalleryViewModel(
     val viewState = _viewState.asStateFlow()
 
     private val manga = args.getParcelable<MangaDto>("manga")!!
-    private val _detail = MutableStateFlow(manga.let {
-        MangaDetailDto(
-            providerId = it.providerId,
-            id = it.id,
-            cover = it.cover,
-            updateTime = it.updateTime,
-            title = it.title,
-            authors = it.authors,
-            isFinished = it.isFinished,
-        )
-    })
+    private val _detail = MutableStateFlow(manga.toDetail())
     val id = manga.id
     val detail = _detail.asStateFlow()
 
@@ -68,15 +59,15 @@ class GalleryViewModel(
 
     fun addToLibrary() = viewModelScope.launch {
         remoteLibraryRepository.createManga(manga.providerId, manga.id).fold(
-            { _detail.value = _detail.value.copy(inLibrary = true) },
-            {}
+            { _detail.value = _detail.value.copy(state = MangaState.RemoteInLibrary) },
+            { sendEffect(GalleryEffect.Failure(it)) }
         )
     }
 
     fun removeFromLibrary() = viewModelScope.launch {
         remoteLibraryRepository.deleteManga(manga.providerId, manga.id).fold(
-            { _detail.value = _detail.value.copy(inLibrary = false) },
-            {}
+            { _detail.value = _detail.value.copy(state = MangaState.Remote) },
+            { sendEffect(GalleryEffect.Failure(it)) }
         )
     }
 

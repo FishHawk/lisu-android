@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.ui.provider
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.BoardFilter
 import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.data.remote.model.MangaDto
+import com.fishhawk.lisu.data.remote.model.MangaState
 import com.fishhawk.lisu.ui.base.MangaBadge
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.main.navToGallery
@@ -101,8 +103,11 @@ fun ProviderScreen(navController: NavHostController) {
                         mangaList = mangaList,
                         onAction = onAction,
                         onCardLongClick = {
-                            if (it.inLibrary) removeDialogManga = it
-                            else addDialogManga = it
+                            when (it.state) {
+                                MangaState.Local -> Log.w(null, "Manga state should be local here")
+                                MangaState.Remote -> addDialogManga = it
+                                MangaState.RemoteInLibrary -> removeDialogManga = it
+                            }
                         }
                     )
                 }
@@ -187,7 +192,7 @@ private fun ProviderBoard(
         RefreshableMangaList(
             mangaList = mangaList,
             decorator = {
-                if (it != null && it.inLibrary) {
+                if (it != null && it.state == MangaState.RemoteInLibrary) {
                     MangaBadge(text = "in library")
                 }
             },

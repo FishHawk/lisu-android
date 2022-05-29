@@ -11,6 +11,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Share
@@ -24,6 +25,7 @@ import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
+import com.fishhawk.lisu.data.remote.model.MangaState
 import com.fishhawk.lisu.util.copyToClipboard
 import com.fishhawk.lisu.util.saveImage
 import com.fishhawk.lisu.util.shareImage
@@ -129,14 +131,14 @@ fun GalleryScreen(navController: NavHostController) {
     LisuTransition {
         val scrollState = rememberScrollState()
         MangaDetail(viewState, detail, history, scrollState, onAction)
-        ToolBar(detail.title ?: detail.id, detail.inLibrary, scrollState, onAction)
+        ToolBar(detail.title ?: detail.id, detail.state, scrollState, onAction)
     }
 }
 
 @Composable
 private fun ToolBar(
     title: String,
-    inLibrary: Boolean,
+    state: MangaState,
     scrollState: ScrollState,
     onAction: GalleryActionHandler
 ) {
@@ -152,13 +154,21 @@ private fun ToolBar(
             title = title,
             onNavUp = { onAction(GalleryAction.NavUp) }
         ) {
-            if (inLibrary) {
-                IconButton(onClick = { onAction(GalleryAction.RemoveFromLibrary) }) {
-                    Icon(LisuIcons.Favorite, stringResource(R.string.action_remove_from_library))
+            when(state) {
+                MangaState.Local -> {
+                    IconButton(onClick = { onAction(GalleryAction.NavToEdit) }) {
+                        Icon(LisuIcons.Edit, stringResource(R.string.action_edit_manga))
+                    }
                 }
-            } else {
-                IconButton(onClick = { onAction(GalleryAction.AddToLibrary) }) {
-                    Icon(LisuIcons.FavoriteBorder, stringResource(R.string.action_add_to_library))
+                MangaState.Remote -> {
+                    IconButton(onClick = { onAction(GalleryAction.AddToLibrary) }) {
+                        Icon(LisuIcons.FavoriteBorder, stringResource(R.string.action_add_to_library))
+                    }
+                }
+                MangaState.RemoteInLibrary -> {
+                    IconButton(onClick = { onAction(GalleryAction.RemoveFromLibrary) }) {
+                        Icon(LisuIcons.Favorite, stringResource(R.string.action_remove_from_library))
+                    }
                 }
             }
             IconButton(onClick = { onAction(GalleryAction.Share) }) {

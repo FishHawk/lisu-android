@@ -14,6 +14,7 @@ import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDto
+import com.fishhawk.lisu.data.remote.model.MangaState
 import com.fishhawk.lisu.ui.base.MangaBadge
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.main.navToGallery
@@ -94,13 +95,13 @@ fun ProviderSearchScreen(navController: NavHostController) {
                     modifier = Modifier.padding(paddingValues),
                     mangaList = mangaList,
                     decorator = {
-                        if (it != null && it.inLibrary) {
+                        if (it != null && it.state == MangaState.RemoteInLibrary) {
                             MangaBadge(text = "in library")
                         }
                     },
                     onCardClick = { onAction(SearchAction.NavToGallery(it)) },
                     onCardLongClick = {
-                        if (it.inLibrary) removeDialogManga = it
+                        if (it.state == MangaState.RemoteInLibrary) removeDialogManga = it
                         else addDialogManga = it
                     }
                 )

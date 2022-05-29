@@ -8,9 +8,13 @@ data class MangaKeyDto(
     val id: String,
 )
 
+enum class MangaState {
+    Local, Remote, RemoteInLibrary
+}
+
 @Parcelize
 data class MangaDto(
-    val inLibrary: Boolean = false,
+    val state: MangaState = MangaState.Local,
 
     val providerId: String,
     val id: String,
@@ -30,7 +34,7 @@ data class MangaDto(
 
 @Parcelize
 data class MangaDetailDto(
-    val inLibrary: Boolean = false,
+    val state: MangaState = MangaState.Local,
 
     val providerId: String,
     val id: String,
@@ -51,3 +55,15 @@ data class MangaDetailDto(
     val titleOrId
         get() = title ?: id
 }
+
+fun MangaDto.toDetail() =
+    MangaDetailDto(
+        state = state,
+        providerId = providerId,
+        id = id,
+        cover = cover,
+        updateTime = updateTime,
+        title = title,
+        authors = authors,
+        isFinished = isFinished,
+    )
