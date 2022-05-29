@@ -112,14 +112,12 @@ internal fun MangaHeader(
                 val bottomSheetHelper = LocalBottomSheetHelper.current
                 val drawable = (painter.state as? AsyncImagePainter.State.Success)?.result?.drawable
                 Surface(
-                    modifier = Modifier.aspectRatio(0.75f).let { modifier ->
-                        drawable?.let {
-                            modifier.clickable {
-                                val sheet = GalleryCoverSheet(it, onAction)
-                                scope.launch { bottomSheetHelper.open(sheet) }
-                            }
-                        } ?: modifier
-                    },
+                    modifier = Modifier
+                        .aspectRatio(0.75f)
+                        .clickable {
+                            val sheet = GalleryCoverSheet(drawable, onAction)
+                            scope.launch { bottomSheetHelper.open(sheet) }
+                        },
                     shape = RoundedCornerShape(4.dp),
                     elevation = 4.dp,
                 ) {
@@ -246,7 +244,7 @@ private fun MangaActionButtons(
     onAction: GalleryActionHandler
 ) {
     Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-        when(detail.state) {
+        when (detail.state) {
             MangaState.Local -> {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     MangaActionButton(

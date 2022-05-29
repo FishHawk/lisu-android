@@ -17,6 +17,8 @@ import com.fishhawk.lisu.ui.base.Effect
 import com.fishhawk.lisu.ui.widget.ViewState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
 
 class ReaderChapter(
@@ -249,8 +251,11 @@ class ReaderViewModel(
         val stream = ByteArrayOutputStream()
         drawable.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream)
         val byteArray = stream.toByteArray()
-        remoteLibraryRepository.updateMangaCover(providerId, mangaId, byteArray)
-            .onSuccess { sendEffect(ReaderEffect.Message(R.string.cover_updated)) }
+        remoteLibraryRepository.updateMangaCover(
+            providerId,
+            mangaId,
+            byteArray.toRequestBody("image/png".toMediaType())
+        ).onSuccess { sendEffect(ReaderEffect.Message(R.string.cover_updated)) }
             .onFailure { sendEffect(ReaderEffect.Message(R.string.cover_update_failed)) }
     }
 }

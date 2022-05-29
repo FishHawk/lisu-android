@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import okhttp3.RequestBody
 
 sealed interface GalleryEffect : Effect {
     object MetadataUpdateSuccessfully : GalleryEffect
@@ -71,15 +72,15 @@ class GalleryViewModel(
         )
     }
 
-//    fun updateCover(requestBody: RequestBody) = viewModelScope.launch {
-//        val result = remoteProviderRepository.updateMangaCover(
-//            manga.providerId, manga.id, requestBody
-//        )
-//        result.onSuccess { _detail.value = it }
-//        resultWarp(result) {
+    fun updateCover(requestBody: RequestBody) = viewModelScope.launch {
+        remoteLibraryRepository.updateMangaCover(
+            manga.providerId, manga.id, requestBody
+        ).onSuccess {
 //            feed(R.string.toast_manga_cover_updated)
-//        }
-//    }
+        }.onFailure {
+
+        }
+    }
 
     fun updateMetadata(metadata: MangaMetadataDto) = viewModelScope.launch {
         remoteLibraryRepository.updateMangaMetadata(

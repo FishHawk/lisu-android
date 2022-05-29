@@ -8,14 +8,16 @@ import androidx.compose.material.icons.outlined.SaveAlt
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.widget.BottomSheet
 import com.fishhawk.lisu.ui.widget.SheetListItem
+import com.fishhawk.lisu.util.toast
 
 internal class GalleryCoverSheet(
-    private val drawable: Drawable,
+    private val drawable: Drawable?,
     private val onAction: GalleryActionHandler
 ) : BottomSheet() {
     @Composable
@@ -27,21 +29,28 @@ internal class GalleryCoverSheet(
 
 @Composable
 private fun GalleryCoverSheetContent(
-    cover: Drawable,
+    cover: Drawable?,
     onAction: GalleryActionHandler
 ) {
+    val context = LocalContext.current
     Column(modifier = Modifier.fillMaxWidth()) {
         SheetListItem(
             icon = LisuIcons.Refresh,
-            title = stringResource(R.string.action_edit_cover)
+            title = stringResource(R.string.action_edit_cover),
         ) { onAction(GalleryAction.EditCover) }
         SheetListItem(
             icon = LisuIcons.SaveAlt,
-            title = stringResource(R.string.action_save_cover)
-        ) { onAction(GalleryAction.SaveCover(cover)) }
+            title = stringResource(R.string.action_save_cover),
+        ) {
+            if (cover == null) context.toast("There is no cover.")
+            else onAction(GalleryAction.SaveCover(cover))
+        }
         SheetListItem(
             icon = LisuIcons.Share,
-            title = stringResource(R.string.action_share_cover)
-        ) { onAction(GalleryAction.ShareCover(cover)) }
+            title = stringResource(R.string.action_share_cover),
+        ) {
+            if (cover == null) context.toast("There is no cover.")
+            else onAction(GalleryAction.ShareCover(cover))
+        }
     }
 }

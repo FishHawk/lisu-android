@@ -5,8 +5,8 @@ import com.fishhawk.lisu.data.remote.model.MangaKeyDto
 import com.fishhawk.lisu.data.remote.model.MangaMetadataDto
 import com.fishhawk.lisu.data.remote.service.RemoteLibraryService
 import kotlinx.coroutines.flow.Flow
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Retrofit
 
 class RemoteLibraryRepository(retrofit: Flow<Result<Retrofit>?>) :
@@ -45,12 +45,10 @@ class RemoteLibraryRepository(retrofit: Flow<Result<Retrofit>?>) :
     suspend fun updateMangaCover(
         providerId: String,
         mangaId: String,
-        cover: ByteArray
+        requestBody: RequestBody
     ): Result<String> = resultWrap {
-        it.updateMangaCover(
-            providerId, mangaId,
-            cover.toRequestBody("image/png".toMediaType())
-        )
+        val cover = MultipartBody.Part.createFormData("cover", "cover", requestBody)
+        it.updateMangaCover(providerId, mangaId, cover)
     }
 
     suspend fun deleteMultipleMangas(

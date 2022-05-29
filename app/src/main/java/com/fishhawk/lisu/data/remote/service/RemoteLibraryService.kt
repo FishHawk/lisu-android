@@ -3,7 +3,7 @@ package com.fishhawk.lisu.data.remote.service
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaKeyDto
 import com.fishhawk.lisu.data.remote.model.MangaMetadataDto
-import okhttp3.RequestBody
+import okhttp3.MultipartBody
 import retrofit2.http.*
 
 interface RemoteLibraryService {
@@ -29,11 +29,11 @@ interface RemoteLibraryService {
     ): String
 
     @Multipart
-    @PUT("/provider/manga/{providerId}/{mangaId}/cover")
+    @PUT("/library/manga/{providerId}/{mangaId}/cover")
     suspend fun updateMangaCover(
         @Path("providerId") providerId: String,
         @Path("mangaId") mangaId: String,
-        @Part("cover\"; filename=\"cover\" ") cover: RequestBody
+        @Part cover: MultipartBody.Part,
     ): String
 
     @PUT("/library/manga/{providerId}/{mangaId}/metadata")

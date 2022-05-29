@@ -1,6 +1,8 @@
 package com.fishhawk.lisu.ui.gallery
 
 import android.graphics.drawable.Drawable
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
@@ -26,10 +28,6 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaState
-import com.fishhawk.lisu.util.copyToClipboard
-import com.fishhawk.lisu.util.saveImage
-import com.fishhawk.lisu.util.shareImage
-import com.fishhawk.lisu.util.shareText
 import com.fishhawk.lisu.ui.main.navToGalleryEdit
 import com.fishhawk.lisu.ui.main.navToGlobalSearch
 import com.fishhawk.lisu.ui.main.navToProviderSearch
@@ -39,6 +37,9 @@ import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.widget.StateView
 import com.fishhawk.lisu.ui.widget.ViewState
+import com.fishhawk.lisu.util.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -77,6 +78,21 @@ fun GalleryScreen(navController: NavHostController) {
 
     val context = LocalContext.current
 
+    val newCoverSelectorLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            if (uri != null) {
+                val content = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                val type = context.contentResolver.getType(uri)?.toMediaTypeOrNull()
+                if (content == null || type == null) {
+                    context.toast("Image file not found.")
+                } else if (type.type != "image") {
+                    context.toast("Only image file can set as cover.")
+                } else {
+                    viewModel.updateCover(content.toRequestBody(type))
+                }
+            }
+        }
+
     val onAction: GalleryActionHandler = { action ->
         when (action) {
             GalleryAction.NavUp ->
@@ -99,25 +115,8 @@ fun GalleryScreen(navController: NavHostController) {
                     action.cover,
                     "${detail.title ?: detail.id}-cover"
                 )
-            GalleryAction.EditCover -> {
-//        val context = LocalContext.current
-//            val newCover = remember { mutableStateOf<Uri?>(null) }
-//            val launcher = rememberLauncherForActivityResult(
-//                ActivityResultContracts.GetContent()
-//            ) { newCover.value = it }
-
-//            newCover.value?.let {
-//                val content = context.contentResolver.openInputStream(it)?.readBytes()
-//                val type = context.contentResolver.getType(it)?.toMediaTypeOrNull()
-//                if (content != null && type != null)
-//                    viewModel.updateCover(content.toRequestBody(type))
-//            }
-//                            override fun onEditCover() {
-//                                if (viewModel.isRefreshing.value)
-//                                    return context.toast(R.string.toast_manga_not_loaded)
-//                                launcher.launch("test")
-//                            }
-            }
+            GalleryAction.EditCover ->
+                newCoverSelectorLauncher.launch("image/*")
 
             GalleryAction.Reload -> viewModel.reloadManga()
             GalleryAction.Share ->
@@ -154,7 +153,7 @@ private fun ToolBar(
             title = title,
             onNavUp = { onAction(GalleryAction.NavUp) }
         ) {
-            when(state) {
+            when (state) {
                 MangaState.Local -> {
                     IconButton(onClick = { onAction(GalleryAction.NavToEdit) }) {
                         Icon(LisuIcons.Edit, stringResource(R.string.action_edit_manga))
@@ -162,12 +161,18 @@ private fun ToolBar(
                 }
                 MangaState.Remote -> {
                     IconButton(onClick = { onAction(GalleryAction.AddToLibrary) }) {
-                        Icon(LisuIcons.FavoriteBorder, stringResource(R.string.action_add_to_library))
+                        Icon(
+                            LisuIcons.FavoriteBorder,
+                            stringResource(R.string.action_add_to_library)
+                        )
                     }
                 }
                 MangaState.RemoteInLibrary -> {
                     IconButton(onClick = { onAction(GalleryAction.RemoveFromLibrary) }) {
-                        Icon(LisuIcons.Favorite, stringResource(R.string.action_remove_from_library))
+                        Icon(
+                            LisuIcons.Favorite,
+                            stringResource(R.string.action_remove_from_library)
+                        )
                     }
                 }
             }
