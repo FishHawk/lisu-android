@@ -52,6 +52,7 @@ import com.fishhawk.lisu.ui.globalsearch.GlobalSearchScreen
 import com.fishhawk.lisu.ui.history.HistoryScreen
 import com.fishhawk.lisu.ui.library.LibraryScreen
 import com.fishhawk.lisu.ui.more.*
+import com.fishhawk.lisu.ui.provider.ProviderLoginScreen
 import com.fishhawk.lisu.ui.provider.ProviderScreen
 import com.fishhawk.lisu.ui.provider.ProviderSearchScreen
 import com.fishhawk.lisu.ui.theme.LisuTheme
@@ -189,7 +190,12 @@ private fun MainNavHost(
         )) { GlobalSearchScreen(navController) }
 
         composable("provider/{providerId}") { ProviderScreen(navController) }
-
+        composable("provider/{providerId}/login?provider={provider}", listOf(
+            navArgument("provider") {
+                nullable = true
+                type = ProviderNavType
+            }
+        )) { ProviderLoginScreen(navController) }
         composable("provider/{providerId}/search?keywords={keywords}", listOf(
             navArgument("keywords") { nullable = true }
         )) { ProviderSearchScreen(navController) }

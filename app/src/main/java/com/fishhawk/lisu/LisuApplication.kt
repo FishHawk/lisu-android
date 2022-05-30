@@ -1,7 +1,6 @@
 package com.fishhawk.lisu
 
 import android.app.Application
-import android.webkit.URLUtil
 import androidx.room.Room
 import coil.ImageLoader
 import coil.ImageLoaderFactory
@@ -23,6 +22,7 @@ import com.fishhawk.lisu.ui.history.HistoryViewModel
 import com.fishhawk.lisu.ui.library.LibraryViewModel
 import com.fishhawk.lisu.ui.main.MainViewModel
 import com.fishhawk.lisu.ui.more.MoreViewModel
+import com.fishhawk.lisu.ui.provider.ProviderLoginViewModel
 import com.fishhawk.lisu.ui.provider.ProviderSearchViewModel
 import com.fishhawk.lisu.ui.provider.ProviderViewModel
 import com.fishhawk.lisu.ui.reader.ReaderViewModel
@@ -32,7 +32,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -141,6 +140,7 @@ val appModule = module {
     viewModel { GlobalSearchViewModel(get(), get(), get()) }
     viewModel { ProviderViewModel(get(), get(), get(), get()) }
     viewModel { ProviderSearchViewModel(get(), get(), get(), get()) }
+    viewModel { ProviderLoginViewModel(get(), get()) }
     viewModel { GalleryViewModel(get(), get(), get(), get()) }
 
     viewModel { ReaderViewModel(get(), get(), get(), get()) }

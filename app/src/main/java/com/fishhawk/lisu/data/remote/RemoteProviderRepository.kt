@@ -33,6 +33,13 @@ class RemoteProviderRepository(retrofit: Flow<Result<Retrofit>?>) :
             .map { it.copy(cover = processCover(it.providerId, it.id, it.cover)) }
     }
 
+    suspend fun login(
+        providerId: String,
+        cookies: Map<String, String>,
+    ): Result<String> = resultWrap { service ->
+        service.login(providerId, cookies)
+    }
+
     suspend fun search(
         providerId: String,
         page: Int,

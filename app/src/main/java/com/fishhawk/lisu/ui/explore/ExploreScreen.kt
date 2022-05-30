@@ -30,6 +30,7 @@ import com.fishhawk.lisu.data.datastore.setBlocking
 import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.main.navToGlobalSearch
 import com.fishhawk.lisu.ui.main.navToProvider
+import com.fishhawk.lisu.ui.main.navToProviderLogin
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.EmptyView
@@ -44,6 +45,7 @@ private typealias ExploreActionHandler = (ExploreAction) -> Unit
 private sealed interface ExploreAction {
     object NavToGlobalSearch : ExploreAction
     data class NavToProvider(val provider: ProviderDto) : ExploreAction
+    data class NavToProviderLogin(val provider: ProviderDto) : ExploreAction
 
     object Reload : ExploreAction
 }
@@ -59,6 +61,7 @@ fun ExploreScreen(navController: NavHostController) {
         when (action) {
             ExploreAction.NavToGlobalSearch -> navController.navToGlobalSearch()
             is ExploreAction.NavToProvider -> navController.navToProvider(action.provider.id)
+            is ExploreAction.NavToProviderLogin -> navController.navToProviderLogin(action.provider)
             ExploreAction.Reload -> viewModel.reload()
         }
     }
@@ -167,5 +170,11 @@ private fun ProviderListItem(
             maxLines = 1,
             style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium)
         )
+        if (provider.isLogged == false) {
+            Spacer(modifier = Modifier.weight(1.0f))
+            TextButton(onClick = { onAction(ExploreAction.NavToProviderLogin(provider)) }) {
+                Text(text = "Login")
+            }
+        }
     }
 }

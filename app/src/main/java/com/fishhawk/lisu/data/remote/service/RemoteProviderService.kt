@@ -9,6 +9,12 @@ interface RemoteProviderService {
     @GET("/provider")
     suspend fun listProvider(): List<ProviderDto>
 
+    @POST("/provider/{providerId}/login")
+    suspend fun login(
+        @Path("providerId") providerId: String,
+        @Body cookies: Map<String, String>,
+    ): String
+
     @GET("/provider/{providerId}/search")
     suspend fun search(
         @Path("providerId") providerId: String,

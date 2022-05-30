@@ -9,6 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
+import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.reader.ReaderActivity
 import com.google.gson.Gson
 
@@ -26,8 +27,27 @@ object MangaNavType : NavType<MangaDto>(isNullableAllowed = true) {
     }
 }
 
+object ProviderNavType : NavType<ProviderDto>(isNullableAllowed = true) {
+    override fun get(bundle: Bundle, key: String): ProviderDto? {
+        return bundle.getParcelable(key)
+    }
+
+    override fun parseValue(value: String): ProviderDto {
+        return Gson().fromJson(value, ProviderDto::class.java)
+    }
+
+    override fun put(bundle: Bundle, key: String, value: ProviderDto) {
+        bundle.putParcelable(key, value)
+    }
+}
+
 fun NavHostController.navToProvider(id: String) {
     navigate("provider/${id}")
+}
+
+fun NavHostController.navToProviderLogin(provider: ProviderDto) {
+    val json = Uri.encode(Gson().toJson(provider))
+    navigate("provider/${provider.id}/login?provider=${json}")
 }
 
 fun NavHostController.navToProviderSearch(providerId: String, keywords: String? = null) {
