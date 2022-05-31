@@ -51,4 +51,10 @@ class ExploreViewModel(
                 _viewState.value = ViewState.Failure(it)
             }
     }
+
+    fun logout(providerId: String) = viewModelScope.launch {
+        repository.logout(providerId)
+            .onSuccess { }
+            .onFailure { }
+    }
 }

@@ -12,7 +12,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.fishhawk.lisu.R
 import com.google.accompanist.insets.ui.TopAppBar
@@ -24,12 +23,31 @@ fun LisuToolBar(
     transparent: Boolean = false,
     onNavUp: (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
-) = TopAppBar(
+) = LisuToolBar(
     title = {
         title?.let {
-            Text(text = it, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(
+                text = it,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            )
         }
     },
+    modifier = modifier,
+    transparent = transparent,
+    onNavUp = onNavUp,
+    actions = actions,
+)
+
+@Composable
+fun LisuToolBar(
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    transparent: Boolean = false,
+    onNavUp: (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {},
+) = TopAppBar(
+    title = title,
     modifier = modifier,
     contentPadding = WindowInsets.statusBars.asPaddingValues(),
     navigationIcon = onNavUp?.let {

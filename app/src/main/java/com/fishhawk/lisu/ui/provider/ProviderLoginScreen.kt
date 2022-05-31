@@ -3,18 +3,18 @@ package com.fishhawk.lisu.ui.provider
 import android.webkit.CookieManager
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
+import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.Login
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.LisuToolBar
+import com.fishhawk.lisu.ui.widget.OneLineText
 import com.fishhawk.lisu.util.toast
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
@@ -29,6 +29,7 @@ internal sealed interface ProviderLoginAction {
     object Login : ProviderLoginAction
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ProviderLoginScreen(navController: NavHostController) {
     val viewModel by viewModel<ProviderLoginViewModel> {
@@ -36,7 +37,8 @@ fun ProviderLoginScreen(navController: NavHostController) {
     }
 
     val context = LocalContext.current
-    val url = viewModel.provider.loginSite
+    val provider = viewModel.provider
+    val url = provider.loginSite
     if (url.isNullOrBlank()) {
         context.toast("Missing login site.")
         navController.navigateUp()
@@ -74,7 +76,15 @@ fun ProviderLoginScreen(navController: NavHostController) {
 
     Scaffold(
         topBar = {
-            LisuToolBar(title = "login") {
+            LisuToolBar(
+                title = {
+                    ListItem(
+                        text = { OneLineText(text = "Login - ${provider.id}") },
+                        secondaryText = { OneLineText(text = url) },
+                    )
+                },
+                onNavUp = { onAction(ProviderLoginAction.NavUp) },
+            ) {
                 IconButton(onClick = { onAction(ProviderLoginAction.Login) }) {
                     Icon(LisuIcons.Login, "test")
                 }

@@ -92,9 +92,6 @@ dependencies {
     implementation("androidx.compose.material:material-icons-core:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
 
-    debugImplementation("androidx.customview:customview:1.2.0-alpha01")
-    debugImplementation("androidx.customview:customview-poolingcontainer:1.0.0-alpha01")
-
     implementation("androidx.navigation:navigation-compose:2.5.0-rc01")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-rc01")

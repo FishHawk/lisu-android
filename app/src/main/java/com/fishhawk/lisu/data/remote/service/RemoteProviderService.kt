@@ -15,6 +15,11 @@ interface RemoteProviderService {
         @Body cookies: Map<String, String>,
     ): String
 
+    @POST("/provider/{providerId}/logout")
+    suspend fun logout(
+        @Path("providerId") providerId: String,
+    ): String
+
     @GET("/provider/{providerId}/search")
     suspend fun search(
         @Path("providerId") providerId: String,

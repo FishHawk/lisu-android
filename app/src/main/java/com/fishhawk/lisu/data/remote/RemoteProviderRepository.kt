@@ -40,6 +40,12 @@ class RemoteProviderRepository(retrofit: Flow<Result<Retrofit>?>) :
         service.login(providerId, cookies)
     }
 
+    suspend fun logout(
+        providerId: String,
+    ): Result<String> = resultWrap { service ->
+        service.logout(providerId)
+    }
+
     suspend fun search(
         providerId: String,
         page: Int,
