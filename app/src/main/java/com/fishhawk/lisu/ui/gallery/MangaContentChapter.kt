@@ -1,10 +1,12 @@
 package com.fishhawk.lisu.ui.gallery
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material.icons.outlined.ViewModule
@@ -14,7 +16,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -145,26 +146,57 @@ private fun ChapterGrid(
     isMarked: Boolean,
     onChapterClick: () -> Unit = {},
 ) {
+    val isLocked = chapter.isLocked == true
+
+    val modifier =
+        if (isLocked) Modifier
+        else Modifier.clickable { if (chapter.isLocked != true) onChapterClick() }
+    val color = MaterialTheme.colors
+        .run { if (isMarked) primary else surface }
+        .let { if (isLocked) it.copy(alpha = ContentAlpha.disabled) else it }
+    val border = if (isLocked) BorderStroke(
+        width = 1.dp,
+        color = MaterialTheme.colors.onSurface.copy(alpha = 0.05f)
+    ) else null
+    val elevation = if (isLocked) 0.dp else 2.dp
+
+    val textColor = MaterialTheme.colors
+        .run { if (isMarked) onPrimary else onSurface }
+        .let { if (isLocked) it.copy(alpha = ContentAlpha.disabled) else it }
+
     Surface(
-        modifier = Modifier.clickable { if (chapter.isLocked != true) onChapterClick() },
+        modifier = modifier,
         shape = RectangleShape,
-        elevation = 2.dp,
-        color = MaterialTheme.colors.run { if (isMarked) primary else surface }
+        color = color,
+        border = border,
+        elevation = elevation,
     ) {
         Box {
-            ChapterNewMark(
-                modifier = Modifier
-                    .size(8.dp)
-                    .align(Alignment.TopStart),
-                updateTime = chapter.updateTime
-            )
+            if (isLocked) {
+                Icon(
+                    imageVector = LisuIcons.Lock,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .size(12.dp)
+                        .align(Alignment.TopStart),
+                    tint = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
+                )
+            } else {
+                ChapterNewMark(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .align(Alignment.TopStart),
+                    updateTime = chapter.updateTime
+                )
+            }
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 2.dp, vertical = 8.dp),
                 text = chapter.name,
                 style = MaterialTheme.typography.body1.copy(fontSize = 12.sp),
-                color = if (isMarked) Color.White else MaterialTheme.colors.onSurface,
+                color = textColor,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center
@@ -197,17 +229,27 @@ private fun ChapterLinear(
     isMarked: Boolean,
     onChapterClick: () -> Unit = {},
 ) {
+    val isLocked = chapter.isLocked == true
+    val modifier = Modifier
+        .fillMaxWidth()
+        .let {
+            if (isMarked) it.clickable { if (chapter.isLocked != true) onChapterClick() }
+            else it
+        }
+        .padding(vertical = 12.dp, horizontal = 16.dp)
+
+    val textColor = MaterialTheme.colors
+        .run { if (isMarked) onPrimary else onSurface }
+        .let { if (isLocked) it.copy(alpha = ContentAlpha.disabled) else it }
+
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { if (chapter.isLocked != true) onChapterClick() }
-            .padding(vertical = 12.dp, horizontal = 16.dp),
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = listOf("¶", chapter.name, chapter.title).joinToString(" "),
-            color = if (isMarked) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface,
+            color = textColor,
             style = MaterialTheme.typography.caption,
         )
     }
@@ -230,4 +272,3 @@ private fun ChapterNewMark(modifier: Modifier, updateTime: Long?) {
         )
     }
 }
-
