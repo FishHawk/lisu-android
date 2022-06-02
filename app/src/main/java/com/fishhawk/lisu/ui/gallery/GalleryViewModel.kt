@@ -2,13 +2,11 @@ package com.fishhawk.lisu.ui.gallery
 
 import android.os.Bundle
 import androidx.lifecycle.viewModelScope
+import androidx.paging.*
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
 import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
-import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.MangaMetadataDto
-import com.fishhawk.lisu.data.remote.model.MangaState
-import com.fishhawk.lisu.data.remote.model.toDetail
+import com.fishhawk.lisu.data.remote.model.*
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Effect
 import com.fishhawk.lisu.ui.widget.ViewState
@@ -41,6 +39,12 @@ class GalleryViewModel(
 
     val history = readingHistoryRepository.select(manga.id)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+
+    private var source: CommentSource? = null
+
+    val commentList = Pager(PagingConfig(pageSize = 20)) {
+        CommentSource().also { source = it }
+    }.flow.cachedIn(viewModelScope)
 
     fun reloadManga() = viewModelScope.launch {
         _viewState.value = ViewState.Loading
@@ -90,5 +94,17 @@ class GalleryViewModel(
         }.onFailure {
             sendEffect(GalleryEffect.Failure(it))
         }
+    }
+
+    inner class CommentSource : PagingSource<Int, CommentDto>() {
+        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CommentDto> {
+            val page = params.key ?: 0
+            return remoteProviderRepository.getComment(manga.providerId, manga.id, page).fold(
+                { LoadResult.Page(it, null, if (it.isEmpty()) null else page + 1) },
+                { LoadResult.Error(it) }
+            )
+        }
+
+        override fun getRefreshKey(state: PagingState<Int, CommentDto>): Int = 0
     }
 }

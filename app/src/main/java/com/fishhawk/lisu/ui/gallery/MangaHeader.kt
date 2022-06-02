@@ -98,6 +98,14 @@ internal fun MangaHeader(
                 onNavUp = { onAction(GalleryAction.NavUp) },
                 transparent = true,
             ) {
+                if (detail.state != MangaState.Local) {
+                    IconButton(onClick = { onAction(GalleryAction.NavToComment) }) {
+                        Icon(
+                            LisuIcons.Comment,
+                            "Comment"
+                        )
+                    }
+                }
                 IconButton(onClick = { onAction(GalleryAction.Share) }) {
                     Icon(LisuIcons.Share, stringResource(R.string.action_share_manga))
                 }

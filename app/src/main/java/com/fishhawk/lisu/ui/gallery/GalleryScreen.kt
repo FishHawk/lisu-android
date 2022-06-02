@@ -13,10 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,10 +25,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaState
-import com.fishhawk.lisu.ui.main.navToGalleryEdit
-import com.fishhawk.lisu.ui.main.navToGlobalSearch
-import com.fishhawk.lisu.ui.main.navToProviderSearch
-import com.fishhawk.lisu.ui.main.navToReader
+import com.fishhawk.lisu.ui.main.*
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.LisuToolBar
@@ -48,6 +42,7 @@ internal typealias GalleryActionHandler = (GalleryAction) -> Unit
 internal sealed interface GalleryAction {
     object NavUp : GalleryAction
     object NavToEdit : GalleryAction
+    object NavToComment : GalleryAction
     data class NavToGlobalSearch(val keywords: String) : GalleryAction
     data class NavToSearch(val keywords: String) : GalleryAction
     data class NavToReader(
@@ -99,6 +94,8 @@ fun GalleryScreen(navController: NavHostController) {
                 navController.navigateUp()
             GalleryAction.NavToEdit ->
                 navController.navToGalleryEdit()
+            GalleryAction.NavToComment ->
+                navController.navToGalleryComment()
             is GalleryAction.NavToGlobalSearch ->
                 navController.navToGlobalSearch(action.keywords)
             is GalleryAction.NavToSearch ->
@@ -174,6 +171,14 @@ private fun ToolBar(
                             stringResource(R.string.action_remove_from_library)
                         )
                     }
+                }
+            }
+            if (state != MangaState.Local) {
+                IconButton(onClick = { onAction(GalleryAction.NavToComment) }) {
+                    Icon(
+                        LisuIcons.Comment,
+                        "Comment"
+                    )
                 }
             }
             IconButton(onClick = { onAction(GalleryAction.Share) }) {

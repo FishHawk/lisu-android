@@ -46,6 +46,7 @@ import com.fishhawk.lisu.data.remote.model.GitHubReleaseDto
 import com.fishhawk.lisu.notification.AppUpdateNotification
 import com.fishhawk.lisu.ui.base.BaseActivity
 import com.fishhawk.lisu.ui.explore.ExploreScreen
+import com.fishhawk.lisu.ui.gallery.GalleryCommentScreen
 import com.fishhawk.lisu.ui.gallery.GalleryEditScreen
 import com.fishhawk.lisu.ui.gallery.GalleryScreen
 import com.fishhawk.lisu.ui.globalsearch.GlobalSearchScreen
@@ -208,6 +209,8 @@ private fun MainNavHost(
         )) { GalleryScreen(navController) }
 
         composable("edit") { GalleryEditScreen(navController) }
+
+        composable("comment") { GalleryCommentScreen(navController) }
 
         composable("setting-general") { SettingGeneralScreen(navController) }
         composable("setting-reader") { SettingReaderScreen(navController) }

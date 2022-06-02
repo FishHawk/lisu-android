@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.data.remote
 
+import com.fishhawk.lisu.data.remote.model.CommentDto
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.ProviderDto
@@ -67,6 +68,14 @@ class RemoteProviderRepository(retrofit: Flow<Result<Retrofit>?>) :
                 }
             )
         }
+    }
+
+    suspend fun getComment(
+        providerId: String,
+        mangaId: String,
+        page: Int,
+    ): Result<List<CommentDto>> = resultWrap { service ->
+        service.getComment(providerId, mangaId, page)
     }
 
     suspend fun getContent(

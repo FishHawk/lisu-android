@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.data.remote.service
 
+import com.fishhawk.lisu.data.remote.model.CommentDto
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.ProviderDto
@@ -40,6 +41,13 @@ interface RemoteProviderService {
         @Path("providerId") providerId: String,
         @Path("mangaId") id: String
     ): MangaDetailDto
+
+    @GET("/provider/{providerId}/manga/{mangaId}/comment")
+    suspend fun getComment(
+        @Path("providerId") providerId: String,
+        @Path("mangaId") id: String,
+        @Query("page") page: Int,
+    ): List<CommentDto>
 
     @GET("/provider/{providerId}/manga/{mangaId}/content/{collectionId}/{chapterId}")
     suspend fun getContent(

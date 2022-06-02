@@ -67,6 +67,7 @@ fun NavHostController.navToGallery(manga: MangaDto) {
 
 fun NavHostController.navToGalleryEdit() = navigate("edit")
 
+fun NavHostController.navToGalleryComment() = navigate("comment")
 
 fun NavHostController.navToSettingGeneral() = navigate("setting-general")
 fun NavHostController.navToSettingReader() = navigate("setting-reader")
