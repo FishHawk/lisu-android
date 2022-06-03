@@ -13,7 +13,7 @@ import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.ChapterDto
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
-import com.fishhawk.lisu.ui.base.Effect
+import com.fishhawk.lisu.ui.base.Event
 import com.fishhawk.lisu.ui.widget.ViewState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -33,7 +33,7 @@ class ReaderChapter(
     var images: List<String> = listOf()
 }
 
-sealed interface ReaderEffect : Effect {
+sealed interface ReaderEffect : Event {
     data class Message(val redId: Int) : ReaderEffect
 }
 
@@ -180,7 +180,7 @@ class ReaderViewModel(
 
     private fun sendMessage(resId: Int) {
         viewModelScope.launch {
-            sendEffect(ReaderEffect.Message(resId))
+            sendEvent(ReaderEffect.Message(resId))
         }
     }
 
@@ -255,7 +255,7 @@ class ReaderViewModel(
             providerId,
             mangaId,
             byteArray.toRequestBody("image/png".toMediaType())
-        ).onSuccess { sendEffect(ReaderEffect.Message(R.string.cover_updated)) }
-            .onFailure { sendEffect(ReaderEffect.Message(R.string.cover_update_failed)) }
+        ).onSuccess { sendEvent(ReaderEffect.Message(R.string.cover_updated)) }
+            .onFailure { sendEvent(ReaderEffect.Message(R.string.cover_update_failed)) }
     }
 }

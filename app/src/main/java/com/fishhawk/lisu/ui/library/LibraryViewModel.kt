@@ -7,11 +7,11 @@ import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaKeyDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
-import com.fishhawk.lisu.ui.base.Effect
+import com.fishhawk.lisu.ui.base.Event
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-sealed interface LibraryEffect : Effect {
+sealed interface LibraryEffect : Event {
     data class Toast(val message: String) : LibraryEffect
     data class NavToGallery(val manga: MangaDto) : LibraryEffect
 }
@@ -42,14 +42,14 @@ class LibraryViewModel(
 
     fun getRandomManga() = viewModelScope.launch {
         libraryRepo.getRandomManga()
-            .onSuccess { sendEffect(LibraryEffect.NavToGallery(it)) }
-            .onFailure { sendEffect(LibraryEffect.Toast(it.localizedMessage ?: "")) }
+            .onSuccess { sendEvent(LibraryEffect.NavToGallery(it)) }
+            .onFailure { sendEvent(LibraryEffect.Toast(it.localizedMessage ?: "")) }
     }
 
     fun deleteMultipleManga(mangas: List<MangaKeyDto>) = viewModelScope.launch {
         libraryRepo.deleteMultipleMangas(mangas)
             .onSuccess { source?.invalidate() }
-            .onFailure { sendEffect(LibraryEffect.Toast(it.localizedMessage ?: "")) }
+            .onFailure { sendEvent(LibraryEffect.Toast(it.localizedMessage ?: "")) }
     }
 
     fun search(keywords: String) {

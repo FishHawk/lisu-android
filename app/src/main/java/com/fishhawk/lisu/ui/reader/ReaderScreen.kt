@@ -88,7 +88,7 @@ fun ReaderScreen() {
     }
 
     LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
+        viewModel.event.collect { effect ->
             when (effect) {
                 is ReaderEffect.Message -> context.toast(effect.redId)
             }

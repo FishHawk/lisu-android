@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
@@ -63,7 +62,7 @@ fun ProviderLoginScreen(navController: NavHostController) {
     }
 
     LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
+        viewModel.event.collect { effect ->
             when (effect) {
                 is ProviderLoginEffect.LoginFailure -> context.toast("Login fail.")
                 ProviderLoginEffect.LoginSuccess -> {

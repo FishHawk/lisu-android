@@ -8,7 +8,7 @@ import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
 import com.fishhawk.lisu.data.remote.RemoteProviderRepository
 import com.fishhawk.lisu.data.remote.model.*
 import com.fishhawk.lisu.ui.base.BaseViewModel
-import com.fishhawk.lisu.ui.base.Effect
+import com.fishhawk.lisu.ui.base.Event
 import com.fishhawk.lisu.ui.widget.ViewState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -17,9 +17,15 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import okhttp3.RequestBody
 
-sealed interface GalleryEffect : Effect {
-    object MetadataUpdateSuccessfully : GalleryEffect
-    data class Failure(val exception: Throwable) : GalleryEffect
+sealed interface GalleryEffect : Event {
+    data class AddToLibraryFailure(val exception: Throwable) : GalleryEffect
+    data class RemoveFromLibraryFailure(val exception: Throwable) : GalleryEffect
+
+    object UpdateMetadataSuccess : GalleryEffect
+    data class UpdateMetadataFailure(val exception: Throwable) : GalleryEffect
+
+    object UpdateCoverSuccess : GalleryEffect
+    data class UpdateCoverFailure(val exception: Throwable) : GalleryEffect
 }
 
 class GalleryViewModel(
@@ -63,26 +69,32 @@ class GalleryViewModel(
     }
 
     fun addToLibrary() = viewModelScope.launch {
-        remoteLibraryRepository.createManga(manga.providerId, manga.id).fold(
-            { _detail.value = _detail.value.copy(state = MangaState.RemoteInLibrary) },
-            { sendEffect(GalleryEffect.Failure(it)) }
-        )
+        remoteLibraryRepository.createManga(
+            manga.providerId, manga.id
+        ).onSuccess {
+            _detail.value = _detail.value.copy(state = MangaState.RemoteInLibrary)
+        }.onFailure {
+            sendEvent(GalleryEffect.AddToLibraryFailure(it))
+        }
     }
 
     fun removeFromLibrary() = viewModelScope.launch {
-        remoteLibraryRepository.deleteManga(manga.providerId, manga.id).fold(
-            { _detail.value = _detail.value.copy(state = MangaState.Remote) },
-            { sendEffect(GalleryEffect.Failure(it)) }
-        )
+        remoteLibraryRepository.deleteManga(
+            manga.providerId, manga.id
+        ).onSuccess {
+            _detail.value = _detail.value.copy(state = MangaState.Remote)
+        }.onFailure {
+            sendEvent(GalleryEffect.RemoveFromLibraryFailure(it))
+        }
     }
 
     fun updateCover(requestBody: RequestBody) = viewModelScope.launch {
         remoteLibraryRepository.updateMangaCover(
             manga.providerId, manga.id, requestBody
         ).onSuccess {
-//            feed(R.string.toast_manga_cover_updated)
+            sendEvent(GalleryEffect.UpdateCoverSuccess)
         }.onFailure {
-
+            sendEvent(GalleryEffect.UpdateCoverFailure(it))
         }
     }
 
@@ -90,9 +102,9 @@ class GalleryViewModel(
         remoteLibraryRepository.updateMangaMetadata(
             manga.providerId, manga.id, metadata
         ).onSuccess {
-            sendEffect(GalleryEffect.MetadataUpdateSuccessfully)
+            sendEvent(GalleryEffect.UpdateMetadataSuccess)
         }.onFailure {
-            sendEffect(GalleryEffect.Failure(it))
+            sendEvent(GalleryEffect.UpdateMetadataFailure(it))
         }
     }
 

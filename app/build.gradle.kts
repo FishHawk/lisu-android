@@ -1,7 +1,7 @@
 import java.io.FileInputStream
 import java.util.*
 
-val composeVersion by extra { "1.2.0-beta01" }
+val composeVersion by extra { "1.2.0-beta03" }
 
 plugins {
     id("com.android.application") version "7.2.0-rc01"
@@ -96,11 +96,11 @@ dependencies {
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-rc01")
 
-    implementation("androidx.paging:paging-compose:1.0.0-alpha14")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha15")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    val roomVersion = "2.4.1"
+    val roomVersion = "2.5.0-alpha02"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
@@ -122,7 +122,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-webview:$accompanistVersion")
 
-    val coilVersion = "2.0.0"
+    val coilVersion = "2.1.0"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
 

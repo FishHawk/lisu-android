@@ -59,7 +59,7 @@ fun LibraryScreen(navController: NavHostController) {
 
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
+        viewModel.event.collect { effect ->
             when (effect) {
                 is LibraryEffect.NavToGallery -> navController.navToGallery(effect.manga)
                 is LibraryEffect.Toast -> context.toast(effect.message)

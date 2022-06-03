@@ -3,6 +3,7 @@ package com.fishhawk.lisu.ui.base
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Badge
 import androidx.compose.material.Card
@@ -30,6 +31,8 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaKeyDto
+import com.fishhawk.lisu.ui.widget.ErrorItem
+import com.fishhawk.lisu.ui.widget.LoadingItem
 import com.fishhawk.lisu.ui.widget.StateView
 import com.fishhawk.lisu.ui.widget.ViewState
 import com.google.accompanist.placeholder.PlaceholderHighlight
@@ -102,16 +105,15 @@ fun MangaList(
                 badge(manga)
             }
         }
-        // span does not work
-//        fun itemFullWidth(content: @Composable () -> Unit) {
-//            item(span = { GridItemSpan(maxCurrentLineSpan) }) { Box {} }
-//            item(span = { GridItemSpan(maxCurrentLineSpan) }) { content() }
-//        }
-//        when (val state = mangaList.loadState.append) {
-//            LoadState.Loading -> itemFullWidth { LoadingItem() }
-//            is LoadState.Error -> itemFullWidth { ErrorItem(state.error) { mangaList.retry() } }
-//            else -> Unit
-//        }
+        fun itemFullWidth(content: @Composable () -> Unit) {
+            item(span = { GridItemSpan(maxCurrentLineSpan) }) { Box {} }
+            item(span = { GridItemSpan(maxCurrentLineSpan) }) { content() }
+        }
+        when (val state = mangaList.loadState.append) {
+            LoadState.Loading -> itemFullWidth { LoadingItem() }
+            is LoadState.Error -> itemFullWidth { ErrorItem(state.error) { mangaList.retry() } }
+            else -> Unit
+        }
     }
 }
 
@@ -187,7 +189,6 @@ fun MangaCover(
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current)
             .data(cover)
-            .size(Size.ORIGINAL)
             .crossfade(true)
             .crossfade(500)
             .build()

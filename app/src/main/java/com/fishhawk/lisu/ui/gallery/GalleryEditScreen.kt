@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -27,7 +28,9 @@ import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaMetadataDto
 import com.fishhawk.lisu.data.remote.model.toMetadataDetail
+import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.widget.LisuToolBar
+import com.fishhawk.lisu.util.toast
 import org.koin.androidx.compose.viewModel
 
 internal typealias GalleryEditActionHandler = (GalleryEditAction) -> Unit
@@ -57,6 +60,16 @@ fun GalleryEditScreen(navController: NavHostController) {
                 )
                 viewModel.updateMetadata(detailToPublish)
             }
+        }
+    }
+
+    val context = LocalContext.current
+
+    OnEvent(viewModel.event) {
+        when (it) {
+            GalleryEffect.UpdateMetadataSuccess -> context.toast(R.string.metadata_updated)
+            is GalleryEffect.UpdateMetadataFailure -> context.toast("Failed to update metadata.")
+            else -> Unit
         }
     }
 

@@ -82,7 +82,7 @@ private fun MainApp() {
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
+        viewModel.event.collect { effect ->
             when (effect) {
                 is MainEffect.Message -> context.toast(context.getString(effect.messageId))
                 is MainEffect.StringMessage -> context.toast(effect.message)

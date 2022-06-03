@@ -8,7 +8,7 @@ import com.fishhawk.lisu.data.datastore.get
 import com.fishhawk.lisu.data.remote.GitHubRepository
 import com.fishhawk.lisu.data.remote.model.GitHubReleaseDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
-import com.fishhawk.lisu.ui.base.Effect
+import com.fishhawk.lisu.ui.base.Event
 import com.fishhawk.lisu.util.interceptor.ProgressInterceptor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +17,7 @@ import java.io.File
 import java.time.Duration
 import java.time.Instant
 
-sealed interface MainEffect : Effect {
+sealed interface MainEffect : Event {
     data class Message(val messageId: Int) : MainEffect
     data class StringMessage(val message: String) : MainEffect
     data class ShowUpdateDialog(val release: GitHubReleaseDto) : MainEffect
@@ -43,15 +43,15 @@ class MainViewModel(
         repo.getLatestRelease(lisuOwner, lisuRepo)
             .onSuccess {
                 if (isNewVersion(it.version)) {
-                    sendEffect(MainEffect.ShowUpdateDialog(it))
+                    sendEvent(MainEffect.ShowUpdateDialog(it))
                 } else if (isUserPrompt) {
-                    sendEffect(MainEffect.Message(R.string.update_check_no_new_updates))
+                    sendEvent(MainEffect.Message(R.string.update_check_no_new_updates))
                 }
             }
             .onFailure {
                 val message = it.message
                 if (isUserPrompt && message != null) {
-                    sendEffect(MainEffect.StringMessage(message))
+                    sendEvent(MainEffect.StringMessage(message))
                 }
             }
         PR.lastAppCheckTime.set(Instant.now().epochSecond)
@@ -63,14 +63,14 @@ class MainViewModel(
     }
 
     fun downloadApk(apkFile: File, downloadUrl: String) = viewModelScope.launch {
-        sendEffect(MainEffect.NotifyDownloadStart)
+        sendEvent(MainEffect.NotifyDownloadStart)
 
         var lastInstant = Instant.now()
         ProgressInterceptor.addListener(downloadUrl) {
             val currentInstant = Instant.now()
             if (Duration.between(lastInstant, currentInstant) > Duration.ofMillis(200)) {
                 lastInstant = currentInstant
-                launchEffect(MainEffect.NotifyDownloadProgress(it))
+                sendEventSync(MainEffect.NotifyDownloadProgress(it))
             }
         }
 
@@ -80,8 +80,8 @@ class MainViewModel(
                     it.copyTo(apkFile.outputStream())
                 }
             }
-            .onSuccess { sendEffect(MainEffect.NotifyDownloadFinish(apkFile)) }
-            .onFailure { sendEffect(MainEffect.NotifyDownloadError(downloadUrl)) }
+            .onSuccess { sendEvent(MainEffect.NotifyDownloadFinish(apkFile)) }
+            .onFailure { sendEvent(MainEffect.NotifyDownloadError(downloadUrl)) }
 
         ProgressInterceptor.removeListener(downloadUrl)
     }

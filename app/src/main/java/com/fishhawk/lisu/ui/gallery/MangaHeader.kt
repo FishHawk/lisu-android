@@ -65,7 +65,6 @@ internal fun MangaHeader(
         val painter = rememberAsyncImagePainter(
             ImageRequest.Builder(LocalContext.current)
                 .data(loadedCover)
-                .size(Size.ORIGINAL)
                 .crossfade(true)
                 .crossfade(500)
                 .build()

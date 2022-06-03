@@ -29,6 +29,7 @@ import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.EmptyView
 import com.fishhawk.lisu.ui.widget.LisuDialog
 import com.fishhawk.lisu.ui.widget.LisuToolBar
+import com.fishhawk.lisu.util.toDisplayString
 import org.koin.androidx.compose.viewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -136,16 +137,9 @@ private fun HistoryListHeader(
     date: LocalDate,
     modifier: Modifier = Modifier
 ) {
-    val days = ChronoUnit.DAYS.between(date, LocalDate.now())
-    val dateString = when {
-        days == 0L -> stringResource(R.string.history_today)
-        days == 1L -> stringResource(R.string.history_yesterday)
-        days <= 5L -> stringResource(R.string.history_n_days_ago).format(days)
-        else -> date.format(DateTimeFormatter.ofPattern(stringResource(R.string.history_date_format)))
-    }
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Text(
-            text = dateString,
+            text = date.toDisplayString(),
             modifier = modifier.padding(horizontal = 8.dp, vertical = 12.dp),
             style = MaterialTheme.typography.subtitle2
         )

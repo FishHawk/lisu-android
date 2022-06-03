@@ -25,6 +25,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaState
+import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.main.*
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
@@ -121,6 +122,16 @@ fun GalleryScreen(navController: NavHostController) {
             GalleryAction.AddToLibrary -> viewModel.addToLibrary()
             GalleryAction.RemoveFromLibrary -> viewModel.removeFromLibrary()
             is GalleryAction.Copy -> context.copyToClipboard(action.text, action.hintResId)
+        }
+    }
+
+    OnEvent(viewModel.event) {
+        when (it) {
+            is GalleryEffect.AddToLibraryFailure -> context.toast("Failed to add to library.")
+            is GalleryEffect.RemoveFromLibraryFailure -> context.toast("Failed to remove from library.")
+            GalleryEffect.UpdateCoverSuccess -> Unit
+            is GalleryEffect.UpdateCoverFailure -> context.toast(R.string.cover_update_failed)
+            else -> Unit
         }
     }
 
