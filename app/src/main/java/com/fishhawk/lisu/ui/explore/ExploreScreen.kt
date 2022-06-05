@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.*
@@ -170,11 +171,16 @@ private fun ProviderListItem(
                         .crossfade(true)
                         .build()
                 )
-            Image(
-                painter = painter,
-                contentDescription = provider.id,
-                modifier = Modifier.size(32.dp),
-            )
+            Surface(
+                shape = RoundedCornerShape(4.dp),
+                elevation = 2.dp,
+            ) {
+                Image(
+                    painter = painter,
+                    contentDescription = provider.id,
+                    modifier = Modifier.size(32.dp),
+                )
+            }
         },
         text = { OneLineText(text = provider.id) },
         secondaryText = {

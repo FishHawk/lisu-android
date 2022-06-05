@@ -4,7 +4,7 @@ import java.util.*
 val composeVersion by extra { "1.2.0-beta03" }
 
 plugins {
-    id("com.android.application") version "7.2.0-rc01"
+    id("com.android.application") version "7.2.1"
     id("com.google.devtools.ksp") version "1.6.21-1.0.5"
     id("org.jetbrains.kotlin.android") version "1.6.21"
     id("org.jetbrains.kotlin.plugin.parcelize") version "1.6.21"
