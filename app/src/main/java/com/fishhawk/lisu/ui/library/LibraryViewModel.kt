@@ -11,45 +11,49 @@ import com.fishhawk.lisu.ui.base.Event
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-sealed interface LibraryEffect : Event {
-    data class Toast(val message: String) : LibraryEffect
-    data class NavToGallery(val manga: MangaDto) : LibraryEffect
+sealed interface LibraryEvent : Event {
+    data class GetRandomSuccess(val manga: MangaDto) : LibraryEvent
+    data class GetRandomFailure(val exception: Throwable) : LibraryEvent
+    data class DeleteMultipleFailure(val exception: Throwable) : LibraryEvent
 }
 
 class LibraryViewModel(
     private val libraryRepo: RemoteLibraryRepository,
-    searchHistoryRepository: SearchHistoryRepository,
-) : BaseViewModel<LibraryEffect>() {
+    searchHistoryRepo: SearchHistoryRepository,
+) : BaseViewModel<LibraryEvent>() {
 
     private val _keywords = MutableStateFlow("")
     val keywords = _keywords.asStateFlow()
 
-    val suggestions = searchHistoryRepository.list()
+    val suggestions = searchHistoryRepo.list()
         .map { list -> list.map { it.keywords }.distinct() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private var source: LibraryMangaSource? = null
-
-    val mangaList =
-        combine(
-            _keywords,
-            libraryRepo.serviceFlow
-        ) { keywords, _ -> keywords }.flatMapLatest { keywords ->
+    val mangaList = combine(
+        _keywords,
+        libraryRepo.serviceFlow
+    ) { keywords, _ -> keywords }
+        .flatMapLatest { keywords ->
             Pager(PagingConfig(pageSize = 20)) {
                 LibraryMangaSource(keywords).also { source = it }
             }.flow.cachedIn(viewModelScope)
         }
 
-    fun getRandomManga() = viewModelScope.launch {
-        libraryRepo.getRandomManga()
-            .onSuccess { sendEvent(LibraryEffect.NavToGallery(it)) }
-            .onFailure { sendEvent(LibraryEffect.Toast(it.localizedMessage ?: "")) }
+    fun getRandomManga() {
+        viewModelScope.launch {
+            libraryRepo.getRandomManga()
+                .onSuccess { sendEvent(LibraryEvent.GetRandomSuccess(it)) }
+                .onFailure { sendEvent(LibraryEvent.GetRandomFailure(it)) }
+        }
     }
 
-    fun deleteMultipleManga(mangas: List<MangaKeyDto>) = viewModelScope.launch {
-        libraryRepo.deleteMultipleMangas(mangas)
-            .onSuccess { source?.invalidate() }
-            .onFailure { sendEvent(LibraryEffect.Toast(it.localizedMessage ?: "")) }
+    fun deleteMultipleManga(mangas: List<MangaKeyDto>) {
+        viewModelScope.launch {
+            libraryRepo.deleteMultipleMangas(mangas)
+                .onSuccess { source?.invalidate() }
+                .onFailure { sendEvent(LibraryEvent.DeleteMultipleFailure(it)) }
+        }
     }
 
     fun search(keywords: String) {

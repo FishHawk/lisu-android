@@ -22,6 +22,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaKeyDto
+import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.theme.LisuIcons
@@ -58,12 +59,14 @@ fun LibraryScreen(navController: NavHostController) {
     }
 
     val context = LocalContext.current
-    LaunchedEffect(Unit) {
-        viewModel.event.collect { effect ->
-            when (effect) {
-                is LibraryEffect.NavToGallery -> navController.navToGallery(effect.manga)
-                is LibraryEffect.Toast -> context.toast(effect.message)
-            }
+    OnEvent(viewModel.event) {
+        when (it) {
+            is LibraryEvent.GetRandomSuccess ->
+                navController.navToGallery(it.manga)
+            is LibraryEvent.GetRandomFailure ->
+                context.toast(it.exception.localizedMessage ?: "")
+            is LibraryEvent.DeleteMultipleFailure ->
+                context.toast(it.exception.localizedMessage ?: "")
         }
     }
 

@@ -34,77 +34,89 @@ class GalleryViewModel(
     private val remoteProviderRepository: RemoteProviderRepository,
     readingHistoryRepository: ReadingHistoryRepository,
 ) : BaseViewModel<GalleryEffect>() {
+    private val manga = args.getParcelable<MangaDto>("manga")!!
+    val id = manga.id
 
     private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
     val viewState = _viewState.asStateFlow()
 
-    private val manga = args.getParcelable<MangaDto>("manga")!!
     private val _detail = MutableStateFlow(manga.toDetail())
-    val id = manga.id
     val detail = _detail.asStateFlow()
 
     val history = readingHistoryRepository.select(manga.id)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     private var source: CommentSource? = null
-
     val commentList = Pager(PagingConfig(pageSize = 20)) {
         CommentSource().also { source = it }
     }.flow.cachedIn(viewModelScope)
-
-    fun reloadManga() = viewModelScope.launch {
-        _viewState.value = ViewState.Loading
-        remoteProviderRepository
-            .getManga(manga.providerId, manga.id)
-            .onSuccess {
-                _viewState.value = ViewState.Loaded
-                _detail.value = it
-            }.onFailure {
-                _viewState.value = ViewState.Failure(it)
-            }
-    }
 
     init {
         reloadManga()
     }
 
-    fun addToLibrary() = viewModelScope.launch {
-        remoteLibraryRepository.createManga(
-            manga.providerId, manga.id
-        ).onSuccess {
-            _detail.value = _detail.value.copy(state = MangaState.RemoteInLibrary)
-        }.onFailure {
-            sendEvent(GalleryEffect.AddToLibraryFailure(it))
+    fun reloadManga() {
+        _viewState.value = ViewState.Loading
+        viewModelScope.launch {
+            remoteProviderRepository.getManga(
+                manga.providerId, manga.id
+            ).onSuccess {
+                _viewState.value = ViewState.Loaded
+                _detail.value = it
+            }.onFailure {
+                _viewState.value = ViewState.Failure(it)
+            }
         }
     }
 
-    fun removeFromLibrary() = viewModelScope.launch {
-        remoteLibraryRepository.deleteManga(
-            manga.providerId, manga.id
-        ).onSuccess {
-            _detail.value = _detail.value.copy(state = MangaState.Remote)
-        }.onFailure {
-            sendEvent(GalleryEffect.RemoveFromLibraryFailure(it))
+    fun addToLibrary() {
+        if (manga.state != MangaState.Remote) return
+        viewModelScope.launch {
+            remoteLibraryRepository.createManga(
+                manga.providerId, manga.id
+            ).onSuccess {
+                _detail.value = _detail.value.copy(state = MangaState.RemoteInLibrary)
+            }.onFailure {
+                sendEvent(GalleryEffect.AddToLibraryFailure(it))
+            }
         }
     }
 
-    fun updateCover(requestBody: RequestBody) = viewModelScope.launch {
-        remoteLibraryRepository.updateMangaCover(
-            manga.providerId, manga.id, requestBody
-        ).onSuccess {
-            sendEvent(GalleryEffect.UpdateCoverSuccess)
-        }.onFailure {
-            sendEvent(GalleryEffect.UpdateCoverFailure(it))
+    fun removeFromLibrary() {
+        if (manga.state != MangaState.RemoteInLibrary) return
+        viewModelScope.launch {
+            remoteLibraryRepository.deleteManga(
+                manga.providerId, manga.id
+            ).onSuccess {
+                _detail.value = _detail.value.copy(state = MangaState.Remote)
+            }.onFailure {
+                sendEvent(GalleryEffect.RemoveFromLibraryFailure(it))
+            }
         }
     }
 
-    fun updateMetadata(metadata: MangaMetadataDto) = viewModelScope.launch {
-        remoteLibraryRepository.updateMangaMetadata(
-            manga.providerId, manga.id, metadata
-        ).onSuccess {
-            sendEvent(GalleryEffect.UpdateMetadataSuccess)
-        }.onFailure {
-            sendEvent(GalleryEffect.UpdateMetadataFailure(it))
+    fun updateCover(requestBody: RequestBody) {
+        viewModelScope.launch {
+            remoteLibraryRepository.updateMangaCover(
+                manga.providerId, manga.id, requestBody
+            ).onSuccess {
+                sendEvent(GalleryEffect.UpdateCoverSuccess)
+            }.onFailure {
+                sendEvent(GalleryEffect.UpdateCoverFailure(it))
+            }
+        }
+    }
+
+    fun updateMetadata(metadata: MangaMetadataDto) {
+        if (manga.state != MangaState.Local) return
+        viewModelScope.launch {
+            remoteLibraryRepository.updateMangaMetadata(
+                manga.providerId, manga.id, metadata
+            ).onSuccess {
+                sendEvent(GalleryEffect.UpdateMetadataSuccess)
+            }.onFailure {
+                sendEvent(GalleryEffect.UpdateMetadataFailure(it))
+            }
         }
     }
 

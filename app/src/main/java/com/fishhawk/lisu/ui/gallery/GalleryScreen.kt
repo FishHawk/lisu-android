@@ -117,8 +117,7 @@ fun GalleryScreen(navController: NavHostController) {
                 newCoverSelectorLauncher.launch("image/*")
 
             GalleryAction.Reload -> viewModel.reloadManga()
-            GalleryAction.Share ->
-                context.shareText("Share manga via", detail.title ?: detail.id)
+            GalleryAction.Share -> context.shareText("Share manga via", detail.title ?: detail.id)
             GalleryAction.AddToLibrary -> viewModel.addToLibrary()
             GalleryAction.RemoveFromLibrary -> viewModel.removeFromLibrary()
             is GalleryAction.Copy -> context.copyToClipboard(action.text, action.hintResId)
