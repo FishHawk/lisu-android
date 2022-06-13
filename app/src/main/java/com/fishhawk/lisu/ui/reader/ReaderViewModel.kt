@@ -74,12 +74,12 @@ class ReaderViewModel(
             val chapterId = args.getString("chapterId")!!
             when {
                 collectionId.isNotBlank() -> {
-                    detail.collections!![collectionId]!!.mapIndexed { index, chapter ->
+                    detail.collections[collectionId]!!.mapIndexed { index, chapter ->
                         ReaderChapter(collectionId, index, chapter)
                     }
                 }
                 chapterId.isNotBlank() -> {
-                    detail.chapters!!.mapIndexed { index, chapter ->
+                    detail.chapters.mapIndexed { index, chapter ->
                         ReaderChapter(collectionId, index, chapter)
                     }
                 }
@@ -236,7 +236,7 @@ class ReaderViewModel(
             mangaId = mangaId,
             cover = detail.cover,
             title = detail.title,
-            authors = detail.authors?.joinToString(separator = ";"),
+            authors = detail.authors.joinToString(separator = ";"),
             collectionId = chapter.collectionId,
             chapterId = chapter.id,
             chapterName = chapter.name,

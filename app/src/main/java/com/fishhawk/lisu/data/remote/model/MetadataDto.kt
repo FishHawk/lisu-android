@@ -11,7 +11,7 @@ data class MangaMetadataDto(
     val authors: List<String>? = null,
     val isFinished: Boolean? = null,
     val description: String? = null,
-    val tags: Map<String, List<String>>? = null,
+    val tags: Map<String, List<String>> = emptyMap(),
 
     val collections: Map<String, Map<String, ChapterMetadataDto>>? = null,
     val chapters: Map<String, ChapterMetadataDto>? = null,

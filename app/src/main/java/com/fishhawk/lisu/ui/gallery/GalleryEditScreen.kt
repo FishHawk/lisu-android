@@ -142,7 +142,7 @@ fun GalleryEditScreen(navController: NavHostController) {
                     )
                 }
 
-                detail.tags?.forEach { (key, tags) ->
+                detail.tags.forEach { (key, tags) ->
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
@@ -260,7 +260,7 @@ private fun MangaMetadataDto.copyWithNewAuthor(newAuthor: String) =
     copy(authors = (authors ?: emptyList()).toMutableList().apply { add(newAuthor) })
 
 private fun MangaMetadataDto.copyWithoutTag(key: String, tag: String) =
-    copy(tags = tags?.toMutableMap()?.also { tags ->
+    copy(tags = tags.toMutableMap().also { tags ->
         tags[key]?.toMutableList()?.let {
             it.remove(tag)
             tags[key] = it
@@ -268,7 +268,7 @@ private fun MangaMetadataDto.copyWithoutTag(key: String, tag: String) =
     })
 
 private fun MangaMetadataDto.copyWithNewTag(key: String, newTag: String) =
-    copy(tags = (tags ?: emptyMap()).toMutableMap().also { tags ->
+    copy(tags = tags.toMutableMap().also { tags ->
         (tags[key] ?: emptyList()).toMutableList().let {
             it.add(newTag)
             tags[key] = it

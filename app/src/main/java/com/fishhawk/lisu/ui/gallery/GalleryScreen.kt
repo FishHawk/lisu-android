@@ -224,14 +224,13 @@ private fun MangaDetail(
                 if (!detail.description.isNullOrBlank()) {
                     MangaDescription(detail.description)
                 }
-                detail.tags?.let { tags ->
-                    MangaTagGroups(tags,
-                        onTagClick = { onAction(GalleryAction.NavToSearch(it)) },
-                        onTagLongClick = {
-                            onAction(GalleryAction.Copy(it, R.string.tag_copied))
-                        }
-                    )
-                }
+                MangaTagGroups(
+                    detail.tags,
+                    onTagClick = { onAction(GalleryAction.NavToSearch(it)) },
+                    onTagLongClick = {
+                        onAction(GalleryAction.Copy(it, R.string.tag_copied))
+                    }
+                )
                 MangaContent(detail, history, onAction)
             }
         }

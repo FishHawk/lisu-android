@@ -33,7 +33,6 @@ import com.fishhawk.lisu.util.toDisplayString
 import org.koin.androidx.compose.viewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 
 private typealias HistoryActionHandler = (HistoryAction) -> Unit
 
@@ -59,7 +58,7 @@ fun HistoryScreen(navController: NavHostController) {
                     id = mangaId,
                     cover = cover,
                     title = title,
-                    authors = authors?.let { listOf(it) }
+                    authors = authors?.let { listOf(it) } ?: emptyList()
                 ))
             }
             is HistoryAction.NavToReader -> with(action.history) {

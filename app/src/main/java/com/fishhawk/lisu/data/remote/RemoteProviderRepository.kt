@@ -82,7 +82,7 @@ class RemoteProviderRepository(client: Flow<Result<HttpClient>?>) :
                 val detail = response.body<MangaDetailDto>()
                 detail.copy(
                     cover = processCover(url, detail.providerId, detail.id, detail.cover),
-                    preview = detail.preview?.map {
+                    preview = detail.preview.map {
                         processImage(url, providerId, mangaId, " ", " ", it)
                     }
                 )

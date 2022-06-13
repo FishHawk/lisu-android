@@ -28,7 +28,6 @@ import androidx.paging.compose.LazyPagingItems
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import coil.size.Size
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaKeyDto
 import com.fishhawk.lisu.ui.widget.ErrorItem

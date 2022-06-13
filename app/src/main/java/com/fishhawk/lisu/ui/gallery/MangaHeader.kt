@@ -137,7 +137,7 @@ internal fun MangaHeader(
                 MangaInfo(
                     providerId = detail.providerId,
                     title = (detail.title ?: detail.id),
-                    author = detail.authors?.joinToString(separator = ";"),
+                    author = detail.authors.joinToString(separator = ";"),
                     isFinished = detail.isFinished,
                     onTitleClick = { onAction(GalleryAction.NavToGlobalSearch(it)) },
                     onAuthorClick = { onAction(GalleryAction.NavToGlobalSearch(it)) },
@@ -285,11 +285,9 @@ private fun MangaActionButtons(
                 onAction(
                     GalleryAction.NavToReader(
                         collectionId = history?.collectionId
-                            ?: detail.collections?.keys?.first() ?: " ",
+                            ?: detail.collections.keys.first(),
                         chapterId = history?.chapterId
-                            ?: detail.collections?.values?.first()?.first()?.id
-                            ?: detail.chapters?.first()?.id
-                            ?: " ",
+                            ?: detail.collections.values.first().first().id,
                         page = history?.page ?: 0
                     )
                 )

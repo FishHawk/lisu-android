@@ -26,7 +26,7 @@ data class MangaDto(
     var cover: String? = null,
     val updateTime: Long? = null,
     val title: String? = null,
-    val authors: List<String>? = null,
+    val authors: List<String> = emptyList(),
     val isFinished: Boolean? = null,
 ) : Parcelable {
     val key
@@ -46,16 +46,16 @@ data class MangaDetailDto(
 
     var cover: String? = null,
     val updateTime: Long? = null,
-    val title: String?,
-    val authors: List<String>?,
-    val isFinished: Boolean?,
+    val title: String? = null,
+    val authors: List<String> = emptyList(),
+    val isFinished: Boolean? = null,
 
     val description: String? = null,
-    val tags: Map<String, List<String>>? = null,
+    val tags: Map<String, List<String>> = emptyMap(),
 
-    val collections: Map<String, List<ChapterDto>>? = null,
-    val chapters: List<ChapterDto>? = null,
-    var preview: List<String>? = null
+    val collections: Map<String, List<ChapterDto>> = emptyMap(),
+    val chapters: List<ChapterDto> = emptyList(),
+    var preview: List<String> = emptyList()
 ) : Parcelable {
     val titleOrId
         get() = title ?: id

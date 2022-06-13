@@ -32,12 +32,12 @@ internal fun MangaContent(
         onAction(GalleryAction.NavToReader(" ", " ", page))
     }
 
-    if (!detail.collections.isNullOrEmpty())
+    if (detail.collections.isNotEmpty())
         MangaContentCollections(detail.collections, isMarked, onChapterClick)
-    else if (!detail.chapters.isNullOrEmpty())
+    else if (detail.chapters.isNotEmpty()) {
         MangaContentChapters(detail.chapters, isMarked, onChapterClick)
-    else if (!detail.preview.isNullOrEmpty())
-        MangaContentPreview(detail.preview!!, onPageClick)
+    } else if (detail.preview.isNotEmpty())
+        MangaContentPreview(detail.preview, onPageClick)
     else MangaNoChapter()
 }
 
