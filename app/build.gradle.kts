@@ -4,6 +4,7 @@ import java.util.*
 val composeVersion by extra { "1.2.0-beta03" }
 
 plugins {
+    kotlin("plugin.serialization") version "1.6.21"
     id("com.android.application") version "7.2.1"
     id("com.google.devtools.ksp") version "1.6.21-1.0.5"
     id("org.jetbrains.kotlin.android") version "1.6.21"
@@ -126,10 +127,12 @@ dependencies {
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
 
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.7")
+
+    val ktorVersion = "2.0.2"
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 
     // Licenses
     implementation("com.mikepenz:aboutlibraries-compose:10.1.0")

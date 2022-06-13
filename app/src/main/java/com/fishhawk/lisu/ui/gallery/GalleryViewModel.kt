@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import okhttp3.RequestBody
 
 sealed interface GalleryEffect : Event {
     data class AddToLibraryFailure(val exception: Throwable) : GalleryEffect
@@ -95,10 +94,10 @@ class GalleryViewModel(
         }
     }
 
-    fun updateCover(requestBody: RequestBody) {
+    fun updateCover(cover: ByteArray, coverType: String) {
         viewModelScope.launch {
             remoteLibraryRepository.updateMangaCover(
-                manga.providerId, manga.id, requestBody
+                manga.providerId, manga.id, cover, coverType
             ).onSuccess {
                 sendEvent(GalleryEffect.UpdateCoverSuccess)
             }.onFailure {

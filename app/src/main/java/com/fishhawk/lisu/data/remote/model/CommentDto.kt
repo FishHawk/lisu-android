@@ -1,5 +1,8 @@
 package com.fishhawk.lisu.data.remote.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class CommentDto(
     val username: String,
     val content: String,

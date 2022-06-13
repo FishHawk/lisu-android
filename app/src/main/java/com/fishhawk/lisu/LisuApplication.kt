@@ -27,11 +27,16 @@ import com.fishhawk.lisu.ui.provider.ProviderSearchViewModel
 import com.fishhawk.lisu.ui.provider.ProviderViewModel
 import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import com.fishhawk.lisu.util.interceptor.ProgressInterceptor
+import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
-import okhttp3.HttpUrl.Companion.toHttpUrl
+import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -40,9 +45,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.converter.scalars.ScalarsConverterFactory
 
 lateinit var PR: PreferenceRepository
 
@@ -79,7 +81,7 @@ val appModule = module {
     single { PreferenceRepository(androidApplication()) }
     single { ProviderBrowseHistoryRepository(androidApplication()) }
 
-    single<Flow<Result<Retrofit>?>> {
+    single<Flow<Result<HttpClient>?>> {
         get<PreferenceRepository>().serverAddress.flow
             .map { address ->
                 address
@@ -97,11 +99,10 @@ val appModule = module {
                     return@map Result.failure(Exception("No server selected"))
                 try {
                     Result.success(
-                        Retrofit.Builder()
-                            .baseUrl(url.toHttpUrl())
-                            .addConverterFactory(ScalarsConverterFactory.create())
-                            .addConverterFactory(GsonConverterFactory.create())
-                            .build()
+                        HttpClient(OkHttp) {
+                            defaultRequest { url(url) }
+                            install(ContentNegotiation) { json(Json) }
+                        }
                     )
                 } catch (e: Throwable) {
                     Result.failure(e)

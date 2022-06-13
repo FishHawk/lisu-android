@@ -33,8 +33,6 @@ import com.fishhawk.lisu.ui.widget.LisuToolBar
 import com.fishhawk.lisu.ui.widget.StateView
 import com.fishhawk.lisu.ui.widget.ViewState
 import com.fishhawk.lisu.util.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -78,13 +76,13 @@ fun GalleryScreen(navController: NavHostController) {
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             if (uri != null) {
                 val content = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-                val type = context.contentResolver.getType(uri)?.toMediaTypeOrNull()
+                val type = context.contentResolver.getType(uri)
                 if (content == null || type == null) {
                     context.toast("Image file not found.")
-                } else if (type.type != "image") {
+                } else if (!type.startsWith("image")) {
                     context.toast("Only image file can set as cover.")
                 } else {
-                    viewModel.updateCover(content.toRequestBody(type))
+                    viewModel.updateCover(content, type)
                 }
             }
         }

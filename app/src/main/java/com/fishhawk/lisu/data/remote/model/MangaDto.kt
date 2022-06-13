@@ -2,16 +2,20 @@ package com.fishhawk.lisu.data.remote.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class MangaKeyDto(
     val providerId: String,
     val id: String,
 )
 
+@Serializable
 enum class MangaState {
     Local, Remote, RemoteInLibrary
 }
 
+@Serializable
 @Parcelize
 data class MangaDto(
     val state: MangaState = MangaState.Local,
@@ -32,6 +36,7 @@ data class MangaDto(
         get() = title ?: id
 }
 
+@Serializable
 @Parcelize
 data class MangaDetailDto(
     val state: MangaState = MangaState.Local,

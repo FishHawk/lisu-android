@@ -11,7 +11,7 @@ import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.reader.ReaderActivity
-import com.google.gson.Gson
+import kotlinx.serialization.json.Json
 
 object MangaNavType : NavType<MangaDto>(isNullableAllowed = true) {
     override fun get(bundle: Bundle, key: String): MangaDto? {
@@ -19,7 +19,7 @@ object MangaNavType : NavType<MangaDto>(isNullableAllowed = true) {
     }
 
     override fun parseValue(value: String): MangaDto {
-        return Gson().fromJson(value, MangaDto::class.java)
+        return Json.decodeFromString(MangaDto.serializer(), value)
     }
 
     override fun put(bundle: Bundle, key: String, value: MangaDto) {
@@ -33,7 +33,7 @@ object ProviderNavType : NavType<ProviderDto>(isNullableAllowed = true) {
     }
 
     override fun parseValue(value: String): ProviderDto {
-        return Gson().fromJson(value, ProviderDto::class.java)
+        return Json.decodeFromString(ProviderDto.serializer(), value)
     }
 
     override fun put(bundle: Bundle, key: String, value: ProviderDto) {
@@ -46,7 +46,7 @@ fun NavHostController.navToProvider(id: String) {
 }
 
 fun NavHostController.navToProviderLogin(provider: ProviderDto) {
-    val json = Uri.encode(Gson().toJson(provider))
+    val json = Uri.encode(Json.encodeToString(ProviderDto.serializer(), provider))
     navigate("provider/${provider.id}/login?provider=${json}")
 }
 
@@ -61,7 +61,7 @@ fun NavHostController.navToGlobalSearch(keywords: String? = null) {
 }
 
 fun NavHostController.navToGallery(manga: MangaDto) {
-    val json = Uri.encode(Gson().toJson(manga))
+    val json = Uri.encode(Json.encodeToString(MangaDto.serializer(), manga))
     navigate("gallery/${manga.id}/detail?manga=${json}")
 }
 

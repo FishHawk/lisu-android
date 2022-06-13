@@ -4,78 +4,99 @@ import com.fishhawk.lisu.data.remote.model.CommentDto
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.ProviderDto
-import com.fishhawk.lisu.data.remote.service.RemoteProviderService
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.coroutines.flow.Flow
-import retrofit2.Retrofit
-import java.net.URLEncoder
 
-class RemoteProviderRepository(retrofit: Flow<Result<Retrofit>?>) :
-    BaseRemoteRepository<RemoteProviderService>(retrofit) {
-
-    override val serviceType = RemoteProviderService::class.java
+class RemoteProviderRepository(client: Flow<Result<HttpClient>?>) :
+    BaseRemoteRepository(client) {
 
     private var cachedProviderList: List<ProviderDto>? = null
 
-    suspend fun listProvider(): Result<List<ProviderDto>> = resultWrap { service ->
-        cachedProviderList ?: service.listProvider()
-            .map { info -> info.copy(icon = "${url}provider/${info.id}/icon") }
-            .also { cachedProviderList = it }
+    suspend fun listProvider(): Result<List<ProviderDto>> = resultWrap { client ->
+        cachedProviderList ?: client.get("/provider")
+            .let {
+                val url = it.request.url
+                it.body<List<ProviderDto>>()
+                    .map { info -> info.copy(icon = generateProviderIcon(url, info.id)) }
+                    .also { cachedProviderList = it }
+            }
     }
 
     fun getProvider(id: String): ProviderDto = cachedProviderList?.find { it.id == id }!!
 
-    suspend fun getBoard(
-        providerId: String,
-        boardId: String,
-        page: Int,
-        filters: Map<String, Int>
-    ): Result<List<MangaDto>> = resultWrap { service ->
-        service.getBoard(providerId, boardId, page, filters)
-            .map { it.copy(cover = processCover(it.providerId, it.id, it.cover)) }
-    }
-
     suspend fun login(
         providerId: String,
         cookies: Map<String, String>,
-    ): Result<String> = resultWrap { service ->
-        service.login(providerId, cookies)
+    ): Result<String> = resultWrap { client ->
+        client.post("/provider/${providerId.path}/login") { setBody(cookies) }.body()
     }
 
     suspend fun logout(
         providerId: String,
-    ): Result<String> = resultWrap { service ->
-        service.logout(providerId)
+    ): Result<String> = resultWrap { client ->
+        client.post("/provider/${providerId.path}/logout").body()
     }
 
     suspend fun search(
         providerId: String,
         page: Int,
         keywords: String,
-    ): Result<List<MangaDto>> = resultWrap { service ->
-        service.search(providerId, page, keywords)
-            .map { it.copy(cover = processCover(it.providerId, it.id, it.cover)) }
+    ): Result<List<MangaDto>> = resultWrap { client ->
+        client.get("/provider/${providerId.path}/search") {
+            parameter("page", page)
+            parameter("keywords", keywords)
+        }.let { response ->
+            val url = response.request.url
+            response.body<List<MangaDto>>()
+                .map { it.copy(cover = processCover(url, it.providerId, it.id, it.cover)) }
+        }
+    }
+
+    suspend fun getBoard(
+        providerId: String,
+        boardId: String,
+        page: Int,
+        filters: Map<String, Int>
+    ): Result<List<MangaDto>> = resultWrap { client ->
+        client.get("/provider/${providerId.path}/board/${boardId.path}") {
+            parameter("page", page)
+            filters.forEach { (key, value) -> parameter(key, value) }
+        }.let { response ->
+            val url = response.request.url
+            response.body<List<MangaDto>>()
+                .map { it.copy(cover = processCover(url, it.providerId, it.id, it.cover)) }
+        }
     }
 
     suspend fun getManga(
         providerId: String,
         mangaId: String
-    ): Result<MangaDetailDto> = resultWrap { service ->
-        service.getManga(providerId, mangaId).let { detail ->
-            detail.copy(
-                cover = processCover(detail.providerId, detail.id, detail.cover),
-                preview = detail.preview?.map {
-                    processImage(providerId, mangaId, " ", " ", it)
-                }
-            )
-        }
+    ): Result<MangaDetailDto> = resultWrap { client ->
+        client.get("/provider/${providerId.path}/manga/${mangaId.path}")
+            .let { response ->
+                val url = response.request.url
+                val detail = response.body<MangaDetailDto>()
+                detail.copy(
+                    cover = processCover(url, detail.providerId, detail.id, detail.cover),
+                    preview = detail.preview?.map {
+                        processImage(url, providerId, mangaId, " ", " ", it)
+                    }
+                )
+            }
     }
 
     suspend fun getComment(
         providerId: String,
         mangaId: String,
         page: Int,
-    ): Result<List<CommentDto>> = resultWrap { service ->
-        service.getComment(providerId, mangaId, page)
+    ): Result<List<CommentDto>> = resultWrap { client ->
+        client.get("/provider/${providerId.path}/manga/${mangaId.path}/comment") {
+            parameter("page", page)
+        }.body()
     }
 
     suspend fun getContent(
@@ -83,23 +104,62 @@ class RemoteProviderRepository(retrofit: Flow<Result<Retrofit>?>) :
         mangaId: String,
         collectionId: String,
         chapterId: String
-    ): Result<List<String>> = resultWrap { service ->
-        service.getContent(providerId, mangaId, collectionId, chapterId)
-            .map { processImage(providerId, mangaId, collectionId, chapterId, it) }
+    ): Result<List<String>> = resultWrap { client ->
+        client.get("/provider/${providerId.path}/manga/${mangaId.path}/content/${collectionId.path}/${chapterId.path}")
+            .let { response ->
+                val url = response.request.url
+                response.body<List<String>>()
+                    .map { processImage(url, providerId, mangaId, collectionId, chapterId, it) }
+            }
+    }
+
+    private fun generateProviderIcon(
+        url: Url,
+        providerId: String,
+    ): String {
+        val builder = URLBuilder(url)
+        builder.pathSegments = emptyList()
+        builder.parameters.clear()
+        builder.appendPathSegments("provider", providerId, "icon")
+        return builder.build().toString()
+    }
+
+    private fun processCover(
+        url: Url,
+        providerId: String,
+        mangaId: String,
+        cover: String?
+    ): String {
+        val builder = URLBuilder(url)
+        builder.pathSegments = emptyList()
+        builder.parameters.clear()
+        builder.appendPathSegments("provider", providerId, "manga", mangaId, "cover")
+        builder.parameters.append("imageId", cover ?: "")
+        return builder.build().toString()
     }
 
     private fun processImage(
+        url: Url,
         providerId: String,
         mangaId: String,
         collectionId: String,
         chapterId: String,
         imageId: String
     ): String {
-        val encoded = URLEncoder.encode(imageId, "UTF-8")
-        return "${url}provider/${providerId}/manga/${mangaId}/image/${collectionId}/${chapterId}/${encoded}"
-    }
-
-    private fun processCover(providerId: String, mangaId: String, cover: String?): String {
-        return "${url}provider/${providerId}/manga/${mangaId}/cover?imageId=${cover}"
+        val builder = URLBuilder(url)
+        builder.pathSegments = emptyList()
+        builder.parameters.clear()
+        builder.appendPathSegments(
+            "provider",
+            providerId,
+            "manga",
+            mangaId,
+            "image",
+            collectionId,
+            chapterId,
+            imageId
+        )
+        builder.parameters.append("imageId", imageId)
+        return builder.build().toString()
     }
 }

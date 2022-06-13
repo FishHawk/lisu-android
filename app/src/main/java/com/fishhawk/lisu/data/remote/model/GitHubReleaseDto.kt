@@ -1,13 +1,15 @@
 package com.fishhawk.lisu.data.remote.model
 
 import android.os.Build
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class GitHubReleaseDto(
-    @SerializedName("tag_name") val version: String,
-    @SerializedName("body") val info: String,
-    @SerializedName("html_url") val releaseLink: String,
-    @SerializedName("assets") private val assets: List<Assets>
+    @SerialName("tag_name") val version: String,
+    @SerialName("body") val info: String,
+    @SerialName("html_url") val releaseLink: String,
+    @SerialName("assets") private val assets: List<Assets>
 ) {
     fun getDownloadLink(): String {
         val apkVariant = when (Build.SUPPORTED_ABIS[0]) {
@@ -22,5 +24,6 @@ data class GitHubReleaseDto(
         return asset.downloadLink
     }
 
-    data class Assets(@SerializedName("browser_download_url") val downloadLink: String)
+    @Serializable
+    data class Assets(@SerialName("browser_download_url") val downloadLink: String)
 }
