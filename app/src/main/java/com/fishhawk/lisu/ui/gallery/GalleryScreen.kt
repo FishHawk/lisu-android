@@ -220,7 +220,7 @@ private fun MangaDetail(
             onRetry = { onAction(GalleryAction.Reload) }
         ) {
             Column(
-                modifier = Modifier.padding(bottom = 16.dp),
+                modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 if (!detail.description.isNullOrBlank()) {

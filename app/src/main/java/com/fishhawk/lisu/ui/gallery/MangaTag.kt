@@ -30,7 +30,10 @@ fun MangaTagGroups(
     ) {
         tagGroups.forEach { (key, tags) ->
             Row {
-                if (key.isNotBlank()) Tag(key)
+                if (key.isNotBlank()) {
+                    Tag(key)
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
                 FlowRow(
                     modifier = Modifier.padding(bottom = 8.dp),
                     mainAxisSpacing = 4.dp,

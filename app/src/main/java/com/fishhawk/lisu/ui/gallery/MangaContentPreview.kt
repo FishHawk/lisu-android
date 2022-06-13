@@ -3,8 +3,12 @@ package com.fishhawk.lisu.ui.gallery
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -12,7 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import coil.size.Size
 import com.fishhawk.lisu.ui.widget.VerticalGrid
 
 @Composable
@@ -52,14 +55,18 @@ private fun PreviewPage(
             painter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
                     .data(url)
-                    .size(Size.ORIGINAL)
                     .crossfade(true)
                     .crossfade(500)
                     .build()
             ),
             contentDescription = null,
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Fit,
         )
-        Text(text = page.toString())
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            Text(
+                text = page.toString(),
+                style = MaterialTheme.typography.body2,
+            )
+        }
     }
 }

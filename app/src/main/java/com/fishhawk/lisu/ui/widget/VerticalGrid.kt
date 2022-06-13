@@ -17,9 +17,11 @@ fun <T> VerticalGrid(
         modifier = modifier,
         verticalArrangement = verticalArrangement,
     ) {
-        items.chunked(nColumns).onEach { rowItems ->
+        items.chunked(nColumns).onEachIndexed { rowIndex, rowItems ->
             Row(horizontalArrangement = horizontalArrangement) {
-                rowItems.onEachIndexed { index, it -> content(index, it) }
+                rowItems.onEachIndexed { columnIndex, it ->
+                    content(rowIndex * nColumns + columnIndex, it)
+                }
                 repeat(nColumns - rowItems.size) {
                     Spacer(Modifier.weight(1f))
                 }

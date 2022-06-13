@@ -233,13 +233,13 @@ private fun ChapterLinear(
     val modifier = Modifier
         .fillMaxWidth()
         .let {
-            if (isMarked) it.clickable { if (chapter.isLocked != true) onChapterClick() }
+            if (!isLocked) it.clickable { if (chapter.isLocked != true) onChapterClick() }
             else it
         }
         .padding(vertical = 12.dp, horizontal = 16.dp)
 
     val textColor = MaterialTheme.colors
-        .run { if (isMarked) onPrimary else onSurface }
+        .run { if (isMarked) primary else onSurface }
         .let { if (isLocked) it.copy(alpha = ContentAlpha.disabled) else it }
 
     Row(
