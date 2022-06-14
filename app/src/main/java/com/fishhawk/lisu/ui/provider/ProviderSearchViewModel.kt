@@ -6,16 +6,14 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.database.model.SearchHistory
-import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
-import com.fishhawk.lisu.data.remote.RemoteProviderRepository
+import com.fishhawk.lisu.data.remote.LisuRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ProviderSearchViewModel(
     args: Bundle,
-    private val remoteLibraryRepository: RemoteLibraryRepository,
-    private val remoteProviderRepository: RemoteProviderRepository,
+    private val lisuRepository: LisuRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
 ) : ViewModel() {
 
@@ -44,7 +42,7 @@ class ProviderSearchViewModel(
     }.cachedIn(viewModelScope)
 
     init {
-        listOf(keywords, remoteProviderRepository.serviceFlow).forEach {
+        listOf(keywords, lisuRepository.serviceFlow).forEach {
             it.onEach { source?.invalidate() }.launchIn(viewModelScope)
         }
     }
@@ -58,11 +56,11 @@ class ProviderSearchViewModel(
     }
 
     fun addToLibrary(manga: MangaDto) = viewModelScope.launch {
-        remoteLibraryRepository.createManga(manga.providerId, manga.id).fold({}, {})
+        lisuRepository.addMangaToLibrary(manga.providerId, manga.id).fold({}, {})
     }
 
     fun removeFromLibrary(manga: MangaDto) = viewModelScope.launch {
-        remoteLibraryRepository.deleteManga(manga.providerId, manga.id).fold({}, {})
+        lisuRepository.removeMangaFromLibrary(manga.providerId, manga.id).fold({}, {})
     }
 
 
@@ -71,7 +69,7 @@ class ProviderSearchViewModel(
     ) : PagingSource<Int, MangaDto>() {
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MangaDto> {
             val page = params.key ?: 0
-            return remoteProviderRepository.search(providerId, page, keywords).fold(
+            return lisuRepository.search(providerId, page, keywords).fold(
                 { LoadResult.Page(it, null, page + 1) },
                 { LoadResult.Error(it) }
             )

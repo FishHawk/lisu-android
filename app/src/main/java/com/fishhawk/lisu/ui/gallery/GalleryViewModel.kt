@@ -4,8 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
-import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
-import com.fishhawk.lisu.data.remote.RemoteProviderRepository
+import com.fishhawk.lisu.data.remote.LisuRepository
 import com.fishhawk.lisu.data.remote.model.*
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
@@ -29,8 +28,7 @@ sealed interface GalleryEffect : Event {
 
 class GalleryViewModel(
     args: Bundle,
-    private val remoteLibraryRepository: RemoteLibraryRepository,
-    private val remoteProviderRepository: RemoteProviderRepository,
+    private val lisuRepository: LisuRepository,
     readingHistoryRepository: ReadingHistoryRepository,
 ) : BaseViewModel<GalleryEffect>() {
     private val manga = args.getParcelable<MangaDto>("manga")!!
@@ -57,7 +55,7 @@ class GalleryViewModel(
     fun reloadManga() {
         _viewState.value = ViewState.Loading
         viewModelScope.launch {
-            remoteProviderRepository.getManga(
+            lisuRepository.getManga(
                 manga.providerId, manga.id
             ).onSuccess {
                 _viewState.value = ViewState.Loaded
@@ -71,7 +69,7 @@ class GalleryViewModel(
     fun addToLibrary() {
         if (manga.state != MangaState.Remote) return
         viewModelScope.launch {
-            remoteLibraryRepository.createManga(
+            lisuRepository.addMangaToLibrary(
                 manga.providerId, manga.id
             ).onSuccess {
                 _detail.value = _detail.value.copy(state = MangaState.RemoteInLibrary)
@@ -84,7 +82,7 @@ class GalleryViewModel(
     fun removeFromLibrary() {
         if (manga.state != MangaState.RemoteInLibrary) return
         viewModelScope.launch {
-            remoteLibraryRepository.deleteManga(
+            lisuRepository.removeMangaFromLibrary(
                 manga.providerId, manga.id
             ).onSuccess {
                 _detail.value = _detail.value.copy(state = MangaState.Remote)
@@ -96,7 +94,7 @@ class GalleryViewModel(
 
     fun updateCover(cover: ByteArray, coverType: String) {
         viewModelScope.launch {
-            remoteLibraryRepository.updateMangaCover(
+            lisuRepository.updateMangaCover(
                 manga.providerId, manga.id, cover, coverType
             ).onSuccess {
                 sendEvent(GalleryEffect.UpdateCoverSuccess)
@@ -109,7 +107,7 @@ class GalleryViewModel(
     fun updateMetadata(metadata: MangaMetadataDto) {
         if (manga.state != MangaState.Local) return
         viewModelScope.launch {
-            remoteLibraryRepository.updateMangaMetadata(
+            lisuRepository.updateMangaMetadata(
                 manga.providerId, manga.id, metadata
             ).onSuccess {
                 sendEvent(GalleryEffect.UpdateMetadataSuccess)
@@ -122,7 +120,7 @@ class GalleryViewModel(
     inner class CommentSource : PagingSource<Int, CommentDto>() {
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CommentDto> {
             val page = params.key ?: 0
-            return remoteProviderRepository.getComment(manga.providerId, manga.id, page).fold(
+            return lisuRepository.getComment(manga.providerId, manga.id, page).fold(
                 { LoadResult.Page(it, null, if (it.isEmpty()) null else page + 1) },
                 { LoadResult.Error(it) }
             )

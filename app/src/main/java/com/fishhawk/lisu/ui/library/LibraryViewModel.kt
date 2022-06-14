@@ -3,7 +3,7 @@ package com.fishhawk.lisu.ui.library
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.fishhawk.lisu.data.database.SearchHistoryRepository
-import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
+import com.fishhawk.lisu.data.remote.LisuRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaKeyDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
@@ -18,7 +18,7 @@ sealed interface LibraryEvent : Event {
 }
 
 class LibraryViewModel(
-    private val libraryRepo: RemoteLibraryRepository,
+    private val lisuRepository: LisuRepository,
     searchHistoryRepo: SearchHistoryRepository,
 ) : BaseViewModel<LibraryEvent>() {
 
@@ -32,7 +32,7 @@ class LibraryViewModel(
     private var source: LibraryMangaSource? = null
     val mangaList = combine(
         _keywords,
-        libraryRepo.serviceFlow
+        lisuRepository.serviceFlow
     ) { keywords, _ -> keywords }
         .flatMapLatest { keywords ->
             Pager(PagingConfig(pageSize = 20)) {
@@ -42,7 +42,7 @@ class LibraryViewModel(
 
     fun getRandomManga() {
         viewModelScope.launch {
-            libraryRepo.getRandomManga()
+            lisuRepository.getRandomMangaFromLibrary()
                 .onSuccess { sendEvent(LibraryEvent.GetRandomSuccess(it)) }
                 .onFailure { sendEvent(LibraryEvent.GetRandomFailure(it)) }
         }
@@ -50,7 +50,7 @@ class LibraryViewModel(
 
     fun deleteMultipleManga(mangas: List<MangaKeyDto>) {
         viewModelScope.launch {
-            libraryRepo.deleteMultipleMangas(mangas)
+            lisuRepository.removeMultipleMangasFromLibrary(mangas)
                 .onSuccess { source?.invalidate() }
                 .onFailure { sendEvent(LibraryEvent.DeleteMultipleFailure(it)) }
         }
@@ -63,7 +63,7 @@ class LibraryViewModel(
     inner class LibraryMangaSource(private val keywords: String) : PagingSource<Int, MangaDto>() {
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MangaDto> {
             val page = params.key ?: 0
-            return libraryRepo.search(page, keywords).fold(
+            return lisuRepository.searchFromLibrary(page, keywords).fold(
                 { LoadResult.Page(it, null, if (it.isEmpty()) null else page + 1) },
                 { LoadResult.Error(it) }
             )

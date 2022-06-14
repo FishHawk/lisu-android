@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.database.model.SearchHistory
-import com.fishhawk.lisu.data.remote.RemoteProviderRepository
+import com.fishhawk.lisu.data.remote.LisuRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.widget.ViewState
@@ -19,7 +19,7 @@ data class SearchResult(
 
 class GlobalSearchViewModel(
     args: Bundle,
-    private val remoteLibraryRepository: RemoteProviderRepository,
+    private val lisuRepository: LisuRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
 ) : ViewModel() {
 
@@ -38,7 +38,7 @@ class GlobalSearchViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private val providerList =
-        flow { emit(remoteLibraryRepository.listProvider().getOrNull()) }.filterNotNull()
+        flow { emit(lisuRepository.listProvider().getOrNull()) }.filterNotNull()
 
     val searchResultList =
         combine(
@@ -48,7 +48,7 @@ class GlobalSearchViewModel(
             providerList.map { provider ->
                 flow {
                     emit(
-                        remoteLibraryRepository.search(provider.id, 0, keywords).fold(
+                        lisuRepository.search(provider.id, 0, keywords).fold(
                             { SearchResult(provider, ViewState.Loaded, it) },
                             { SearchResult(provider, ViewState.Failure(it)) }
                         )

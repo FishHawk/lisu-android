@@ -12,8 +12,7 @@ import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.lisu.data.remote.Connectivity
 import com.fishhawk.lisu.data.remote.GitHubRepository
-import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
-import com.fishhawk.lisu.data.remote.RemoteProviderRepository
+import com.fishhawk.lisu.data.remote.LisuRepository
 import com.fishhawk.lisu.notification.Notifications
 import com.fishhawk.lisu.ui.explore.ExploreViewModel
 import com.fishhawk.lisu.ui.gallery.GalleryViewModel
@@ -115,8 +114,7 @@ val appModule = module {
             )
     }
 
-    single { RemoteLibraryRepository(get()) }
-    single { RemoteProviderRepository(get()) }
+    single { LisuRepository(get()) }
     single { GitHubRepository() }
 
     single {
@@ -139,10 +137,10 @@ val appModule = module {
     viewModel { MoreViewModel(get()) }
 
     viewModel { GlobalSearchViewModel(get(), get(), get()) }
-    viewModel { ProviderViewModel(get(), get(), get(), get()) }
-    viewModel { ProviderSearchViewModel(get(), get(), get(), get()) }
+    viewModel { ProviderViewModel(get(), get(), get()) }
+    viewModel { ProviderSearchViewModel(get(), get(), get()) }
     viewModel { ProviderLoginViewModel(get(), get()) }
-    viewModel { GalleryViewModel(get(), get(), get(), get()) }
+    viewModel { GalleryViewModel(get(), get(), get()) }
 
-    viewModel { ReaderViewModel(get(), get(), get(), get()) }
+    viewModel { ReaderViewModel(get(), get(), get()) }
 }

@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.remote.Connectivity
-import com.fishhawk.lisu.data.remote.RemoteProviderRepository
+import com.fishhawk.lisu.data.remote.LisuRepository
 import com.fishhawk.lisu.data.remote.model.ProviderDto
 import com.fishhawk.lisu.ui.widget.ViewState
 import com.fishhawk.lisu.ui.widget.onFailure
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ExploreViewModel(
-    private val repository: RemoteProviderRepository,
+    private val repository: LisuRepository,
     connectivity: Connectivity
 ) : ViewModel() {
 

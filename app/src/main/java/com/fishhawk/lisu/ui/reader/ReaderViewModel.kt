@@ -8,8 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
 import com.fishhawk.lisu.data.database.model.ReadingHistory
-import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
-import com.fishhawk.lisu.data.remote.RemoteProviderRepository
+import com.fishhawk.lisu.data.remote.LisuRepository
 import com.fishhawk.lisu.data.remote.model.ChapterDto
 import com.fishhawk.lisu.data.remote.model.MangaDetailDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
@@ -37,8 +36,7 @@ sealed interface ReaderEffect : Event {
 
 class ReaderViewModel(
     args: Bundle,
-    private val remoteProviderRepository: RemoteProviderRepository,
-    private val remoteLibraryRepository: RemoteLibraryRepository,
+    private val lisuRepository: LisuRepository,
     private val readingHistoryRepository: ReadingHistoryRepository,
 ) : BaseViewModel<ReaderEffect>() {
 
@@ -136,7 +134,7 @@ class ReaderViewModel(
         if (chapter.state == ViewState.Loaded) return
         chapter.state = ViewState.Loading
 
-        val result = remoteProviderRepository.getContent(
+        val result = lisuRepository.getContent(
             providerId,
             mangaId,
             chapter.collectionId,
@@ -170,7 +168,7 @@ class ReaderViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
     fun refreshReader() = viewModelScope.launch {
-        val result = remoteProviderRepository.getManga(providerId, mangaId)
+        val result = lisuRepository.getManga(providerId, mangaId)
         if (mangaLoadState.value != ViewState.Loaded) {
             mangaDetail.value = result
         }
@@ -249,7 +247,7 @@ class ReaderViewModel(
         val stream = ByteArrayOutputStream()
         drawable.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream)
         val byteArray = stream.toByteArray()
-        remoteLibraryRepository.updateMangaCover(
+        lisuRepository.updateMangaCover(
             providerId,
             mangaId,
             byteArray,

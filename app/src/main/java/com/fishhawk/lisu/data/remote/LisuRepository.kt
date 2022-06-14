@@ -1,19 +1,32 @@
 package com.fishhawk.lisu.data.remote
 
-import com.fishhawk.lisu.data.remote.model.CommentDto
-import com.fishhawk.lisu.data.remote.model.MangaDetailDto
-import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.ProviderDto
+import com.fishhawk.lisu.data.remote.model.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.*
 
-class RemoteProviderRepository(client: Flow<Result<HttpClient>?>) :
-    BaseRemoteRepository(client) {
+class LisuRepository(client: Flow<Result<HttpClient>?>) {
+    val serviceFlow = client.stateIn(
+        CoroutineScope(SupervisorJob() + Dispatchers.Main),
+        SharingStarted.Eagerly, null
+    )
 
+    private val String.path
+        get() = encodeURLPath()
+
+    private suspend inline fun <T> resultWrap(crossinline func: suspend (HttpClient) -> T): Result<T> {
+        val service = serviceFlow.filterNotNull().first()
+        return service.mapCatching { func(it) }
+    }
+
+    // Provider API
     private var cachedProviderList: List<ProviderDto>? = null
 
     suspend fun listProvider(): Result<List<ProviderDto>> = resultWrap { client ->
@@ -89,6 +102,35 @@ class RemoteProviderRepository(client: Flow<Result<HttpClient>?>) :
             }
     }
 
+    suspend fun updateMangaMetadata(
+        providerId: String,
+        mangaId: String,
+        metadata: MangaMetadataDto
+    ): Result<String> = resultWrap { client ->
+        client.put("/library/manga/${providerId.path}/${mangaId.path}/metadata") {
+            setBody(metadata)
+        }.body()
+    }
+
+    suspend fun updateMangaCover(
+        providerId: String,
+        mangaId: String,
+        cover: ByteArray,
+        coverType: String,
+    ): Result<String> = resultWrap { client ->
+        client.put("/library/manga/${providerId.path}/${mangaId.path}/cover") {
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append("cover", cover, Headers.build {
+                            append(HttpHeaders.ContentType, coverType)
+                        })
+                    }
+                )
+            )
+        }.body()
+    }
+
     suspend fun getComment(
         providerId: String,
         mangaId: String,
@@ -111,6 +153,47 @@ class RemoteProviderRepository(client: Flow<Result<HttpClient>?>) :
                 response.body<List<String>>()
                     .map { processImage(url, providerId, mangaId, collectionId, chapterId, it) }
             }
+    }
+
+    suspend fun getRandomMangaFromLibrary(): Result<MangaDto> = resultWrap { client ->
+        client.get("/library/random-manga").body()
+    }
+
+    suspend fun addMangaToLibrary(
+        providerId: String,
+        mangaId: String
+    ): Result<String> = resultWrap { client ->
+        client.post("/library/manga/${providerId.path}/${mangaId.path}").body()
+    }
+
+    // Library API
+    suspend fun searchFromLibrary(
+        page: Int,
+        keywords: String = ""
+    ): Result<List<MangaDto>> = resultWrap { client ->
+        client.get("/library/search") {
+            parameter("page", page)
+            parameter("keywords", keywords)
+        }.let { response ->
+            val url = response.request.url
+            response.body<List<MangaDto>>()
+                .map { it.copy(cover = processCover(url, it.providerId, it.id, it.cover)) }
+        }
+    }
+
+    suspend fun removeMangaFromLibrary(
+        providerId: String,
+        mangaId: String
+    ): Result<String> = resultWrap { client ->
+        client.delete("/library/manga/${providerId.path}/${mangaId.path}").body()
+    }
+
+    suspend fun removeMultipleMangasFromLibrary(
+        mangas: List<MangaKeyDto>
+    ): Result<String> = resultWrap { client ->
+        client.post("/library/manga-delete") {
+            setBody(mangas)
+        }.body()
     }
 
     private fun generateProviderIcon(

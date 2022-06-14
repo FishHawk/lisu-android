@@ -5,8 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
-import com.fishhawk.lisu.data.remote.RemoteLibraryRepository
-import com.fishhawk.lisu.data.remote.RemoteProviderRepository
+import com.fishhawk.lisu.data.remote.LisuRepository
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterNotNull
@@ -16,12 +15,11 @@ import kotlinx.coroutines.launch
 
 class ProviderViewModel(
     args: Bundle,
-    private val remoteLibraryRepository: RemoteLibraryRepository,
-    private val remoteProviderRepository: RemoteProviderRepository,
+    private val lisuRepository: LisuRepository,
     private val providerBrowseHistoryRepository: ProviderBrowseHistoryRepository
 ) : ViewModel() {
 
-    val provider = remoteProviderRepository.getProvider(args.getString("providerId")!!)
+    val provider = lisuRepository.getProvider(args.getString("providerId")!!)
 
     val boards = provider.boardModels.keys.toList()
 
@@ -40,11 +38,11 @@ class ProviderViewModel(
     }
 
     fun addToLibrary(manga: MangaDto) = viewModelScope.launch {
-        remoteLibraryRepository.createManga(manga.providerId, manga.id).fold({}, {})
+        lisuRepository.addMangaToLibrary(manga.providerId, manga.id).fold({}, {})
     }
 
     fun removeFromLibrary(manga: MangaDto) = viewModelScope.launch {
-        remoteLibraryRepository.deleteManga(manga.providerId, manga.id).fold({}, {})
+        lisuRepository.removeMangaFromLibrary(manga.providerId, manga.id).fold({}, {})
     }
 
     val pageHistory = providerBrowseHistoryRepository.getBoardHistory(provider.id)
@@ -60,7 +58,7 @@ class ProviderViewModel(
     ) : PagingSource<Int, MangaDto>() {
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MangaDto> {
             val page = params.key ?: 0
-            return remoteProviderRepository.getBoard(provider.id, boardId, page, filters).fold(
+            return lisuRepository.getBoard(provider.id, boardId, page, filters).fold(
                 { LoadResult.Page(it, null, if (it.isEmpty()) null else page + 1) },
                 { LoadResult.Error(it) }
             )
