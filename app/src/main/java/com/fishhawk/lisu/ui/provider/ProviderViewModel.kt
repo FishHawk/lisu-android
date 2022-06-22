@@ -3,67 +3,94 @@ package com.fishhawk.lisu.ui.provider
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.*
+import com.fishhawk.lisu.data.datastore.BoardFilter
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.lisu.data.remote.LisuRepository
+import com.fishhawk.lisu.data.remote.util.PagedList
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.stateIn
+import com.fishhawk.lisu.util.flatten
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+
+
+data class Board(
+    val filters: List<BoardFilter>,
+    val mangaResult: Result<PagedList<MangaDto>>?,
+)
 
 class ProviderViewModel(
     args: Bundle,
     private val lisuRepository: LisuRepository,
     private val providerBrowseHistoryRepository: ProviderBrowseHistoryRepository
 ) : ViewModel() {
+    val providerId = args.getString("providerId")!!
 
-    val provider = lisuRepository.getProvider(args.getString("providerId")!!)
+    val provider =
+        lisuRepository.providers
+            .mapNotNull {
+                it?.value
+                    ?.getOrNull()
+                    ?.find { provider -> provider.id == providerId }
+            }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val boards = provider.boardModels.keys.toList()
+    private val _boards = provider
+        .filterNotNull()
+        .flatMapLatest { provider ->
+            flatten(
+                provider.boardModels.mapValues { (boardId, model) ->
+                    val filters =
+                        providerBrowseHistoryRepository.getFilters(provider.id, boardId, model)
 
-    val boardFilters = provider.boardModels.mapValues { (boardId, model) ->
-        providerBrowseHistoryRepository.getFilters(provider.id, boardId, model)
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-    }
+                    val remoteList = filters.flatMapLatest {
+                        val options = it.associate { it.name to it.selected }
+                        lisuRepository.getBoard(providerId, boardId, options)
+                    }
 
-    val boardMangaLists = boardFilters.mapValues { (boardId, filters) ->
-        filters.filterNotNull().flatMapLatest { groups ->
-            Pager(PagingConfig(pageSize = 20)) {
-                val option = groups.associate { it.name to it.selected }
-                ProviderMangaSource(boardId, option)
-            }.flow
-        }.cachedIn(viewModelScope)
-    }
-
-    fun addToLibrary(manga: MangaDto) = viewModelScope.launch {
-        lisuRepository.addMangaToLibrary(manga.providerId, manga.id).fold({}, {})
-    }
-
-    fun removeFromLibrary(manga: MangaDto) = viewModelScope.launch {
-        lisuRepository.removeMangaFromLibrary(manga.providerId, manga.id).fold({}, {})
-    }
-
-    val pageHistory = providerBrowseHistoryRepository.getBoardHistory(provider.id)
-
-    fun updateFilterHistory(boardId: String, name: String, selected: Int) =
-        viewModelScope.launch {
-            providerBrowseHistoryRepository.setFilter(provider.id, boardId, name, selected)
-        }
-
-    inner class ProviderMangaSource(
-        private val boardId: String,
-        private val filters: Map<String, Int>
-    ) : PagingSource<Int, MangaDto>() {
-        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MangaDto> {
-            val page = params.key ?: 0
-            return lisuRepository.getBoard(provider.id, boardId, page, filters).fold(
-                { LoadResult.Page(it, null, if (it.isEmpty()) null else page + 1) },
-                { LoadResult.Error(it) }
+                    combine(filters, remoteList) { f, r -> f to r }
+                }
             )
         }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
 
-        override fun getRefreshKey(state: PagingState<Int, MangaDto>): Int = 0
+    val boards = _boards
+        .map {
+            it.mapValues { (_, pair) ->
+                val (filters, remoteList) = pair
+                Board(filters, remoteList.value)
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+
+    val pageHistory = providerBrowseHistoryRepository.getBoardHistory(providerId)
+
+    fun addToLibrary(manga: MangaDto) {
+        viewModelScope.launch {
+            lisuRepository.addMangaToLibrary(manga.providerId, manga.id).fold({}, {})
+        }
+    }
+
+    fun removeFromLibrary(manga: MangaDto) {
+        viewModelScope.launch {
+            lisuRepository.removeMangaFromLibrary(manga.providerId, manga.id).fold({}, {})
+        }
+    }
+
+    fun updateFilterHistory(boardId: String, name: String, selected: Int) {
+        viewModelScope.launch {
+            providerBrowseHistoryRepository.setFilter(providerId, boardId, name, selected)
+        }
+    }
+
+    fun reload(boardId: String) {
+        viewModelScope.launch {
+            _boards.value[boardId]?.second?.reload()
+        }
+    }
+
+    fun requestNextPage(boardId: String) {
+        viewModelScope.launch {
+            _boards.value[boardId]?.second?.requestNextPage()
+        }
     }
 }

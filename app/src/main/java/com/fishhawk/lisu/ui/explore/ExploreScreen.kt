@@ -59,8 +59,7 @@ internal sealed interface ExploreAction {
 @Composable
 fun ExploreScreen(navController: NavHostController) {
     val viewModel by viewModel<ExploreViewModel>()
-    val viewState by viewModel.viewState.collectAsState()
-    val providers by viewModel.providers.collectAsState()
+    val providersResult by viewModel.providersLoadState.collectAsState()
     val lastUsedProvider by viewModel.lastUsedProvider.collectAsState()
 
     val onAction: ExploreActionHandler = { action ->
@@ -75,59 +74,39 @@ fun ExploreScreen(navController: NavHostController) {
     }
 
     Scaffold(
-        topBar = { ToolBar(onAction) },
+        topBar = {
+            LisuToolBar(title = stringResource(R.string.label_explore)) {
+                IconButton(onClick = { onAction(ExploreAction.NavToGlobalSearch) }) {
+                    Icon(LisuIcons.TravelExplore, stringResource(R.string.action_global_search))
+                }
+            }
+        },
         content = { paddingValues ->
             LisuTransition {
-                ProviderList(
-                    viewState,
-                    providers,
-                    lastUsedProvider,
-                    onAction,
+                StateView(
+                    result = providersResult,
+                    onRetry = { onAction(ExploreAction.Reload) },
                     modifier = Modifier
                         .padding(paddingValues)
-                        .fillMaxSize()
-                )
+                        .fillMaxSize(),
+                ) { providers ->
+                    if (providers.isEmpty()) EmptyView()
+                    else {
+                        LazyColumn {
+                            lastUsedProvider?.let {
+                                item { ProviderListHeader(stringResource(R.string.explore_last_used)) }
+                                item { ProviderListItem(it, onAction) }
+                            }
+                            providers.forEach { (lang, list) ->
+                                item { ProviderListHeader(Locale(lang).displayLanguage) }
+                                items(list) { ProviderListItem(it, onAction) }
+                            }
+                        }
+                    }
+                }
             }
         }
     )
-}
-
-@Composable
-private fun ToolBar(onAction: ExploreActionHandler) {
-    LisuToolBar(title = stringResource(R.string.label_explore)) {
-        IconButton(onClick = { onAction(ExploreAction.NavToGlobalSearch) }) {
-            Icon(LisuIcons.TravelExplore, stringResource(R.string.action_global_search))
-        }
-    }
-}
-
-@Composable
-private fun ProviderList(
-    viewState: ViewState,
-    providers: Map<String, List<ProviderDto>>,
-    lastUsedProvider: ProviderDto?,
-    onAction: ExploreActionHandler,
-    modifier: Modifier = Modifier
-) {
-    StateView(
-        modifier = modifier,
-        viewState = viewState,
-        onRetry = { onAction(ExploreAction.Reload) }
-    ) {
-        if (providers.isEmpty()) EmptyView()
-        else {
-            LazyColumn {
-                lastUsedProvider?.let {
-                    item { ProviderListHeader(stringResource(R.string.explore_last_used)) }
-                    item { ProviderListItem(it, onAction) }
-                }
-                providers.forEach { (lang, list) ->
-                    item { ProviderListHeader(Locale(lang).displayLanguage) }
-                    items(list) { ProviderListItem(it, onAction) }
-                }
-            }
-        }
-    }
 }
 
 @Composable

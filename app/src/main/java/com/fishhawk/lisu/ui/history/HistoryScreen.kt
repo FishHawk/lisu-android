@@ -21,7 +21,6 @@ import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.ui.base.MangaCover
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToReader
 import com.fishhawk.lisu.ui.theme.LisuIcons
@@ -29,6 +28,7 @@ import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.EmptyView
 import com.fishhawk.lisu.ui.widget.LisuDialog
 import com.fishhawk.lisu.ui.widget.LisuToolBar
+import com.fishhawk.lisu.ui.widget.MangaCover
 import com.fishhawk.lisu.util.toDisplayString
 import org.koin.androidx.compose.viewModel
 import java.time.LocalDate

@@ -11,18 +11,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaState
-import com.fishhawk.lisu.ui.base.MangaBadge
-import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.theme.LisuTransition
-import com.fishhawk.lisu.ui.widget.LisuDialog
-import com.fishhawk.lisu.ui.widget.LisuSearchToolBar
-import com.fishhawk.lisu.ui.widget.LisuToolBar
-import com.fishhawk.lisu.ui.widget.SuggestionList
+import com.fishhawk.lisu.ui.widget.*
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -33,6 +27,10 @@ private sealed interface SearchAction {
     data class NavToGallery(val manga: MangaDto) : SearchAction
     data class Search(val keywords: String) : SearchAction
     data class DeleteSuggestion(val keywords: String) : SearchAction
+
+    object Reload : SearchAction
+    object RequestNextPage : SearchAction
+
     data class AddToLibrary(val manga: MangaDto) : SearchAction
     data class RemoveFromLibrary(val manga: MangaDto) : SearchAction
 }
@@ -44,7 +42,7 @@ fun ProviderSearchScreen(navController: NavHostController) {
     }
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
-    val mangaList = viewModel.mangaList.collectAsLazyPagingItems()
+    val mangaList by viewModel.mangas.collectAsState()
     var addDialogManga by remember { mutableStateOf<MangaDto?>(null) }
     var removeDialogManga by remember { mutableStateOf<MangaDto?>(null) }
 
@@ -54,6 +52,10 @@ fun ProviderSearchScreen(navController: NavHostController) {
             is SearchAction.NavToGallery -> navController.navToGallery(action.manga)
             is SearchAction.Search -> viewModel.search(action.keywords)
             is SearchAction.DeleteSuggestion -> viewModel.deleteSuggestion(action.keywords)
+
+            is SearchAction.Reload -> viewModel.reload()
+            is SearchAction.RequestNextPage -> viewModel.requestNextPage()
+
             is SearchAction.AddToLibrary -> viewModel.addToLibrary(action.manga)
             is SearchAction.RemoveFromLibrary -> viewModel.removeFromLibrary(action.manga)
         }
@@ -92,8 +94,11 @@ fun ProviderSearchScreen(navController: NavHostController) {
         content = { paddingValues ->
             LisuTransition {
                 RefreshableMangaList(
+                    result = mangaList,
+                    onRetry = { onAction(SearchAction.Reload) },
+                    onRefresh = { onAction(SearchAction.Reload) },
+                    onRequestNextPage = { onAction(SearchAction.RequestNextPage) },
                     modifier = Modifier.padding(paddingValues),
-                    mangaList = mangaList,
                     decorator = {
                         if (it != null && it.state == MangaState.RemoteInLibrary) {
                             MangaBadge(text = "in library")

@@ -10,7 +10,7 @@ import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.database.ServerHistoryRepository
 import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
-import com.fishhawk.lisu.data.remote.Connectivity
+import com.fishhawk.lisu.data.remote.util.Connectivity
 import com.fishhawk.lisu.data.remote.GitHubRepository
 import com.fishhawk.lisu.data.remote.LisuRepository
 import com.fishhawk.lisu.notification.Notifications
@@ -28,13 +28,8 @@ import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import com.fishhawk.lisu.util.interceptor.ProgressInterceptor
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
-import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidApplication
@@ -43,6 +38,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 lateinit var PR: PreferenceRepository
@@ -80,42 +76,19 @@ val appModule = module {
     single { PreferenceRepository(androidApplication()) }
     single { ProviderBrowseHistoryRepository(androidApplication()) }
 
-    single<Flow<Result<HttpClient>?>> {
+    single(named("address")) {
         get<PreferenceRepository>().serverAddress.flow
-            .map { address ->
-                address
-                    .ifBlank { null }
-                    ?.let {
-                        if (
-                            it.startsWith("https:", ignoreCase = true) ||
-                            it.startsWith("http:", ignoreCase = true)
-                        ) it else "http://$it"
-                    }
-            }
-            .distinctUntilChanged()
-            .map { url ->
-                if (url == null)
-                    return@map Result.failure(Exception("No server selected"))
-                try {
-                    Result.success(
-                        HttpClient(OkHttp) {
-                            defaultRequest { url(url) }
-                            install(ContentNegotiation) { json(Json) }
-                        }
-                    )
-                } catch (e: Throwable) {
-                    Result.failure(e)
-                }
-            }
-            .shareIn(
-                CoroutineScope(SupervisorJob() + Dispatchers.Main),
-                SharingStarted.Eagerly,
-                1
-            )
+
     }
 
-    single { LisuRepository(get()) }
-    single { GitHubRepository() }
+    single {
+        HttpClient(OkHttp) {
+            install(ContentNegotiation) { json(Json) }
+        }
+    }
+
+    single { LisuRepository(get(named("address")), get()) }
+    single { GitHubRepository(get()) }
 
     single {
         Room.databaseBuilder(
@@ -133,7 +106,7 @@ val appModule = module {
 
     viewModel { LibraryViewModel(get(), get()) }
     viewModel { HistoryViewModel(get()) }
-    viewModel { ExploreViewModel(get(), get()) }
+    viewModel { ExploreViewModel(get()) }
     viewModel { MoreViewModel(get()) }
 
     viewModel { GlobalSearchViewModel(get(), get(), get()) }

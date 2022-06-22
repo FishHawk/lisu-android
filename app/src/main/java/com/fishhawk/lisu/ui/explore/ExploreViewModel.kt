@@ -3,58 +3,38 @@ package com.fishhawk.lisu.ui.explore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.PR
-import com.fishhawk.lisu.data.remote.Connectivity
 import com.fishhawk.lisu.data.remote.LisuRepository
-import com.fishhawk.lisu.data.remote.model.ProviderDto
-import com.fishhawk.lisu.ui.widget.ViewState
-import com.fishhawk.lisu.ui.widget.onFailure
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ExploreViewModel(
-    private val repository: LisuRepository,
-    connectivity: Connectivity
+    private val lisuRepository: LisuRepository,
 ) : ViewModel() {
-
-    init {
-        connectivity.interfaceName
-            .onEach { _viewState.value.onFailure { reload() } }
-            .launchIn(viewModelScope)
-    }
-
-    private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
-    val viewState = _viewState.asStateFlow()
-
-    private val _providers = MutableStateFlow(emptyList<ProviderDto>())
-
-    val providers = _providers
-        .map { list -> list.groupBy { it.lang } }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+    val providersLoadState = lisuRepository.providers
+        .filterNotNull()
+        .map { it.value?.map { list -> list.groupBy { provider -> provider.lang } } }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val lastUsedProvider =
-        combine(_providers, PR.lastUsedProvider.flow) { list, name ->
-            list.find { it.id == name }
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+        combine(
+            lisuRepository.providers
+                .filterNotNull()
+                .mapNotNull { it.value?.getOrNull() },
+            PR.lastUsedProvider.flow
+        ) { list, name -> list.find { it.id == name } }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    init {
-        reload()
-        repository.serviceFlow.onEach { reload() }.launchIn(viewModelScope)
+    fun reload() {
+        viewModelScope.launch {
+            lisuRepository.providers.value?.reload()
+        }
     }
 
-    fun reload() = viewModelScope.launch {
-        _viewState.value = ViewState.Loading
-        repository.listProvider()
-            .onSuccess {
-                _viewState.value = ViewState.Loaded
-                _providers.value = it
-            }.onFailure {
-                _viewState.value = ViewState.Failure(it)
-            }
-    }
-
-    fun logout(providerId: String) = viewModelScope.launch {
-        repository.logout(providerId)
-            .onSuccess { }
-            .onFailure { }
+    fun logout(providerId: String) {
+        viewModelScope.launch {
+            lisuRepository.logout(providerId)
+                .onSuccess { }
+                .onFailure { }
+        }
     }
 }

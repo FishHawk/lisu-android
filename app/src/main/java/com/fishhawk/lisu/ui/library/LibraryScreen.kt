@@ -16,19 +16,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaKeyDto
 import com.fishhawk.lisu.ui.base.OnEvent
-import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.LisuSearchToolBar
 import com.fishhawk.lisu.ui.widget.LisuToolBar
+import com.fishhawk.lisu.ui.widget.RefreshableMangaList
 import com.fishhawk.lisu.ui.widget.SuggestionList
 import com.fishhawk.lisu.util.toast
 import org.koin.androidx.compose.viewModel
@@ -47,7 +46,7 @@ fun LibraryScreen(navController: NavHostController) {
     val viewModel by viewModel<LibraryViewModel>()
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
-    val mangaList = viewModel.mangaList.collectAsLazyPagingItems()
+    val mangaList by viewModel.mangas.collectAsState()
 
     val onAction: LibraryActionHandler = { action ->
         when (action) {
@@ -105,8 +104,11 @@ fun LibraryScreen(navController: NavHostController) {
         content = { paddingValues ->
             LisuTransition {
                 RefreshableMangaList(
+                    result = mangaList,
+                    onRetry = {},
+                    onRefresh = {},
+                    onRequestNextPage = {},
                     modifier = Modifier.padding(paddingValues),
-                    mangaList = mangaList,
                     selectedMangaList = selectedMangaList,
                     onCardClick = {
                         if (selectedMangaList.isEmpty()) {
@@ -124,16 +126,16 @@ fun LibraryScreen(navController: NavHostController) {
                         if (selectedMangaList.isEmpty()) {
                             selectedMangaList.add(manga.key)
                         } else {
-                            val list = mangaList.itemSnapshotList.mapNotNull { it?.key }
-                            val start = list.indexOf(selectedMangaList.last())
-                            val end = list.indexOf(manga.key)
-                            val pendingList = if (start > end) {
-                                list.slice(end..start).reversed()
-                            } else {
-                                list.slice(start..end)
-                            }
-                            selectedMangaList.removeIf { pendingList.contains(it) }
-                            selectedMangaList.addAll(pendingList)
+//                            val list = mangaList.itemSnapshotList.mapNotNull { it?.key }
+//                            val start = list.indexOf(selectedMangaList.last())
+//                            val end = list.indexOf(manga.key)
+//                            val pendingList = if (start > end) {
+//                                list.slice(end..start).reversed()
+//                            } else {
+//                                list.slice(start..end)
+//                            }
+//                            selectedMangaList.removeIf { pendingList.contains(it) }
+//                            selectedMangaList.addAll(pendingList)
                         }
                     }
                 )

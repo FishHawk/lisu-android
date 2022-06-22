@@ -2,17 +2,13 @@ package com.fishhawk.lisu.ui.gallery
 
 import android.os.Bundle
 import androidx.lifecycle.viewModelScope
-import androidx.paging.*
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
 import com.fishhawk.lisu.data.remote.LisuRepository
 import com.fishhawk.lisu.data.remote.model.*
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
 import com.fishhawk.lisu.ui.widget.ViewState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 sealed interface GalleryEffect : Event {
@@ -34,35 +30,35 @@ class GalleryViewModel(
     private val manga = args.getParcelable<MangaDto>("manga")!!
     val id = manga.id
 
-    private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
-    val viewState = _viewState.asStateFlow()
+    private val _detail = lisuRepository.getManga(manga.providerId, manga.id)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-    private val _detail = MutableStateFlow(manga.toDetail())
-    val detail = _detail.asStateFlow()
+    val viewState = _detail.filterNotNull().map {
+        it.value?.fold(
+            onSuccess = { ViewState.Loaded },
+            onFailure = { ViewState.Failure(it) },
+        ) ?: ViewState.Loading
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState.Loading)
+
+    val detail = _detail
+        .filterNotNull()
+        .mapNotNull { it.value?.getOrNull() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), manga.toDetail())
 
     val history = readingHistoryRepository.select(manga.id)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-    private var source: CommentSource? = null
-    val commentList = Pager(PagingConfig(pageSize = 20)) {
-        CommentSource().also { source = it }
-    }.flow.cachedIn(viewModelScope)
+    private val _comments = lisuRepository
+        .getComment(manga.providerId, manga.id)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-    init {
-        reloadManga()
-    }
+    val comments = _comments
+        .map { it?.value }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     fun reloadManga() {
-        _viewState.value = ViewState.Loading
         viewModelScope.launch {
-            lisuRepository.getManga(
-                manga.providerId, manga.id
-            ).onSuccess {
-                _viewState.value = ViewState.Loaded
-                _detail.value = it
-            }.onFailure {
-                _viewState.value = ViewState.Failure(it)
-            }
+            _detail.value?.reload()
         }
     }
 
@@ -72,7 +68,7 @@ class GalleryViewModel(
             lisuRepository.addMangaToLibrary(
                 manga.providerId, manga.id
             ).onSuccess {
-                _detail.value = _detail.value.copy(state = MangaState.RemoteInLibrary)
+//                _detail.value = _detail.value.copy(state = MangaState.RemoteInLibrary)
             }.onFailure {
                 sendEvent(GalleryEffect.AddToLibraryFailure(it))
             }
@@ -85,7 +81,7 @@ class GalleryViewModel(
             lisuRepository.removeMangaFromLibrary(
                 manga.providerId, manga.id
             ).onSuccess {
-                _detail.value = _detail.value.copy(state = MangaState.Remote)
+//                _detail.value = _detail.value.copy(state = MangaState.Remote)
             }.onFailure {
                 sendEvent(GalleryEffect.RemoveFromLibraryFailure(it))
             }
@@ -115,17 +111,5 @@ class GalleryViewModel(
                 sendEvent(GalleryEffect.UpdateMetadataFailure(it))
             }
         }
-    }
-
-    inner class CommentSource : PagingSource<Int, CommentDto>() {
-        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CommentDto> {
-            val page = params.key ?: 0
-            return lisuRepository.getComment(manga.providerId, manga.id, page).fold(
-                { LoadResult.Page(it, null, if (it.isEmpty()) null else page + 1) },
-                { LoadResult.Error(it) }
-            )
-        }
-
-        override fun getRefreshKey(state: PagingState<Int, CommentDto>): Int = 0
     }
 }

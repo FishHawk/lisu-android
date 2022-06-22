@@ -16,20 +16,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.BoardFilter
 import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaState
-import com.fishhawk.lisu.ui.base.MangaBadge
-import com.fishhawk.lisu.ui.base.RefreshableMangaList
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToProviderSearch
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.LisuDialog
 import com.fishhawk.lisu.ui.widget.LisuToolBar
+import com.fishhawk.lisu.ui.widget.MangaBadge
+import com.fishhawk.lisu.ui.widget.RefreshableMangaList
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
@@ -49,6 +47,9 @@ internal sealed interface ProviderAction {
         val selected: Int
     ) : ProviderAction
 
+    data class Reload(val boardId: String) : ProviderAction
+    data class RequestNextPage(val boardId: String) : ProviderAction
+
     data class AddToLibrary(val manga: MangaDto) : ProviderAction
     data class RemoveFromLibrary(val manga: MangaDto) : ProviderAction
 }
@@ -59,7 +60,11 @@ fun ProviderScreen(navController: NavHostController) {
     val viewModel by viewModel<ProviderViewModel> {
         parametersOf(navController.currentBackStackEntry!!.arguments!!)
     }
-    val boards = viewModel.boards
+    val provider by viewModel.provider.collectAsState()
+    val boardIds = provider?.boardModels?.keys?.toList() ?: emptyList()
+    val boards by viewModel.boards.collectAsState()
+    println(boards)
+
     val boardHistory = viewModel.pageHistory.getBlocking()
     var addDialogManga by remember { mutableStateOf<MangaDto?>(null) }
     var removeDialogManga by remember { mutableStateOf<MangaDto?>(null) }
@@ -67,40 +72,42 @@ fun ProviderScreen(navController: NavHostController) {
     val onAction: ProviderActionHandler = { action ->
         when (action) {
             ProviderAction.NavUp -> navController.navigateUp()
-            ProviderAction.NavToSearch -> navController.navToProviderSearch(viewModel.provider.id)
+            ProviderAction.NavToSearch -> navController.navToProviderSearch(viewModel.providerId)
             is ProviderAction.NavToGallery -> navController.navToGallery(action.manga)
 
             is ProviderAction.SelectFilter -> with(action) {
                 viewModel.updateFilterHistory(boardId, name, selected)
             }
+
+            is ProviderAction.Reload -> viewModel.reload(action.boardId)
+            is ProviderAction.RequestNextPage -> viewModel.requestNextPage(action.boardId)
+
             is ProviderAction.AddToLibrary -> viewModel.addToLibrary(action.manga)
             is ProviderAction.RemoveFromLibrary -> viewModel.removeFromLibrary(action.manga)
         }
     }
 
     val pagerState = rememberPagerState(
-        initialPage = boards.indexOf(boardHistory).coerceAtLeast(0)
+        initialPage = boardIds.indexOf(boardHistory).coerceAtLeast(0)
     )
     LaunchedEffect(pagerState.currentPage) {
-        viewModel.pageHistory.set(boards[pagerState.currentPage])
+        viewModel.pageHistory.set(boardIds[pagerState.currentPage])
     }
 
     Scaffold(
-        topBar = { ToolBar(viewModel.provider.id, boards, pagerState, onAction) },
+        topBar = { ToolBar(viewModel.providerId, boardIds, pagerState, onAction) },
         content = { paddingValues ->
             LisuTransition {
                 HorizontalPager(
                     modifier = Modifier.padding(paddingValues),
-                    count = boards.size,
+                    count = boardIds.size,
                     state = pagerState
                 ) { page ->
-                    val boardId = boards[page]
-                    val filterList by viewModel.boardFilters[boardId]!!.collectAsState()
-                    val mangaList = viewModel.boardMangaLists[boardId]!!.collectAsLazyPagingItems()
+                    val boardId = boardIds[page]
+                    val board = boards[boardId] ?: return@HorizontalPager
                     ProviderBoard(
                         boardId = boardId,
-                        filterList = filterList,
-                        mangaList = mangaList,
+                        board = board,
                         onAction = onAction,
                         onCardLongClick = {
                             when (it.state) {
@@ -182,15 +189,17 @@ private fun ToolBar(
 @Composable
 private fun ProviderBoard(
     boardId: String,
-    filterList: List<BoardFilter>?,
-    mangaList: LazyPagingItems<MangaDto>,
+    board: Board,
     onAction: ProviderActionHandler,
     onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        filterList?.forEach { BoardFilter(boardId, it, onAction) }
+        board.filters.forEach { BoardFilter(boardId, it, onAction) }
         RefreshableMangaList(
-            mangaList = mangaList,
+            result = board.mangaResult,
+            onRetry = { onAction(ProviderAction.Reload(boardId)) },
+            onRefresh = { onAction(ProviderAction.Reload(boardId)) },
+            onRequestNextPage = { onAction(ProviderAction.RequestNextPage(boardId)) },
             decorator = {
                 if (it != null && it.state == MangaState.RemoteInLibrary) {
                     MangaBadge(text = "in library")

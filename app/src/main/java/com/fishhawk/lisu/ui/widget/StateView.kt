@@ -70,6 +70,19 @@ fun StateView(
 }
 
 @Composable
+fun <T> StateView(
+    result: Result<T>?,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable (value: T) -> Unit,
+) {
+    result
+        ?.onSuccess { content(it) }
+        ?.onFailure { ErrorView(modifier, it, onRetry) }
+        ?: LoadingView(modifier)
+}
+
+@Composable
 private fun LoadingView(
     modifier: Modifier = Modifier
 ) {

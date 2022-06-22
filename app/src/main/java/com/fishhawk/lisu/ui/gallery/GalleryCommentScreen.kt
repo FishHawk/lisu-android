@@ -9,6 +9,8 @@ import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.Placeholder
@@ -17,9 +19,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavHostController
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.fishhawk.lisu.data.remote.model.CommentDto
 import com.fishhawk.lisu.ui.widget.LisuToolBar
+import com.fishhawk.lisu.ui.widget.StateView
 import com.fishhawk.lisu.util.toDisplayString
 import com.fishhawk.lisu.util.toLocalDateTime
 import org.koin.androidx.compose.viewModel
@@ -29,7 +31,7 @@ fun GalleryCommentScreen(navController: NavHostController) {
     val viewModel by viewModel<GalleryViewModel>(
         owner = navController.previousBackStackEntry!!
     )
-    val commentList = viewModel.commentList.collectAsLazyPagingItems()
+    val commentList by viewModel.comments.collectAsState()
 
     Scaffold(
         topBar = {
@@ -39,10 +41,16 @@ fun GalleryCommentScreen(navController: NavHostController) {
             )
         },
         content = { paddingValues ->
-            LazyColumn(modifier = Modifier.padding(paddingValues)) {
-                items(commentList.itemSnapshotList.items) {
-                    CommentWithSubComments(comment = it)
-                    Divider(color = MaterialTheme.colors.onSurface.copy(alpha = 0.06f))
+            StateView(
+                result = commentList,
+                onRetry = { },
+                modifier = Modifier.padding(paddingValues),
+            ) {
+                LazyColumn {
+                    items(it.list) {
+                        CommentWithSubComments(comment = it)
+                        Divider(color = MaterialTheme.colors.onSurface.copy(alpha = 0.06f))
+                    }
                 }
             }
         }

@@ -168,10 +168,10 @@ class ReaderViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
     fun refreshReader() = viewModelScope.launch {
-        val result = lisuRepository.getManga(providerId, mangaId)
-        if (mangaLoadState.value != ViewState.Loaded) {
-            mangaDetail.value = result
-        }
+//        val result = lisuRepository.getManga(providerId, mangaId)
+//        if (mangaLoadState.value != ViewState.Loaded) {
+//            mangaDetail.value = result
+//        }
     }
 
     private fun sendMessage(resId: Int) {

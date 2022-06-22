@@ -97,8 +97,6 @@ dependencies {
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-rc01")
 
-    implementation("androidx.paging:paging-compose:1.0.0-alpha15")
-
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     val roomVersion = "2.5.0-alpha02"

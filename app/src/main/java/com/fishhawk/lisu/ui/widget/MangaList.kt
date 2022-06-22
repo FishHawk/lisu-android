@@ -1,15 +1,16 @@
-package com.fishhawk.lisu.ui.base
+package com.fishhawk.lisu.ui.widget
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.Badge
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,17 +24,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.fishhawk.lisu.data.remote.util.PagedList
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.MangaKeyDto
-import com.fishhawk.lisu.ui.widget.ErrorItem
-import com.fishhawk.lisu.ui.widget.LoadingItem
-import com.fishhawk.lisu.ui.widget.StateView
-import com.fishhawk.lisu.ui.widget.ViewState
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.fade
 import com.google.accompanist.placeholder.material.placeholder
@@ -42,32 +38,29 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun RefreshableMangaList(
-    mangaList: LazyPagingItems<MangaDto>,
+    result: Result<PagedList<MangaDto>>?,
+    onRetry: () -> Unit,
+    onRefresh: () -> Unit,
+    onRequestNextPage: () -> Unit,
     modifier: Modifier = Modifier,
     selectedMangaList: SnapshotStateList<MangaKeyDto>? = null,
     decorator: @Composable BoxScope.(manga: MangaDto?) -> Unit = {},
     onCardClick: (manga: MangaDto) -> Unit = {},
     onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
-    val state = mangaList.loadState.refresh
     StateView(
+        result = result,
+        onRetry = onRetry,
         modifier = modifier.fillMaxSize(),
-        viewState = state.let {
-            when (it) {
-                LoadState.Loading -> ViewState.Loading
-                is LoadState.NotLoading -> ViewState.Loaded
-                is LoadState.Error -> ViewState.Failure(it.error)
-            }
-        },
-        onRetry = { mangaList.retry() }
     ) {
-        val isRefreshing = mangaList.loadState.refresh is LoadState.Loading
+        val isRefreshing = result == null
         SwipeRefresh(
             state = rememberSwipeRefreshState(isRefreshing),
-            onRefresh = { mangaList.refresh() },
+            onRefresh = onRefresh,
         ) {
             MangaList(
-                mangaList = mangaList,
+                mangaList = it,
+                onRequestNextPage = onRequestNextPage,
                 selectedMangaList = selectedMangaList,
                 badge = decorator,
                 onCardClick = onCardClick,
@@ -79,12 +72,14 @@ fun RefreshableMangaList(
 
 @Composable
 fun MangaList(
-    mangaList: LazyPagingItems<MangaDto>,
+    mangaList: PagedList<MangaDto>,
+    onRequestNextPage: () -> Unit,
     selectedMangaList: SnapshotStateList<MangaKeyDto>? = null,
     badge: @Composable BoxScope.(manga: MangaDto?) -> Unit = {},
     onCardClick: (manga: MangaDto) -> Unit = {},
     onCardLongClick: (manga: MangaDto) -> Unit = {}
 ) {
+    var maxAccessed by remember { mutableStateOf(0) }
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 96.dp),
         modifier = Modifier.fillMaxSize(),
@@ -92,27 +87,34 @@ fun MangaList(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(mangaList.itemCount) { index ->
-            val manga = mangaList[index]
+        itemsIndexed(mangaList.list) { index, manga ->
+            if (index > maxAccessed) {
+                maxAccessed = index
+                if (
+                    mangaList.appendState?.isSuccess == true &&
+                    maxAccessed < mangaList.list.size + 30
+                ) {
+                    onRequestNextPage()
+                }
+            }
             Box {
                 MangaCard(
                     manga = manga,
-                    selected = selectedMangaList?.contains(manga?.key) ?: false,
+                    selected = selectedMangaList?.contains(manga.key) ?: false,
                     onClick = onCardClick,
                     onLongClick = onCardLongClick
                 )
                 badge(manga)
             }
         }
+
         fun itemFullWidth(content: @Composable () -> Unit) {
             item(span = { GridItemSpan(maxCurrentLineSpan) }) { Box {} }
             item(span = { GridItemSpan(maxCurrentLineSpan) }) { content() }
         }
-        when (val state = mangaList.loadState.append) {
-            LoadState.Loading -> itemFullWidth { LoadingItem() }
-            is LoadState.Error -> itemFullWidth { ErrorItem(state.error) { mangaList.retry() } }
-            else -> Unit
-        }
+        mangaList.appendState
+            ?.onFailure { itemFullWidth { ErrorItem(it) { onRequestNextPage() } } }
+            ?: itemFullWidth { LoadingItem() }
     }
 }
 

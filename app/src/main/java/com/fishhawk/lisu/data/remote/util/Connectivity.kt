@@ -1,4 +1,4 @@
-package com.fishhawk.lisu.data.remote
+package com.fishhawk.lisu.data.remote.util
 
 import android.content.Context
 import android.net.*
@@ -37,5 +37,10 @@ class Connectivity(context: Context) {
                     _interfaceName.trySend(linkProperties.interfaceName)
                 }
             })
+        instance = this
+    }
+
+    companion object {
+        var instance: Connectivity? = null
     }
 }

@@ -16,12 +16,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.ui.base.MangaCard
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToProviderSearch
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.*
-import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -106,7 +104,7 @@ fun GlobalSearchScreen(navController: NavHostController) {
 
 @Composable
 private fun SearchResultList(
-    searchResultList: List<StateFlow<SearchResult>>,
+    searchResultList: List<SearchResult>,
     onAction: GlobalSearchActionHandler,
     modifier: Modifier = Modifier
 ) {
@@ -116,8 +114,7 @@ private fun SearchResultList(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(searchResultList) {
-            val searchResult by it.collectAsState()
-            SearchResultItem(searchResult, onAction)
+            SearchResultItem(it, onAction)
         }
     }
 }
@@ -141,20 +138,20 @@ private fun SearchResultItem(
             }
         }
 
-        when (searchResult.viewState) {
-            ViewState.Loading -> LoadingItem()
-            is ViewState.Failure -> NoResultFound()
-            ViewState.Loaded -> {
-                if (searchResult.mangas.isEmpty()) NoResultFound()
-                else LazyRow(
-                    modifier = Modifier.height(140.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    items(searchResult.mangas) {
-                        MangaCard(it, onClick = { manga ->
-                            onAction(GlobalSearchAction.NavToGallery(manga))
-                        })
-                    }
+        StateView(
+            result = searchResult.mangas,
+            onRetry = { /*TODO*/ },
+        ) {
+            if (it.list.isEmpty()) NoResultFound()
+            else LazyRow(
+                modifier = Modifier.height(140.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(it.list) { manga ->
+                    MangaCard(
+                        manga = manga,
+                        onClick = { manga -> onAction(GlobalSearchAction.NavToGallery(manga)) },
+                    )
                 }
             }
         }

@@ -6,15 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.database.model.SearchHistory
 import com.fishhawk.lisu.data.remote.LisuRepository
+import com.fishhawk.lisu.data.remote.util.PagedList
 import com.fishhawk.lisu.data.remote.model.MangaDto
 import com.fishhawk.lisu.data.remote.model.ProviderDto
-import com.fishhawk.lisu.ui.widget.ViewState
+import com.fishhawk.lisu.util.flatten
 import kotlinx.coroutines.flow.*
 
 data class SearchResult(
     val provider: ProviderDto,
-    val viewState: ViewState,
-    val mangas: List<MangaDto> = emptyList()
+    val mangas: Result<PagedList<MangaDto>>? = null
 )
 
 class GlobalSearchViewModel(
@@ -26,40 +26,32 @@ class GlobalSearchViewModel(
     private val _keywords = MutableStateFlow(args.getString("keywords") ?: "")
     val keywords = _keywords.asStateFlow()
 
-    init {
-        keywords
-            .filter { it.isNotBlank() }
-            .onEach { searchHistoryRepository.update(SearchHistory("", it)) }
-            .launchIn(viewModelScope)
-    }
+    private val _searchResultList =
+        combine(
+            keywords
+                .filter { it.isNotBlank() }
+                .onEach { searchHistoryRepository.update(SearchHistory("", it)) },
+            lisuRepository.providers
+                .mapNotNull { it?.value?.getOrNull() }
+                .filterNotNull(),
+        ) { keywords, providers ->
+            flatten(
+                providers.map { provider ->
+                    lisuRepository.search(provider.id, keywords)
+                        .map { provider to it }
+                }
+            )
+        }
+            .flattenConcat()
+            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    val searchResultList = _searchResultList
+        .map { it.map { SearchResult(it.first, it.second.value) } }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     val suggestions = searchHistoryRepository.list()
         .map { list -> list.map { it.keywords }.distinct() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-
-    private val providerList =
-        flow { emit(lisuRepository.listProvider().getOrNull()) }.filterNotNull()
-
-    val searchResultList =
-        combine(
-            keywords.filter { it.isNotBlank() },
-            providerList
-        ) { keywords, providerList ->
-            providerList.map { provider ->
-                flow {
-                    emit(
-                        lisuRepository.search(provider.id, 0, keywords).fold(
-                            { SearchResult(provider, ViewState.Loaded, it) },
-                            { SearchResult(provider, ViewState.Failure(it)) }
-                        )
-                    )
-                }.stateIn(
-                    viewModelScope,
-                    SharingStarted.Lazily,
-                    SearchResult(provider, ViewState.Loading)
-                )
-            }
-        }.stateIn(viewModelScope, SharingStarted.Lazily, listOf())
 
     fun search(keywords: String) {
         _keywords.value = keywords
