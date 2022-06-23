@@ -74,7 +74,7 @@ fun <Key : Any, T> remotePagingList(
                 value = listState?.map {
                     PagedList(
                         appendState = appendState,
-                        list = value.toList(),
+                        list = value,
                     )
                 },
             )

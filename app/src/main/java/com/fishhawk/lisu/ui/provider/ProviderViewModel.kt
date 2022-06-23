@@ -32,10 +32,12 @@ class ProviderViewModel(
                     ?.getOrNull()
                     ?.find { provider -> provider.id == providerId }
             }
+            .onEach { println("asdf") }
             .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     private val _boards = provider
         .filterNotNull()
+        .onEach { println("fuck") }
         .flatMapLatest { provider ->
             flatten(
                 provider.boardModels.mapValues { (boardId, model) ->
@@ -51,7 +53,8 @@ class ProviderViewModel(
                 }
             )
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+        .onEach { println("??") }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
 
     val boards = _boards
         .map {
@@ -60,7 +63,7 @@ class ProviderViewModel(
                 Board(filters, remoteList.value)
             }
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyMap())
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
 
     val pageHistory = providerBrowseHistoryRepository.getBoardHistory(providerId)
 

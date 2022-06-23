@@ -63,7 +63,6 @@ fun ProviderScreen(navController: NavHostController) {
     val provider by viewModel.provider.collectAsState()
     val boardIds = provider?.boardModels?.keys?.toList() ?: emptyList()
     val boards by viewModel.boards.collectAsState()
-    println(boards)
 
     val boardHistory = viewModel.pageHistory.getBlocking()
     var addDialogManga by remember { mutableStateOf<MangaDto?>(null) }

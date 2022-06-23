@@ -15,7 +15,7 @@ class LisuRepository(
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    val daoFlow = urlFlow
+    private val daoFlow = urlFlow
         .map {
             if (it.isBlank()) {
                 Result.failure(Exception("sdaf"))
@@ -40,6 +40,8 @@ class LisuRepository(
 
     // Provider API
     private val mangaActionChannels = mutableListOf<RemoteDataActionChannel<MangaDetailDto>>()
+    private val providerMangaListActionChannels = mutableListOf<RemoteListActionChannel<MangaDto>>()
+    private val libraryMangaListActionChannels = mutableListOf<RemoteListActionChannel<MangaDto>>()
 
     val providers =
         daoFlow.filterNotNull().flatMapLatest {
@@ -80,6 +82,8 @@ class LisuRepository(
                 it.mapCatching { dao -> dao.search(providerId, page, keywords) }
                     .map { Page(it, if (it.isEmpty()) null else page + 1) }
             },
+            onStart = { providerMangaListActionChannels.add(it) },
+            onClose = { providerMangaListActionChannels.remove(it) },
         )
     }
 
@@ -94,6 +98,8 @@ class LisuRepository(
                 it.mapCatching { dao -> dao.getBoard(providerId, boardId, page, filters) }
                     .map { Page(it, if (it.isEmpty()) null else page + 1) }
             },
+            onStart = { providerMangaListActionChannels.add(it) },
+            onClose = { providerMangaListActionChannels.remove(it) },
         )
     }
 
@@ -113,18 +119,17 @@ class LisuRepository(
         providerId: String,
         mangaId: String,
         metadata: MangaMetadataDto
-    ): Result<String> = oneshot {
-        it.updateMangaMetadata(providerId, mangaId, metadata)
-    }
+    ): Result<String> =
+        oneshot { it.updateMangaMetadata(providerId, mangaId, metadata) }
+            .onSuccess { /*TODO*/ }
 
     suspend fun updateMangaCover(
         providerId: String,
         mangaId: String,
         cover: ByteArray,
         coverType: String,
-    ): Result<String> = oneshot {
-        it.updateMangaCover(providerId, mangaId, cover, coverType)
-    }
+    ): Result<String> =
+        oneshot { it.updateMangaCover(providerId, mangaId, cover, coverType) }
 
     fun getComment(
         providerId: String,
@@ -144,9 +149,8 @@ class LisuRepository(
         mangaId: String,
         collectionId: String,
         chapterId: String
-    ): Result<List<String>> = oneshot {
-        it.getContent(providerId, mangaId, collectionId, chapterId)
-    }
+    ): Result<List<String>> =
+        oneshot { it.getContent(providerId, mangaId, collectionId, chapterId) }
 
     suspend fun getRandomMangaFromLibrary(): Result<MangaDto> =
         oneshot { it.getRandomMangaFromLibrary() }
@@ -160,13 +164,15 @@ class LisuRepository(
                     it.mapCatching { dao -> dao.searchFromLibrary(page, keywords) }
                         .map { Page(it, if (it.isEmpty()) null else page + 1) }
                 },
+                onStart = { libraryMangaListActionChannels.add(it) },
+                onClose = { libraryMangaListActionChannels.remove(it) },
             )
         }
 
     suspend fun addMangaToLibrary(providerId: String, mangaId: String): Result<String> =
         oneshot { it.addMangaToLibrary(providerId, mangaId) }.onSuccess {
-            mangaActionChannels.forEach { manga ->
-                manga.mutate {
+            mangaActionChannels.forEach { ch ->
+                ch.mutate {
                     if (it.providerId == providerId &&
                         it.id == mangaId &&
                         it.state == MangaState.Remote
@@ -174,6 +180,21 @@ class LisuRepository(
                     else it
                 }
             }
+            providerMangaListActionChannels.forEach { ch ->
+                ch.mutate { list ->
+                    if (list.firstOrNull()?.providerId != providerId) list
+                    else {
+                        list.map {
+                            if (
+                                it.id == mangaId &&
+                                it.state == MangaState.Remote
+                            ) it.copy(state = MangaState.RemoteInLibrary)
+                            else it
+                        }.toMutableList()
+                    }
+                }
+            }
+            libraryMangaListActionChannels.forEach { ch -> ch.reload() }
         }
 
     suspend fun removeMangaFromLibrary(providerId: String, mangaId: String): Result<String> =
@@ -187,8 +208,53 @@ class LisuRepository(
                     else it
                 }
             }
+            providerMangaListActionChannels.forEach { ch ->
+                ch.mutate { list ->
+                    if (list.firstOrNull()?.providerId != providerId) list
+                    else {
+                        list.map {
+                            if (
+                                it.id == mangaId &&
+                                it.state == MangaState.RemoteInLibrary
+                            ) it.copy(state = MangaState.Remote)
+                            else it
+                        }.toMutableList()
+                    }
+                }
+            }
+            libraryMangaListActionChannels.forEach { ch ->
+                ch.mutate { list ->
+                    val removed = list.removeIf { it.providerId == providerId && it.id == mangaId }
+                    if (removed) list.toMutableList() else list
+                }
+            }
         }
 
     suspend fun removeMultipleMangasFromLibrary(mangas: List<MangaKeyDto>): Result<String> =
-        oneshot { it.removeMultipleMangasFromLibrary(mangas) }
+        oneshot { it.removeMultipleMangasFromLibrary(mangas) }.onSuccess {
+            providerMangaListActionChannels.forEach { ch ->
+                ch.mutate { list ->
+                    list.map {
+                        if (
+                            mangas.any { removedManga ->
+                                it.providerId == removedManga.providerId &&
+                                        it.id == removedManga.id
+                            }
+                        ) it.copy(state = MangaState.Remote)
+                        else it
+                    }.toMutableList()
+                }
+            }
+            libraryMangaListActionChannels.forEach { ch ->
+                ch.mutate { list ->
+                    val removed = list.removeIf {
+                        mangas.any { removedManga ->
+                            it.providerId == removedManga.providerId &&
+                                    it.id == removedManga.id
+                        }
+                    }
+                    if (removed) list.toMutableList() else list
+                }
+            }
+        }
 }
