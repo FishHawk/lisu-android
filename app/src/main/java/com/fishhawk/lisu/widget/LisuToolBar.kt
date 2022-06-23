@@ -1,4 +1,4 @@
-package com.fishhawk.lisu.ui.widget
+package com.fishhawk.lisu.widget
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
@@ -12,6 +12,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.fishhawk.lisu.R
 import com.google.accompanist.insets.ui.TopAppBar
@@ -29,7 +30,7 @@ fun LisuToolBar(
             Text(
                 text = it,
                 maxLines = 1,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis
             )
         }
     },

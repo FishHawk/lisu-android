@@ -1,4 +1,4 @@
-package com.fishhawk.lisu.ui.widget
+package com.fishhawk.lisu.widget
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable

@@ -1,4 +1,4 @@
-package com.fishhawk.lisu.data.remote.util
+package com.fishhawk.lisu.data.network.base
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel

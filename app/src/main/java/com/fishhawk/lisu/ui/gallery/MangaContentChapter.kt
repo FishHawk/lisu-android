@@ -29,9 +29,9 @@ import com.fishhawk.lisu.data.datastore.ChapterDisplayMode
 import com.fishhawk.lisu.data.datastore.ChapterDisplayOrder
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.setNext
-import com.fishhawk.lisu.data.remote.model.ChapterDto
+import com.fishhawk.lisu.data.network.model.ChapterDto
 import com.fishhawk.lisu.ui.theme.LisuIcons
-import com.fishhawk.lisu.ui.widget.VerticalGrid
+import com.fishhawk.lisu.widget.VerticalGrid
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate

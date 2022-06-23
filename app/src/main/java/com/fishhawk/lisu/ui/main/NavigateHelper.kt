@@ -7,9 +7,9 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import com.fishhawk.lisu.data.remote.model.MangaDetailDto
-import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.ProviderDto
+import com.fishhawk.lisu.data.network.model.MangaDetailDto
+import com.fishhawk.lisu.data.network.model.MangaDto
+import com.fishhawk.lisu.data.network.model.ProviderDto
 import com.fishhawk.lisu.ui.reader.ReaderActivity
 import kotlinx.serialization.json.Json
 

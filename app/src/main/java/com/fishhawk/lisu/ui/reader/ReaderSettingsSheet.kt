@@ -11,7 +11,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.ScaleType
 import com.fishhawk.lisu.ui.more.ListPreference
 import com.fishhawk.lisu.ui.more.SwitchPreference
-import com.fishhawk.lisu.ui.widget.BottomSheet
+import com.fishhawk.lisu.widget.BottomSheet
 
 object ReaderSettingsSheet : BottomSheet() {
     @Composable

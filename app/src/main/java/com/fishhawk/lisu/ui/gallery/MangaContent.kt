@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
-import com.fishhawk.lisu.data.remote.model.MangaDetailDto
+import com.fishhawk.lisu.data.network.model.MangaDetailDto
 
 @Composable
 internal fun MangaContent(

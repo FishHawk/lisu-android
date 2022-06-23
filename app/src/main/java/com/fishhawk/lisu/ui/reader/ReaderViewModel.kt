@@ -8,12 +8,12 @@ import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
 import com.fishhawk.lisu.data.database.model.ReadingHistory
-import com.fishhawk.lisu.data.remote.LisuRepository
-import com.fishhawk.lisu.data.remote.model.ChapterDto
-import com.fishhawk.lisu.data.remote.model.MangaDetailDto
+import com.fishhawk.lisu.data.network.LisuRepository
+import com.fishhawk.lisu.data.network.model.ChapterDto
+import com.fishhawk.lisu.data.network.model.MangaDetailDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
-import com.fishhawk.lisu.ui.widget.ViewState
+import com.fishhawk.lisu.widget.ViewState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream

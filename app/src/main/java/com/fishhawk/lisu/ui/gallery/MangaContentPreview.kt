@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.fishhawk.lisu.ui.widget.VerticalGrid
+import com.fishhawk.lisu.widget.VerticalGrid
 
 @Composable
 internal fun MangaContentPreview(

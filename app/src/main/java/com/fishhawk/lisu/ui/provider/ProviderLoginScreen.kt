@@ -12,8 +12,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
-import com.fishhawk.lisu.ui.widget.LisuToolBar
-import com.fishhawk.lisu.ui.widget.OneLineText
+import com.fishhawk.lisu.widget.LisuToolBar
+import com.fishhawk.lisu.widget.OneLineText
 import com.fishhawk.lisu.util.toast
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState

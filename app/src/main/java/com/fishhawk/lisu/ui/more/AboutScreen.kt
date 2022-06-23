@@ -17,7 +17,7 @@ import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.ui.main.MainViewModel
 import com.fishhawk.lisu.ui.main.navToOpenSourceLicense
 import com.fishhawk.lisu.ui.theme.LisuTransition
-import com.fishhawk.lisu.ui.widget.LisuToolBar
+import com.fishhawk.lisu.widget.LisuToolBar
 import org.koin.androidx.compose.viewModel
 
 @Composable

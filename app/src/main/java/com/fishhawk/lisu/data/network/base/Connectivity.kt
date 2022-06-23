@@ -1,4 +1,4 @@
-package com.fishhawk.lisu.data.remote.util
+package com.fishhawk.lisu.data.network.base
 
 import android.content.Context
 import android.net.*

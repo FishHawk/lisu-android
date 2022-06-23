@@ -3,7 +3,7 @@ package com.fishhawk.lisu.data.datastore
 import android.content.Context
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.fishhawk.lisu.data.remote.model.BoardModel
+import com.fishhawk.lisu.data.network.model.BoardModel
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map

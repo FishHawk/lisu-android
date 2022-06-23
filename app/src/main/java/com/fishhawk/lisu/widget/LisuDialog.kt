@@ -1,4 +1,4 @@
-package com.fishhawk.lisu.ui.widget
+package com.fishhawk.lisu.widget
 
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text

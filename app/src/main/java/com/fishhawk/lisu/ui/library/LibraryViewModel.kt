@@ -2,9 +2,9 @@ package com.fishhawk.lisu.ui.library
 
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.SearchHistoryRepository
-import com.fishhawk.lisu.data.remote.LisuRepository
-import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.MangaKeyDto
+import com.fishhawk.lisu.data.network.LisuRepository
+import com.fishhawk.lisu.data.network.model.MangaDto
+import com.fishhawk.lisu.data.network.model.MangaKeyDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
 import kotlinx.coroutines.flow.*

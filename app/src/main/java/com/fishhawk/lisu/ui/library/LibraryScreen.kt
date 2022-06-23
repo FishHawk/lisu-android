@@ -19,16 +19,16 @@ import androidx.navigation.NavHostController
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.collectAsState
-import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.MangaKeyDto
+import com.fishhawk.lisu.data.network.model.MangaDto
+import com.fishhawk.lisu.data.network.model.MangaKeyDto
 import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
-import com.fishhawk.lisu.ui.widget.LisuSearchToolBar
-import com.fishhawk.lisu.ui.widget.LisuToolBar
-import com.fishhawk.lisu.ui.widget.RefreshableMangaList
-import com.fishhawk.lisu.ui.widget.SuggestionList
+import com.fishhawk.lisu.widget.LisuSearchToolBar
+import com.fishhawk.lisu.widget.LisuToolBar
+import com.fishhawk.lisu.widget.RefreshableMangaList
+import com.fishhawk.lisu.widget.SuggestionList
 import com.fishhawk.lisu.util.toast
 import org.koin.androidx.compose.viewModel
 

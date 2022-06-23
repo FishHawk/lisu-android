@@ -25,7 +25,7 @@ import com.fishhawk.lisu.ui.main.navToSettingAdvanced
 import com.fishhawk.lisu.ui.main.navToSettingGeneral
 import com.fishhawk.lisu.ui.main.navToSettingReader
 import com.fishhawk.lisu.ui.theme.LisuTransition
-import com.fishhawk.lisu.ui.widget.LisuToolBar
+import com.fishhawk.lisu.widget.LisuToolBar
 import com.fishhawk.lisu.util.nsdManager
 import okhttp3.HttpUrl
 import org.koin.androidx.compose.viewModel

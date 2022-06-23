@@ -15,11 +15,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.data.remote.model.MangaDto
+import com.fishhawk.lisu.data.network.model.MangaDto
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToProviderSearch
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.*
+import com.fishhawk.lisu.widget.*
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 

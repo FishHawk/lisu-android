@@ -3,7 +3,7 @@ package com.fishhawk.lisu.ui.explore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.PR
-import com.fishhawk.lisu.data.remote.LisuRepository
+import com.fishhawk.lisu.data.network.LisuRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 

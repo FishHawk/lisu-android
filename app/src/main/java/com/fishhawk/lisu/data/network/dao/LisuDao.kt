@@ -1,11 +1,10 @@
-package com.fishhawk.lisu.data.remote
+package com.fishhawk.lisu.data.network.dao
 
-import com.fishhawk.lisu.data.remote.model.*
+import com.fishhawk.lisu.data.network.model.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 
 class LisuDao(

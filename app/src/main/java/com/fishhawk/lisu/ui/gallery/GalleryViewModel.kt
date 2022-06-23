@@ -3,11 +3,11 @@ package com.fishhawk.lisu.ui.gallery
 import android.os.Bundle
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
-import com.fishhawk.lisu.data.remote.LisuRepository
-import com.fishhawk.lisu.data.remote.model.*
+import com.fishhawk.lisu.data.network.LisuRepository
+import com.fishhawk.lisu.data.network.model.*
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
-import com.fishhawk.lisu.ui.widget.ViewState
+import com.fishhawk.lisu.widget.ViewState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 

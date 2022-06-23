@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.database.model.SearchHistory
-import com.fishhawk.lisu.data.remote.LisuRepository
-import com.fishhawk.lisu.data.remote.util.PagedList
-import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.ProviderDto
+import com.fishhawk.lisu.data.network.LisuRepository
+import com.fishhawk.lisu.data.network.base.PagedList
+import com.fishhawk.lisu.data.network.model.MangaDto
+import com.fishhawk.lisu.data.network.model.ProviderDto
 import com.fishhawk.lisu.util.flatten
 import kotlinx.coroutines.flow.*
 

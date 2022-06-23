@@ -22,8 +22,8 @@ import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.ui.reader.viewer.ListViewer
 import com.fishhawk.lisu.ui.reader.viewer.PagerViewer
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
-import com.fishhawk.lisu.ui.widget.LocalBottomSheetHelper
-import com.fishhawk.lisu.ui.widget.StateView
+import com.fishhawk.lisu.widget.LocalBottomSheetHelper
+import com.fishhawk.lisu.widget.StateView
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.systemuicontroller.rememberSystemUiController

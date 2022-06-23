@@ -1,6 +1,6 @@
-package com.fishhawk.lisu.data.remote
+package com.fishhawk.lisu.data.network
 
-import com.fishhawk.lisu.data.remote.model.GitHubReleaseDto
+import com.fishhawk.lisu.data.network.model.GitHubReleaseDto
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*

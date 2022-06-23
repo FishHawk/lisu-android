@@ -1,4 +1,4 @@
-package com.fishhawk.lisu.ui.widget
+package com.fishhawk.lisu.widget
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -27,9 +27,9 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.fishhawk.lisu.data.remote.model.MangaDto
-import com.fishhawk.lisu.data.remote.model.MangaKeyDto
-import com.fishhawk.lisu.data.remote.util.PagedList
+import com.fishhawk.lisu.data.network.model.MangaDto
+import com.fishhawk.lisu.data.network.model.MangaKeyDto
+import com.fishhawk.lisu.data.network.base.PagedList
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.fade
 import com.google.accompanist.placeholder.material.placeholder

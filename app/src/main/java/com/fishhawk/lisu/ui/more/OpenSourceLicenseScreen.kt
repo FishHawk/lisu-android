@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.ui.widget.LisuToolBar
+import com.fishhawk.lisu.widget.LisuToolBar
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 
 @Composable

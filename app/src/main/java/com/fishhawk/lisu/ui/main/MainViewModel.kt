@@ -5,8 +5,8 @@ import com.fishhawk.lisu.BuildConfig
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.get
-import com.fishhawk.lisu.data.remote.GitHubRepository
-import com.fishhawk.lisu.data.remote.model.GitHubReleaseDto
+import com.fishhawk.lisu.data.network.GitHubRepository
+import com.fishhawk.lisu.data.network.model.GitHubReleaseDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
 import com.fishhawk.lisu.util.interceptor.ProgressInterceptor

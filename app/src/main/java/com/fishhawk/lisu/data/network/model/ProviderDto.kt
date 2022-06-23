@@ -1,4 +1,4 @@
-package com.fishhawk.lisu.data.remote.model
+package com.fishhawk.lisu.data.network.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.theme.LisuIcons
-import com.fishhawk.lisu.ui.widget.BottomSheet
-import com.fishhawk.lisu.ui.widget.SheetListItem
+import com.fishhawk.lisu.widget.BottomSheet
+import com.fishhawk.lisu.widget.SheetListItem
 
 internal class ReaderPageSheet(
     private val drawable: Drawable,

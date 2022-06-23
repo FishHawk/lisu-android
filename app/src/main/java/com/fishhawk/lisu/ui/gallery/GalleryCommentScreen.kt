@@ -19,9 +19,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavHostController
-import com.fishhawk.lisu.data.remote.model.CommentDto
-import com.fishhawk.lisu.ui.widget.LisuToolBar
-import com.fishhawk.lisu.ui.widget.StateView
+import com.fishhawk.lisu.data.network.model.CommentDto
+import com.fishhawk.lisu.widget.LisuToolBar
+import com.fishhawk.lisu.widget.StateView
 import com.fishhawk.lisu.util.toDisplayString
 import com.fishhawk.lisu.util.toLocalDateTime
 import org.koin.androidx.compose.viewModel

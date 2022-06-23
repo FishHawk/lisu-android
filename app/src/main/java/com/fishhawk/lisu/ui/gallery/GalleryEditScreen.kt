@@ -26,10 +26,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.data.remote.model.MangaMetadataDto
-import com.fishhawk.lisu.data.remote.model.toMetadataDetail
+import com.fishhawk.lisu.data.network.model.MangaMetadataDto
+import com.fishhawk.lisu.data.network.model.toMetadataDetail
 import com.fishhawk.lisu.ui.base.OnEvent
-import com.fishhawk.lisu.ui.widget.LisuToolBar
+import com.fishhawk.lisu.widget.LisuToolBar
 import com.fishhawk.lisu.util.toast
 import org.koin.androidx.compose.viewModel
 

@@ -1,7 +1,8 @@
-package com.fishhawk.lisu.data.remote
+package com.fishhawk.lisu.data.network
 
-import com.fishhawk.lisu.data.remote.model.*
-import com.fishhawk.lisu.data.remote.util.*
+import com.fishhawk.lisu.data.network.base.*
+import com.fishhawk.lisu.data.network.dao.LisuDao
+import com.fishhawk.lisu.data.network.model.*
 import io.ktor.client.*
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
@@ -28,9 +29,7 @@ class LisuRepository(
             }
         }
         .distinctUntilChanged()
-        .map {
-            it.map { url -> LisuDao(client, url) }
-        }
+        .map { it.map { url -> LisuDao(client, url) } }
         .stateIn(scope, SharingStarted.Eagerly, null)
 
 

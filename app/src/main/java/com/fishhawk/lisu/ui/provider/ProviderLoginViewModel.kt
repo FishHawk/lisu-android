@@ -2,8 +2,8 @@ package com.fishhawk.lisu.ui.provider
 
 import android.os.Bundle
 import androidx.lifecycle.viewModelScope
-import com.fishhawk.lisu.data.remote.LisuRepository
-import com.fishhawk.lisu.data.remote.model.ProviderDto
+import com.fishhawk.lisu.data.network.LisuRepository
+import com.fishhawk.lisu.data.network.model.ProviderDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
 import kotlinx.coroutines.launch

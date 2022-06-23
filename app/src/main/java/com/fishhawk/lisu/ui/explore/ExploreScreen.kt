@@ -33,13 +33,14 @@ import coil.size.Size
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.setBlocking
-import com.fishhawk.lisu.data.remote.model.ProviderDto
+import com.fishhawk.lisu.data.network.model.ProviderDto
 import com.fishhawk.lisu.ui.main.navToGlobalSearch
 import com.fishhawk.lisu.ui.main.navToProvider
 import com.fishhawk.lisu.ui.main.navToProviderLogin
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.widget.*
+import com.fishhawk.lisu.widget.*
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.viewModel
 import java.util.*

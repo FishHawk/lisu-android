@@ -12,8 +12,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.theme.LisuIcons
-import com.fishhawk.lisu.ui.widget.BottomSheet
-import com.fishhawk.lisu.ui.widget.SheetListItem
+import com.fishhawk.lisu.widget.BottomSheet
+import com.fishhawk.lisu.widget.SheetListItem
 import com.fishhawk.lisu.util.toast
 
 internal class GalleryCoverSheet(

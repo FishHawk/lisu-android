@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.database.model.SearchHistory
-import com.fishhawk.lisu.data.remote.LisuRepository
-import com.fishhawk.lisu.data.remote.model.MangaDto
+import com.fishhawk.lisu.data.network.LisuRepository
+import com.fishhawk.lisu.data.network.model.MangaDto
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 

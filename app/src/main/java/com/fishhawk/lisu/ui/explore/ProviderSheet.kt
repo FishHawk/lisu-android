@@ -9,11 +9,11 @@ import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import com.fishhawk.lisu.data.remote.model.ProviderDto
+import com.fishhawk.lisu.data.network.model.ProviderDto
 import com.fishhawk.lisu.ui.theme.LisuIcons
-import com.fishhawk.lisu.ui.widget.BottomSheet
-import com.fishhawk.lisu.ui.widget.LocalBottomSheetHelper
-import com.fishhawk.lisu.ui.widget.SheetListItem
+import com.fishhawk.lisu.widget.BottomSheet
+import com.fishhawk.lisu.widget.LocalBottomSheetHelper
+import com.fishhawk.lisu.widget.SheetListItem
 import kotlinx.coroutines.launch
 
 internal class ExploreSheet(
