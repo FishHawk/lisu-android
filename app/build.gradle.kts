@@ -1,7 +1,7 @@
 import java.io.FileInputStream
 import java.util.*
 
-val composeVersion by extra { "1.2.0-beta03" }
+val composeVersion by extra { "1.2.0-rc02" }
 
 plugins {
     kotlin("plugin.serialization") version "1.6.21"
@@ -9,7 +9,7 @@ plugins {
     id("com.google.devtools.ksp") version "1.6.21-1.0.5"
     id("org.jetbrains.kotlin.android") version "1.6.21"
     id("org.jetbrains.kotlin.plugin.parcelize") version "1.6.21"
-    id("com.mikepenz.aboutlibraries.plugin") version "10.1.0"
+    id("com.mikepenz.aboutlibraries.plugin") version "10.3.0"
 }
 
 android {
@@ -83,7 +83,7 @@ android {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
 
-    implementation("androidx.activity:activity-compose:1.6.0-alpha03")
+    implementation("androidx.activity:activity-compose:1.6.0-alpha05")
 
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
@@ -93,9 +93,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-core:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
 
-    implementation("androidx.navigation:navigation-compose:2.5.0-rc01")
+    implementation("androidx.navigation:navigation-compose:2.5.0-rc02")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-rc01")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-rc02")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
@@ -104,13 +104,12 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
 
-
     val koinVersion = "3.1.6"
     implementation("io.insert-koin:koin-core:$koinVersion")
     implementation("io.insert-koin:koin-android:$koinVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
 
-    val accompanistVersion = "0.24.9-beta"
+    val accompanistVersion = "0.24.12-rc"
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
@@ -125,7 +124,6 @@ dependencies {
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
 
-
     val ktorVersion = "2.0.2"
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
@@ -133,7 +131,7 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
 
     // Licenses
-    implementation("com.mikepenz:aboutlibraries-compose:10.1.0")
+    implementation("com.mikepenz:aboutlibraries-compose:10.3.0")
 
     // UI Tests
     testImplementation("junit:junit:4.13.2")
