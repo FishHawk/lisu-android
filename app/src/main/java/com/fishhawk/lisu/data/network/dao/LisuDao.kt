@@ -156,7 +156,7 @@ class LisuDao(
 
 
     private val String.path
-        get() = encodeURLPath()
+        get() = encodeURLParameter()
 
     private fun generateProviderIcon(
         providerId: String,
@@ -164,7 +164,11 @@ class LisuDao(
         val builder = URLBuilder(url)
         builder.pathSegments = emptyList()
         builder.parameters.clear()
-        builder.appendPathSegments("provider", providerId, "icon")
+        builder.appendPathSegments(
+            "provider",
+            providerId.path,
+            "icon",
+        )
         return builder.build().toString()
     }
 
@@ -176,7 +180,13 @@ class LisuDao(
         val builder = URLBuilder(url)
         builder.pathSegments = emptyList()
         builder.parameters.clear()
-        builder.appendPathSegments("provider", providerId, "manga", mangaId, "cover")
+        builder.appendPathSegments(
+            "provider",
+            providerId.path,
+            "manga",
+            mangaId.path,
+            "cover",
+        )
         builder.parameters.append("imageId", cover ?: "")
         return builder.build().toString()
     }
@@ -193,15 +203,14 @@ class LisuDao(
         builder.parameters.clear()
         builder.appendPathSegments(
             "provider",
-            providerId,
+            providerId.path,
             "manga",
-            mangaId,
+            mangaId.path,
             "image",
-            collectionId,
-            chapterId,
-            imageId
+            collectionId.path,
+            chapterId.path,
+            imageId.path,
         )
-        builder.parameters.append("imageId", imageId)
         return builder.build().toString()
     }
 }
