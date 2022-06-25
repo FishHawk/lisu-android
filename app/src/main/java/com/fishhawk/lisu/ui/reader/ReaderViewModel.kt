@@ -5,9 +5,14 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.viewModelScope
+import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.data.database.MangaSettingRepository
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
+import com.fishhawk.lisu.data.database.model.MangaSetting
 import com.fishhawk.lisu.data.database.model.ReadingHistory
+import com.fishhawk.lisu.data.datastore.ReaderMode
+import com.fishhawk.lisu.data.datastore.ReaderOrientation
 import com.fishhawk.lisu.data.network.LisuRepository
 import com.fishhawk.lisu.data.network.model.ChapterDto
 import com.fishhawk.lisu.data.network.model.MangaDetailDto
@@ -38,6 +43,7 @@ class ReaderViewModel(
     args: Bundle,
     private val lisuRepository: LisuRepository,
     private val readingHistoryRepository: ReadingHistoryRepository,
+    private val mangaSettingRepository: MangaSettingRepository,
 ) : BaseViewModel<ReaderEffect>() {
 
     private val mangaId =
@@ -115,6 +121,32 @@ class ReaderViewModel(
 
     lateinit var chapterPointer: MutableStateFlow<ReaderChapterPointer>
 
+    val isMenuOpened = MutableStateFlow(false)
+
+    val isOnlyOneChapter = chapterList
+        .map { it?.size == 1 }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+
+    private val mangaSetting = mangaSettingRepository
+        .select(providerId, mangaId, null)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    val readerMode = mangaSetting
+        .map { it?.readerMode }
+        .transformLatest {
+            if (it != null) emit(it)
+            else emitAll(PR.readerMode.flow)
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    val readerOrientation = mangaSetting
+        .map { it?.readerOrientation }
+        .transformLatest {
+            if (it != null) emit(it)
+            else emitAll(PR.readerOrientation.flow)
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
     init {
         refreshReader()
         chapterList
@@ -160,12 +192,6 @@ class ReaderViewModel(
             }
         })
     }
-
-    val isMenuOpened = MutableStateFlow(false)
-
-    val isOnlyOneChapter = chapterList
-        .map { it?.size == 1 }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
     fun refreshReader() = viewModelScope.launch {
 //        val result = lisuRepository.getManga(providerId, mangaId)
@@ -254,5 +280,33 @@ class ReaderViewModel(
             "image/png",
         ).onSuccess { sendEvent(ReaderEffect.Message(R.string.cover_updated)) }
             .onFailure { sendEvent(ReaderEffect.Message(R.string.cover_update_failed)) }
+    }
+
+    fun setReaderMode(value: ReaderMode) {
+        viewModelScope.launch {
+            val setting = mangaSetting.value?.copy(readerMode = value)
+                ?: MangaSetting(
+                    providerId = providerId,
+                    mangaId = mangaId,
+                    title = null,
+                    readerMode = value,
+                    readerOrientation = null,
+                )
+            mangaSettingRepository.update(setting)
+        }
+    }
+
+    fun setReaderOrientation(value: ReaderOrientation) {
+        viewModelScope.launch {
+            val setting = mangaSetting.value?.copy(readerOrientation = value)
+                ?: MangaSetting(
+                    providerId = providerId,
+                    mangaId = mangaId,
+                    title = null,
+                    readerMode = null,
+                    readerOrientation = value,
+                )
+            mangaSettingRepository.update(setting)
+        }
     }
 }

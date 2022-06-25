@@ -4,9 +4,11 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.fishhawk.lisu.data.database.dao.MangaSettingDao
 import com.fishhawk.lisu.data.database.dao.ReadingHistoryDao
 import com.fishhawk.lisu.data.database.dao.SearchHistoryDao
 import com.fishhawk.lisu.data.database.dao.ServerHistoryDao
+import com.fishhawk.lisu.data.database.model.MangaSetting
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.database.model.SearchHistory
 import com.fishhawk.lisu.data.database.model.ServerHistory
@@ -26,6 +28,7 @@ class LocalDateTimeConverters {
 
 @Database(
     entities = [
+        MangaSetting::class,
         ReadingHistory::class,
         SearchHistory::class,
         ServerHistory::class
@@ -35,6 +38,7 @@ class LocalDateTimeConverters {
 )
 @TypeConverters(LocalDateTimeConverters::class)
 abstract class ApplicationDatabase : RoomDatabase() {
+    abstract fun mangaSettingDao(): MangaSettingDao
     abstract fun readingHistoryDao(): ReadingHistoryDao
     abstract fun searchHistoryDao(): SearchHistoryDao
     abstract fun serverHistoryDao(): ServerHistoryDao

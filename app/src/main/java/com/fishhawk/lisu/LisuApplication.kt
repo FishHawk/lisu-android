@@ -4,10 +4,7 @@ import android.app.Application
 import androidx.room.Room
 import coil.ImageLoader
 import coil.ImageLoaderFactory
-import com.fishhawk.lisu.data.database.ApplicationDatabase
-import com.fishhawk.lisu.data.database.ReadingHistoryRepository
-import com.fishhawk.lisu.data.database.SearchHistoryRepository
-import com.fishhawk.lisu.data.database.ServerHistoryRepository
+import com.fishhawk.lisu.data.database.*
 import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.lisu.data.network.base.Connectivity
@@ -84,6 +81,7 @@ val appModule = module {
     single {
         HttpClient(OkHttp) {
             install(ContentNegotiation) { json(Json) }
+            expectSuccess = true
         }
     }
 
@@ -98,6 +96,7 @@ val appModule = module {
         ).build()
     }
 
+    single { MangaSettingRepository(get<ApplicationDatabase>().mangaSettingDao()) }
     single { ReadingHistoryRepository(get<ApplicationDatabase>().readingHistoryDao()) }
     single { SearchHistoryRepository(get<ApplicationDatabase>().searchHistoryDao()) }
     single { ServerHistoryRepository(get<ApplicationDatabase>().serverHistoryDao()) }
@@ -115,5 +114,5 @@ val appModule = module {
     viewModel { ProviderLoginViewModel(get(), get()) }
     viewModel { GalleryViewModel(get(), get(), get()) }
 
-    viewModel { ReaderViewModel(get(), get(), get()) }
+    viewModel { ReaderViewModel(get(), get(), get(), get()) }
 }

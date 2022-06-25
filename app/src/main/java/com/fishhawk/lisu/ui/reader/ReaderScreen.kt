@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.ui.reader
 
+import android.content.pm.ActivityInfo
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,14 +15,15 @@ import coil.imageLoader
 import coil.request.ImageRequest
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
+import com.fishhawk.lisu.data.datastore.ReaderOrientation
 import com.fishhawk.lisu.data.datastore.collectAsState
+import com.fishhawk.lisu.ui.reader.viewer.ListViewer
+import com.fishhawk.lisu.ui.reader.viewer.PagerViewer
+import com.fishhawk.lisu.ui.reader.viewer.ViewerState
 import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.util.saveImage
 import com.fishhawk.lisu.util.shareImage
 import com.fishhawk.lisu.util.toast
-import com.fishhawk.lisu.ui.reader.viewer.ListViewer
-import com.fishhawk.lisu.ui.reader.viewer.PagerViewer
-import com.fishhawk.lisu.ui.reader.viewer.ViewerState
 import com.fishhawk.lisu.widget.LocalBottomSheetHelper
 import com.fishhawk.lisu.widget.StateView
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -33,7 +35,7 @@ import org.koin.core.parameter.parametersOf
 
 internal typealias ReaderActionHandler = (ReaderAction) -> Unit
 
-internal sealed interface ReaderAction {
+sealed interface ReaderAction {
     object NavUp : ReaderAction
 
     data class SetAsImage(val drawable: Drawable) : ReaderAction
@@ -43,6 +45,8 @@ internal sealed interface ReaderAction {
     object OpenPrevChapter : ReaderAction
     object OpenNextChapter : ReaderAction
 
+    data class SetReaderMode(val value: ReaderMode) : ReaderAction
+    data class SetReaderOrientation(val value: ReaderOrientation) : ReaderAction
     data class UpdateHistory(val page: Int) : ReaderAction
 }
 
@@ -65,6 +69,8 @@ fun ReaderScreen() {
     val mangaTitle by viewModel.mangaTitle.collectAsState()
     val isMenuOpened by viewModel.isMenuOpened.collectAsState()
     val isOnlyOneChapter by viewModel.isOnlyOneChapter.collectAsState()
+    val readerMode by viewModel.readerMode.collectAsState()
+    val readerOrientation by viewModel.readerOrientation.collectAsState()
 
     val onAction: ReaderActionHandler = { action ->
         when (action) {
@@ -83,6 +89,8 @@ fun ReaderScreen() {
                 )
             ReaderAction.OpenPrevChapter -> viewModel.openPrevChapter()
             ReaderAction.OpenNextChapter -> viewModel.openNextChapter()
+            is ReaderAction.SetReaderMode -> viewModel.setReaderMode(action.value)
+            is ReaderAction.SetReaderOrientation -> viewModel.setReaderOrientation(action.value)
             is ReaderAction.UpdateHistory -> viewModel.updateReadingHistory(action.page)
         }
     }
@@ -93,6 +101,16 @@ fun ReaderScreen() {
                 is ReaderEffect.Message -> context.toast(effect.redId)
             }
         }
+    }
+
+    readerOrientation?.let {
+        val activity = context.findActivity()
+        val newOrientation = when (it) {
+            ReaderOrientation.Portrait -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            ReaderOrientation.Landscape -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        }
+        if (newOrientation != activity.requestedOrientation)
+            activity.requestedOrientation = newOrientation
     }
 
     Surface {
@@ -109,7 +127,6 @@ fun ReaderScreen() {
                     viewState = pointer.currChapter.state,
                     onRetry = { }
                 ) {
-                    val mode by PR.readerMode.collectAsState()
                     val size = pointer.currChapter.images.size
                     var startPage by remember(pointer) {
                         mutableStateOf(pointer.startPage.coerceAtMost(size - 1))
@@ -126,19 +143,19 @@ fun ReaderScreen() {
                     }
 
                     readerState =
-                        if (mode == ReaderMode.Continuous) ViewerState.List(
-                            rememberSaveable(pointer, mode, saver = LazyListState.Saver) {
+                        if (readerMode == ReaderMode.Continuous) ViewerState.List(
+                            rememberSaveable(pointer, readerMode, saver = LazyListState.Saver) {
                                 LazyListState(firstVisibleItemIndex = startPage)
                             }
                         ).also {
                             ListViewer(it, pointer, onLongPress)
                         }
                         else ViewerState.Pager(
-                            rememberSaveable(pointer, mode, saver = PagerState.Saver) {
+                            rememberSaveable(pointer, readerMode, saver = PagerState.Saver) {
                                 PagerState(currentPage = startPage)
                             }
                         ).also {
-                            PagerViewer(it, pointer, mode == ReaderMode.Rtl, onLongPress)
+                            PagerViewer(it, pointer, readerMode == ReaderMode.Rtl, onLongPress)
                         }
                     LaunchedEffect(readerState) {
                         snapshotFlow { readerState!!.position }.collect {
@@ -167,11 +184,14 @@ fun ReaderScreen() {
                     ReaderInfoBar(name, title, readerState)
 
                 ReaderColorFilterOverlay()
+
                 ReaderMenu(
                     isMenuOpened,
                     mangaTitle,
                     name,
                     title,
+                    readerMode ?: return@Box,
+                    readerOrientation ?: return@Box,
                     isOnlyOneChapter,
                     readerState,
                     onAction

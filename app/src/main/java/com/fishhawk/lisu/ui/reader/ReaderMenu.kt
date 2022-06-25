@@ -23,16 +23,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
-import com.fishhawk.lisu.data.datastore.collectAsState
-import com.fishhawk.lisu.data.datastore.setNext
-import com.fishhawk.lisu.util.findActivity
+import com.fishhawk.lisu.data.datastore.ReaderOrientation
+import com.fishhawk.lisu.data.datastore.next
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
+import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.widget.LocalBottomSheetHelper
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @Composable
 internal fun BoxScope.ReaderInfoBar(
@@ -60,6 +58,8 @@ internal fun BoxScope.ReaderMenu(
     mangaTitle: String,
     chapterName: String,
     chapterTitle: String,
+    readerMode: ReaderMode,
+    readerOrientation: ReaderOrientation,
     isOnlyOneChapter: Boolean,
     viewerState: ViewerState?,
     onAction: ReaderActionHandler
@@ -88,7 +88,13 @@ internal fun BoxScope.ReaderMenu(
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it })
     ) {
-        ReaderMenuBottom(isOnlyOneChapter, viewerState, onAction)
+        ReaderMenuBottom(
+            readerMode = readerMode,
+            readerOrientation = readerOrientation,
+            isOnlyOneChapter = isOnlyOneChapter,
+            viewerState = viewerState,
+            onAction = onAction
+        )
     }
 }
 
@@ -137,17 +143,18 @@ private fun ReaderMenuTop(
 
 @Composable
 private fun ReaderMenuBottom(
+    readerMode: ReaderMode,
+    readerOrientation: ReaderOrientation,
     isOnlyOneChapter: Boolean,
     viewerState: ViewerState?,
     onAction: ReaderActionHandler
 ) {
     Column(modifier = Modifier.navigationBarsPadding()) {
-        val readingDirection by PR.readerMode.collectAsState()
-        val layoutDirection =
-            if (readingDirection == ReaderMode.Rtl) LayoutDirection.Rtl
-            else LayoutDirection.Ltr
-
-        CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+        CompositionLocalProvider(
+            LocalLayoutDirection provides
+                    if (readerMode == ReaderMode.Rtl) LayoutDirection.Rtl
+                    else LayoutDirection.Ltr
+        ) {
             Row(
                 modifier = Modifier.padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -236,19 +243,21 @@ private fun ReaderMenuBottom(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(modifier = Modifier.weight(1f), onClick = {
-                    runBlocking { PR.readerMode.setNext() }
+                    onAction(ReaderAction.SetReaderMode(readerMode.next()))
                 }) {
-                    val icon = when (readingDirection) {
+                    val icon = when (readerMode) {
                         ReaderMode.Ltr -> Icons.Filled.ArrowForward
                         ReaderMode.Rtl -> Icons.Filled.ArrowBack
                         ReaderMode.Continuous -> Icons.Filled.Expand
                     }
-                    Icon(icon, "setting")
+                    Icon(icon, "reader mode")
                 }
 
                 IconButton(modifier = Modifier.weight(1f), onClick = {
-                    runBlocking { PR.readerOrientation.setNext() }
-                }) { Icon(Icons.Filled.ScreenRotation, null) }
+                    onAction(ReaderAction.SetReaderOrientation(readerOrientation.next()))
+                }) {
+                    Icon(Icons.Filled.ScreenRotation, "reader orientation")
+                }
 
                 val bottomSheetHelper = LocalBottomSheetHelper.current
                 val scope = rememberCoroutineScope()

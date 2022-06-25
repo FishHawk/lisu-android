@@ -59,16 +59,16 @@
     <string name="settings_enable_random_button">Enable random button</string>
 
     <!-- setting reader screen -->
-    <string name="settings_reader_mode">Reading direction</string>
+    <string name="settings_reader_mode">Default reader mode</string>
     <string name="settings_reader_mode_left_to_right">Left to right</string>
     <string name="settings_reader_mode_right_to_Left">Right to left</string>
     <string name="settings_reader_mode_continuous">Continuous</string>
 
-    <string name="settings_reader_orientation">Screen orientation</string>
+    <string name="settings_reader_orientation">Default reader orientation</string>
     <string name="settings_reader_orientation_portrait">Portrait</string>
     <string name="settings_reader_orientation_landscape">Landscape</string>
 
-    <string name="settings_scale_type">Screen orientation</string>
+    <string name="settings_scale_type">Scale type</string>
     <string name="settings_scale_type_fit_screen">Fit screen</string>
     <string name="settings_scale_type_fit_width">Fit width</string>
     <string name="settings_scale_type_fit_height">Fit height</string>

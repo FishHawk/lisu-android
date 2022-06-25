@@ -13,10 +13,7 @@ interface ReadingHistoryDao {
     fun select(mangaId: String): Flow<ReadingHistory>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(history: ReadingHistory)
-
-    @Update
-    suspend fun update(history: ReadingHistory)
+    suspend fun updateOrInsert(history: ReadingHistory)
 
     @Delete
     suspend fun delete(history: ReadingHistory)

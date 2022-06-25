@@ -32,12 +32,10 @@ class ProviderViewModel(
                     ?.getOrNull()
                     ?.find { provider -> provider.id == providerId }
             }
-            .onEach { println("asdf") }
             .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     private val _boards = provider
         .filterNotNull()
-        .onEach { println("fuck") }
         .flatMapLatest { provider ->
             flatten(
                 provider.boardModels.mapValues { (boardId, model) ->
@@ -53,7 +51,6 @@ class ProviderViewModel(
                 }
             )
         }
-        .onEach { println("??") }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
 
     val boards = _boards
