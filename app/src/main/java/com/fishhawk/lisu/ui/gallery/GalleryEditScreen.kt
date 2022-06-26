@@ -29,8 +29,8 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.network.model.MangaMetadataDto
 import com.fishhawk.lisu.data.network.model.toMetadataDetail
 import com.fishhawk.lisu.ui.base.OnEvent
-import com.fishhawk.lisu.widget.LisuToolBar
 import com.fishhawk.lisu.util.toast
+import com.fishhawk.lisu.widget.LisuToolBar
 import org.koin.androidx.compose.viewModel
 
 internal typealias GalleryEditActionHandler = (GalleryEditAction) -> Unit
@@ -45,8 +45,14 @@ fun GalleryEditScreen(navController: NavHostController) {
     val viewModel by viewModel<GalleryViewModel>(
         owner = navController.previousBackStackEntry!!
     )
-    val id = viewModel.id
-    val initDetail by viewModel.detail.collectAsState()
+    val id = viewModel.mangaId
+    val detailResult by viewModel.detail.collectAsState()
+    val initDetail = detailResult?.getOrNull()
+
+    if (initDetail == null) {
+        navController.navigateUp()
+        return
+    }
     var detail by remember { mutableStateOf(initDetail.toMetadataDetail()) }
 
     val onAction: GalleryEditActionHandler = { action ->

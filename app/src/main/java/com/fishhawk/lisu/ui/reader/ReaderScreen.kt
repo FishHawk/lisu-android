@@ -38,6 +38,8 @@ internal typealias ReaderActionHandler = (ReaderAction) -> Unit
 sealed interface ReaderAction {
     object NavUp : ReaderAction
 
+    object RelaodManga : ReaderAction
+
     data class SetAsImage(val drawable: Drawable) : ReaderAction
     data class SavePage(val drawable: Drawable, val position: Int) : ReaderAction
     data class SharePage(val drawable: Drawable, val position: Int) : ReaderAction
@@ -65,8 +67,7 @@ fun ReaderScreen() {
         parametersOf(context.findActivity().intent.extras!!)
     }
 
-    val mangaViewState by viewModel.mangaLoadState.collectAsState()
-    val mangaTitle by viewModel.mangaTitle.collectAsState()
+    val mangaTitleResult by viewModel.mangaTitleResult.collectAsState()
     val isMenuOpened by viewModel.isMenuOpened.collectAsState()
     val isOnlyOneChapter by viewModel.isOnlyOneChapter.collectAsState()
     val readerMode by viewModel.readerMode.collectAsState()
@@ -75,17 +76,18 @@ fun ReaderScreen() {
     val onAction: ReaderActionHandler = { action ->
         when (action) {
             ReaderAction.NavUp -> context.findActivity().finish()
+            ReaderAction.RelaodManga -> viewModel.reloadManga()
             is ReaderAction.SetAsImage -> viewModel.updateCover(action.drawable)
             is ReaderAction.SavePage ->
                 context.saveImage(
                     action.drawable,
-                    "${mangaTitle}-${action.position}"
+                    "${mangaTitleResult?.getOrNull()!!}-${action.position}"
                 )
             is ReaderAction.SharePage ->
                 context.shareImage(
                     "Share page via",
                     action.drawable,
-                    "${mangaTitle}-${action.position}"
+                    "${mangaTitleResult?.getOrNull()!!}-${action.position}"
                 )
             ReaderAction.OpenPrevChapter -> viewModel.openPrevChapter()
             ReaderAction.OpenNextChapter -> viewModel.openNextChapter()
@@ -115,19 +117,19 @@ fun ReaderScreen() {
 
     Surface {
         StateView(
+            result = mangaTitleResult,
+            onRetry = { onAction(ReaderAction.RelaodManga) },
             modifier = Modifier.fillMaxSize(),
-            viewState = mangaViewState,
-            onRetry = { viewModel.refreshReader() }
-        ) {
+        ) { mangaTitle ->
             Box(modifier = Modifier.fillMaxSize()) {
                 val pointer by viewModel.chapterPointer.collectAsState()
                 var readerState: ViewerState? = null
                 StateView(
+                    result = pointer.currChapter.content,
+                    onRetry = { /*TODO*/ },
                     modifier = Modifier.fillMaxSize(),
-                    viewState = pointer.currChapter.state,
-                    onRetry = { }
-                ) {
-                    val size = pointer.currChapter.images.size
+                ) { images ->
+                    val size = images.size
                     var startPage by remember(pointer) {
                         mutableStateOf(pointer.startPage.coerceAtMost(size - 1))
                     }
@@ -148,20 +150,20 @@ fun ReaderScreen() {
                                 LazyListState(firstVisibleItemIndex = startPage)
                             }
                         ).also {
-                            ListViewer(it, pointer, onLongPress)
+                            ListViewer(it, images, onLongPress)
                         }
                         else ViewerState.Pager(
                             rememberSaveable(pointer, readerMode, saver = PagerState.Saver) {
                                 PagerState(currentPage = startPage)
                             }
                         ).also {
-                            PagerViewer(it, pointer, readerMode == ReaderMode.Rtl, onLongPress)
+                            PagerViewer(it, images, readerMode == ReaderMode.Rtl, onLongPress)
                         }
                     LaunchedEffect(readerState) {
                         snapshotFlow { readerState!!.position }.collect {
                             startPage = it
                             onAction(ReaderAction.UpdateHistory(it))
-                            pointer.currChapter.images
+                            images
                                 .slice(
                                     (it - 3).coerceAtLeast(0)..
                                             (it + 5).coerceAtMost(readerState!!.size - 1)

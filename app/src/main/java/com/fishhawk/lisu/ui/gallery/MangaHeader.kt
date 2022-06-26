@@ -25,7 +25,6 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
-import com.fishhawk.lisu.data.network.model.MangaDetailDto
 import com.fishhawk.lisu.data.network.model.MangaState
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.widget.LisuToolBar
@@ -37,7 +36,12 @@ internal val MangaHeaderHeight = 290.dp
 
 @Composable
 internal fun MangaHeader(
-    detail: MangaDetailDto,
+    state: MangaState,
+    providerId: String,
+    cover: String?,
+    title: String,
+    authors: List<String>,
+    isFinished: Boolean?,
     history: ReadingHistory?,
     onAction: GalleryActionHandler
 ) {
@@ -47,10 +51,10 @@ internal fun MangaHeader(
             .height(MangaHeaderHeight)
     ) {
         val context = LocalContext.current
-        var loadedCover by remember { mutableStateOf(detail.cover) }
-        LaunchedEffect(detail) {
+        var loadedCover by remember { mutableStateOf(cover) }
+        LaunchedEffect(cover) {
             // Prevent the image flickering when the cover changes
-            snapshotFlow { detail.cover }
+            snapshotFlow { cover }
                 .filterNotNull()
                 .collect {
                     val request = ImageRequest.Builder(context)
@@ -76,7 +80,6 @@ internal fun MangaHeader(
             contentScale = ContentScale.Crop,
             alpha = 0.3f
         )
-
         Box(
             modifier = Modifier
                 .align(Alignment.BottomStart)
@@ -91,13 +94,12 @@ internal fun MangaHeader(
                     )
                 )
         )
-
         Column {
             LisuToolBar(
                 onNavUp = { onAction(GalleryAction.NavUp) },
                 transparent = true,
             ) {
-                if (detail.state != MangaState.Local) {
+                if (state != MangaState.Local) {
                     IconButton(onClick = { onAction(GalleryAction.NavToComment) }) {
                         Icon(
                             LisuIcons.Comment,
@@ -135,18 +137,14 @@ internal fun MangaHeader(
                     )
                 }
                 MangaInfo(
-                    providerId = detail.providerId,
-                    title = (detail.title ?: detail.id),
-                    author = detail.authors.joinToString(separator = ";"),
-                    isFinished = detail.isFinished,
-                    onTitleClick = { onAction(GalleryAction.NavToGlobalSearch(it)) },
-                    onAuthorClick = { onAction(GalleryAction.NavToGlobalSearch(it)) },
-                    onTitleLongClick = { onAction(GalleryAction.Copy(it, R.string.title_copied)) },
-                    onAuthorLongClick = { onAction(GalleryAction.Copy(it, R.string.author_copied)) }
+                    providerId = providerId,
+                    title = title,
+                    authors = authors,
+                    isFinished = isFinished,
+                    onAction = onAction,
                 )
             }
-
-            MangaActionButtons(detail, history, onAction)
+            MangaActionButtons(state, history, onAction)
         }
     }
 }
@@ -156,40 +154,39 @@ internal fun MangaHeader(
 private fun MangaInfo(
     providerId: String,
     title: String,
-    author: String?,
+    authors: List<String>,
     isFinished: Boolean?,
-    onTitleClick: (String) -> Unit,
-    onAuthorClick: (String) -> Unit,
-    onTitleLongClick: (String) -> Unit,
-    onAuthorLongClick: (String) -> Unit
+    onAction: GalleryActionHandler,
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(vertical = 2.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        title.let {
-            Box(modifier = Modifier.weight(1f)) {
-                MangaInfoTitle(
-                    text = it,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .combinedClickable(
-                            onClick = { onTitleClick(it) },
-                            onLongClick = { onTitleLongClick(it) }
-                        )
-                )
-            }
+        Box(modifier = Modifier.weight(1f)) {
+            MangaInfoTitle(
+                text = title,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .combinedClickable(
+                        onClick = { onAction(GalleryAction.NavToGlobalSearch(title)) },
+                        onLongClick = { onAction(GalleryAction.Copy(title, R.string.title_copied)) }
+                    ),
+            )
         }
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            author?.let {
+            if (authors.isNotEmpty()) {
+                val authorsText = authors.joinToString(separator = ";")
                 MangaInfoSubtitle(
-                    text = it,
+                    text = authorsText,
                     modifier = Modifier.combinedClickable(
-                        onClick = { onAuthorClick(it) },
-                        onLongClick = { onAuthorLongClick(it) }
-                    )
+                        onClick = { onAction(GalleryAction.NavToGlobalSearch(authorsText)) },
+                        onLongClick = {
+                            onAction(GalleryAction.Copy(authorsText, R.string.author_copied))
+                        },
+                    ),
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -246,12 +243,12 @@ private fun MangaInfoSubtitle(
 
 @Composable
 private fun MangaActionButtons(
-    detail: MangaDetailDto,
+    state: MangaState,
     history: ReadingHistory?,
     onAction: GalleryActionHandler
 ) {
     Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-        when (detail.state) {
+        when (state) {
             MangaState.Local -> {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     MangaActionButton(
@@ -281,17 +278,7 @@ private fun MangaActionButtons(
             MangaActionButton(
                 icon = LisuIcons.AutoStories,
                 text = if (history == null) "Read" else "Continue"
-            ) {
-                onAction(
-                    GalleryAction.NavToReader(
-                        collectionId = history?.collectionId
-                            ?: detail.collections.keys.first(),
-                        chapterId = history?.chapterId
-                            ?: detail.collections.values.first().first().id,
-                        page = history?.page ?: 0
-                    )
-                )
-            }
+            ) { onAction(GalleryAction.Continue) }
         }
     }
 }

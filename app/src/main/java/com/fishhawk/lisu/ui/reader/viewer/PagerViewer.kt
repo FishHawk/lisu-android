@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun PagerViewer(
     state: ViewerState.Pager,
-    pointer: ReaderViewModel.ReaderChapterPointer,
+    images: List<String>,
     isRtl: Boolean,
     onLongPress: ((drawable: Drawable, position: Int) -> Unit)
 ) {
@@ -127,14 +127,14 @@ internal fun PagerViewer(
         val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
         CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
             HorizontalPager(
-                count = pointer.currChapter.images.size,
+                count = images.size,
                 modifier = Modifier.fillMaxSize(),
                 state = state.state,
                 itemSpacing = if (isPageIntervalEnabled) 16.dp else 0.dp
             ) { index ->
                 Page(
                     position = index.plus(1),
-                    url = pointer.currChapter.images[index],
+                    url = images[index],
                     contentScale = when (scaleType) {
                         ScaleType.FitScreen -> ContentScale.Fit
                         ScaleType.FitWidth -> ContentScale.FillWidth

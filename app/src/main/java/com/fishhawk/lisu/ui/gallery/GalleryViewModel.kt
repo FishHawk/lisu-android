@@ -4,10 +4,11 @@ import android.os.Bundle
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
 import com.fishhawk.lisu.data.network.LisuRepository
-import com.fishhawk.lisu.data.network.model.*
+import com.fishhawk.lisu.data.network.model.MangaDto
+import com.fishhawk.lisu.data.network.model.MangaMetadataDto
+import com.fishhawk.lisu.data.network.model.MangaState
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
-import com.fishhawk.lisu.widget.ViewState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -27,26 +28,21 @@ class GalleryViewModel(
     private val lisuRepository: LisuRepository,
     readingHistoryRepository: ReadingHistoryRepository,
 ) : BaseViewModel<GalleryEffect>() {
-    private val manga = args.getParcelable<MangaDto>("manga")!!
-    val id = manga.id
+    val manga = args.getParcelable<MangaDto>("manga")!!
+
+    val providerId = manga.providerId
+    val mangaId = manga.id
 
     private val _detail = lisuRepository.getManga(manga.providerId, manga.id)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-
-    val viewState = _detail.filterNotNull().map {
-        it.value?.fold(
-            onSuccess = { ViewState.Loaded },
-            onFailure = { ViewState.Failure(it) },
-        ) ?: ViewState.Loading
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState.Loading)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val detail = _detail
         .filterNotNull()
-        .mapNotNull { it.value?.getOrNull() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), manga.toDetail())
+        .map { it.value }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     val history = readingHistoryRepository.select(manga.id)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     private val _comments = lisuRepository
         .getComment(manga.providerId, manga.id)
@@ -67,9 +63,7 @@ class GalleryViewModel(
         viewModelScope.launch {
             lisuRepository.addMangaToLibrary(
                 manga.providerId, manga.id
-            ).onSuccess {
-//                _detail.value = _detail.value.copy(state = MangaState.RemoteInLibrary)
-            }.onFailure {
+            ).onFailure {
                 sendEvent(GalleryEffect.AddToLibraryFailure(it))
             }
         }
@@ -80,9 +74,7 @@ class GalleryViewModel(
         viewModelScope.launch {
             lisuRepository.removeMangaFromLibrary(
                 manga.providerId, manga.id
-            ).onSuccess {
-//                _detail.value = _detail.value.copy(state = MangaState.Remote)
-            }.onFailure {
+            ).onFailure {
                 sendEvent(GalleryEffect.RemoveFromLibraryFailure(it))
             }
         }

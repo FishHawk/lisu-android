@@ -18,7 +18,6 @@ import com.fishhawk.lisu.data.network.model.ChapterDto
 import com.fishhawk.lisu.data.network.model.MangaDetailDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
-import com.fishhawk.lisu.widget.ViewState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
@@ -31,8 +30,7 @@ class ReaderChapter(
     val id = chapter.id
     val title = chapter.title
     val name = chapter.name
-    var state: ViewState = ViewState.Loading
-    var images: List<String> = listOf()
+    var content: Result<List<String>>? = null
 }
 
 sealed interface ReaderEffect : Event {
@@ -46,33 +44,32 @@ class ReaderViewModel(
     private val mangaSettingRepository: MangaSettingRepository,
 ) : BaseViewModel<ReaderEffect>() {
 
-    private val mangaId =
-        args.getParcelable<MangaDetailDto>("detail")?.id
-            ?: args.getString("mangaId")!!
-
     private val providerId =
         args.getParcelable<MangaDetailDto>("detail")?.providerId
             ?: args.getString("providerId")!!
 
-    private val mangaDetail = MutableStateFlow(
-        args.getParcelable<MangaDetailDto>("detail")?.let { Result.success(it) }
-    )
+    private val mangaId =
+        args.getParcelable<MangaDetailDto>("detail")?.id
+            ?: args.getString("mangaId")!!
 
-    val mangaLoadState = mangaDetail
-        .map { detail ->
-            detail?.fold({ ViewState.Loaded }, { ViewState.Failure(it) }) ?: ViewState.Loading
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState.Loading)
+    private val mangaData =
+        lisuRepository.getManga(providerId, mangaId)
+            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val mangaTitle = mangaDetail
-        .map { it?.getOrNull() }
-        .filterNotNull()
-        .map { it.title ?: it.id }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), mangaId)
+    private val mangaResult =
+        mangaData
+            .map { it?.value }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.Eagerly,
+                args.getParcelable<MangaDetailDto>("detail")?.let { Result.success(it) })
 
-    private val chapterList = mangaDetail
-        .map { it?.getOrNull() }
-        .filterNotNull()
+    val mangaTitleResult = mangaResult
+        .map { result -> result?.map { it.title ?: it.id } }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    private val chapterList = mangaResult
+        .mapNotNull { it?.getOrNull() }
         .map { detail ->
             val collectionId = args.getString("collectionId")!!
             val chapterId = args.getString("chapterId")!!
@@ -148,7 +145,7 @@ class ReaderViewModel(
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     init {
-        refreshReader()
+        reloadManga()
         chapterList
             .filterNotNull()
             .onEach { loadChapterPointer() }
@@ -163,15 +160,8 @@ class ReaderViewModel(
     }
 
     private suspend fun loadChapter(chapter: ReaderChapter) {
-        if (chapter.state == ViewState.Loaded) return
-        chapter.state = ViewState.Loading
-
-        val result = lisuRepository.getContent(
-            providerId,
-            mangaId,
-            chapter.collectionId,
-            chapter.id
-        )
+        if (chapter.content?.isSuccess == true) return
+        chapter.content = null
 
         fun refreshPointerIfNeed() {
             chapterPointer.value.let { pointer ->
@@ -181,23 +171,23 @@ class ReaderViewModel(
             }
         }
 
-        result.fold({
-            chapter.state = ViewState.Loaded
-            chapter.images = it
+        val result = lisuRepository.getContent(
+            providerId,
+            mangaId,
+            chapter.collectionId,
+            chapter.id
+        )
+
+        if (chapter.content?.isSuccess != true) {
+            chapter.content = result
             refreshPointerIfNeed()
-        }, {
-            if (chapter.state != ViewState.Loaded) {
-                chapter.state = ViewState.Failure(it)
-                refreshPointerIfNeed()
-            }
-        })
+        }
     }
 
-    fun refreshReader() = viewModelScope.launch {
-//        val result = lisuRepository.getManga(providerId, mangaId)
-//        if (mangaLoadState.value != ViewState.Loaded) {
-//            mangaDetail.value = result
-//        }
+    fun reloadManga() {
+        viewModelScope.launch {
+            mangaData.value?.reload()
+        }
     }
 
     private fun sendMessage(resId: Int) {
@@ -229,7 +219,7 @@ class ReaderViewModel(
         val nextChapter = pointer.nextChapter
             ?: return sendMessage(R.string.no_next_chapter)
 
-        if (nextChapter.state is ViewState.Loaded) {
+        if (nextChapter.content?.isSuccess == true) {
             chapterPointer.value =
                 ReaderChapterPointer(nextChapter.index, 0)
             loadChapterPointer()
@@ -243,7 +233,7 @@ class ReaderViewModel(
         val prevChapter = pointer.prevChapter
             ?: return sendMessage(R.string.no_prev_chapter)
 
-        if (prevChapter.state is ViewState.Loaded) {
+        if (prevChapter.content?.isSuccess == true) {
             chapterPointer.value =
                 ReaderChapterPointer(prevChapter.index, Int.MAX_VALUE)
             loadChapterPointer()
@@ -253,7 +243,7 @@ class ReaderViewModel(
     }
 
     fun updateReadingHistory(page: Int) = viewModelScope.launch {
-        val detail = mangaDetail.value!!.getOrNull()!!
+        val detail = mangaResult.value?.getOrNull() ?: return@launch
         val chapter = chapterPointer.value.currChapter
         val readingHistory = ReadingHistory(
             providerId = detail.providerId,

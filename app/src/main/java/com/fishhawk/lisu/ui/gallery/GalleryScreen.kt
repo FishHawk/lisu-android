@@ -29,10 +29,9 @@ import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.main.*
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.util.*
 import com.fishhawk.lisu.widget.LisuToolBar
 import com.fishhawk.lisu.widget.StateView
-import com.fishhawk.lisu.widget.ViewState
-import com.fishhawk.lisu.util.*
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -54,6 +53,7 @@ internal sealed interface GalleryAction {
     data class ShareCover(val cover: Drawable) : GalleryAction
     object EditCover : GalleryAction
 
+    object Continue : GalleryAction
     object Reload : GalleryAction
     object Share : GalleryAction
     object AddToLibrary : GalleryAction
@@ -66,9 +66,16 @@ fun GalleryScreen(navController: NavHostController) {
     val viewModel by viewModel<GalleryViewModel> {
         parametersOf(navController.currentBackStackEntry!!.arguments!!)
     }
-    val viewState by viewModel.viewState.collectAsState()
+    val providerId = viewModel.providerId
+    val manga = viewModel.manga
     val detail by viewModel.detail.collectAsState()
     val history by viewModel.history.collectAsState()
+
+    val state = detail?.getOrNull()?.state ?: manga.state
+    val cover = detail?.getOrNull()?.cover ?: manga.cover
+    val title = detail?.getOrNull()?.title ?: manga.title ?: manga.id
+    val authors = detail?.getOrNull()?.authors ?: manga.authors
+    val isFinished = detail?.getOrNull()?.isFinished ?: manga.isFinished
 
     val context = LocalContext.current
 
@@ -98,24 +105,32 @@ fun GalleryScreen(navController: NavHostController) {
             is GalleryAction.NavToGlobalSearch ->
                 navController.navToGlobalSearch(action.keywords)
             is GalleryAction.NavToSearch ->
-                navController.navToProviderSearch(detail.providerId, action.keywords)
-            is GalleryAction.NavToReader -> with(action) {
-                context.navToReader(detail, collectionId, chapterId, page)
+                navController.navToProviderSearch(providerId, action.keywords)
+            is GalleryAction.NavToReader -> detail?.getOrNull()?.let {
+                context.navToReader(it, action.collectionId, action.chapterId, action.page)
             }
 
             is GalleryAction.SaveCover ->
-                context.saveImage(action.cover, "${detail.title ?: detail.id}-cover")
+                context.saveImage(action.cover, "$title-cover")
             is GalleryAction.ShareCover ->
-                context.shareImage(
-                    "Share cover via",
-                    action.cover,
-                    "${detail.title ?: detail.id}-cover"
-                )
+                context.shareImage("Share cover via", action.cover, "$title-cover")
             GalleryAction.EditCover ->
                 newCoverSelectorLauncher.launch("image/*")
 
+            GalleryAction.Continue -> {
+                detail?.getOrNull()?.let {
+                    context.navToReader(
+                        it,
+                        collectionId = history?.collectionId
+                            ?: it.collections.keys.first(),
+                        chapterId = history?.chapterId
+                            ?: it.collections.values.first().first().id,
+                        page = history?.page ?: 0,
+                    )
+                }
+            }
             GalleryAction.Reload -> viewModel.reloadManga()
-            GalleryAction.Share -> context.shareText("Share manga via", detail.title ?: detail.id)
+            GalleryAction.Share -> context.shareText("Share manga via", title)
             GalleryAction.AddToLibrary -> viewModel.addToLibrary()
             GalleryAction.RemoveFromLibrary -> viewModel.removeFromLibrary()
             is GalleryAction.Copy -> context.copyToClipboard(action.text, action.hintResId)
@@ -134,15 +149,31 @@ fun GalleryScreen(navController: NavHostController) {
 
     LisuTransition {
         val scrollState = rememberScrollState()
-        MangaDetail(viewState, detail, history, scrollState, onAction)
-        ToolBar(detail.title ?: detail.id, detail.state, scrollState, onAction)
+        MangaDetail(
+            state = state,
+            providerId = providerId,
+            cover = cover,
+            title = title,
+            authors = authors,
+            isFinished = isFinished,
+            detailResult = detail,
+            history = history,
+            scrollState = scrollState,
+            onAction = onAction,
+        )
+        ToolBar(
+            state = state,
+            title = title,
+            scrollState = scrollState,
+            onAction = onAction,
+        )
     }
 }
 
 @Composable
 private fun ToolBar(
-    title: String,
     state: MangaState,
+    title: String,
     scrollState: ScrollState,
     onAction: GalleryActionHandler
 ) {
@@ -198,8 +229,13 @@ private fun ToolBar(
 
 @Composable
 private fun MangaDetail(
-    viewState: ViewState,
-    detail: MangaDetailDto,
+    state: MangaState,
+    providerId: String,
+    cover: String?,
+    title: String,
+    authors: List<String>,
+    isFinished: Boolean?,
+    detailResult: Result<MangaDetailDto>?,
     history: ReadingHistory?,
     scrollState: ScrollState,
     onAction: GalleryActionHandler
@@ -209,14 +245,23 @@ private fun MangaDetail(
             .fillMaxSize()
             .verticalScroll(scrollState)
     ) {
-        MangaHeader(detail, history, onAction)
+        MangaHeader(
+            state = state,
+            providerId = providerId,
+            cover = cover,
+            title = title,
+            authors = authors,
+            isFinished = isFinished,
+            history = history,
+            onAction = onAction,
+        )
         StateView(
+            result = detailResult,
+            onRetry = { onAction(GalleryAction.Reload) },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            viewState = viewState,
-            onRetry = { onAction(GalleryAction.Reload) }
-        ) {
+        ) { detail ->
             Column(
                 modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)

@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun ListViewer(
     state: ViewerState.List,
-    pointer: ReaderViewModel.ReaderChapterPointer,
+    images: List<String>,
     onLongPress: ((drawable: Drawable, position: Int) -> Unit)
 ) {
     val viewModel = viewModel<ReaderViewModel>()
@@ -111,7 +111,7 @@ internal fun ListViewer(
             state = state.state,
             verticalArrangement = Arrangement.spacedBy(itemSpacing)
         ) {
-            itemsIndexed(pointer.currChapter.images) { index, url ->
+            itemsIndexed(images) { index, url ->
                 Page(
                     position = index.plus(1),
                     url = url,
