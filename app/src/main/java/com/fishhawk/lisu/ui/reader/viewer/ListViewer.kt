@@ -6,7 +6,9 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -21,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImagePainter
@@ -29,6 +32,7 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.collectAsState
+import com.fishhawk.lisu.ui.reader.ReaderPage
 import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import kotlinx.coroutines.launch
 
@@ -36,7 +40,7 @@ import kotlinx.coroutines.launch
 @Composable
 internal fun ListViewer(
     state: ViewerState.List,
-    images: List<String>,
+    pages: List<ReaderPage>,
     onLongPress: ((drawable: Drawable, position: Int) -> Unit)
 ) {
     val viewModel = viewModel<ReaderViewModel>()
@@ -111,15 +115,17 @@ internal fun ListViewer(
             state = state.state,
             verticalArrangement = Arrangement.spacedBy(itemSpacing)
         ) {
-            itemsIndexed(images) { index, url ->
-                Page(
-                    position = index.plus(1),
-                    url = url,
-                    onTap = {
-                        viewModel.isMenuOpened.value = !viewModel.isMenuOpened.value
-                    },
-                    onLongPress = onLongPress
-                )
+            items(pages) { page ->
+                when (page) {
+                    is ReaderPage.Image -> ImagePage(
+                        page = page,
+                        onTap = {
+                            viewModel.isMenuOpened.value = !viewModel.isMenuOpened.value
+                        },
+                        onLongPress = onLongPress
+                    )
+                    ReaderPage.Empty -> EmptyPage()
+                }
             }
         }
     }
@@ -131,16 +137,15 @@ internal fun ListViewer(
 }
 
 @Composable
-private fun Page(
-    position: Int,
-    url: String,
+private fun ImagePage(
+    page: ReaderPage.Image,
     onTap: ((Offset) -> Unit),
     onLongPress: ((drawable: Drawable, position: Int) -> Unit)
 ) {
     var retryHash by remember { mutableStateOf(0) }
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current)
-            .data(url)
+            .data(page.url)
             .size(Size.ORIGINAL)
             .setParameter("retry_hash", retryHash, memoryCacheKey = null)
             .build()
@@ -158,7 +163,7 @@ private fun Page(
                     onDoubleTap = { /* Called on Double Tap */ },
                     onLongPress = {
                         (painter.state as? AsyncImagePainter.State.Success)
-                            ?.let { onLongPress(it.result.drawable, position) }
+                            ?.let { onLongPress(it.result.drawable, page.index + 1) }
                     },
                     onTap = { offset ->
                         onTap(
@@ -184,9 +189,30 @@ private fun Page(
                 .height(240.dp)
                 .align(Alignment.Center),
             state = painter.state,
-            position = position,
-            url = url,
+            page = page,
             onRetry = { retryHash++ }
         )
+    }
+}
+
+@Composable
+private fun EmptyPage() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(240.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier.padding(48.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Chapter is empty",
+                style = MaterialTheme.typography.subtitle2,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }

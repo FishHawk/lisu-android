@@ -128,10 +128,9 @@ fun ReaderScreen() {
                     result = pointer.currChapter.content,
                     onRetry = { /*TODO*/ },
                     modifier = Modifier.fillMaxSize(),
-                ) { images ->
-                    val size = images.size
+                ) { pages ->
                     var startPage by remember(pointer) {
-                        mutableStateOf(pointer.startPage.coerceAtMost(size - 1))
+                        mutableStateOf(pointer.startPage.coerceAtMost(pages.size - 1))
                     }
 
                     val scope = rememberCoroutineScope()
@@ -150,29 +149,31 @@ fun ReaderScreen() {
                                 LazyListState(firstVisibleItemIndex = startPage)
                             }
                         ).also {
-                            ListViewer(it, images, onLongPress)
+                            ListViewer(it, pages, onLongPress)
                         }
                         else ViewerState.Pager(
                             rememberSaveable(pointer, readerMode, saver = PagerState.Saver) {
                                 PagerState(currentPage = startPage)
                             }
                         ).also {
-                            PagerViewer(it, images, readerMode == ReaderMode.Rtl, onLongPress)
+                            PagerViewer(it, pages, readerMode == ReaderMode.Rtl, onLongPress)
                         }
                     LaunchedEffect(readerState) {
                         snapshotFlow { readerState!!.position }.collect {
                             startPage = it
                             onAction(ReaderAction.UpdateHistory(it))
-                            images
+                            pages
                                 .slice(
                                     (it - 3).coerceAtLeast(0)..
                                             (it + 5).coerceAtMost(readerState!!.size - 1)
                                 )
-                                .forEach { url ->
-                                    val request = ImageRequest.Builder(context)
-                                        .data(url)
-                                        .build()
-                                    context.imageLoader.enqueue(request)
+                                .forEach { page ->
+                                    if (page is ReaderPage.Image) {
+                                        val request = ImageRequest.Builder(context)
+                                            .data(page.url)
+                                            .build()
+                                        context.imageLoader.enqueue(request)
+                                    }
                                 }
                         }
                     }
@@ -183,7 +184,7 @@ fun ReaderScreen() {
 
                 val showInfoBar by PR.showInfoBar.collectAsState()
                 if (showInfoBar && !isMenuOpened)
-                    ReaderInfoBar(name, title, readerState)
+                    readerState?.let { ReaderInfoBar(it) }
 
                 ReaderColorFilterOverlay()
 

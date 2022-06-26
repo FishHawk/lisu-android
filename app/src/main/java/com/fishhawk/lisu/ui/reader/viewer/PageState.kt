@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.ui.reader.ReaderPage
 import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import com.fishhawk.lisu.util.interceptor.ProgressInterceptor
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -58,21 +59,20 @@ fun nestedScrollConnection(
 fun PageState(
     modifier: Modifier,
     state: AsyncImagePainter.State,
-    position: Int,
-    url: String,
+    page: ReaderPage.Image,
     onRetry: () -> Unit
 ) {
     when (state) {
         is AsyncImagePainter.State.Loading ->
             PageLoadingState(
                 modifier = modifier,
-                position = position,
-                url = url
+                position = page.index + 1,
+                url = page.url
             )
         is AsyncImagePainter.State.Error ->
             PageErrorState(
                 modifier = modifier,
-                position = position,
+                position = page.index + 1,
                 throwable = state.result.throwable,
                 onRetry = onRetry
             )

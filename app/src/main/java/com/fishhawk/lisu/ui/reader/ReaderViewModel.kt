@@ -22,6 +22,11 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
+sealed interface ReaderPage {
+    data class Image(val index: Int, val url: String) : ReaderPage
+    object Empty : ReaderPage
+}
+
 class ReaderChapter(
     val collectionId: String,
     val index: Int,
@@ -30,7 +35,7 @@ class ReaderChapter(
     val id = chapter.id
     val title = chapter.title
     val name = chapter.name
-    var content: Result<List<String>>? = null
+    var content: Result<List<ReaderPage>>? = null
 }
 
 sealed interface ReaderEffect : Event {
@@ -179,7 +184,10 @@ class ReaderViewModel(
         )
 
         if (chapter.content?.isSuccess != true) {
-            chapter.content = result
+            chapter.content = result.map {
+                if (it.isEmpty()) listOf(ReaderPage.Empty)
+                else it.mapIndexed { index, url -> ReaderPage.Image(index = index, url = url) }
+            }
             refreshPointerIfNeed()
         }
     }

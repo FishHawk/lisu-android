@@ -8,9 +8,11 @@ import androidx.compose.foundation.gestures.animateZoomBy
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -26,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
@@ -33,20 +36,21 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import coil.size.Size as CoilSize
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ScaleType
 import com.fishhawk.lisu.data.datastore.collectAsState
+import com.fishhawk.lisu.ui.reader.ReaderPage
 import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import kotlinx.coroutines.launch
+import coil.size.Size as CoilSize
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalComposeUiApi::class)
 @Composable
 internal fun PagerViewer(
     state: ViewerState.Pager,
-    images: List<String>,
+    pages: List<ReaderPage>,
     isRtl: Boolean,
     onLongPress: ((drawable: Drawable, position: Int) -> Unit)
 ) {
@@ -127,30 +131,35 @@ internal fun PagerViewer(
         val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
         CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
             HorizontalPager(
-                count = images.size,
+                count = pages.size,
                 modifier = Modifier.fillMaxSize(),
                 state = state.state,
                 itemSpacing = if (isPageIntervalEnabled) 16.dp else 0.dp
             ) { index ->
-                Page(
-                    position = index.plus(1),
-                    url = images[index],
-                    contentScale = when (scaleType) {
-                        ScaleType.FitScreen -> ContentScale.Fit
-                        ScaleType.FitWidth -> ContentScale.FillWidth
-                        ScaleType.FitHeight -> ContentScale.FillHeight
-                        ScaleType.OriginalSize -> ContentScale.None
-                    },
-                    onTap = { offset ->
-                        if (viewModel.isMenuOpened.value) viewModel.isMenuOpened.value = false
-                        else when {
-                            offset.x < 0.25 -> toLeft()
-                            offset.x > 0.75 -> toRight()
-                            else -> viewModel.isMenuOpened.value = !viewModel.isMenuOpened.value
-                        }
-                    },
-                    onLongPress = onLongPress
-                )
+                when (val page = pages[index]) {
+                    is ReaderPage.Image ->
+                        ImagePage(
+                            page = page,
+                            contentScale = when (scaleType) {
+                                ScaleType.FitScreen -> ContentScale.Fit
+                                ScaleType.FitWidth -> ContentScale.FillWidth
+                                ScaleType.FitHeight -> ContentScale.FillHeight
+                                ScaleType.OriginalSize -> ContentScale.None
+                            },
+                            onTap = { offset ->
+                                if (viewModel.isMenuOpened.value) viewModel.isMenuOpened.value =
+                                    false
+                                else when {
+                                    offset.x < 0.25 -> toLeft()
+                                    offset.x > 0.75 -> toRight()
+                                    else -> viewModel.isMenuOpened.value =
+                                        !viewModel.isMenuOpened.value
+                                }
+                            },
+                            onLongPress = onLongPress
+                        )
+                    ReaderPage.Empty -> EmptyPage()
+                }
             }
         }
     }
@@ -162,41 +171,57 @@ internal fun PagerViewer(
 }
 
 @Composable
-private fun Page(
-    position: Int,
-    url: String,
+private fun ImagePage(
+    page: ReaderPage.Image,
     contentScale: ContentScale,
     onTap: ((Offset) -> Unit),
     onLongPress: ((drawable: Drawable, position: Int) -> Unit)
 ) {
-    var retryHash by remember { mutableStateOf(0) }
-    val painter = rememberAsyncImagePainter(
-        ImageRequest.Builder(LocalContext.current)
-            .data(url)
-            .size(CoilSize.ORIGINAL)
-            .setParameter("retry_hash", retryHash, memoryCacheKey = null)
-            .build()
-    )
-
     Box {
+        var retryHash by remember { mutableStateOf(0) }
+        val painter = rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current)
+                .data(page.url)
+                .size(CoilSize.ORIGINAL)
+                .setParameter("retry_hash", retryHash, memoryCacheKey = null)
+                .build()
+        )
         ZoomableImage(
             painter = painter,
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             onLongPress = {
                 (painter.state as? AsyncImagePainter.State.Success)
-                    ?.let { onLongPress(it.result.drawable, position) }
+                    ?.let { onLongPress(it.result.drawable, page.index + 1) }
             },
             onTap = onTap
         )
-
         PageState(
             modifier = Modifier.fillMaxSize(),
             state = painter.state,
-            position = position,
-            url = url,
+            page = page,
             onRetry = { retryHash++ }
         )
+    }
+}
+
+@Composable
+private fun EmptyPage() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier.padding(48.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Chapter is empty",
+                style = MaterialTheme.typography.subtitle2,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 
