@@ -19,12 +19,12 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.reader.ReaderPage
-import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import com.fishhawk.lisu.util.interceptor.ProgressInterceptor
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 fun nestedScrollConnection(
-    viewModel: ReaderViewModel,
+    requestMoveToPrevChapter: () -> Unit,
+    requestMoveToNextChapter: () -> Unit,
     isPrepareToPrev: (offset: Offset) -> Boolean,
     isPrepareToNext: (offset: Offset) -> Boolean
 ) = object : NestedScrollConnection {
@@ -46,10 +46,10 @@ fun nestedScrollConnection(
     override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
         if (prepareToNext) {
             prepareToNext = false
-            viewModel.moveToNextChapter()
+            requestMoveToNextChapter()
         } else if (prepareToPrev) {
             prepareToPrev = false
-            viewModel.moveToPrevChapter()
+            requestMoveToPrevChapter()
         }
         return Velocity.Zero
     }

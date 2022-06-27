@@ -25,8 +25,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fishhawk.lisu.data.datastore.ReaderMode
-import com.fishhawk.lisu.data.datastore.ReaderOrientation
-import com.fishhawk.lisu.data.datastore.next
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
 import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.widget.LocalBottomSheetHelper
@@ -34,8 +32,8 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun BoxScope.ReaderInfoBar(readerState: ViewerState) {
-    val infoBarText = "${readerState.position + 1}/${readerState.size}"
+internal fun BoxScope.ReaderInfoBar(viewerState: ViewerState) {
+    val infoBarText = "${viewerState.position + 1}/${viewerState.size}"
     Text(
         text = infoBarText,
         modifier = Modifier
@@ -58,7 +56,6 @@ internal fun BoxScope.ReaderMenu(
     chapterName: String,
     chapterTitle: String,
     readerMode: ReaderMode,
-    readerOrientation: ReaderOrientation,
     isOnlyOneChapter: Boolean,
     viewerState: ViewerState?,
     onAction: ReaderActionHandler
@@ -77,7 +74,11 @@ internal fun BoxScope.ReaderMenu(
         enter = slideInVertically(initialOffsetY = { -it }),
         exit = slideOutVertically(targetOffsetY = { -it })
     ) {
-        ReaderMenuTop(mangaTitle, chapterName, chapterTitle)
+        ReaderMenuTop(
+            mangaTitle = mangaTitle,
+            chapterName = chapterName,
+            chapterTitle = chapterTitle
+        )
     }
 
     AnimatedVisibility(
@@ -88,7 +89,6 @@ internal fun BoxScope.ReaderMenu(
     ) {
         ReaderMenuBottom(
             readerMode = readerMode,
-            readerOrientation = readerOrientation,
             isOnlyOneChapter = isOnlyOneChapter,
             viewerState = viewerState,
             onAction = onAction
@@ -96,10 +96,11 @@ internal fun BoxScope.ReaderMenu(
     }
 }
 
-
 @Composable
 private fun ReaderMenuTop(
-    mangaTitle: String, chapterName: String, chapterTitle: String
+    mangaTitle: String,
+    chapterName: String,
+    chapterTitle: String
 ) {
     ReaderMenuSurface {
         Row(
@@ -140,7 +141,6 @@ private fun ReaderMenuTop(
 @Composable
 private fun ReaderMenuBottom(
     readerMode: ReaderMode,
-    readerOrientation: ReaderOrientation,
     isOnlyOneChapter: Boolean,
     viewerState: ViewerState?,
     onAction: ReaderActionHandler
@@ -225,7 +225,7 @@ private fun ReaderMenuBottom(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(modifier = Modifier.weight(1f), onClick = {
-                    onAction(ReaderAction.SetReaderMode(readerMode.next()))
+                    onAction(ReaderAction.ToggleReaderMode)
                 }) {
                     val icon = when (readerMode) {
                         ReaderMode.Ltr -> Icons.Filled.ArrowForward
@@ -236,7 +236,7 @@ private fun ReaderMenuBottom(
                 }
 
                 IconButton(modifier = Modifier.weight(1f), onClick = {
-                    onAction(ReaderAction.SetReaderOrientation(readerOrientation.next()))
+                    onAction(ReaderAction.ToggleReaderOrientation)
                 }) {
                     Icon(Icons.Filled.ScreenRotation, "reader orientation")
                 }
@@ -257,7 +257,9 @@ private fun ReaderMenuBottom(
 
 @Composable
 private fun ReaderMenuSurface(
-    modifier: Modifier = Modifier, shape: Shape = RectangleShape, content: @Composable () -> Unit
+    modifier: Modifier = Modifier,
+    shape: Shape = RectangleShape,
+    content: @Composable () -> Unit
 ) = Surface(
     modifier = modifier,
     shape = shape,

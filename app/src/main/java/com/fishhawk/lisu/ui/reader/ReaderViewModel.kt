@@ -13,6 +13,7 @@ import com.fishhawk.lisu.data.database.model.MangaSetting
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.datastore.ReaderMode
 import com.fishhawk.lisu.data.datastore.ReaderOrientation
+import com.fishhawk.lisu.data.datastore.next
 import com.fishhawk.lisu.data.network.LisuRepository
 import com.fishhawk.lisu.data.network.model.ChapterDto
 import com.fishhawk.lisu.data.network.model.MangaDetailDto
@@ -103,11 +104,9 @@ class ReaderViewModel(
         .onEach { chapters ->
             val chapterId = args.getString("chapterId")
             val chapterIndex = chapters.indexOfFirst { it.id == chapterId }
-            chapterPointer = MutableStateFlow(
-                ReaderChapterPointer(
-                    index = if (chapterIndex < 0) 0 else chapterIndex,
-                    startPage = args.getInt("page", 0)
-                )
+            chapterPointer.value = ReaderChapterPointer(
+                index = if (chapterIndex < 0) 0 else chapterIndex,
+                startPage = args.getInt("page", 0),
             )
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
@@ -121,9 +120,7 @@ class ReaderViewModel(
         val prevChapter get() = chapterList.value!!.getOrNull(index - 1)
     }
 
-    lateinit var chapterPointer: MutableStateFlow<ReaderChapterPointer>
-
-    val isMenuOpened = MutableStateFlow(false)
+    val chapterPointer = MutableStateFlow<ReaderChapterPointer?>(null)
 
     val isOnlyOneChapter = chapterList
         .map { it?.size == 1 }
@@ -157,11 +154,13 @@ class ReaderViewModel(
             .launchIn(viewModelScope)
     }
 
-    private fun loadChapterPointer() = viewModelScope.launch {
-        val pointer = chapterPointer.value
-        loadChapter(pointer.currChapter)
-        pointer.prevChapter?.let { loadChapter(it) }
-        pointer.nextChapter?.let { loadChapter(it) }
+    private fun loadChapterPointer() {
+        viewModelScope.launch {
+            val pointer = chapterPointer.value ?: return@launch
+            loadChapter(pointer.currChapter)
+            pointer.prevChapter?.let { loadChapter(it) }
+            pointer.nextChapter?.let { loadChapter(it) }
+        }
     }
 
     private suspend fun loadChapter(chapter: ReaderChapter) {
@@ -169,7 +168,7 @@ class ReaderViewModel(
         chapter.content = null
 
         fun refreshPointerIfNeed() {
-            chapterPointer.value.let { pointer ->
+            chapterPointer.value?.let { pointer ->
                 if (chapter.index == pointer.index) {
                     chapterPointer.value = ReaderChapterPointer(pointer.index, pointer.startPage)
                 }
@@ -205,7 +204,7 @@ class ReaderViewModel(
     }
 
     fun openNextChapter() {
-        val pointer = chapterPointer.value
+        val pointer = chapterPointer.value ?: return
         val nextChapter = pointer.nextChapter
             ?: return sendMessage(R.string.no_next_chapter)
         chapterPointer.value =
@@ -214,7 +213,7 @@ class ReaderViewModel(
     }
 
     fun openPrevChapter() {
-        val pointer = chapterPointer.value
+        val pointer = chapterPointer.value ?: return
         val prevChapter = pointer.prevChapter
             ?: return sendMessage(R.string.no_prev_chapter)
         chapterPointer.value =
@@ -223,7 +222,7 @@ class ReaderViewModel(
     }
 
     fun moveToNextChapter() {
-        val pointer = chapterPointer.value
+        val pointer = chapterPointer.value ?: return
         val nextChapter = pointer.nextChapter
             ?: return sendMessage(R.string.no_next_chapter)
 
@@ -237,7 +236,7 @@ class ReaderViewModel(
     }
 
     fun moveToPrevChapter() {
-        val pointer = chapterPointer.value
+        val pointer = chapterPointer.value ?: return
         val prevChapter = pointer.prevChapter
             ?: return sendMessage(R.string.no_prev_chapter)
 
@@ -250,38 +249,43 @@ class ReaderViewModel(
         }
     }
 
-    fun updateReadingHistory(page: Int) = viewModelScope.launch {
-        val detail = mangaResult.value?.getOrNull() ?: return@launch
-        val chapter = chapterPointer.value.currChapter
-        val readingHistory = ReadingHistory(
-            providerId = detail.providerId,
-            mangaId = mangaId,
-            cover = detail.cover,
-            title = detail.title,
-            authors = detail.authors.joinToString(separator = ";"),
-            collectionId = chapter.collectionId,
-            chapterId = chapter.id,
-            chapterName = chapter.name,
-            page = page
-        )
-        readingHistoryRepository.update(readingHistory)
-    }
-
-    fun updateCover(drawable: Drawable) = viewModelScope.launch {
-        val stream = ByteArrayOutputStream()
-        drawable.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream)
-        val byteArray = stream.toByteArray()
-        lisuRepository.updateMangaCover(
-            providerId,
-            mangaId,
-            byteArray,
-            "image/png",
-        ).onSuccess { sendEvent(ReaderEffect.Message(R.string.cover_updated)) }
-            .onFailure { sendEvent(ReaderEffect.Message(R.string.cover_update_failed)) }
-    }
-
-    fun setReaderMode(value: ReaderMode) {
+    fun updateReadingHistory(page: Int) {
         viewModelScope.launch {
+            val detail = mangaResult.value?.getOrNull() ?: return@launch
+            val chapter = chapterPointer.value?.currChapter ?: return@launch
+            val readingHistory = ReadingHistory(
+                providerId = detail.providerId,
+                mangaId = mangaId,
+                cover = detail.cover,
+                title = detail.title,
+                authors = detail.authors.joinToString(separator = ";"),
+                collectionId = chapter.collectionId,
+                chapterId = chapter.id,
+                chapterName = chapter.name,
+                page = page
+            )
+            readingHistoryRepository.update(readingHistory)
+        }
+    }
+
+    fun updateCover(drawable: Drawable) {
+        viewModelScope.launch {
+            val stream = ByteArrayOutputStream()
+            drawable.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream)
+            val byteArray = stream.toByteArray()
+            lisuRepository.updateMangaCover(
+                providerId,
+                mangaId,
+                byteArray,
+                "image/png",
+            ).onSuccess { sendEvent(ReaderEffect.Message(R.string.cover_updated)) }
+                .onFailure { sendEvent(ReaderEffect.Message(R.string.cover_update_failed)) }
+        }
+    }
+
+    fun toggleReaderMode() {
+        viewModelScope.launch {
+            val value = readerMode.value?.next()
             val setting = mangaSetting.value?.copy(readerMode = value)
                 ?: MangaSetting(
                     providerId = providerId,
@@ -294,8 +298,9 @@ class ReaderViewModel(
         }
     }
 
-    fun setReaderOrientation(value: ReaderOrientation) {
+    fun toggleReaderOrientation() {
         viewModelScope.launch {
+            val value = readerOrientation.value?.next()
             val setting = mangaSetting.value?.copy(readerOrientation = value)
                 ?: MangaSetting(
                     providerId = providerId,

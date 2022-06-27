@@ -9,7 +9,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -28,7 +27,6 @@ import com.fishhawk.lisu.widget.LocalBottomSheetHelper
 import com.fishhawk.lisu.widget.StateView
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
@@ -46,53 +44,48 @@ sealed interface ReaderAction {
 
     object OpenPrevChapter : ReaderAction
     object OpenNextChapter : ReaderAction
+    object MoveToPrevChapter : ReaderAction
+    object MoveToNextChapter : ReaderAction
 
-    data class SetReaderMode(val value: ReaderMode) : ReaderAction
-    data class SetReaderOrientation(val value: ReaderOrientation) : ReaderAction
+    object ToggleReaderMode : ReaderAction
+    object ToggleReaderOrientation : ReaderAction
     data class UpdateHistory(val page: Int) : ReaderAction
 }
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ReaderScreen() {
-    val systemUiController = rememberSystemUiController()
-    SideEffect {
-        systemUiController.setNavigationBarColor(
-            color = Color(0xFF333333).copy(alpha = 0.8f)
-        )
-    }
-
     val context = LocalContext.current
     val viewModel by viewModel<ReaderViewModel> {
         parametersOf(context.findActivity().intent.extras!!)
     }
 
     val mangaTitleResult by viewModel.mangaTitleResult.collectAsState()
-    val isMenuOpened by viewModel.isMenuOpened.collectAsState()
     val isOnlyOneChapter by viewModel.isOnlyOneChapter.collectAsState()
     val readerMode by viewModel.readerMode.collectAsState()
     val readerOrientation by viewModel.readerOrientation.collectAsState()
+    val pointer by viewModel.chapterPointer.collectAsState()
 
     val onAction: ReaderActionHandler = { action ->
         when (action) {
             ReaderAction.NavUp -> context.findActivity().finish()
             ReaderAction.RelaodManga -> viewModel.reloadManga()
             is ReaderAction.SetAsImage -> viewModel.updateCover(action.drawable)
-            is ReaderAction.SavePage ->
-                context.saveImage(
-                    action.drawable,
-                    "${mangaTitleResult?.getOrNull()!!}-${action.position}"
-                )
-            is ReaderAction.SharePage ->
-                context.shareImage(
-                    "Share page via",
-                    action.drawable,
-                    "${mangaTitleResult?.getOrNull()!!}-${action.position}"
-                )
+            is ReaderAction.SavePage -> context.saveImage(
+                action.drawable,
+                "${mangaTitleResult?.getOrNull()!!}-${action.position}"
+            )
+            is ReaderAction.SharePage -> context.shareImage(
+                "Share page via",
+                action.drawable,
+                "${mangaTitleResult?.getOrNull()!!}-${action.position}"
+            )
             ReaderAction.OpenPrevChapter -> viewModel.openPrevChapter()
             ReaderAction.OpenNextChapter -> viewModel.openNextChapter()
-            is ReaderAction.SetReaderMode -> viewModel.setReaderMode(action.value)
-            is ReaderAction.SetReaderOrientation -> viewModel.setReaderOrientation(action.value)
+            ReaderAction.MoveToPrevChapter -> viewModel.moveToPrevChapter()
+            ReaderAction.MoveToNextChapter -> viewModel.moveToNextChapter()
+            is ReaderAction.ToggleReaderMode -> viewModel.toggleReaderMode()
+            is ReaderAction.ToggleReaderOrientation -> viewModel.toggleReaderOrientation()
             is ReaderAction.UpdateHistory -> viewModel.updateReadingHistory(action.page)
         }
     }
@@ -105,14 +98,16 @@ fun ReaderScreen() {
         }
     }
 
-    readerOrientation?.let {
-        val activity = context.findActivity()
-        val newOrientation = when (it) {
-            ReaderOrientation.Portrait -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            ReaderOrientation.Landscape -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+    LaunchedEffect(readerOrientation) {
+        readerOrientation?.let {
+            val activity = context.findActivity()
+            val newOrientation = when (it) {
+                ReaderOrientation.Portrait -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                ReaderOrientation.Landscape -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            }
+            if (newOrientation != activity.requestedOrientation)
+                activity.requestedOrientation = newOrientation
         }
-        if (newOrientation != activity.requestedOrientation)
-            activity.requestedOrientation = newOrientation
     }
 
     Surface {
@@ -122,8 +117,11 @@ fun ReaderScreen() {
             modifier = Modifier.fillMaxSize(),
         ) { mangaTitle ->
             Box(modifier = Modifier.fillMaxSize()) {
-                val pointer by viewModel.chapterPointer.collectAsState()
-                var readerState: ViewerState? = null
+
+                val isMenuOpened = rememberSaveable { mutableStateOf(false) }
+                val pointer = pointer ?: return@StateView
+                var viewerState: ViewerState? = null
+
                 StateView(
                     result = pointer.currChapter.content,
                     onRetry = { /*TODO*/ },
@@ -143,29 +141,44 @@ fun ReaderScreen() {
                         }
                     }
 
-                    readerState =
+                    viewerState =
                         if (readerMode == ReaderMode.Continuous) ViewerState.List(
                             rememberSaveable(pointer, readerMode, saver = LazyListState.Saver) {
                                 LazyListState(firstVisibleItemIndex = startPage)
                             }
                         ).also {
-                            ListViewer(it, pages, onLongPress)
+                            ListViewer(
+                                isMenuOpened = isMenuOpened,
+                                state = it,
+                                pages = pages,
+                                requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
+                                requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
+                                onLongPress = onLongPress,
+                            )
                         }
                         else ViewerState.Pager(
                             rememberSaveable(pointer, readerMode, saver = PagerState.Saver) {
                                 PagerState(currentPage = startPage)
                             }
                         ).also {
-                            PagerViewer(it, pages, readerMode == ReaderMode.Rtl, onLongPress)
+                            PagerViewer(
+                                isMenuOpened = isMenuOpened,
+                                state = it,
+                                pages = pages,
+                                isRtl = readerMode == ReaderMode.Rtl,
+                                requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
+                                requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
+                                onLongPress = onLongPress,
+                            )
                         }
-                    LaunchedEffect(readerState) {
-                        snapshotFlow { readerState!!.position }.collect {
+                    LaunchedEffect(viewerState) {
+                        snapshotFlow { viewerState!!.position }.collect {
                             startPage = it
                             onAction(ReaderAction.UpdateHistory(it))
                             pages
                                 .slice(
                                     (it - 3).coerceAtLeast(0)..
-                                            (it + 5).coerceAtMost(readerState!!.size - 1)
+                                            (it + 5).coerceAtMost(viewerState!!.size - 1)
                                 )
                                 .forEach { page ->
                                     if (page is ReaderPage.Image) {
@@ -179,25 +192,21 @@ fun ReaderScreen() {
                     }
                 }
 
-                val name = pointer.currChapter.name
-                val title = pointer.currChapter.title
-
                 val showInfoBar by PR.showInfoBar.collectAsState()
-                if (showInfoBar && !isMenuOpened)
-                    readerState?.let { ReaderInfoBar(it) }
+                if (showInfoBar && !isMenuOpened.value)
+                    viewerState?.let { ReaderInfoBar(it) }
 
                 ReaderColorFilterOverlay()
 
                 ReaderMenu(
-                    isMenuOpened,
-                    mangaTitle,
-                    name,
-                    title,
-                    readerMode ?: return@Box,
-                    readerOrientation ?: return@Box,
-                    isOnlyOneChapter,
-                    readerState,
-                    onAction
+                    isOpened = isMenuOpened.value,
+                    mangaTitle = mangaTitle,
+                    chapterName = pointer.currChapter.name,
+                    chapterTitle = pointer.currChapter.title,
+                    readerMode = readerMode ?: return@Box,
+                    isOnlyOneChapter = isOnlyOneChapter,
+                    viewerState = viewerState,
+                    onAction = onAction
                 )
             }
         }

@@ -25,7 +25,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -33,29 +32,30 @@ import coil.size.Size
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.ui.reader.ReaderPage
-import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun ListViewer(
+    isMenuOpened: MutableState<Boolean>,
     state: ViewerState.List,
     pages: List<ReaderPage>,
+    requestMoveToPrevChapter: () -> Unit,
+    requestMoveToNextChapter: () -> Unit,
     onLongPress: ((drawable: Drawable, position: Int) -> Unit)
 ) {
-    val viewModel = viewModel<ReaderViewModel>()
     val scope = rememberCoroutineScope()
 
     fun toNext() {
         if (state.position < state.size - 1)
             scope.launch { state.scrollToPage(state.position + 1) }
-        else viewModel.moveToNextChapter()
+        else requestMoveToNextChapter()
     }
 
     fun toPrev() {
         if (state.position > 0)
             scope.launch { state.scrollToPage(state.position - 1) }
-        else viewModel.moveToPrevChapter()
+        else requestMoveToPrevChapter()
     }
 
     val useVolumeKey by PR.useVolumeKey.collectAsState()
@@ -64,7 +64,12 @@ internal fun ListViewer(
     val focusRequester = remember { FocusRequester() }
 
     val nestedScrollConnection = remember {
-        nestedScrollConnection(viewModel, { it.y > 10 }, { it.y < -10 })
+        nestedScrollConnection(
+            requestMoveToPrevChapter = requestMoveToPrevChapter,
+            requestMoveToNextChapter = requestMoveToNextChapter,
+            isPrepareToPrev = { it.y > 10 },
+            isPrepareToNext = { it.y < -10 },
+        )
     }
 
     Box(
@@ -77,11 +82,11 @@ internal fun ListViewer(
                     KeyEventType.KeyDown -> {
                         when (it.key) {
                             Key.VolumeUp ->
-                                if (useVolumeKey && !viewModel.isMenuOpened.value) {
+                                if (useVolumeKey && !isMenuOpened.value) {
                                     if (invertVolumeKey) toNext() else toPrev()
                                 } else return@onPreviewKeyEvent false
                             Key.VolumeDown ->
-                                if (useVolumeKey && !viewModel.isMenuOpened.value) {
+                                if (useVolumeKey && !isMenuOpened.value) {
                                     if (invertVolumeKey) toPrev() else toNext()
                                 } else return@onPreviewKeyEvent false
                             else -> return@onPreviewKeyEvent false
@@ -89,10 +94,10 @@ internal fun ListViewer(
                     }
                     KeyEventType.KeyUp -> {
                         when (it.key) {
-                            Key.Menu -> viewModel.isMenuOpened.value = !viewModel.isMenuOpened.value
+                            Key.Menu -> isMenuOpened.value = !isMenuOpened.value
 
-                            Key.N -> viewModel.moveToNextChapter()
-                            Key.P -> viewModel.moveToPrevChapter()
+                            Key.N -> requestMoveToNextChapter()
+                            Key.P -> requestMoveToPrevChapter()
 //
 //                            Key.DirectionUp, Key.PageUp -> toPrev()
 //                            Key.DirectionDown, Key.PageDown -> toNext()
@@ -120,7 +125,7 @@ internal fun ListViewer(
                     is ReaderPage.Image -> ImagePage(
                         page = page,
                         onTap = {
-                            viewModel.isMenuOpened.value = !viewModel.isMenuOpened.value
+                            isMenuOpened.value = !isMenuOpened.value
                         },
                         onLongPress = onLongPress
                     )

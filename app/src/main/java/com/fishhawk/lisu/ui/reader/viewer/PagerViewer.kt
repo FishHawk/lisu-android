@@ -32,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -40,7 +39,6 @@ import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ScaleType
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.ui.reader.ReaderPage
-import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import kotlinx.coroutines.launch
@@ -49,24 +47,26 @@ import coil.size.Size as CoilSize
 @OptIn(ExperimentalPagerApi::class, ExperimentalComposeUiApi::class)
 @Composable
 internal fun PagerViewer(
+    isMenuOpened: MutableState<Boolean>,
     state: ViewerState.Pager,
     pages: List<ReaderPage>,
     isRtl: Boolean,
-    onLongPress: ((drawable: Drawable, position: Int) -> Unit)
+    requestMoveToPrevChapter: () -> Unit,
+    requestMoveToNextChapter: () -> Unit,
+    onLongPress: (drawable: Drawable, position: Int) -> Unit,
 ) {
-    val viewModel = viewModel<ReaderViewModel>()
     val scope = rememberCoroutineScope()
 
     fun toNext() {
         if (state.position < state.size - 1)
             scope.launch { state.scrollToPage(state.position + 1) }
-        else viewModel.moveToNextChapter()
+        else requestMoveToNextChapter()
     }
 
     fun toPrev() {
         if (state.position > 0)
             scope.launch { state.scrollToPage(state.position - 1) }
-        else viewModel.moveToPrevChapter()
+        else requestMoveToPrevChapter()
     }
 
     fun toLeft() = if (isRtl) toNext() else toPrev()
@@ -79,9 +79,10 @@ internal fun PagerViewer(
 
     val nestedScrollConnection = remember(isRtl) {
         nestedScrollConnection(
-            viewModel,
-            { if (isRtl) it.x < -10 else it.x > 10 },
-            { if (isRtl) it.x > 10 else it.x < -10 }
+            requestMoveToPrevChapter = requestMoveToPrevChapter,
+            requestMoveToNextChapter = requestMoveToNextChapter,
+            isPrepareToPrev = { if (isRtl) it.x < -10 else it.x > 10 },
+            isPrepareToNext = { if (isRtl) it.x > 10 else it.x < -10 },
         )
     }
 
@@ -95,11 +96,11 @@ internal fun PagerViewer(
                 KeyEventType.KeyDown -> {
                     when (it.key) {
                         Key.VolumeUp ->
-                            if (useVolumeKey && !viewModel.isMenuOpened.value) {
+                            if (useVolumeKey && !isMenuOpened.value) {
                                 if (invertVolumeKey) toNext() else toPrev()
                             } else return@onPreviewKeyEvent false
                         Key.VolumeDown ->
-                            if (useVolumeKey && !viewModel.isMenuOpened.value) {
+                            if (useVolumeKey && !isMenuOpened.value) {
                                 if (invertVolumeKey) toPrev() else toNext()
                             } else return@onPreviewKeyEvent false
                         else -> return@onPreviewKeyEvent false
@@ -107,10 +108,10 @@ internal fun PagerViewer(
                 }
                 KeyEventType.KeyUp -> {
                     when (it.key) {
-                        Key.Menu -> viewModel.isMenuOpened.value = !viewModel.isMenuOpened.value
+                        Key.Menu -> isMenuOpened.value = !isMenuOpened.value
 
-                        Key.N -> viewModel.moveToNextChapter()
-                        Key.P -> viewModel.moveToPrevChapter()
+                        Key.N -> requestMoveToNextChapter()
+                        Key.P -> requestMoveToPrevChapter()
 
                         Key.DirectionUp, Key.PageUp -> toPrev()
                         Key.DirectionDown, Key.PageDown -> toNext()
@@ -147,13 +148,11 @@ internal fun PagerViewer(
                                 ScaleType.OriginalSize -> ContentScale.None
                             },
                             onTap = { offset ->
-                                if (viewModel.isMenuOpened.value) viewModel.isMenuOpened.value =
-                                    false
+                                if (isMenuOpened.value) isMenuOpened.value = false
                                 else when {
                                     offset.x < 0.25 -> toLeft()
                                     offset.x > 0.75 -> toRight()
-                                    else -> viewModel.isMenuOpened.value =
-                                        !viewModel.isMenuOpened.value
+                                    else -> isMenuOpened.value = true
                                 }
                             },
                             onLongPress = onLongPress
