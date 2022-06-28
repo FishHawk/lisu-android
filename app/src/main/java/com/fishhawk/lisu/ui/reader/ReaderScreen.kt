@@ -36,7 +36,8 @@ internal typealias ReaderActionHandler = (ReaderAction) -> Unit
 sealed interface ReaderAction {
     object NavUp : ReaderAction
 
-    object RelaodManga : ReaderAction
+    object ReloadManga : ReaderAction
+    object ReloadChapter : ReaderAction
 
     data class SetAsImage(val drawable: Drawable) : ReaderAction
     data class SavePage(val drawable: Drawable, val position: Int) : ReaderAction
@@ -69,7 +70,8 @@ fun ReaderScreen() {
     val onAction: ReaderActionHandler = { action ->
         when (action) {
             ReaderAction.NavUp -> context.findActivity().finish()
-            ReaderAction.RelaodManga -> viewModel.reloadManga()
+            ReaderAction.ReloadManga -> viewModel.reloadManga()
+            ReaderAction.ReloadChapter -> viewModel.loadChapterPointer()
             is ReaderAction.SetAsImage -> viewModel.updateCover(action.drawable)
             is ReaderAction.SavePage -> context.saveImage(
                 action.drawable,
@@ -113,102 +115,118 @@ fun ReaderScreen() {
     Surface {
         StateView(
             result = mangaTitleResult,
-            onRetry = { onAction(ReaderAction.RelaodManga) },
+            onRetry = { onAction(ReaderAction.ReloadManga) },
             modifier = Modifier.fillMaxSize(),
         ) { mangaTitle ->
-            Box(modifier = Modifier.fillMaxSize()) {
+            Reader(
+                pointer = pointer ?: return@StateView,
+                readerMode = readerMode,
+                mangaTitle = mangaTitle,
+                isOnlyOneChapter = isOnlyOneChapter,
+                onAction = onAction,
+            )
+        }
+    }
+}
 
-                val isMenuOpened = rememberSaveable { mutableStateOf(false) }
-                val pointer = pointer ?: return@StateView
-                var viewerState: ViewerState? = null
+@Composable
+@OptIn(ExperimentalPagerApi::class)
+private fun Reader(
+    pointer: ReaderViewModel.ReaderChapterPointer,
+    readerMode: ReaderMode?,
+    mangaTitle: String,
+    isOnlyOneChapter: Boolean,
+    onAction: ReaderActionHandler,
+) {
+    val context = LocalContext.current
+    Box(modifier = Modifier.fillMaxSize()) {
+        var viewerState: ViewerState? = null
+        val isMenuOpened = rememberSaveable { mutableStateOf(false) }
+        StateView(
+            result = pointer.pages,
+            onRetry = { onAction(ReaderAction.ReloadChapter) },
+            modifier = Modifier.fillMaxSize(),
+        ) { pages ->
+            var startPage by remember(pointer) {
+                mutableStateOf(pointer.startPage.coerceAtMost(pages.size - 1))
+            }
 
-                StateView(
-                    result = pointer.currChapter.content,
-                    onRetry = { /*TODO*/ },
-                    modifier = Modifier.fillMaxSize(),
-                ) { pages ->
-                    var startPage by remember(pointer) {
-                        mutableStateOf(pointer.startPage.coerceAtMost(pages.size - 1))
-                    }
-
-                    val scope = rememberCoroutineScope()
-                    val isLongTapDialogEnabled by PR.isLongTapDialogEnabled.collectAsState()
-                    val bottomSheetHelper = LocalBottomSheetHelper.current
-                    val onLongPress = { drawable: Drawable, position: Int ->
-                        if (isLongTapDialogEnabled) {
-                            val sheet = ReaderPageSheet(drawable, position, onAction)
-                            scope.launch { bottomSheetHelper.open(sheet) }
-                        }
-                    }
-
-                    viewerState =
-                        if (readerMode == ReaderMode.Continuous) ViewerState.List(
-                            rememberSaveable(pointer, readerMode, saver = LazyListState.Saver) {
-                                LazyListState(firstVisibleItemIndex = startPage)
-                            }
-                        ).also {
-                            ListViewer(
-                                isMenuOpened = isMenuOpened,
-                                state = it,
-                                pages = pages,
-                                requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
-                                requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
-                                onLongPress = onLongPress,
-                            )
-                        }
-                        else ViewerState.Pager(
-                            rememberSaveable(pointer, readerMode, saver = PagerState.Saver) {
-                                PagerState(currentPage = startPage)
-                            }
-                        ).also {
-                            PagerViewer(
-                                isMenuOpened = isMenuOpened,
-                                state = it,
-                                pages = pages,
-                                isRtl = readerMode == ReaderMode.Rtl,
-                                requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
-                                requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
-                                onLongPress = onLongPress,
-                            )
-                        }
-                    LaunchedEffect(viewerState) {
-                        snapshotFlow { viewerState!!.position }.collect {
-                            startPage = it
-                            onAction(ReaderAction.UpdateHistory(it))
-                            pages
-                                .slice(
-                                    (it - 3).coerceAtLeast(0)..
-                                            (it + 5).coerceAtMost(viewerState!!.size - 1)
-                                )
-                                .forEach { page ->
-                                    if (page is ReaderPage.Image) {
-                                        val request = ImageRequest.Builder(context)
-                                            .data(page.url)
-                                            .build()
-                                        context.imageLoader.enqueue(request)
-                                    }
-                                }
-                        }
-                    }
+            val scope = rememberCoroutineScope()
+            val isLongTapDialogEnabled by PR.isLongTapDialogEnabled.collectAsState()
+            val bottomSheetHelper = LocalBottomSheetHelper.current
+            val onLongPress = { drawable: Drawable, position: Int ->
+                if (isLongTapDialogEnabled) {
+                    val sheet = ReaderPageSheet(drawable, position, onAction)
+                    scope.launch { bottomSheetHelper.open(sheet) }
                 }
+            }
 
-                val showInfoBar by PR.showInfoBar.collectAsState()
-                if (showInfoBar && !isMenuOpened.value)
-                    viewerState?.let { ReaderInfoBar(it) }
-
-                ReaderColorFilterOverlay()
-
-                ReaderMenu(
-                    isOpened = isMenuOpened.value,
-                    mangaTitle = mangaTitle,
-                    chapterName = pointer.currChapter.name,
-                    chapterTitle = pointer.currChapter.title,
-                    readerMode = readerMode ?: return@Box,
-                    isOnlyOneChapter = isOnlyOneChapter,
-                    viewerState = viewerState,
-                    onAction = onAction
-                )
+            viewerState =
+                if (readerMode == ReaderMode.Continuous) ViewerState.List(
+                    rememberSaveable(pointer, readerMode, saver = LazyListState.Saver) {
+                        LazyListState(firstVisibleItemIndex = startPage)
+                    }
+                ).also {
+                    ListViewer(
+                        isMenuOpened = isMenuOpened,
+                        state = it,
+                        pages = pages,
+                        requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
+                        requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
+                        onLongPress = onLongPress,
+                    )
+                }
+                else ViewerState.Pager(
+                    rememberSaveable(pointer, readerMode, saver = PagerState.Saver) {
+                        PagerState(currentPage = startPage)
+                    }
+                ).also {
+                    PagerViewer(
+                        isMenuOpened = isMenuOpened,
+                        state = it,
+                        pages = pages,
+                        isRtl = readerMode == ReaderMode.Rtl,
+                        requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
+                        requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
+                        onLongPress = onLongPress,
+                    )
+                }
+            LaunchedEffect(viewerState) {
+                snapshotFlow { viewerState!!.position }.collect {
+                    startPage = it
+                    onAction(ReaderAction.UpdateHistory(it))
+                    pages
+                        .slice(
+                            (it - 3).coerceAtLeast(0)..
+                                    (it + 5).coerceAtMost(viewerState!!.size - 1)
+                        )
+                        .forEach { page ->
+                            if (page is ReaderPage.Image) {
+                                val request = ImageRequest.Builder(context)
+                                    .data(page.url)
+                                    .build()
+                                context.imageLoader.enqueue(request)
+                            }
+                        }
+                }
             }
         }
+
+        val showInfoBar by PR.showInfoBar.collectAsState()
+        if (showInfoBar && !isMenuOpened.value)
+            viewerState?.let { ReaderInfoBar(it) }
+
+        ReaderColorFilterOverlay()
+
+        ReaderMenu(
+            isOpened = isMenuOpened.value,
+            mangaTitle = mangaTitle,
+            chapterName = pointer.chapterName,
+            chapterTitle = pointer.chapterTitle,
+            readerMode = readerMode ?: return@Box,
+            isOnlyOneChapter = isOnlyOneChapter,
+            viewerState = viewerState,
+            onAction = onAction
+        )
     }
 }

@@ -11,8 +11,6 @@ import com.fishhawk.lisu.data.database.MangaSettingRepository
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
 import com.fishhawk.lisu.data.database.model.MangaSetting
 import com.fishhawk.lisu.data.database.model.ReadingHistory
-import com.fishhawk.lisu.data.datastore.ReaderMode
-import com.fishhawk.lisu.data.datastore.ReaderOrientation
 import com.fishhawk.lisu.data.datastore.next
 import com.fishhawk.lisu.data.network.LisuRepository
 import com.fishhawk.lisu.data.network.model.ChapterDto
@@ -36,7 +34,7 @@ class ReaderChapter(
     val id = chapter.id
     val title = chapter.title
     val name = chapter.name
-    var content: Result<List<ReaderPage>>? = null
+    var content: Result<List<String>>? = null
 }
 
 sealed interface ReaderEffect : Event {
@@ -101,24 +99,41 @@ class ReaderViewModel(
                 }
             }
         }
-        .onEach { chapters ->
-            val chapterId = args.getString("chapterId")
-            val chapterIndex = chapters.indexOfFirst { it.id == chapterId }
-            chapterPointer.value = ReaderChapterPointer(
-                index = if (chapterIndex < 0) 0 else chapterIndex,
-                startPage = args.getInt("page", 0),
-            )
-        }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    init {
+        chapterList
+            .filterNotNull()
+            .onEach { chapters ->
+                val chapterId = args.getString("chapterId")
+                val chapterIndex = chapters.indexOfFirst { it.id == chapterId }
+                chapterPointer.value = ReaderChapterPointer(
+                    index = if (chapterIndex < 0) 0 else chapterIndex,
+                    startPage = args.getInt("page", 0),
+                )
+            }
+            .launchIn(viewModelScope)
+    }
 
     inner class ReaderChapterPointer(
         val index: Int,
-        val startPage: Int
+        val startPage: Int,
     ) {
-        val currChapter get() = chapterList.value!![index]
-        val nextChapter get() = chapterList.value!!.getOrNull(index + 1)
-        val prevChapter get() = chapterList.value!!.getOrNull(index - 1)
+        val chapterName get() = currChapter.name
+        val chapterTitle get() = currChapter.title
+        val pages: Result<List<ReaderPage>>?
+
+        init {
+            pages = currChapter.content?.map {
+                if (it.isEmpty()) listOf(ReaderPage.Empty)
+                else it.mapIndexed { index, url -> ReaderPage.Image(index = index, url = url) }
+            }
+        }
     }
+
+    private val ReaderChapterPointer.currChapter get() = chapterList.value!![index]
+    private val ReaderChapterPointer.nextChapter get() = chapterList.value!!.getOrNull(index + 1)
+    private val ReaderChapterPointer.prevChapter get() = chapterList.value!!.getOrNull(index - 1)
 
     val chapterPointer = MutableStateFlow<ReaderChapterPointer?>(null)
 
@@ -154,7 +169,13 @@ class ReaderViewModel(
             .launchIn(viewModelScope)
     }
 
-    private fun loadChapterPointer() {
+    fun reloadManga() {
+        viewModelScope.launch {
+            mangaData.value?.reload()
+        }
+    }
+
+    fun loadChapterPointer() {
         viewModelScope.launch {
             val pointer = chapterPointer.value ?: return@launch
             loadChapter(pointer.currChapter)
@@ -183,17 +204,8 @@ class ReaderViewModel(
         )
 
         if (chapter.content?.isSuccess != true) {
-            chapter.content = result.map {
-                if (it.isEmpty()) listOf(ReaderPage.Empty)
-                else it.mapIndexed { index, url -> ReaderPage.Image(index = index, url = url) }
-            }
+            chapter.content = result
             refreshPointerIfNeed()
-        }
-    }
-
-    fun reloadManga() {
-        viewModelScope.launch {
-            mangaData.value?.reload()
         }
     }
 
