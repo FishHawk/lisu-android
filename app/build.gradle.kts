@@ -1,14 +1,14 @@
 import java.io.FileInputStream
 import java.util.*
 
-val composeVersion by extra { "1.2.0-rc02" }
+val composeVersion by extra { "1.3.0-alpha01" }
 
 plugins {
-    kotlin("plugin.serialization") version "1.6.21"
+    kotlin("plugin.serialization") version "1.7.0"
     id("com.android.application") version "7.2.1"
-    id("com.google.devtools.ksp") version "1.6.21-1.0.5"
-    id("org.jetbrains.kotlin.android") version "1.6.21"
-    id("org.jetbrains.kotlin.plugin.parcelize") version "1.6.21"
+    id("com.google.devtools.ksp") version "1.7.0-1.0.6"
+    id("org.jetbrains.kotlin.android") version "1.7.0"
+    id("org.jetbrains.kotlin.plugin.parcelize") version "1.7.0"
     id("com.mikepenz.aboutlibraries.plugin") version "10.3.0"
 }
 
@@ -76,7 +76,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = composeVersion
+        kotlinCompilerExtensionVersion = "1.2.0"
     }
 }
 
@@ -93,9 +93,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-core:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
 
-    implementation("androidx.navigation:navigation-compose:2.5.0-rc02")
+    implementation("androidx.navigation:navigation-compose:2.5.0")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-rc02")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0-alpha01")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
@@ -109,7 +109,7 @@ dependencies {
     implementation("io.insert-koin:koin-android:$koinVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
 
-    val accompanistVersion = "0.24.12-rc"
+    val accompanistVersion = "0.24.13-rc"
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
