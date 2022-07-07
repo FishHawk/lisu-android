@@ -8,11 +8,9 @@ import androidx.compose.foundation.gestures.animateZoomBy
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -28,7 +26,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
@@ -36,7 +33,6 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.fishhawk.lisu.PR
-import com.fishhawk.lisu.data.datastore.ScaleType
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.ui.reader.ReaderPage
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -49,7 +45,6 @@ import coil.size.Size as CoilSize
 internal fun PagerViewer(
     isMenuOpened: MutableState<Boolean>,
     state: ViewerState.Pager,
-    pages: List<ReaderPage>,
     isRtl: Boolean,
     requestMoveToPrevChapter: () -> Unit,
     requestMoveToNextChapter: () -> Unit,
@@ -127,26 +122,27 @@ internal fun PagerViewer(
         }
     ) {
         val isPageIntervalEnabled by PR.isPageIntervalEnabled.collectAsState()
-        val scaleType by PR.scaleType.collectAsState()
 
         val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
         CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
             HorizontalPager(
-                count = pages.size,
+                count = state.pages.size,
                 modifier = Modifier.fillMaxSize(),
                 state = state.state,
+                key = {
+                    when (val page = state.pages[it]) {
+                        ReaderPage.Empty -> 0
+                        is ReaderPage.Image -> page.index
+                        is ReaderPage.NextChapterState -> -1
+                        is ReaderPage.PrevChapterState -> state.pages.size
+                    }
+                },
                 itemSpacing = if (isPageIntervalEnabled) 16.dp else 0.dp
             ) { index ->
-                when (val page = pages[index]) {
+                when (val page = state.pages[index]) {
                     is ReaderPage.Image ->
                         ImagePage(
                             page = page,
-                            contentScale = when (scaleType) {
-                                ScaleType.FitScreen -> ContentScale.Fit
-                                ScaleType.FitWidth -> ContentScale.FillWidth
-                                ScaleType.FitHeight -> ContentScale.FillHeight
-                                ScaleType.OriginalSize -> ContentScale.None
-                            },
                             onTap = { offset ->
                                 if (isMenuOpened.value) isMenuOpened.value = false
                                 else when {
@@ -157,7 +153,12 @@ internal fun PagerViewer(
                             },
                             onLongPress = onLongPress
                         )
-                    ReaderPage.Empty -> EmptyPage()
+                    ReaderPage.Empty ->
+                        EmptyPage(modifier = Modifier.fillMaxSize())
+                    is ReaderPage.NextChapterState ->
+                        NextChapterStatePage(page = page, modifier = Modifier.fillMaxSize())
+                    is ReaderPage.PrevChapterState ->
+                        PrevChapterStatePage(page = page, modifier = Modifier.fillMaxSize())
                 }
             }
         }
@@ -172,9 +173,8 @@ internal fun PagerViewer(
 @Composable
 private fun ImagePage(
     page: ReaderPage.Image,
-    contentScale: ContentScale,
     onTap: ((Offset) -> Unit),
-    onLongPress: ((drawable: Drawable, position: Int) -> Unit)
+    onLongPress: ((drawable: Drawable, position: Int) -> Unit),
 ) {
     Box {
         var retryHash by remember { mutableStateOf(0) }
@@ -204,25 +204,6 @@ private fun ImagePage(
     }
 }
 
-@Composable
-private fun EmptyPage() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            modifier = Modifier.padding(48.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Chapter is empty",
-                style = MaterialTheme.typography.subtitle2,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
 
 private const val maxScale = 3.0f
 private const val midScale = 1.5f
@@ -234,7 +215,7 @@ private fun ZoomableImage(
     contentDescription: String?,
     modifier: Modifier = Modifier,
     onLongPress: ((Offset) -> Unit)? = null,
-    onTap: ((Offset) -> Unit)? = null
+    onTap: ((Offset) -> Unit)? = null,
 ) {
     val srcSize = painter.intrinsicSize
     var dstSize = Size.Unspecified

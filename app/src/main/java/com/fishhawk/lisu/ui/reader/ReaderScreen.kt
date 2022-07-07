@@ -16,9 +16,9 @@ import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
 import com.fishhawk.lisu.data.datastore.ReaderOrientation
 import com.fishhawk.lisu.data.datastore.collectAsState
-import com.fishhawk.lisu.ui.reader.viewer.ListViewer
 import com.fishhawk.lisu.ui.reader.viewer.PagerViewer
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
+import com.fishhawk.lisu.ui.reader.viewer.WebtoonViewer
 import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.util.saveImage
 import com.fishhawk.lisu.util.shareImage
@@ -53,7 +53,6 @@ sealed interface ReaderAction {
     data class UpdateHistory(val page: Int) : ReaderAction
 }
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ReaderScreen() {
     val context = LocalContext.current
@@ -118,6 +117,7 @@ fun ReaderScreen() {
             onRetry = { onAction(ReaderAction.ReloadManga) },
             modifier = Modifier.fillMaxSize(),
         ) { mangaTitle ->
+            println("update here?")
             Reader(
                 pointer = pointer ?: return@StateView,
                 readerMode = readerMode,
@@ -138,83 +138,49 @@ private fun Reader(
     isOnlyOneChapter: Boolean,
     onAction: ReaderActionHandler,
 ) {
-    val context = LocalContext.current
     Box(modifier = Modifier.fillMaxSize()) {
-        var viewerState: ViewerState? = null
         val isMenuOpened = rememberSaveable { mutableStateOf(false) }
+        val viewerStateResult = pointer.pages?.map { pages ->
+            if (readerMode == ReaderMode.Continuous) ViewerState.Webtoon(
+                pages,
+                rememberSaveable(pointer, readerMode, saver = LazyListState.Saver) {
+                    val startPage = pages
+                        .filter { it is ReaderPage.Image || it is ReaderPage.Empty }
+                        .let { it.getOrNull(pointer.startPage) ?: it.last() }
+                        .let { pages.indexOf(it) }
+                    LazyListState(firstVisibleItemIndex = startPage)
+                }
+            )
+            else ViewerState.Pager(
+                pages,
+                rememberSaveable(pointer, readerMode, saver = PagerState.Saver) {
+                    val startPage = pages
+                        .filter { it is ReaderPage.Image || it is ReaderPage.Empty }
+                        .let { it.getOrNull(pointer.startPage) ?: it.last() }
+                        .let { pages.indexOf(it) }
+                    PagerState(currentPage = startPage)
+                }
+            )
+        }
+        println(viewerStateResult?.getOrNull()?.position)
+
         StateView(
-            result = pointer.pages,
+            result = viewerStateResult,
             onRetry = { onAction(ReaderAction.ReloadChapter) },
             modifier = Modifier.fillMaxSize(),
-        ) { pages ->
-            var startPage by remember(pointer) {
-                mutableStateOf(pointer.startPage.coerceAtMost(pages.size - 1))
-            }
-
-            val scope = rememberCoroutineScope()
-            val isLongTapDialogEnabled by PR.isLongTapDialogEnabled.collectAsState()
-            val bottomSheetHelper = LocalBottomSheetHelper.current
-            val onLongPress = { drawable: Drawable, position: Int ->
-                if (isLongTapDialogEnabled) {
-                    val sheet = ReaderPageSheet(drawable, position, onAction)
-                    scope.launch { bottomSheetHelper.open(sheet) }
-                }
-            }
-
-            viewerState =
-                if (readerMode == ReaderMode.Continuous) ViewerState.List(
-                    rememberSaveable(pointer, readerMode, saver = LazyListState.Saver) {
-                        LazyListState(firstVisibleItemIndex = startPage)
-                    }
-                ).also {
-                    ListViewer(
-                        isMenuOpened = isMenuOpened,
-                        state = it,
-                        pages = pages,
-                        requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
-                        requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
-                        onLongPress = onLongPress,
-                    )
-                }
-                else ViewerState.Pager(
-                    rememberSaveable(pointer, readerMode, saver = PagerState.Saver) {
-                        PagerState(currentPage = startPage)
-                    }
-                ).also {
-                    PagerViewer(
-                        isMenuOpened = isMenuOpened,
-                        state = it,
-                        pages = pages,
-                        isRtl = readerMode == ReaderMode.Rtl,
-                        requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
-                        requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
-                        onLongPress = onLongPress,
-                    )
-                }
-            LaunchedEffect(viewerState) {
-                snapshotFlow { viewerState!!.position }.collect {
-                    startPage = it
-                    onAction(ReaderAction.UpdateHistory(it))
-                    pages
-                        .slice(
-                            (it - 3).coerceAtLeast(0)..
-                                    (it + 5).coerceAtMost(viewerState!!.size - 1)
-                        )
-                        .forEach { page ->
-                            if (page is ReaderPage.Image) {
-                                val request = ImageRequest.Builder(context)
-                                    .data(page.url)
-                                    .build()
-                                context.imageLoader.enqueue(request)
-                            }
-                        }
-                }
-            }
+        ) { viewerState ->
+            ReaderPages(
+                viewerState = viewerState,
+                isMenuOpened = isMenuOpened,
+                readerMode = readerMode ?: return@StateView,
+                onAction = onAction,
+            )
         }
 
-        val showInfoBar by PR.showInfoBar.collectAsState()
-        if (showInfoBar && !isMenuOpened.value)
-            viewerState?.let { ReaderInfoBar(it) }
+        ReaderInfoBar(
+            isMenuOpened = isMenuOpened.value,
+            viewerState = viewerStateResult?.getOrNull()
+        )
 
         ReaderColorFilterOverlay()
 
@@ -225,8 +191,68 @@ private fun Reader(
             chapterTitle = pointer.chapterTitle,
             readerMode = readerMode ?: return@Box,
             isOnlyOneChapter = isOnlyOneChapter,
-            viewerState = viewerState,
+            viewerState = viewerStateResult?.getOrNull(),
             onAction = onAction
         )
+    }
+}
+
+@Composable
+private fun ReaderPages(
+    viewerState: ViewerState,
+    isMenuOpened: MutableState<Boolean>,
+    readerMode: ReaderMode,
+    onAction: ReaderActionHandler,
+) {
+    val context = LocalContext.current
+
+    val scope = rememberCoroutineScope()
+    val isLongTapDialogEnabled by PR.isLongTapDialogEnabled.collectAsState()
+    val bottomSheetHelper = LocalBottomSheetHelper.current
+    val onLongPress = { drawable: Drawable, position: Int ->
+        if (isLongTapDialogEnabled) {
+            val sheet = ReaderPageSheet(drawable, position, onAction)
+            scope.launch { bottomSheetHelper.open(sheet) }
+        }
+    }
+    when (viewerState) {
+        is ViewerState.Pager ->
+            PagerViewer(
+                isMenuOpened = isMenuOpened,
+                state = viewerState,
+                isRtl = readerMode == ReaderMode.Rtl,
+                requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
+                requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
+                onLongPress = onLongPress,
+            )
+        is ViewerState.Webtoon ->
+            WebtoonViewer(
+                isMenuOpened = isMenuOpened,
+                state = viewerState,
+                requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
+                requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
+                onLongPress = onLongPress,
+            )
+    }
+
+    LaunchedEffect(viewerState) {
+        snapshotFlow { viewerState.imagePosition }
+            .collect {
+                // Update reader history
+                onAction(ReaderAction.UpdateHistory(it))
+                // Preload image
+                viewerState.pages.filterIsInstance<ReaderPage.Image>()
+                    .takeIf { it.isNotEmpty() }
+                    ?.slice(
+                        (it - 3).coerceAtLeast(0)..
+                                (it + 5).coerceIn(0, viewerState.imageSize - 1)
+                    )
+                    ?.forEach { page ->
+                        val request = ImageRequest.Builder(context)
+                            .data(page.url)
+                            .build()
+                        context.imageLoader.enqueue(request)
+                    }
+            }
     }
 }

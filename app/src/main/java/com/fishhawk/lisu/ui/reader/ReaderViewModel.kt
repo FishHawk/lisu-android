@@ -22,8 +22,23 @@ import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
 sealed interface ReaderPage {
-    data class Image(val index: Int, val url: String) : ReaderPage
     object Empty : ReaderPage
+    data class Image(val index: Int, val url: String) : ReaderPage
+    data class NextChapterState(
+        val currentChapterName: String,
+        val currentChapterTitle: String,
+        val nextChapterName: String,
+        val nextChapterTitle: String,
+        val nextChapterState: Result<Unit>?,
+    ) : ReaderPage
+
+    data class PrevChapterState(
+        val currentChapterName: String,
+        val currentChapterTitle: String,
+        val prevChapterName: String,
+        val prevChapterTitle: String,
+        val prevChapterState: Result<Unit>?,
+    ) : ReaderPage
 }
 
 class ReaderChapter(
@@ -124,9 +139,36 @@ class ReaderViewModel(
         val pages: Result<List<ReaderPage>>?
 
         init {
+            val prevChapterStatePage = prevChapter?.let {
+                ReaderPage.PrevChapterState(
+                    currentChapterName = currChapter.name,
+                    currentChapterTitle = currChapter.title,
+                    prevChapterName = it.name,
+                    prevChapterTitle = it.title,
+                    prevChapterState = it.content?.map { },
+                )
+            }
+            val nextChapterStatePage = nextChapter?.let {
+                ReaderPage.NextChapterState(
+                    currentChapterName = currChapter.name,
+                    currentChapterTitle = currChapter.title,
+                    nextChapterName = it.name,
+                    nextChapterTitle = it.title,
+                    nextChapterState = it.content?.map { },
+                )
+            }
             pages = currChapter.content?.map {
-                if (it.isEmpty()) listOf(ReaderPage.Empty)
-                else it.mapIndexed { index, url -> ReaderPage.Image(index = index, url = url) }
+                if (it.isEmpty()) listOfNotNull(
+//                    prevChapterStatePage,
+                    ReaderPage.Empty,
+//                    nextChapterStatePage
+                )
+                else listOfNotNull(
+//                    prevChapterStatePage,
+                    *it.mapIndexed { index, url -> ReaderPage.Image(index = index, url = url) }
+                        .toTypedArray(),
+//                    nextChapterStatePage
+                )
             }
         }
     }
@@ -190,7 +232,7 @@ class ReaderViewModel(
 
         fun refreshPointerIfNeed() {
             chapterPointer.value?.let { pointer ->
-                if (chapter.index == pointer.index) {
+                if (chapter.index - pointer.index <= 1) {
                     chapterPointer.value = ReaderChapterPointer(pointer.index, pointer.startPage)
                 }
             }

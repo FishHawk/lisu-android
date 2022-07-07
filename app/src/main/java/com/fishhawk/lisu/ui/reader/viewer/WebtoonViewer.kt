@@ -7,8 +7,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -23,7 +21,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
@@ -36,13 +33,12 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-internal fun ListViewer(
+internal fun WebtoonViewer(
     isMenuOpened: MutableState<Boolean>,
-    state: ViewerState.List,
-    pages: List<ReaderPage>,
+    state: ViewerState.Webtoon,
     requestMoveToPrevChapter: () -> Unit,
     requestMoveToNextChapter: () -> Unit,
-    onLongPress: ((drawable: Drawable, position: Int) -> Unit)
+    onLongPress: ((drawable: Drawable, position: Int) -> Unit),
 ) {
     val scope = rememberCoroutineScope()
 
@@ -120,7 +116,7 @@ internal fun ListViewer(
             state = state.state,
             verticalArrangement = Arrangement.spacedBy(itemSpacing)
         ) {
-            items(pages) { page ->
+            items(state.pages) { page ->
                 when (page) {
                     is ReaderPage.Image -> ImagePage(
                         page = page,
@@ -129,7 +125,26 @@ internal fun ListViewer(
                         },
                         onLongPress = onLongPress
                     )
-                    ReaderPage.Empty -> EmptyPage()
+                    ReaderPage.Empty ->
+                        EmptyPage(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(240.dp)
+                        )
+                    is ReaderPage.NextChapterState ->
+                        NextChapterStatePage(
+                            page = page,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(240.dp),
+                        )
+                    is ReaderPage.PrevChapterState ->
+                        PrevChapterStatePage(
+                            page = page,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(240.dp),
+                        )
                 }
             }
         }
@@ -145,7 +160,7 @@ internal fun ListViewer(
 private fun ImagePage(
     page: ReaderPage.Image,
     onTap: ((Offset) -> Unit),
-    onLongPress: ((drawable: Drawable, position: Int) -> Unit)
+    onLongPress: ((drawable: Drawable, position: Int) -> Unit),
 ) {
     var retryHash by remember { mutableStateOf(0) }
     val painter = rememberAsyncImagePainter(
@@ -197,27 +212,5 @@ private fun ImagePage(
             page = page,
             onRetry = { retryHash++ }
         )
-    }
-}
-
-@Composable
-private fun EmptyPage() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(240.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            modifier = Modifier.padding(48.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Chapter is empty",
-                style = MaterialTheme.typography.subtitle2,
-                textAlign = TextAlign.Center
-            )
-        }
     }
 }

@@ -24,16 +24,28 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
+import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
 import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.widget.LocalBottomSheetHelper
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNot
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun BoxScope.ReaderInfoBar(viewerState: ViewerState) {
-    val infoBarText = "${viewerState.position + 1}/${viewerState.size}"
+internal fun BoxScope.ReaderInfoBar(
+    isMenuOpened: Boolean,
+    viewerState: ViewerState?
+) {
+    val showInfoBar by PR.showInfoBar.collectAsState()
+    if (!showInfoBar || isMenuOpened || viewerState == null) return
+
+    val infoBarText = viewerState.let { "${it.imagePosition + 1}/${it.imageSize}" }
     Text(
         text = infoBarText,
         modifier = Modifier
@@ -44,8 +56,8 @@ internal fun BoxScope.ReaderInfoBar(viewerState: ViewerState) {
             shadow = Shadow(
                 color = Color.Black,
                 blurRadius = 3f,
-            )
-        )
+            ),
+        ),
     )
 }
 
@@ -183,23 +195,49 @@ private fun ReaderMenuBottom(
 
                         Text(
                             modifier = widthModifier,
-                            text = viewerState?.position?.plus(1)?.toString() ?: "-",
+                            text = viewerState?.imagePosition?.plus(1)?.toString() ?: "-",
                             style = MaterialTheme.typography.body2,
                             textAlign = TextAlign.Center
                         )
 
-                        val scope = rememberCoroutineScope()
-                        Slider(modifier = Modifier.weight(1f), value = viewerState?.run {
-                            position.toFloat() / size.minus(1).coerceAtLeast(1)
-                        } ?: 0f, onValueChange = {
-                            viewerState?.apply {
-                                val target = (it * (size - 1)).toInt().coerceIn(0, size - 1)
-                                scope.launch { scrollToPage(target) }
+                        var isSliderChanging by remember { mutableStateOf(false) }
+                        var sliderValue by remember(viewerState) {
+                            mutableStateOf(
+                                viewerState?.let {
+                                    it.imagePosition.toFloat() /
+                                            it.imageSize.minus(1).coerceAtLeast(1)
+                                } ?: 0f
+                            )
+                        }
+                        LaunchedEffect(viewerState) {
+                            viewerState?.let { viewState ->
+                                snapshotFlow { sliderValue }
+                                    .mapLatest { (it * (viewState.imageSize - 1)).toInt() }
+                                    .distinctUntilChanged()
+                                    .collect { viewState.scrollToImagePage(it) }
                             }
-                        }, enabled = viewerState != null && viewerState.size > 1
+                        }
+                        LaunchedEffect(viewerState) {
+                            viewerState?.let { viewState ->
+                                snapshotFlow { viewState.imagePosition }
+                                    .filterNot { isSliderChanging }
+                                    .map { it.toFloat() / (viewState.imageSize - 1).coerceAtLeast(1) }
+                                    .collect { sliderValue = it }
+                            }
+                        }
+                        Slider(
+                            value = sliderValue,
+                            onValueChange = {
+                                isSliderChanging = true
+                                sliderValue = it
+                            },
+                            modifier = Modifier.weight(1f),
+                            enabled = viewerState != null && viewerState.imageSize > 1,
+                            onValueChangeFinished = { isSliderChanging = false },
                         )
 
-                        Text(text = viewerState?.size?.toString() ?: "-",
+
+                        Text(text = viewerState?.imageSize?.toString() ?: "-",
                             style = MaterialTheme.typography.body2,
                             textAlign = TextAlign.Center,
                             onTextLayout = { sizeLabelWidth = it.size.width })
