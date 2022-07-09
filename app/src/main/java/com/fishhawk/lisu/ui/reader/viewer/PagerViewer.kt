@@ -11,7 +11,6 @@ import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusRequester
@@ -19,7 +18,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -40,90 +38,38 @@ import com.google.accompanist.pager.HorizontalPager
 import kotlinx.coroutines.launch
 import coil.size.Size as CoilSize
 
-@OptIn(ExperimentalPagerApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 internal fun PagerViewer(
+    modifier: Modifier = Modifier,
     isMenuOpened: MutableState<Boolean>,
     state: ViewerState.Pager,
-    isRtl: Boolean,
-    requestMoveToPrevChapter: () -> Unit,
-    requestMoveToNextChapter: () -> Unit,
     onLongPress: (drawable: Drawable, position: Int) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
-    fun toNext() {
-        if (state.position < state.size - 1)
-            scope.launch { state.scrollToPage(state.position + 1) }
-        else requestMoveToNextChapter()
-    }
-
-    fun toPrev() {
-        if (state.position > 0)
-            scope.launch { state.scrollToPage(state.position - 1) }
-        else requestMoveToPrevChapter()
-    }
-
-    fun toLeft() = if (isRtl) toNext() else toPrev()
-    fun toRight() = if (isRtl) toPrev() else toNext()
-
-    val useVolumeKey by PR.useVolumeKey.collectAsState()
-    val invertVolumeKey by PR.invertVolumeKey.collectAsState()
-
     val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
-    val nestedScrollConnection = remember(isRtl) {
+    val nestedScrollConnection = remember(state.isRtl) {
         nestedScrollConnection(
-            requestMoveToPrevChapter = requestMoveToPrevChapter,
-            requestMoveToNextChapter = requestMoveToNextChapter,
-            isPrepareToPrev = { if (isRtl) it.x < -10 else it.x > 10 },
-            isPrepareToNext = { if (isRtl) it.x > 10 else it.x < -10 },
+            requestMoveToPrevChapter = state.requestMoveToPrevChapter,
+            requestMoveToNextChapter = state.requestMoveToNextChapter,
+            isPrepareToPrev = { if (state.isRtl) it.x < -10 else it.x > 10 },
+            isPrepareToNext = { if (state.isRtl) it.x > 10 else it.x < -10 },
         )
     }
 
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .nestedScroll(nestedScrollConnection)
+    Box(modifier = modifier
         .focusRequester(focusRequester)
         .focusable()
-        .onPreviewKeyEvent {
-            when (it.type) {
-                KeyEventType.KeyDown -> {
-                    when (it.key) {
-                        Key.VolumeUp ->
-                            if (useVolumeKey && !isMenuOpened.value) {
-                                if (invertVolumeKey) toNext() else toPrev()
-                            } else return@onPreviewKeyEvent false
-                        Key.VolumeDown ->
-                            if (useVolumeKey && !isMenuOpened.value) {
-                                if (invertVolumeKey) toPrev() else toNext()
-                            } else return@onPreviewKeyEvent false
-                        else -> return@onPreviewKeyEvent false
-                    }
-                }
-                KeyEventType.KeyUp -> {
-                    when (it.key) {
-                        Key.Menu -> isMenuOpened.value = !isMenuOpened.value
-
-                        Key.N -> requestMoveToNextChapter()
-                        Key.P -> requestMoveToPrevChapter()
-
-                        Key.DirectionUp, Key.PageUp -> toPrev()
-                        Key.DirectionDown, Key.PageDown -> toNext()
-
-                        Key.DirectionLeft -> toLeft()
-                        Key.DirectionRight -> toRight()
-                        else -> return@onPreviewKeyEvent false
-                    }
-                }
-                else -> return@onPreviewKeyEvent false
-            }
-            true
-        }
+        .nestedScroll(nestedScrollConnection)
     ) {
         val isPageIntervalEnabled by PR.isPageIntervalEnabled.collectAsState()
 
-        val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
+        val layoutDirection = if (state.isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
         CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
             HorizontalPager(
                 count = state.pages.size,
@@ -146,8 +92,8 @@ internal fun PagerViewer(
                             onTap = { offset ->
                                 if (isMenuOpened.value) isMenuOpened.value = false
                                 else when {
-                                    offset.x < 0.25 -> toLeft()
-                                    offset.x > 0.75 -> toRight()
+                                    offset.x < 0.25 -> scope.launch { state.toLeft() }
+                                    offset.x > 0.75 -> scope.launch { state.toRight() }
                                     else -> isMenuOpened.value = true
                                 }
                             },
@@ -162,11 +108,6 @@ internal fun PagerViewer(
                 }
             }
         }
-    }
-
-    DisposableEffect(Unit) {
-        focusRequester.requestFocus()
-        onDispose { }
     }
 }
 
@@ -257,24 +198,6 @@ private fun ZoomableImage(
                     }
                 )
             }
-//            .pointerInput(Unit) {
-//                forEachGesture {
-//                    awaitPointerEventScope {
-//                        val down = awaitFirstDown(requireUnconsumed = false)
-//                        println("test")
-//                        drag(down.id) {
-//                            val rect = (size.toSize() * (scale - 1))
-//                                .toRect()
-//                                .run { translate(center) }
-//                            val targetTranslation = (it.positionChange() + translation)
-//                            if (rect.contains(targetTranslation)) {
-//                                translation = targetTranslation
-//                                it.consumePositionChange()
-//                            }
-//                        }
-//                    }
-//                }
-//            }
     ) {
         Image(
             painter = painter,
@@ -286,7 +209,8 @@ private fun ZoomableImage(
                     scaleY = scale,
                     translationX = translation.x,
                     translationY = translation.y
-                ),
+                )
+            ,
             contentScale = ContentScale.Fit
         )
     }

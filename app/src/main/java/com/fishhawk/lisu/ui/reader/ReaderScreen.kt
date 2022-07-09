@@ -8,7 +8,9 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalContext
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -140,29 +142,35 @@ private fun Reader(
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         val isMenuOpened = rememberSaveable { mutableStateOf(false) }
-        val viewerStateResult = pointer.pages?.map { pages ->
-            if (readerMode == ReaderMode.Continuous) ViewerState.Webtoon(
-                pages,
-                rememberSaveable(pointer, readerMode, saver = LazyListState.Saver) {
-                    val startPage = pages
-                        .filter { it is ReaderPage.Image || it is ReaderPage.Empty }
-                        .let { it.getOrNull(pointer.startPage) ?: it.last() }
-                        .let { pages.indexOf(it) }
-                    LazyListState(firstVisibleItemIndex = startPage)
-                }
-            )
-            else ViewerState.Pager(
-                pages,
-                rememberSaveable(pointer, readerMode, saver = PagerState.Saver) {
-                    val startPage = pages
-                        .filter { it is ReaderPage.Image || it is ReaderPage.Empty }
-                        .let { it.getOrNull(pointer.startPage) ?: it.last() }
-                        .let { pages.indexOf(it) }
-                    PagerState(currentPage = startPage)
-                }
-            )
+        val viewerStateResult = readerMode?.let { readerMode ->
+            pointer.pages?.mapCatching { pages ->
+                if (readerMode == ReaderMode.Continuous) ViewerState.Webtoon(
+                    state = rememberSaveable(pointer, readerMode, saver = LazyListState.Saver) {
+                        val startPage = pages
+                            .filter { it is ReaderPage.Image || it is ReaderPage.Empty }
+                            .let { it.getOrNull(pointer.startPage) ?: it.last() }
+                            .let { pages.indexOf(it) }
+                        LazyListState(firstVisibleItemIndex = startPage)
+                    },
+                    pages = pages,
+                    requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
+                    requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
+                )
+                else ViewerState.Pager(
+                    state = rememberSaveable(pointer, readerMode, saver = PagerState.Saver) {
+                        val startPage = pages
+                            .filter { it is ReaderPage.Image || it is ReaderPage.Empty }
+                            .let { it.getOrNull(pointer.startPage) ?: it.last() }
+                            .let { pages.indexOf(it) }
+                        PagerState(currentPage = startPage)
+                    },
+                    isRtl = readerMode == ReaderMode.Rtl,
+                    pages = pages,
+                    requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
+                    requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
+                )
+            }
         }
-        println(viewerStateResult?.getOrNull()?.position)
 
         StateView(
             result = viewerStateResult,
@@ -172,7 +180,6 @@ private fun Reader(
             ReaderPages(
                 viewerState = viewerState,
                 isMenuOpened = isMenuOpened,
-                readerMode = readerMode ?: return@StateView,
                 onAction = onAction,
             )
         }
@@ -197,11 +204,11 @@ private fun Reader(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ReaderPages(
     viewerState: ViewerState,
     isMenuOpened: MutableState<Boolean>,
-    readerMode: ReaderMode,
     onAction: ReaderActionHandler,
 ) {
     val context = LocalContext.current
@@ -215,22 +222,86 @@ private fun ReaderPages(
             scope.launch { bottomSheetHelper.open(sheet) }
         }
     }
+
+    val useVolumeKey by PR.useVolumeKey.collectAsState()
+    val invertVolumeKey by PR.invertVolumeKey.collectAsState()
+    fun onPreviewKeyEvent(keyEvent: KeyEvent): Boolean {
+        return when (keyEvent.type) {
+            KeyEventType.KeyDown -> {
+                when (keyEvent.key) {
+                    Key.VolumeUp ->
+                        if (useVolumeKey && !isMenuOpened.value) {
+                            scope.launch {
+                                if (invertVolumeKey) viewerState.toNext()
+                                else viewerState.toPrev()
+                            }
+                            true
+                        } else false
+                    Key.VolumeDown ->
+                        if (useVolumeKey && !isMenuOpened.value) {
+                            scope.launch {
+                                if (invertVolumeKey) viewerState.toPrev()
+                                else viewerState.toNext()
+                            }
+                            true
+                        } else false
+                    else -> false
+                }
+            }
+            KeyEventType.KeyUp -> {
+                when (keyEvent.key) {
+                    Key.Menu -> {
+                        isMenuOpened.value = !isMenuOpened.value
+                        true
+                    }
+                    Key.N -> {
+                        viewerState.requestMoveToNextChapter()
+                        true
+                    }
+                    Key.P -> {
+                        viewerState.requestMoveToPrevChapter()
+                        true
+                    }
+                    Key.DirectionUp, Key.PageUp -> {
+                        scope.launch { viewerState.toPrev() }
+                        true
+                    }
+                    Key.DirectionDown, Key.PageDown -> {
+                        scope.launch { viewerState.toNext() }
+                        true
+                    }
+                    Key.DirectionLeft -> {
+                        scope.launch { viewerState.toLeft() }
+                        true
+                    }
+                    Key.DirectionRight -> {
+                        scope.launch { viewerState.toRight() }
+                        true
+                    }
+                    else -> false
+                }
+            }
+            else -> false
+        }
+    }
+
+    val modifier = Modifier
+        .fillMaxSize()
+        .onPreviewKeyEvent(::onPreviewKeyEvent)
+
     when (viewerState) {
         is ViewerState.Pager ->
             PagerViewer(
+                modifier = modifier,
                 isMenuOpened = isMenuOpened,
                 state = viewerState,
-                isRtl = readerMode == ReaderMode.Rtl,
-                requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
-                requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
                 onLongPress = onLongPress,
             )
         is ViewerState.Webtoon ->
             WebtoonViewer(
+                modifier = modifier,
                 isMenuOpened = isMenuOpened,
                 state = viewerState,
-                requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
-                requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
                 onLongPress = onLongPress,
             )
     }
