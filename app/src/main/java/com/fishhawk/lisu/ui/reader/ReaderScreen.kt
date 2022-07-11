@@ -1,7 +1,7 @@
 package com.fishhawk.lisu.ui.reader
 
 import android.content.pm.ActivityInfo
-import android.graphics.drawable.Drawable
+import android.graphics.Bitmap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
@@ -12,7 +12,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalContext
+import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
+import coil.memory.MemoryCache
 import coil.request.ImageRequest
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
@@ -41,9 +43,9 @@ sealed interface ReaderAction {
     object ReloadManga : ReaderAction
     object ReloadChapter : ReaderAction
 
-    data class SetAsImage(val drawable: Drawable) : ReaderAction
-    data class SavePage(val drawable: Drawable, val position: Int) : ReaderAction
-    data class SharePage(val drawable: Drawable, val position: Int) : ReaderAction
+    data class SetAsImage(val bitmap: Bitmap) : ReaderAction
+    data class SavePage(val bitmap: Bitmap, val position: Int) : ReaderAction
+    data class SharePage(val bitmap: Bitmap, val position: Int) : ReaderAction
 
     object OpenPrevChapter : ReaderAction
     object OpenNextChapter : ReaderAction
@@ -73,14 +75,14 @@ fun ReaderScreen() {
             ReaderAction.NavUp -> context.findActivity().finish()
             ReaderAction.ReloadManga -> viewModel.reloadManga()
             ReaderAction.ReloadChapter -> viewModel.loadChapterPointer()
-            is ReaderAction.SetAsImage -> viewModel.updateCover(action.drawable)
+            is ReaderAction.SetAsImage -> viewModel.updateCover(action.bitmap)
             is ReaderAction.SavePage -> context.saveImage(
-                action.drawable,
+                action.bitmap,
                 "${mangaTitleResult?.getOrNull()!!}-${action.position}"
             )
             is ReaderAction.SharePage -> context.shareImage(
                 "Share page via",
-                action.drawable,
+                action.bitmap,
                 "${mangaTitleResult?.getOrNull()!!}-${action.position}"
             )
             ReaderAction.OpenPrevChapter -> viewModel.openPrevChapter()
@@ -119,7 +121,6 @@ fun ReaderScreen() {
             onRetry = { onAction(ReaderAction.ReloadManga) },
             modifier = Modifier.fillMaxSize(),
         ) { mangaTitle ->
-            println("update here?")
             Reader(
                 pointer = pointer ?: return@StateView,
                 readerMode = readerMode,
@@ -216,10 +217,13 @@ private fun ReaderPages(
     val scope = rememberCoroutineScope()
     val isLongTapDialogEnabled by PR.isLongTapDialogEnabled.collectAsState()
     val bottomSheetHelper = LocalBottomSheetHelper.current
-    val onLongPress = { drawable: Drawable, position: Int ->
+    val onLongPress = { page: ReaderPage.Image ->
         if (isLongTapDialogEnabled) {
-            val sheet = ReaderPageSheet(drawable, position, onAction)
-            scope.launch { bottomSheetHelper.open(sheet) }
+            val bitmap = context.imageLoader.memoryCache?.get(MemoryCache.Key(page.url))?.bitmap
+            if (bitmap != null) {
+                val sheet = ReaderPageSheet(bitmap, page.index + 1, onAction)
+                scope.launch { bottomSheetHelper.open(sheet) }
+            }
         }
     }
 

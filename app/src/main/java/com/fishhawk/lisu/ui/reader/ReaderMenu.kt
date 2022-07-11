@@ -282,11 +282,11 @@ private fun ReaderMenuBottom(
                 val bottomSheetHelper = LocalBottomSheetHelper.current
                 val scope = rememberCoroutineScope()
                 IconButton(modifier = Modifier.weight(1f), onClick = {
-                    scope.launch { bottomSheetHelper.open(ReaderSettingsSheet) }
+                    scope.launch { bottomSheetHelper.open(ReaderOverlaySheet) }
                 }) { Icon(Icons.Filled.BrightnessMedium, "color-filter") }
 
                 IconButton(modifier = Modifier.weight(1f), onClick = {
-                    scope.launch { bottomSheetHelper.open(ReaderOverlaySheet) }
+                    scope.launch { bottomSheetHelper.open(ReaderSettingsSheet) }
                 }) { Icon(Icons.Filled.Settings, "setting") }
             }
         }

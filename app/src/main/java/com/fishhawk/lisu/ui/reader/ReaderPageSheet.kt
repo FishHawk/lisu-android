@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.ui.reader
 
+import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,35 +16,35 @@ import com.fishhawk.lisu.widget.BottomSheet
 import com.fishhawk.lisu.widget.SheetListItem
 
 internal class ReaderPageSheet(
-    private val drawable: Drawable,
+    private val bitmap: Bitmap,
     private val position: Int,
     private val onAction: ReaderActionHandler
 ) : BottomSheet() {
     @Composable
     override fun Content() {
-        ReaderPageSheetContent(drawable, position, onAction)
+        ReaderPageSheetContent(bitmap, position, onAction)
         BackHandler()
     }
 }
 
 @Composable
 private fun ReaderPageSheetContent(
-    drawable: Drawable,
+    bitmap: Bitmap,
     position: Int,
-    onAction: ReaderActionHandler
+    onAction: ReaderActionHandler,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         SheetListItem(
             icon = LisuIcons.Image,
             title = stringResource(R.string.action_set_as_cover)
-        ) { onAction(ReaderAction.SetAsImage(drawable)) }
+        ) { onAction(ReaderAction.SetAsImage(bitmap)) }
         SheetListItem(
             icon = LisuIcons.SaveAlt,
             title = stringResource(R.string.action_save_image)
-        ) { onAction(ReaderAction.SavePage(drawable, position)) }
+        ) { onAction(ReaderAction.SavePage(bitmap, position)) }
         SheetListItem(
             icon = LisuIcons.Share,
             title = stringResource(R.string.action_share_image)
-        ) { onAction(ReaderAction.SharePage(drawable, position)) }
+        ) { onAction(ReaderAction.SharePage(bitmap, position)) }
     }
 }

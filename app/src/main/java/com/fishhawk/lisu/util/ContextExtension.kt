@@ -3,6 +3,7 @@ package com.fishhawk.lisu.util
 import android.app.Activity
 import android.content.*
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -45,7 +46,7 @@ fun Context.openWebPage(url: String) {
     }
 }
 
-fun Context.saveImage(image: Drawable, filename: String) {
+fun Context.saveImage(image: Bitmap, filename: String) {
     try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val contentValues = ContentValues().apply {
@@ -72,13 +73,17 @@ fun Context.saveImage(image: Drawable, filename: String) {
             val imageFile = File(imagesDir, "$filename.png")
             FileOutputStream(imageFile)
         }?.use {
-            if (!image.toBitmap().compress(CompressFormat.PNG, 100, it))
+            if (!image.compress(CompressFormat.PNG, 100, it))
                 throw IOException("Failed to save bitmap.")
             toast(R.string.image_saved)
         } ?: throw IOException("Failed to open output stream.")
     } catch (e: Throwable) {
         toast(e)
     }
+}
+
+fun Context.saveImage(image: Drawable, filename: String) {
+    saveImage(image.toBitmap(), filename)
 }
 
 fun Context.shareText(title: String, text: String) {
@@ -90,11 +95,11 @@ fun Context.shareText(title: String, text: String) {
     startActivity(Intent.createChooser(shareIntent, title))
 }
 
-fun Context.shareImage(title: String, image: Drawable, filename: String) {
+fun Context.shareImage(title: String, image: Bitmap, filename: String) {
     val file = try {
         val outputFile = File(cacheDir, "$filename.png")
         val outPutStream = FileOutputStream(outputFile)
-        image.toBitmap().compress(CompressFormat.PNG, 100, outPutStream)
+        image.compress(CompressFormat.PNG, 100, outPutStream)
         outPutStream.flush()
         outPutStream.close()
         outputFile
@@ -108,6 +113,10 @@ fun Context.shareImage(title: String, image: Drawable, filename: String) {
         putExtra(Intent.EXTRA_STREAM, uri)
     }
     startActivity(Intent.createChooser(shareIntent, title))
+}
+
+fun Context.shareImage(title: String, image: Drawable, filename: String) {
+    shareImage(title, image.toBitmap(), filename)
 }
 
 fun Context.toast(message: String) {

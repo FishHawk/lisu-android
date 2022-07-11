@@ -20,6 +20,7 @@ import com.fishhawk.lisu.ui.base.Event
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
 
 sealed interface ReaderPage {
     object Empty : ReaderPage
@@ -322,10 +323,10 @@ class ReaderViewModel(
         }
     }
 
-    fun updateCover(drawable: Drawable) {
+    fun updateCover(bitmap: Bitmap) {
         viewModelScope.launch {
             val stream = ByteArrayOutputStream()
-            drawable.toBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream)
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
             val byteArray = stream.toByteArray()
             lisuRepository.updateMangaCover(
                 providerId,
