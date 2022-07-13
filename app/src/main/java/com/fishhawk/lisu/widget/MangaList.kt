@@ -27,9 +27,9 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.fishhawk.lisu.data.network.base.PagedList
 import com.fishhawk.lisu.data.network.model.MangaDto
 import com.fishhawk.lisu.data.network.model.MangaKeyDto
-import com.fishhawk.lisu.data.network.base.PagedList
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.fade
 import com.google.accompanist.placeholder.material.placeholder
@@ -38,35 +38,27 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun RefreshableMangaList(
-    result: Result<PagedList<MangaDto>>?,
-    onRetry: () -> Unit,
+    result: PagedList<MangaDto>,
     onRefresh: () -> Unit,
     onRequestNextPage: () -> Unit,
-    modifier: Modifier = Modifier,
     selectedMangaList: SnapshotStateList<MangaKeyDto>? = null,
     decorator: @Composable BoxScope.(manga: MangaDto?) -> Unit = {},
     onCardClick: (manga: MangaDto) -> Unit = {},
-    onCardLongClick: (manga: MangaDto) -> Unit = {}
+    onCardLongClick: (manga: MangaDto) -> Unit = {},
 ) {
-    StateView(
-        result = result,
-        onRetry = onRetry,
-        modifier = modifier.fillMaxSize(),
+    val isRefreshing = false
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing),
+        onRefresh = onRefresh,
     ) {
-        val isRefreshing = result == null
-        SwipeRefresh(
-            state = rememberSwipeRefreshState(isRefreshing),
-            onRefresh = onRefresh,
-        ) {
-            MangaList(
-                mangaList = it,
-                onRequestNextPage = onRequestNextPage,
-                selectedMangaList = selectedMangaList,
-                badge = decorator,
-                onCardClick = onCardClick,
-                onCardLongClick = onCardLongClick
-            )
-        }
+        MangaList(
+            mangaList = result,
+            onRequestNextPage = onRequestNextPage,
+            selectedMangaList = selectedMangaList,
+            badge = decorator,
+            onCardClick = onCardClick,
+            onCardLongClick = onCardLongClick
+        )
     }
 }
 
@@ -77,7 +69,7 @@ fun MangaList(
     selectedMangaList: SnapshotStateList<MangaKeyDto>? = null,
     badge: @Composable BoxScope.(manga: MangaDto?) -> Unit = {},
     onCardClick: (manga: MangaDto) -> Unit = {},
-    onCardLongClick: (manga: MangaDto) -> Unit = {}
+    onCardLongClick: (manga: MangaDto) -> Unit = {},
 ) {
     var maxAccessed by remember { mutableStateOf(0) }
     LazyVerticalGrid(
@@ -124,7 +116,7 @@ fun MangaCard(
     manga: MangaDto?,
     selected: Boolean = false,
     onClick: (manga: MangaDto) -> Unit = {},
-    onLongClick: (manga: MangaDto) -> Unit = {}
+    onLongClick: (manga: MangaDto) -> Unit = {},
 ) {
     Card(
         modifier = Modifier.combinedClickable(
@@ -185,7 +177,7 @@ fun MangaCard(
 @Composable
 fun MangaCover(
     cover: String?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val painter = rememberAsyncImagePainter(
         ImageRequest.Builder(LocalContext.current)

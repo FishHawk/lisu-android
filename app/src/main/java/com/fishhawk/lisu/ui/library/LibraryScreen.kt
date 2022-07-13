@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.Casino
@@ -25,11 +26,8 @@ import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
-import com.fishhawk.lisu.widget.LisuSearchToolBar
-import com.fishhawk.lisu.widget.LisuToolBar
-import com.fishhawk.lisu.widget.RefreshableMangaList
-import com.fishhawk.lisu.widget.SuggestionList
 import com.fishhawk.lisu.util.toast
+import com.fishhawk.lisu.widget.*
 import org.koin.androidx.compose.viewModel
 
 private typealias LibraryActionHandler = (LibraryAction) -> Unit
@@ -39,6 +37,8 @@ private sealed interface LibraryAction {
     data class Search(val keywords: String) : LibraryAction
     data class RemoveFromLibrary(val mangaList: List<MangaKeyDto>) : LibraryAction
     object Random : LibraryAction
+    object Reload : LibraryAction
+    object RequestNextPage : LibraryAction
 }
 
 @Composable
@@ -46,7 +46,7 @@ fun LibraryScreen(navController: NavHostController) {
     val viewModel by viewModel<LibraryViewModel>()
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
-    val mangaList by viewModel.mangas.collectAsState()
+    val mangaListResult by viewModel.mangas.collectAsState()
 
     val onAction: LibraryActionHandler = { action ->
         when (action) {
@@ -54,6 +54,8 @@ fun LibraryScreen(navController: NavHostController) {
             is LibraryAction.Search -> viewModel.search(action.keywords)
             is LibraryAction.RemoveFromLibrary -> viewModel.deleteMultipleManga(action.mangaList)
             LibraryAction.Random -> viewModel.getRandomManga()
+            LibraryAction.Reload -> viewModel.reload()
+            LibraryAction.RequestNextPage -> viewModel.requestNextPage()
         }
     }
 
@@ -103,42 +105,48 @@ fun LibraryScreen(navController: NavHostController) {
         },
         content = { paddingValues ->
             LisuTransition {
-                RefreshableMangaList(
-                    result = mangaList,
-                    onRetry = {},
-                    onRefresh = {},
-                    onRequestNextPage = {},
-                    modifier = Modifier.padding(paddingValues),
-                    selectedMangaList = selectedMangaList,
-                    onCardClick = {
-                        if (selectedMangaList.isEmpty()) {
-                            onAction(LibraryAction.NavToGallery(it))
-                        } else {
-                            val key = it.key
-                            if (selectedMangaList.contains(key)) {
-                                selectedMangaList.remove(key)
+                StateView(
+                    result = mangaListResult,
+                    onRetry = { onAction(LibraryAction.Reload) },
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize(),
+                ) { mangaList ->
+                    RefreshableMangaList(
+                        result = mangaList,
+                        onRefresh = { onAction(LibraryAction.Reload) },
+                        onRequestNextPage = { onAction(LibraryAction.RequestNextPage) },
+                        selectedMangaList = selectedMangaList,
+                        onCardClick = {
+                            if (selectedMangaList.isEmpty()) {
+                                onAction(LibraryAction.NavToGallery(it))
                             } else {
-                                selectedMangaList.add(key)
+                                val key = it.key
+                                if (selectedMangaList.contains(key)) {
+                                    selectedMangaList.remove(key)
+                                } else {
+                                    selectedMangaList.add(key)
+                                }
+                            }
+                        },
+                        onCardLongClick = { manga ->
+                            if (selectedMangaList.isEmpty()) {
+                                selectedMangaList.add(manga.key)
+                            } else {
+                                val list = mangaList.list.map { it.key }
+                                val start = list.indexOf(selectedMangaList.last())
+                                val end = list.indexOf(manga.key)
+                                val pendingList = if (start > end) {
+                                    list.slice(end..start).reversed()
+                                } else {
+                                    list.slice(start..end)
+                                }
+                                selectedMangaList.removeIf { pendingList.contains(it) }
+                                selectedMangaList.addAll(pendingList)
                             }
                         }
-                    },
-                    onCardLongClick = { manga ->
-                        if (selectedMangaList.isEmpty()) {
-                            selectedMangaList.add(manga.key)
-                        } else {
-//                            val list = mangaList.itemSnapshotList.mapNotNull { it?.key }
-//                            val start = list.indexOf(selectedMangaList.last())
-//                            val end = list.indexOf(manga.key)
-//                            val pendingList = if (start > end) {
-//                                list.slice(end..start).reversed()
-//                            } else {
-//                                list.slice(start..end)
-//                            }
-//                            selectedMangaList.removeIf { pendingList.contains(it) }
-//                            selectedMangaList.addAll(pendingList)
-                        }
-                    }
-                )
+                    )
+                }
                 BackHandler(selectedMangaList.isNotEmpty()) {
                     selectedMangaList.clear()
                 }
@@ -157,7 +165,7 @@ fun LibraryScreen(navController: NavHostController) {
 @Composable
 private fun SelectingToolBar(
     selectedMangaList: SnapshotStateList<MangaKeyDto>,
-    onAction: LibraryActionHandler
+    onAction: LibraryActionHandler,
 ) {
     var isOpen by remember { mutableStateOf(false) }
     if (isOpen) {
@@ -188,7 +196,7 @@ private fun SelectingToolBar(
 private fun DeleteMangaDialog(
     size: Int,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = { onDismiss() },

@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -24,10 +25,7 @@ import com.fishhawk.lisu.data.network.model.MangaState
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToProviderSearch
 import com.fishhawk.lisu.ui.theme.LisuTransition
-import com.fishhawk.lisu.widget.LisuDialog
-import com.fishhawk.lisu.widget.LisuToolBar
-import com.fishhawk.lisu.widget.MangaBadge
-import com.fishhawk.lisu.widget.RefreshableMangaList
+import com.fishhawk.lisu.widget.*
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
@@ -44,7 +42,7 @@ internal sealed interface ProviderAction {
     data class SelectFilter(
         val boardId: String,
         val name: String,
-        val selected: Int
+        val selected: Int,
     ) : ProviderAction
 
     data class Reload(val boardId: String) : ProviderAction
@@ -146,7 +144,7 @@ private fun ToolBar(
     providerId: String,
     boards: List<String>,
     pagerState: PagerState,
-    onAction: ProviderActionHandler
+    onAction: ProviderActionHandler,
 ) {
     Surface(elevation = AppBarDefaults.TopAppBarElevation) {
         Column {
@@ -190,23 +188,29 @@ private fun ProviderBoard(
     boardId: String,
     board: Board,
     onAction: ProviderActionHandler,
-    onCardLongClick: (manga: MangaDto) -> Unit = {}
+    onCardLongClick: (manga: MangaDto) -> Unit = {},
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         board.filters.forEach { BoardFilter(boardId, it, onAction) }
-        RefreshableMangaList(
+
+        StateView(
             result = board.mangaResult,
             onRetry = { onAction(ProviderAction.Reload(boardId)) },
-            onRefresh = { onAction(ProviderAction.Reload(boardId)) },
-            onRequestNextPage = { onAction(ProviderAction.RequestNextPage(boardId)) },
-            decorator = {
-                if (it != null && it.state == MangaState.RemoteInLibrary) {
-                    MangaBadge(text = "in library")
-                }
-            },
-            onCardClick = { onAction(ProviderAction.NavToGallery(it)) },
-            onCardLongClick = onCardLongClick
-        )
+            modifier = Modifier.fillMaxSize(),
+        ) { mangaList ->
+            RefreshableMangaList(
+                result = mangaList,
+                onRefresh = { onAction(ProviderAction.Reload(boardId)) },
+                onRequestNextPage = { onAction(ProviderAction.RequestNextPage(boardId)) },
+                decorator = {
+                    if (it != null && it.state == MangaState.RemoteInLibrary) {
+                        MangaBadge(text = "in library")
+                    }
+                },
+                onCardClick = { onAction(ProviderAction.NavToGallery(it)) },
+                onCardLongClick = onCardLongClick
+            )
+        }
     }
 }
 

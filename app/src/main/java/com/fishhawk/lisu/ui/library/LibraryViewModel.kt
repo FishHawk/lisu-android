@@ -58,4 +58,16 @@ class LibraryViewModel(
     fun search(keywords: String) {
         _keywords.value = keywords
     }
+
+    fun reload() {
+        viewModelScope.launch {
+            _mangas.value?.reload()
+        }
+    }
+
+    fun requestNextPage() {
+        viewModelScope.launch {
+            _mangas.value?.requestNextPage()
+        }
+    }
 }

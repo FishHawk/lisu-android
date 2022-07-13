@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.ui.provider
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -42,7 +43,7 @@ fun ProviderSearchScreen(navController: NavHostController) {
     }
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
-    val mangaList by viewModel.mangas.collectAsState()
+    val mangaListResult by viewModel.mangas.collectAsState()
     var addDialogManga by remember { mutableStateOf<MangaDto?>(null) }
     var removeDialogManga by remember { mutableStateOf<MangaDto?>(null) }
 
@@ -93,23 +94,29 @@ fun ProviderSearchScreen(navController: NavHostController) {
         },
         content = { paddingValues ->
             LisuTransition {
-                RefreshableMangaList(
-                    result = mangaList,
+                StateView(
+                    result = mangaListResult,
                     onRetry = { onAction(SearchAction.Reload) },
-                    onRefresh = { onAction(SearchAction.Reload) },
-                    onRequestNextPage = { onAction(SearchAction.RequestNextPage) },
-                    modifier = Modifier.padding(paddingValues),
-                    decorator = {
-                        if (it != null && it.state == MangaState.RemoteInLibrary) {
-                            MangaBadge(text = "in library")
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize(),
+                ) { mangaList ->
+                    RefreshableMangaList(
+                        result = mangaList,
+                        onRefresh = { onAction(SearchAction.Reload) },
+                        onRequestNextPage = { onAction(SearchAction.RequestNextPage) },
+                        decorator = {
+                            if (it != null && it.state == MangaState.RemoteInLibrary) {
+                                MangaBadge(text = "in library")
+                            }
+                        },
+                        onCardClick = { onAction(SearchAction.NavToGallery(it)) },
+                        onCardLongClick = {
+                            if (it.state == MangaState.RemoteInLibrary) removeDialogManga = it
+                            else addDialogManga = it
                         }
-                    },
-                    onCardClick = { onAction(SearchAction.NavToGallery(it)) },
-                    onCardLongClick = {
-                        if (it.state == MangaState.RemoteInLibrary) removeDialogManga = it
-                        else addDialogManga = it
-                    }
-                )
+                    )
+                }
                 SuggestionList(
                     visible = editing,
                     keywords = editingKeywords,
