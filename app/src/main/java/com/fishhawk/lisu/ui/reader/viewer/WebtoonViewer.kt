@@ -1,6 +1,7 @@
 package com.fishhawk.lisu.ui.reader.viewer
 
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -9,12 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.ui.reader.ReaderPage
-import com.fishhawk.lisu.widget.zoomable
 
 @Composable
 internal fun WebtoonViewer(
@@ -42,19 +43,21 @@ internal fun WebtoonViewer(
             .focusRequester(focusRequester)
             .focusable()
             .nestedScroll(nestedScrollConnection)
-            .zoomable(
-                onLongPress = { offset ->
-                    state.state.layoutInfo.visibleItemsInfo.forEach {
-                        if (it.offset <= offset.y && it.offset + it.size >= offset.y) {
-                            val page = state.pages[it.index]
-                            if (page is ReaderPage.Image) onLongPress(page)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = { offset ->
+                        state.state.layoutInfo.visibleItemsInfo.forEach {
+                            if (it.offset <= offset.y && it.offset + it.size >= offset.y) {
+                                val page = state.pages[it.index]
+                                if (page is ReaderPage.Image) onLongPress(page)
+                            }
                         }
-                    }
-                },
-                onTap = {
-                    isMenuOpened.value = !isMenuOpened.value
-                },
-            )
+                    },
+                    onTap = {
+                        isMenuOpened.value = !isMenuOpened.value
+                    },
+                )
+            }
     ) {
         val isPageIntervalEnabled by PR.isPageIntervalEnabled.collectAsState()
         val itemSpacing = if (isPageIntervalEnabled) 16.dp else 0.dp

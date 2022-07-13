@@ -119,42 +119,28 @@ internal fun ImagePage(
             .setParameter("retry_hash", retryHash, memoryCacheKey = null)
             .build()
     )
-    Image(
-        painter = painter,
-        contentDescription = null,
-        modifier = modifier,
-        contentScale = contentScale,
-    )
-    StatePlaceholder(
-        modifier = stateModifier,
-        state = painter.state,
-        page = page,
-        onRetry = { retryHash++ }
-    )
-}
-
-@Composable
-private fun StatePlaceholder(
-    modifier: Modifier,
-    state: AsyncImagePainter.State,
-    page: ReaderPage.Image,
-    onRetry: () -> Unit,
-) {
-    when (state) {
+    when (val state = painter.state) {
+        is AsyncImagePainter.State.Success ->
+            Image(
+                painter = painter,
+                contentDescription = null,
+                modifier = modifier,
+                contentScale = contentScale,
+            )
         is AsyncImagePainter.State.Loading ->
             LoadingState(
-                modifier = modifier,
+                modifier = stateModifier,
                 position = page.index + 1,
                 url = page.url
             )
         is AsyncImagePainter.State.Error ->
             ErrorState(
-                modifier = modifier,
+                modifier = stateModifier,
                 position = page.index + 1,
                 throwable = state.result.throwable,
-                onRetry = onRetry
+                onRetry = { retryHash++ }
             )
-        else -> Unit
+        AsyncImagePainter.State.Empty -> Unit
     }
 }
 
