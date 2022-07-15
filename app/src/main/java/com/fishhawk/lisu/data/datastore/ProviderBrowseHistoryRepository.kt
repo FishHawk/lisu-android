@@ -27,7 +27,4 @@ class ProviderBrowseHistoryRepository(context: Context) {
             BoardFilter(name, options, it[key] ?: 0)
         }
     }.distinctUntilChanged().conflate()
-
-    fun getBoardHistory(providerId: String) =
-        store.get("$providerId:board", "").value
 }

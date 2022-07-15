@@ -12,7 +12,6 @@ import com.fishhawk.lisu.util.flatten
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-
 data class Board(
     val filters: List<BoardFilter>,
     val mangaResult: Result<PagedList<MangaDto>>?,
@@ -21,48 +20,48 @@ data class Board(
 class ProviderViewModel(
     args: Bundle,
     private val lisuRepository: LisuRepository,
-    private val providerBrowseHistoryRepository: ProviderBrowseHistoryRepository
+    private val providerBrowseHistoryRepository: ProviderBrowseHistoryRepository,
 ) : ViewModel() {
     val providerId = args.getString("providerId")!!
+    val boardId = args.getString("boardId")!!
 
-    val provider =
+    private val boardModel =
         lisuRepository.providers
+            .filterNotNull()
             .mapNotNull {
-                it?.value
-                    ?.getOrNull()
-                    ?.find { provider -> provider.id == providerId }
+                it.value?.map { providers ->
+                    providers.find { provider -> provider.id == providerId }
+                        ?.boardModels?.get(boardId)
+                        ?: return@mapNotNull null
+                }
             }
             .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    private val _boards = provider
+    private val _board = boardModel
         .filterNotNull()
-        .flatMapLatest { provider ->
+        .flatMapLatest { result ->
             flatten(
-                provider.boardModels.mapValues { (boardId, model) ->
-                    val filters =
-                        providerBrowseHistoryRepository.getFilters(provider.id, boardId, model)
-
+                result.map { boardModel ->
+                    val filters = providerBrowseHistoryRepository
+                        .getFilters(providerId, boardId, boardModel)
                     val remoteList = filters.flatMapLatest {
                         val options = it.associate { it.name to it.selected }
                         lisuRepository.getBoard(providerId, boardId, options)
                     }
-
                     combine(filters, remoteList) { f, r -> f to r }
                 }
             )
         }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
-    val boards = _boards
-        .map {
-            it.mapValues { (_, pair) ->
-                val (filters, remoteList) = pair
+    val board = _board
+        .filterNotNull()
+        .map { result ->
+            result.map { (filters, remoteList) ->
                 Board(filters, remoteList.value)
             }
         }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
-
-    val pageHistory = providerBrowseHistoryRepository.getBoardHistory(providerId)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     fun addToLibrary(manga: MangaDto) {
         viewModelScope.launch {
@@ -76,21 +75,27 @@ class ProviderViewModel(
         }
     }
 
-    fun updateFilterHistory(boardId: String, name: String, selected: Int) {
+    fun updateFilterHistory(name: String, selected: Int) {
         viewModelScope.launch {
             providerBrowseHistoryRepository.setFilter(providerId, boardId, name, selected)
         }
     }
 
-    fun reload(boardId: String) {
+    fun reloadProvider() {
         viewModelScope.launch {
-            _boards.value[boardId]?.second?.reload()
+            lisuRepository.providers.value?.reload()
         }
     }
 
-    fun requestNextPage(boardId: String) {
+    fun reload() {
         viewModelScope.launch {
-            _boards.value[boardId]?.second?.requestNextPage()
+            _board.value?.getOrNull()?.second?.reload()
+        }
+    }
+
+    fun requestNextPage() {
+        viewModelScope.launch {
+            _board.value?.getOrNull()?.second?.requestNextPage()
         }
     }
 }

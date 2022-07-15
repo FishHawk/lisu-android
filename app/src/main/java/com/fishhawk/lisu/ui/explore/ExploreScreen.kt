@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,6 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.HowToReg
 import androidx.compose.material.icons.outlined.LocalLibrary
 import androidx.compose.material.icons.outlined.PersonOff
@@ -37,9 +40,11 @@ import com.fishhawk.lisu.data.network.model.ProviderDto
 import com.fishhawk.lisu.ui.main.navToGlobalSearch
 import com.fishhawk.lisu.ui.main.navToProvider
 import com.fishhawk.lisu.ui.main.navToProviderLogin
+import com.fishhawk.lisu.ui.main.navToProviderSearch
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.widget.*
+import com.google.accompanist.flowlayout.FlowRow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.viewModel
 import java.util.*
@@ -48,10 +53,12 @@ internal typealias ExploreActionHandler = (ExploreAction) -> Unit
 
 internal sealed interface ExploreAction {
     object NavToGlobalSearch : ExploreAction
-    data class NavToProvider(val provider: ProviderDto) : ExploreAction
+    data class NavToProvider(val providerId: String, val boardId: String) : ExploreAction
     data class NavToProviderLogin(val provider: ProviderDto) : ExploreAction
+    data class NavToProviderSearch(val providerId: String) : ExploreAction
 
     object Reload : ExploreAction
+
     data class Logout(val provider: ProviderDto) : ExploreAction
     data class Disable(val provider: ProviderDto) : ExploreAction
 }
@@ -64,9 +71,15 @@ fun ExploreScreen(navController: NavHostController) {
 
     val onAction: ExploreActionHandler = { action ->
         when (action) {
-            ExploreAction.NavToGlobalSearch -> navController.navToGlobalSearch()
-            is ExploreAction.NavToProvider -> navController.navToProvider(action.provider.id)
-            is ExploreAction.NavToProviderLogin -> navController.navToProviderLogin(action.provider)
+            ExploreAction.NavToGlobalSearch ->
+                navController.navToGlobalSearch()
+            is ExploreAction.NavToProvider ->
+                navController.navToProvider(action.providerId, action.boardId)
+            is ExploreAction.NavToProviderSearch ->
+                navController.navToProviderSearch(action.providerId)
+            is ExploreAction.NavToProviderLogin ->
+                navController.navToProviderLogin(action.provider)
+
             ExploreAction.Reload -> viewModel.reload()
             is ExploreAction.Logout -> viewModel.logout(action.provider.id)
             is ExploreAction.Disable -> Unit
@@ -124,7 +137,7 @@ private fun ProviderListHeader(label: String) {
 @Composable
 private fun ProviderListItem(
     provider: ProviderDto,
-    onAction: ExploreActionHandler
+    onAction: ExploreActionHandler,
 ) {
     val scope = rememberCoroutineScope()
     val bottomSheetHelper = LocalBottomSheetHelper.current
@@ -132,8 +145,6 @@ private fun ProviderListItem(
     ListItem(
         modifier = Modifier.combinedClickable(
             onClick = {
-                onAction(ExploreAction.NavToProvider(provider))
-                PR.lastUsedProvider.setBlocking(provider.id)
             },
             onLongClick = {
                 val sheet = ExploreSheet(provider, onAction)
@@ -197,5 +208,39 @@ private fun ProviderListItem(
                 ),
             )
         },
+        trailing = {
+            IconButton(onClick = {
+                onAction(ExploreAction.NavToProviderSearch(providerId = provider.id))
+            }) {
+                Icon(Icons.Filled.Search, stringResource(R.string.action_search))
+            }
+        },
     )
+    FlowRow(modifier = Modifier.padding(start = 68.dp), mainAxisSpacing = 8.dp) {
+        provider.boardModels.forEach { (boardId, _) ->
+            Board(
+                providerId = provider.id,
+                boardId = boardId,
+                onAction = onAction,
+            )
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterialApi::class)
+private fun Board(
+    providerId: String,
+    boardId: String,
+    onAction: ExploreActionHandler,
+) {
+    Chip(
+        onClick = {
+            onAction(ExploreAction.NavToProvider(providerId, boardId))
+            PR.lastUsedProvider.setBlocking(providerId)
+        },
+        modifier = Modifier.height(24.dp),
+    ) {
+        Text(text = boardId)
+    }
 }

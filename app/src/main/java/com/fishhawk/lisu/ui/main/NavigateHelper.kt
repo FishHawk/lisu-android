@@ -41,8 +41,8 @@ object ProviderNavType : NavType<ProviderDto>(isNullableAllowed = true) {
     }
 }
 
-fun NavHostController.navToProvider(id: String) {
-    navigate("provider/${id}")
+fun NavHostController.navToProvider(providerId: String, boardId: String) {
+    navigate("provider/${providerId}/board/${boardId}")
 }
 
 fun NavHostController.navToProviderLogin(provider: ProviderDto) {

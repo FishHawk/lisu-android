@@ -190,7 +190,7 @@ private fun MainNavHost(
             navArgument("keywords") { nullable = true }
         )) { GlobalSearchScreen(navController) }
 
-        composable("provider/{providerId}") { ProviderScreen(navController) }
+        composable("provider/{providerId}/board/{boardId}") { ProviderScreen(navController) }
         composable("provider/{providerId}/login?provider={provider}", listOf(
             navArgument("provider") {
                 nullable = true
