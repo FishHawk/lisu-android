@@ -34,17 +34,12 @@ internal fun EmptyPage(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-        Column(
+        Text(
             modifier = Modifier.padding(48.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Chapter is empty",
-                style = MaterialTheme.typography.subtitle2,
-                textAlign = TextAlign.Center
-            )
-        }
+            text = "Chapter is empty",
+            style = MaterialTheme.typography.subtitle2,
+            textAlign = TextAlign.Center
+        )
     }
 }
 

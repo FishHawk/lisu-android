@@ -7,6 +7,7 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -16,6 +17,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.center
 import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.PointerInputScope
@@ -94,6 +96,9 @@ internal fun PagerViewer(
                 },
                 itemSpacing = if (isPageIntervalEnabled) 16.dp else 0.dp
             ) { index ->
+                // hacky, see https://github.com/google/accompanist/issues/1249
+                Text("placeholder placeholder placeholder", color = Color.Transparent)
+
                 val pageModifier = Modifier
                     .fillMaxSize()
                     .pointerInput(Unit) {
@@ -282,5 +287,4 @@ private suspend fun PointerInputScope.customDetectTransformGestures(
             }
         }
     }
-
 }

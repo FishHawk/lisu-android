@@ -7,12 +7,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalContext
-import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
 import coil.memory.MemoryCache
 import coil.request.ImageRequest
@@ -123,7 +123,7 @@ fun ReaderScreen() {
         ) { mangaTitle ->
             Reader(
                 pointer = pointer ?: return@StateView,
-                readerMode = readerMode,
+                readerMode = readerMode ?: return@StateView,
                 mangaTitle = mangaTitle,
                 isOnlyOneChapter = isOnlyOneChapter,
                 onAction = onAction,
@@ -136,35 +136,60 @@ fun ReaderScreen() {
 @OptIn(ExperimentalPagerApi::class)
 private fun Reader(
     pointer: ReaderViewModel.ReaderChapterPointer,
-    readerMode: ReaderMode?,
+    readerMode: ReaderMode,
     mangaTitle: String,
     isOnlyOneChapter: Boolean,
     onAction: ReaderActionHandler,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        val isMenuOpened = rememberSaveable { mutableStateOf(false) }
-        val viewerStateResult = readerMode?.let { readerMode ->
-            pointer.pages?.mapCatching { pages ->
+        val viewerStateResult = pointer.pages?.mapCatching { pages ->
+            rememberSaveable(pointer, readerMode, saver = listSaver(
+                save = {
+                    when (it) {
+                        is ViewerState.Webtoon -> listOf(
+                            0,
+                            it.state.firstVisibleItemIndex,
+                            it.state.firstVisibleItemScrollOffset
+                        )
+                        is ViewerState.Pager -> listOf(
+                            1,
+                            it.state.currentPage
+                        )
+                    }
+                },
+                restore = {
+                    when (it[0]) {
+                        0 -> ViewerState.Webtoon(
+                            state = LazyListState(
+                                firstVisibleItemIndex = it[1],
+                                firstVisibleItemScrollOffset = it[2]
+                            ),
+                            pages = pages,
+                            requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
+                            requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
+                        )
+                        else -> ViewerState.Pager(
+                            state = PagerState(currentPage = it[1]),
+                            isRtl = readerMode == ReaderMode.Rtl,
+                            pages = pages,
+                            requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
+                            requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
+                        )
+                    }
+                }
+            )) {
+                val startPage = pages
+                    .filter { it is ReaderPage.Image || it is ReaderPage.Empty }
+                    .let { it.getOrNull(pointer.startPage) ?: it.last() }
+                    .let { pages.indexOf(it) }
                 if (readerMode == ReaderMode.Continuous) ViewerState.Webtoon(
-                    state = rememberSaveable(pointer, readerMode, saver = LazyListState.Saver) {
-                        val startPage = pages
-                            .filter { it is ReaderPage.Image || it is ReaderPage.Empty }
-                            .let { it.getOrNull(pointer.startPage) ?: it.last() }
-                            .let { pages.indexOf(it) }
-                        LazyListState(firstVisibleItemIndex = startPage)
-                    },
+                    state = LazyListState(firstVisibleItemIndex = startPage),
                     pages = pages,
                     requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
                     requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
                 )
                 else ViewerState.Pager(
-                    state = rememberSaveable(pointer, readerMode, saver = PagerState.Saver) {
-                        val startPage = pages
-                            .filter { it is ReaderPage.Image || it is ReaderPage.Empty }
-                            .let { it.getOrNull(pointer.startPage) ?: it.last() }
-                            .let { pages.indexOf(it) }
-                        PagerState(currentPage = startPage)
-                    },
+                    state = PagerState(currentPage = startPage),
                     isRtl = readerMode == ReaderMode.Rtl,
                     pages = pages,
                     requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
@@ -173,6 +198,7 @@ private fun Reader(
             }
         }
 
+        val isMenuOpened = rememberSaveable { mutableStateOf(false) }
         StateView(
             result = viewerStateResult,
             onRetry = { onAction(ReaderAction.ReloadChapter) },
