@@ -23,7 +23,9 @@ sealed class ViewerState(
     val imagePosition
         get() = when (val page = pages[position]) {
             is ReaderPage.Image -> page.index
-            else -> 0
+            ReaderPage.Empty -> 0
+            is ReaderPage.NextChapterState -> imageSize - 1
+            is ReaderPage.PrevChapterState -> 0
         }
 
     abstract suspend fun scrollToPage(@IntRange(from = 0) page: Int)

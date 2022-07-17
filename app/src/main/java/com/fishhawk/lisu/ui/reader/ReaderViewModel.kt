@@ -160,15 +160,15 @@ class ReaderViewModel(
             }
             pages = currChapter.content?.map {
                 if (it.isEmpty()) listOfNotNull(
-//                    prevChapterStatePage,
+                    prevChapterStatePage,
                     ReaderPage.Empty,
-//                    nextChapterStatePage
+                    nextChapterStatePage
                 )
                 else listOfNotNull(
-//                    prevChapterStatePage,
+                    prevChapterStatePage,
                     *it.mapIndexed { index, url -> ReaderPage.Image(index = index, url = url) }
                         .toTypedArray(),
-//                    nextChapterStatePage
+                    nextChapterStatePage
                 )
             }
         }

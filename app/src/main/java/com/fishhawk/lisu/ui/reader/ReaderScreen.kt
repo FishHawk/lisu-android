@@ -223,7 +223,7 @@ private fun Reader(
             mangaTitle = mangaTitle,
             chapterName = pointer.chapterName,
             chapterTitle = pointer.chapterTitle,
-            readerMode = readerMode ?: return@Box,
+            readerMode = readerMode,
             isOnlyOneChapter = isOnlyOneChapter,
             viewerState = viewerStateResult?.getOrNull(),
             onAction = onAction

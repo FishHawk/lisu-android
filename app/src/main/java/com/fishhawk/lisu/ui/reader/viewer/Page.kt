@@ -1,10 +1,7 @@
 package com.fishhawk.lisu.ui.reader.viewer
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -14,8 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
@@ -24,6 +24,7 @@ import coil.size.Size
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.reader.ReaderPage
 import com.fishhawk.lisu.util.interceptor.ProgressInterceptor
+import com.fishhawk.lisu.widget.StateView
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 @Composable
@@ -48,25 +49,28 @@ internal fun NextChapterStatePage(
     page: ReaderPage.NextChapterState,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            modifier = Modifier.padding(48.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        Box(
+            modifier = modifier,
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "${page.currentChapterName} ${page.currentChapterTitle}",
-                style = MaterialTheme.typography.subtitle2,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = "${page.nextChapterName} ${page.nextChapterTitle}",
-                style = MaterialTheme.typography.subtitle2,
-                textAlign = TextAlign.Center
-            )
+            Column(modifier = Modifier.padding(48.dp)) {
+                val style1 = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Bold)
+                val style2 = MaterialTheme.typography.subtitle1
+                val currChapterText = "${page.currentChapterName} ${page.currentChapterTitle}"
+                val nextChapterText = "${page.nextChapterName} ${page.nextChapterTitle}"
+
+                Text(text = "Current:", style = style1)
+                Text(text = currChapterText, style = style2)
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = "Next:", style = style1)
+                Text(text = nextChapterText, style = style2)
+
+                StateView(
+                    result = page.nextChapterState,
+                    onRetry = { },
+                ) { }
+            }
         }
     }
 }
@@ -76,25 +80,23 @@ internal fun PrevChapterStatePage(
     page: ReaderPage.PrevChapterState,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            modifier = Modifier.padding(48.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        Box(
+            modifier = modifier,
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "${page.currentChapterName} ${page.currentChapterTitle}",
-                style = MaterialTheme.typography.subtitle2,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = "${page.prevChapterName} ${page.prevChapterTitle}",
-                style = MaterialTheme.typography.subtitle2,
-                textAlign = TextAlign.Center
-            )
+            Column(modifier = Modifier.padding(48.dp)) {
+                val style1 = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium)
+                val style2 = MaterialTheme.typography.subtitle1
+                val prevChapterText = "${page.prevChapterName} ${page.prevChapterTitle}"
+                val currChapterText = "${page.currentChapterName} ${page.currentChapterTitle}"
+
+                Text(text = "Previous:", style = style1)
+                Text(text = prevChapterText, style = style2)
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = "Current:", style = style1)
+                Text(text = currChapterText, style = style2)
+            }
         }
     }
 }
@@ -147,11 +149,11 @@ private fun LoadingState(modifier: Modifier, position: Int, url: String) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            var progress by remember { mutableStateOf(0f) }
             Text(
                 text = position.toString(),
                 style = MaterialTheme.typography.h3
             )
+            var progress by remember { mutableStateOf(0f) }
             if (progress > 0f) CircularProgressIndicator(progress = progress)
             else CircularProgressIndicator()
 
