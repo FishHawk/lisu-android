@@ -10,13 +10,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.network.model.MangaDto
 import com.fishhawk.lisu.data.network.model.MangaState
+import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.*
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
@@ -30,6 +33,7 @@ private sealed interface SearchAction {
     data class DeleteSuggestion(val keywords: String) : SearchAction
 
     object Reload : SearchAction
+    object Refresh : SearchAction
     object RequestNextPage : SearchAction
 
     data class AddToLibrary(val manga: MangaDto) : SearchAction
@@ -44,21 +48,41 @@ fun ProviderSearchScreen(navController: NavHostController) {
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
     val mangaListResult by viewModel.mangas.collectAsState()
-    var addDialogManga by remember { mutableStateOf<MangaDto?>(null) }
-    var removeDialogManga by remember { mutableStateOf<MangaDto?>(null) }
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     val onAction: SearchActionHandler = { action ->
         when (action) {
             SearchAction.NavUp -> navController.navigateUp()
-            is SearchAction.NavToGallery -> navController.navToGallery(action.manga)
-            is SearchAction.Search -> viewModel.search(action.keywords)
-            is SearchAction.DeleteSuggestion -> viewModel.deleteSuggestion(action.keywords)
+            is SearchAction.NavToGallery ->
+                navController.navToGallery(action.manga)
+            is SearchAction.Search ->
+                viewModel.search(action.keywords)
+            is SearchAction.DeleteSuggestion ->
+                viewModel.deleteSuggestion(action.keywords)
 
-            is SearchAction.Reload -> viewModel.reload()
-            is SearchAction.RequestNextPage -> viewModel.requestNextPage()
+            SearchAction.Reload ->
+                viewModel.reload()
+            SearchAction.Refresh ->
+                viewModel.refresh()
+            SearchAction.RequestNextPage ->
+                viewModel.requestNextPage()
 
-            is SearchAction.AddToLibrary -> viewModel.addToLibrary(action.manga)
-            is SearchAction.RemoveFromLibrary -> viewModel.removeFromLibrary(action.manga)
+            is SearchAction.AddToLibrary ->
+                viewModel.addToLibrary(action.manga)
+            is SearchAction.RemoveFromLibrary ->
+                viewModel.removeFromLibrary(action.manga)
+        }
+    }
+
+    val context = LocalContext.current
+    OnEvent(viewModel.event) {
+        when (it) {
+            is ProviderSearchEvent.AddToLibraryFailure ->
+                context.toast(it.exception.localizedMessage ?: "")
+            is ProviderSearchEvent.RemoveFromLibraryFailure ->
+                context.toast(it.exception.localizedMessage ?: "")
+            is ProviderSearchEvent.RefreshFailure ->
+                context.toast(it.exception.localizedMessage ?: "")
         }
     }
 
@@ -94,6 +118,9 @@ fun ProviderSearchScreen(navController: NavHostController) {
         },
         content = { paddingValues ->
             LisuTransition {
+                var addDialogManga by remember { mutableStateOf<MangaDto?>(null) }
+                var removeDialogManga by remember { mutableStateOf<MangaDto?>(null) }
+
                 StateView(
                     result = mangaListResult,
                     onRetry = { onAction(SearchAction.Reload) },
@@ -102,8 +129,9 @@ fun ProviderSearchScreen(navController: NavHostController) {
                         .fillMaxSize(),
                 ) { mangaList ->
                     RefreshableMangaList(
-                        result = mangaList,
-                        onRefresh = { onAction(SearchAction.Reload) },
+                        mangaList = mangaList,
+                        isRefreshing = isRefreshing,
+                        onRefresh = { onAction(SearchAction.Refresh) },
                         onRequestNextPage = { onAction(SearchAction.RequestNextPage) },
                         decorator = {
                             if (it != null && it.state == MangaState.RemoteInLibrary) {
@@ -124,25 +152,25 @@ fun ProviderSearchScreen(navController: NavHostController) {
                     onSuggestionSelected = { editingKeywords = it },
                     onSuggestionDeleted = { onAction(SearchAction.DeleteSuggestion(it)) }
                 )
+
+                addDialogManga?.let {
+                    LisuDialog(
+                        title = it.titleOrId,
+                        confirmText = "Add to library",
+                        onConfirm = { onAction(SearchAction.AddToLibrary(it)) },
+                        onDismiss = { addDialogManga = null },
+                    )
+                }
+
+                removeDialogManga?.let {
+                    LisuDialog(
+                        title = it.titleOrId,
+                        confirmText = "Remove from library",
+                        onConfirm = { onAction(SearchAction.RemoveFromLibrary(it)) },
+                        onDismiss = { removeDialogManga = null },
+                    )
+                }
             }
         }
     )
-
-    addDialogManga?.let {
-        LisuDialog(
-            title = it.titleOrId,
-            confirmText = "Add to library",
-            onConfirm = { onAction(SearchAction.AddToLibrary(it)) },
-            onDismiss = { addDialogManga = null },
-        )
-    }
-
-    removeDialogManga?.let {
-        LisuDialog(
-            title = it.titleOrId,
-            confirmText = "Remove from library",
-            onConfirm = { onAction(SearchAction.RemoveFromLibrary(it)) },
-            onDismiss = { removeDialogManga = null },
-        )
-    }
 }

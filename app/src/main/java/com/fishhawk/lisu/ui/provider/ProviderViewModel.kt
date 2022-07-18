@@ -1,16 +1,23 @@
 package com.fishhawk.lisu.ui.provider
 
 import android.os.Bundle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.datastore.BoardFilter
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.lisu.data.network.LisuRepository
 import com.fishhawk.lisu.data.network.base.PagedList
 import com.fishhawk.lisu.data.network.model.MangaDto
+import com.fishhawk.lisu.ui.base.BaseViewModel
+import com.fishhawk.lisu.ui.base.Event
 import com.fishhawk.lisu.util.flatten
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+
+sealed interface ProviderEvent : Event {
+    data class RemoveFromLibraryFailure(val exception: Throwable) : ProviderEvent
+    data class AddToLibraryFailure(val exception: Throwable) : ProviderEvent
+    data class RefreshFailure(val exception: Throwable) : ProviderEvent
+}
 
 data class Board(
     val filters: List<BoardFilter>,
@@ -21,7 +28,7 @@ class ProviderViewModel(
     args: Bundle,
     private val lisuRepository: LisuRepository,
     private val providerBrowseHistoryRepository: ProviderBrowseHistoryRepository,
-) : ViewModel() {
+) : BaseViewModel<ProviderEvent>() {
     val providerId = args.getString("providerId")!!
     val boardId = args.getString("boardId")!!
 
@@ -63,15 +70,20 @@ class ProviderViewModel(
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
     fun addToLibrary(manga: MangaDto) {
         viewModelScope.launch {
-            lisuRepository.addMangaToLibrary(manga.providerId, manga.id).fold({}, {})
+            lisuRepository.addMangaToLibrary(manga.providerId, manga.id)
+                .onFailure { sendEvent(ProviderEvent.AddToLibraryFailure(it)) }
         }
     }
 
     fun removeFromLibrary(manga: MangaDto) {
         viewModelScope.launch {
-            lisuRepository.removeMangaFromLibrary(manga.providerId, manga.id).fold({}, {})
+            lisuRepository.removeMangaFromLibrary(manga.providerId, manga.id)
+                .onFailure { sendEvent(ProviderEvent.RemoveFromLibraryFailure(it)) }
         }
     }
 
@@ -90,6 +102,16 @@ class ProviderViewModel(
     fun reload() {
         viewModelScope.launch {
             _board.value?.getOrNull()?.second?.reload()
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            if (_isRefreshing.value) return@launch
+            _isRefreshing.value = true
+            _board.value?.getOrNull()?.second?.refresh()
+                ?.onFailure { sendEvent(ProviderEvent.RefreshFailure(it)) }
+            _isRefreshing.value = false
         }
     }
 

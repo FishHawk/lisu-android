@@ -14,6 +14,7 @@ sealed interface LibraryEvent : Event {
     data class GetRandomSuccess(val manga: MangaDto) : LibraryEvent
     data class GetRandomFailure(val exception: Throwable) : LibraryEvent
     data class DeleteMultipleFailure(val exception: Throwable) : LibraryEvent
+    data class RefreshFailure(val exception: Throwable) : LibraryEvent
 }
 
 class LibraryViewModel(
@@ -39,6 +40,9 @@ class LibraryViewModel(
             .map { it.value }
             .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
     fun getRandomManga() {
         viewModelScope.launch {
             lisuRepository.getRandomMangaFromLibrary()
@@ -62,6 +66,16 @@ class LibraryViewModel(
     fun reload() {
         viewModelScope.launch {
             _mangas.value?.reload()
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            if (_isRefreshing.value) return@launch
+            _isRefreshing.value = true
+            _mangas.value?.refresh()
+                ?.onFailure { sendEvent(LibraryEvent.RefreshFailure(it)) }
+            _isRefreshing.value = false
         }
     }
 

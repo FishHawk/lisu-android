@@ -1,20 +1,28 @@
 package com.fishhawk.lisu.ui.provider
 
 import android.os.Bundle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.database.model.SearchHistory
 import com.fishhawk.lisu.data.network.LisuRepository
 import com.fishhawk.lisu.data.network.model.MangaDto
+import com.fishhawk.lisu.ui.base.BaseViewModel
+import com.fishhawk.lisu.ui.base.Event
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+
+
+sealed interface ProviderSearchEvent : Event {
+    data class RemoveFromLibraryFailure(val exception: Throwable) : ProviderSearchEvent
+    data class AddToLibraryFailure(val exception: Throwable) : ProviderSearchEvent
+    data class RefreshFailure(val exception: Throwable) : ProviderSearchEvent
+}
 
 class ProviderSearchViewModel(
     args: Bundle,
     private val lisuRepository: LisuRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
-) : ViewModel() {
+) : BaseViewModel<ProviderSearchEvent>() {
 
     val providerId = args.getString("providerId")!!
 
@@ -38,6 +46,9 @@ class ProviderSearchViewModel(
             .map { it.value }
             .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
     fun search(keywords: String) {
         _keywords.value = keywords
     }
@@ -47,16 +58,28 @@ class ProviderSearchViewModel(
     }
 
     fun addToLibrary(manga: MangaDto) = viewModelScope.launch {
-        lisuRepository.addMangaToLibrary(manga.providerId, manga.id).fold({}, {})
+        lisuRepository.addMangaToLibrary(manga.providerId, manga.id)
+            .onFailure { sendEvent(ProviderSearchEvent.AddToLibraryFailure(it)) }
     }
 
     fun removeFromLibrary(manga: MangaDto) = viewModelScope.launch {
-        lisuRepository.removeMangaFromLibrary(manga.providerId, manga.id).fold({}, {})
+        lisuRepository.removeMangaFromLibrary(manga.providerId, manga.id)
+            .onFailure { sendEvent(ProviderSearchEvent.RemoveFromLibraryFailure(it)) }
     }
 
     fun reload() {
         viewModelScope.launch {
             _mangas.value?.reload()
+        }
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            if (_isRefreshing.value) return@launch
+            _isRefreshing.value = true
+            _mangas.value?.refresh()
+                ?.onFailure { sendEvent(ProviderSearchEvent.RefreshFailure(it)) }
+            _isRefreshing.value = false
         }
     }
 

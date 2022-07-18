@@ -11,6 +11,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +39,8 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun RefreshableMangaList(
-    result: PagedList<MangaDto>,
+    mangaList: PagedList<MangaDto>,
+    isRefreshing: Boolean,
     onRefresh: () -> Unit,
     onRequestNextPage: () -> Unit,
     selectedMangaList: SnapshotStateList<MangaKeyDto>? = null,
@@ -46,67 +48,51 @@ fun RefreshableMangaList(
     onCardClick: (manga: MangaDto) -> Unit = {},
     onCardLongClick: (manga: MangaDto) -> Unit = {},
 ) {
-    val isRefreshing = false
+    var maxAccessed by rememberSaveable { mutableStateOf(0) }
+    var hasRefreshed by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(isRefreshing) {
+        if (isRefreshing) hasRefreshed = true
+        if (hasRefreshed && !isRefreshing) maxAccessed = 0
+    }
+
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = onRefresh,
     ) {
-        MangaList(
-            mangaList = result,
-            onRequestNextPage = onRequestNextPage,
-            selectedMangaList = selectedMangaList,
-            badge = decorator,
-            onCardClick = onCardClick,
-            onCardLongClick = onCardLongClick
-        )
-    }
-}
-
-@Composable
-fun MangaList(
-    mangaList: PagedList<MangaDto>,
-    onRequestNextPage: () -> Unit,
-    selectedMangaList: SnapshotStateList<MangaKeyDto>? = null,
-    badge: @Composable BoxScope.(manga: MangaDto?) -> Unit = {},
-    onCardClick: (manga: MangaDto) -> Unit = {},
-    onCardLongClick: (manga: MangaDto) -> Unit = {},
-) {
-    var maxAccessed by remember { mutableStateOf(0) }
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 96.dp),
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        itemsIndexed(mangaList.list) { index, manga ->
-            if (index > maxAccessed) {
-                maxAccessed = index
-                if (
-                    mangaList.appendState?.isSuccess == true &&
-                    maxAccessed < mangaList.list.size + 30
-                ) {
-                    onRequestNextPage()
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 96.dp),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            itemsIndexed(mangaList.list) { index, manga ->
+                if (index > maxAccessed) {
+                    maxAccessed = index
+                    if (
+                        mangaList.appendState?.isSuccess == true &&
+                        maxAccessed < mangaList.list.size + 30
+                    ) onRequestNextPage()
+                }
+                Box {
+                    MangaCard(
+                        manga = manga,
+                        selected = selectedMangaList?.contains(manga.key) ?: false,
+                        onClick = onCardClick,
+                        onLongClick = onCardLongClick
+                    )
+                    decorator(manga)
                 }
             }
-            Box {
-                MangaCard(
-                    manga = manga,
-                    selected = selectedMangaList?.contains(manga.key) ?: false,
-                    onClick = onCardClick,
-                    onLongClick = onCardLongClick
-                )
-                badge(manga)
-            }
-        }
 
-        fun itemFullWidth(content: @Composable () -> Unit) {
-            item(span = { GridItemSpan(maxCurrentLineSpan) }) { Box {} }
-            item(span = { GridItemSpan(maxCurrentLineSpan) }) { content() }
+            fun itemFullWidth(content: @Composable () -> Unit) {
+                item(span = { GridItemSpan(maxCurrentLineSpan) }) { Box {} }
+                item(span = { GridItemSpan(maxCurrentLineSpan) }) { content() }
+            }
+            mangaList.appendState
+                ?.onFailure { itemFullWidth { ErrorItem(it) { onRequestNextPage() } } }
+                ?: itemFullWidth { LoadingItem() }
         }
-        mangaList.appendState
-            ?.onFailure { itemFullWidth { ErrorItem(it) { onRequestNextPage() } } }
-            ?: itemFullWidth { LoadingItem() }
     }
 }
 

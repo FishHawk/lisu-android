@@ -1,6 +1,7 @@
 package com.fishhawk.lisu.data.network.base
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 sealed interface RemoteListAction<out T> {
     data class Mutate<T>(val transformer: (MutableList<T>) -> MutableList<T>) : RemoteListAction<T>
@@ -32,12 +34,14 @@ suspend fun <T> RemoteListActionChannel<T>.requestNextPage() {
 class RemoteList<T>(
     private val actionChannel: RemoteListActionChannel<T>,
     val value: Result<PagedList<T>>?,
+    private val refresh: suspend () -> Result<Unit>,
 ) {
     suspend fun mutate(transformer: (MutableList<T>) -> MutableList<T>) =
         actionChannel.mutate(transformer)
 
     suspend fun reload() = actionChannel.reload()
     suspend fun requestNextPage() = actionChannel.requestNextPage()
+    suspend fun refresh() = refresh.invoke()
 }
 
 data class PagedList<T>(
@@ -67,6 +71,8 @@ fun <Key : Any, T> remotePagingList(
 
     onStart?.invoke(actionChannel)
 
+    lateinit var job: Job
+
     suspend fun mySend() {
         send(
             RemoteList(
@@ -77,6 +83,23 @@ fun <Key : Any, T> remotePagingList(
                         list = value,
                     )
                 },
+                refresh = {
+                    withContext(dispatcher) {
+                        loader(startKey)
+                            .onSuccess {
+                                if (job.isActive) {
+                                    job.cancel()
+                                }
+                                value.clear()
+                                value.addAll(it.data)
+                                nextKey = it.nextKey
+                                listState = Result.success(Unit)
+                                appendState = Result.success(Unit)
+                                mySend()
+                            }
+                            .map { }
+                    }
+                }
             )
         )
     }
@@ -102,7 +125,7 @@ fun <Key : Any, T> remotePagingList(
         }
     }
 
-    var job = requestNextPage()
+    job = requestNextPage()
 
     launch(dispatcher) {
         actionChannel.receiveAsFlow().flowOn(dispatcher).collect { action ->

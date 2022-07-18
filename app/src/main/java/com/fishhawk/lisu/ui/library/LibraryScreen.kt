@@ -38,6 +38,7 @@ private sealed interface LibraryAction {
     data class RemoveFromLibrary(val mangaList: List<MangaKeyDto>) : LibraryAction
     object Random : LibraryAction
     object Reload : LibraryAction
+    object Refresh : LibraryAction
     object RequestNextPage : LibraryAction
 }
 
@@ -47,6 +48,7 @@ fun LibraryScreen(navController: NavHostController) {
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
     val mangaListResult by viewModel.mangas.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     val onAction: LibraryActionHandler = { action ->
         when (action) {
@@ -55,6 +57,7 @@ fun LibraryScreen(navController: NavHostController) {
             is LibraryAction.RemoveFromLibrary -> viewModel.deleteMultipleManga(action.mangaList)
             LibraryAction.Random -> viewModel.getRandomManga()
             LibraryAction.Reload -> viewModel.reload()
+            LibraryAction.Refresh -> viewModel.refresh()
             LibraryAction.RequestNextPage -> viewModel.requestNextPage()
         }
     }
@@ -67,6 +70,8 @@ fun LibraryScreen(navController: NavHostController) {
             is LibraryEvent.GetRandomFailure ->
                 context.toast(it.exception.localizedMessage ?: "")
             is LibraryEvent.DeleteMultipleFailure ->
+                context.toast(it.exception.localizedMessage ?: "")
+            is LibraryEvent.RefreshFailure ->
                 context.toast(it.exception.localizedMessage ?: "")
         }
     }
@@ -113,8 +118,9 @@ fun LibraryScreen(navController: NavHostController) {
                         .fillMaxSize(),
                 ) { mangaList ->
                     RefreshableMangaList(
-                        result = mangaList,
-                        onRefresh = { onAction(LibraryAction.Reload) },
+                        mangaList = mangaList,
+                        isRefreshing = isRefreshing,
+                        onRefresh = { onAction(LibraryAction.Refresh) },
                         onRequestNextPage = { onAction(LibraryAction.RequestNextPage) },
                         selectedMangaList = selectedMangaList,
                         onCardClick = {

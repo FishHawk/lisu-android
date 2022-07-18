@@ -11,6 +11,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -18,8 +19,10 @@ import androidx.navigation.NavHostController
 import com.fishhawk.lisu.data.datastore.BoardFilter
 import com.fishhawk.lisu.data.network.model.MangaDto
 import com.fishhawk.lisu.data.network.model.MangaState
+import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.*
 import com.google.accompanist.flowlayout.FlowRow
 import org.koin.androidx.compose.viewModel
@@ -37,6 +40,7 @@ internal sealed interface ProviderAction {
 
     object ReloadProvider : ProviderAction
     object Reload : ProviderAction
+    object Refresh : ProviderAction
     object RequestNextPage : ProviderAction
 }
 
@@ -48,6 +52,7 @@ fun ProviderScreen(navController: NavHostController) {
     val providerId = viewModel.providerId
     val boardId = viewModel.providerId
     val boardResult by viewModel.board.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     val onAction: ProviderActionHandler = { action ->
         when (action) {
@@ -67,8 +72,22 @@ fun ProviderScreen(navController: NavHostController) {
                 viewModel.reloadProvider()
             ProviderAction.Reload ->
                 viewModel.reload()
+            ProviderAction.Refresh ->
+                viewModel.refresh()
             ProviderAction.RequestNextPage ->
                 viewModel.requestNextPage()
+        }
+    }
+
+    val context = LocalContext.current
+    OnEvent(viewModel.event) {
+        when (it) {
+            is ProviderEvent.AddToLibraryFailure ->
+                context.toast(it.exception.localizedMessage ?: "")
+            is ProviderEvent.RemoveFromLibraryFailure ->
+                context.toast(it.exception.localizedMessage ?: "")
+            is ProviderEvent.RefreshFailure ->
+                context.toast(it.exception.localizedMessage ?: "")
         }
     }
 
@@ -86,6 +105,7 @@ fun ProviderScreen(navController: NavHostController) {
 
                 ProviderBoard(
                     boardResult = boardResult,
+                    isRefreshing = isRefreshing,
                     onCardLongClick = {
                         when (it.state) {
                             MangaState.Local -> Log.w(null, "Manga state should be local here")
@@ -123,6 +143,7 @@ fun ProviderScreen(navController: NavHostController) {
 @Composable
 private fun ProviderBoard(
     boardResult: Result<Board>?,
+    isRefreshing: Boolean,
     onCardLongClick: (manga: MangaDto) -> Unit,
     modifier: Modifier = Modifier,
     onAction: ProviderActionHandler,
@@ -143,8 +164,9 @@ private fun ProviderBoard(
                 modifier = Modifier.fillMaxSize(),
             ) { mangaList ->
                 RefreshableMangaList(
-                    result = mangaList,
-                    onRefresh = { onAction(ProviderAction.Reload) },
+                    mangaList = mangaList,
+                    isRefreshing = isRefreshing,
+                    onRefresh = { onAction(ProviderAction.Refresh) },
                     onRequestNextPage = { onAction(ProviderAction.RequestNextPage) },
                     decorator = {
                         if (it != null && it.state == MangaState.RemoteInLibrary) {
