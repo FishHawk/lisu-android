@@ -88,7 +88,6 @@ internal fun PagerViewer(
                 state = state.state,
                 key = {
                     when (val page = state.pages[it]) {
-                        ReaderPage.Empty -> 0
                         is ReaderPage.Image -> page.index
                         is ReaderPage.NextChapterState -> -1
                         is ReaderPage.PrevChapterState -> state.pages.size
@@ -106,20 +105,22 @@ internal fun PagerViewer(
                     }
                 when (val page = state.pages[index]) {
                     is ReaderPage.Image -> {
-                        ImagePage(
-                            page = page,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .zoomable(
-                                    onTap = { onTap(it, size) },
-                                    onLongPress = { onLongPress(page) },
-                                ),
-                            stateModifier = pageModifier,
-                        )
+                        if (page.url.isBlank()) {
+                            EmptyPage(modifier = pageModifier)
+                        } else {
+                            ImagePage(
+                                page = page,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .zoomable(
+                                        onTap = { onTap(it, size) },
+                                        onLongPress = { onLongPress(page) },
+                                    ),
+                                stateModifier = pageModifier,
+                            )
+                        }
                     }
-                    ReaderPage.Empty ->
-                        EmptyPage(modifier = pageModifier)
                     is ReaderPage.NextChapterState ->
                         NextChapterStatePage(page = page, modifier = pageModifier)
                     is ReaderPage.PrevChapterState ->

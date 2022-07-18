@@ -27,10 +27,12 @@ import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.util.saveImage
 import com.fishhawk.lisu.util.shareImage
 import com.fishhawk.lisu.util.toast
+import com.fishhawk.lisu.widget.EmptyView
 import com.fishhawk.lisu.widget.LocalBottomSheetHelper
 import com.fishhawk.lisu.widget.StateView
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
@@ -179,7 +181,7 @@ private fun Reader(
                 }
             )) {
                 val startPage = pages
-                    .filter { it is ReaderPage.Image || it is ReaderPage.Empty }
+                    .filterIsInstance<ReaderPage.Image>()
                     .let { it.getOrNull(pointer.startPage) ?: it.last() }
                     .let { pages.indexOf(it) }
                 if (readerMode == ReaderMode.Continuous) ViewerState.Webtoon(
@@ -199,6 +201,8 @@ private fun Reader(
         }
 
         val isMenuOpened = rememberSaveable { mutableStateOf(false) }
+        var currentImagePage by rememberSaveable { mutableStateOf<ReaderPage.Image?>(null) }
+
         StateView(
             result = viewerStateResult,
             onRetry = { onAction(ReaderAction.ReloadChapter) },
@@ -209,11 +213,16 @@ private fun Reader(
                 isMenuOpened = isMenuOpened,
                 onAction = onAction,
             )
+            LaunchedEffect(viewerState) {
+                snapshotFlow { viewerState.pages[viewerState.position] }
+                    .filterIsInstance<ReaderPage.Image>()
+                    .collect { currentImagePage = it }
+            }
         }
 
         ReaderInfoBar(
             isMenuOpened = isMenuOpened.value,
-            viewerState = viewerStateResult?.getOrNull()
+            currentImagePage = currentImagePage,
         )
 
         ReaderColorFilterOverlay()
@@ -225,7 +234,8 @@ private fun Reader(
             chapterTitle = pointer.chapterTitle,
             readerMode = readerMode,
             isOnlyOneChapter = isOnlyOneChapter,
-            viewerState = viewerStateResult?.getOrNull(),
+            currentImagePage = currentImagePage,
+            onSnapToPage = { viewerStateResult?.getOrNull()?.scrollToImagePage(it) },
             onAction = onAction
         )
     }
@@ -335,22 +345,23 @@ private fun ReaderPages(
                 onLongPress = onLongPress,
             )
     }
-
     LaunchedEffect(viewerState) {
-        snapshotFlow { viewerState.imagePosition }
-            .collect {
-                // Update reader history
-                onAction(ReaderAction.UpdateHistory(it))
+        snapshotFlow { viewerState.pages[viewerState.position] }
+            .filterIsInstance<ReaderPage.Image>()
+            .collect { page ->
+                onAction(ReaderAction.UpdateHistory(page.index))
+
                 // Preload image
-                viewerState.pages.filterIsInstance<ReaderPage.Image>()
+                viewerState.pages
+                    .filterIsInstance<ReaderPage.Image>()
                     .takeIf { it.isNotEmpty() }
                     ?.slice(
-                        (it - 3).coerceAtLeast(0)..
-                                (it + 5).coerceIn(0, viewerState.imageSize - 1)
+                        (page.index - 3).coerceAtLeast(0)..
+                                (page.index + 5).coerceIn(0, page.size - 1)
                     )
-                    ?.forEach { page ->
+                    ?.forEach { adjacentPage ->
                         val request = ImageRequest.Builder(context)
-                            .data(page.url)
+                            .data(adjacentPage.url)
                             .build()
                         context.imageLoader.enqueue(request)
                     }

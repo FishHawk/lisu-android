@@ -27,25 +27,23 @@ import androidx.compose.ui.unit.sp
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
 import com.fishhawk.lisu.data.datastore.collectAsState
-import com.fishhawk.lisu.ui.reader.viewer.ViewerState
 import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.widget.LocalBottomSheetHelper
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNot
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @Composable
 internal fun BoxScope.ReaderInfoBar(
     isMenuOpened: Boolean,
-    viewerState: ViewerState?
+    currentImagePage: ReaderPage.Image?,
 ) {
     val showInfoBar by PR.showInfoBar.collectAsState()
-    if (!showInfoBar || isMenuOpened || viewerState == null) return
+    if (!showInfoBar || isMenuOpened || currentImagePage == null) return
 
-    val infoBarText = viewerState.let { "${it.imagePosition + 1}/${it.imageSize}" }
+    val infoBarText = currentImagePage.let { "${it.index + 1}/${it.size}" }
     Text(
         text = infoBarText,
         modifier = Modifier
@@ -69,8 +67,9 @@ internal fun BoxScope.ReaderMenu(
     chapterTitle: String,
     readerMode: ReaderMode,
     isOnlyOneChapter: Boolean,
-    viewerState: ViewerState?,
-    onAction: ReaderActionHandler
+    currentImagePage: ReaderPage.Image?,
+    onSnapToPage: suspend (Int) -> Unit,
+    onAction: ReaderActionHandler,
 ) {
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = MaterialTheme.colors.isLight
@@ -102,7 +101,8 @@ internal fun BoxScope.ReaderMenu(
         ReaderMenuBottom(
             readerMode = readerMode,
             isOnlyOneChapter = isOnlyOneChapter,
-            viewerState = viewerState,
+            currentImagePage = currentImagePage,
+            onSnapToPage = onSnapToPage,
             onAction = onAction
         )
     }
@@ -112,7 +112,7 @@ internal fun BoxScope.ReaderMenu(
 private fun ReaderMenuTop(
     mangaTitle: String,
     chapterName: String,
-    chapterTitle: String
+    chapterTitle: String,
 ) {
     ReaderMenuSurface {
         Row(
@@ -154,37 +154,45 @@ private fun ReaderMenuTop(
 private fun ReaderMenuBottom(
     readerMode: ReaderMode,
     isOnlyOneChapter: Boolean,
-    viewerState: ViewerState?,
-    onAction: ReaderActionHandler
+    currentImagePage: ReaderPage.Image?,
+    onSnapToPage: suspend (Int) -> Unit,
+    onAction: ReaderActionHandler,
 ) {
     Column(modifier = Modifier.navigationBarsPadding()) {
         CompositionLocalProvider(
-            LocalLayoutDirection provides if (readerMode == ReaderMode.Rtl) LayoutDirection.Rtl
-            else LayoutDirection.Ltr
+            LocalLayoutDirection provides
+                    if (readerMode == ReaderMode.Rtl) LayoutDirection.Rtl
+                    else LayoutDirection.Ltr
         ) {
             Row(
                 modifier = Modifier.padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 if (!isOnlyOneChapter) ReaderMenuSurface(
-                    modifier = Modifier.size(48.dp), shape = CircleShape
+                    modifier = Modifier.size(48.dp),
+                    shape = CircleShape,
                 ) {
                     IconButton(onClick = { onAction(ReaderAction.OpenPrevChapter) }) {
                         Icon(
-                            if (LocalLayoutDirection.current == LayoutDirection.Ltr) Icons.Filled.SkipPrevious else Icons.Filled.SkipNext,
-                            "prev"
+                            if (LocalLayoutDirection.current == LayoutDirection.Ltr) {
+                                Icons.Filled.SkipPrevious
+                            } else {
+                                Icons.Filled.SkipNext
+                            },
+                            "prev",
                         )
                     }
                 }
 
                 ReaderMenuSurface(
-                    modifier = Modifier.weight(1f), shape = RoundedCornerShape(24.dp)
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(24.dp),
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         var sizeLabelWidth by remember { mutableStateOf<Int?>(null) }
                         val widthModifier = sizeLabelWidth?.let { width ->
@@ -195,35 +203,33 @@ private fun ReaderMenuBottom(
 
                         Text(
                             modifier = widthModifier,
-                            text = viewerState?.imagePosition?.plus(1)?.toString() ?: "-",
+                            text = currentImagePage?.index?.plus(1)?.toString() ?: "-",
                             style = MaterialTheme.typography.body2,
                             textAlign = TextAlign.Center
                         )
 
                         var isSliderChanging by remember { mutableStateOf(false) }
-                        var sliderValue by remember(viewerState) {
+                        var sliderValue by remember {
                             mutableStateOf(
-                                viewerState?.let {
-                                    it.imagePosition.toFloat() /
-                                            it.imageSize.minus(1).coerceAtLeast(1)
+                                currentImagePage?.let {
+                                    it.index.toFloat() /
+                                            (it.size - 1).coerceAtLeast(1).toFloat()
                                 } ?: 0f
                             )
                         }
-                        LaunchedEffect(viewerState) {
-                            viewerState?.let { viewState ->
-                                snapshotFlow { sliderValue }
-                                    .mapLatest { (it * (viewState.imageSize - 1)).toInt() }
-                                    .distinctUntilChanged()
-                                    .collect { viewState.scrollToImagePage(it) }
+                        currentImagePage?.let {
+                            if (!isSliderChanging) {
+                                sliderValue = it.index.toFloat() / (it.size - 1).coerceAtLeast(1)
                             }
                         }
-                        LaunchedEffect(viewerState) {
-                            viewerState?.let { viewState ->
-                                snapshotFlow { viewState.imagePosition }
-                                    .filterNot { isSliderChanging }
-                                    .map { it.toFloat() / (viewState.imageSize - 1).coerceAtLeast(1) }
-                                    .collect { sliderValue = it }
-                            }
+
+                        LaunchedEffect(Unit) {
+                            snapshotFlow { sliderValue }
+                                .mapNotNull {
+                                    if (currentImagePage == null) null
+                                    else (it * (currentImagePage.size - 1)).toInt()
+                                }
+                                .collectLatest(onSnapToPage)
                         }
                         Slider(
                             value = sliderValue,
@@ -232,12 +238,11 @@ private fun ReaderMenuBottom(
                                 sliderValue = it
                             },
                             modifier = Modifier.weight(1f),
-                            enabled = viewerState != null && viewerState.imageSize > 1,
+                            enabled = currentImagePage != null && currentImagePage.size > 1,
                             onValueChangeFinished = { isSliderChanging = false },
                         )
 
-
-                        Text(text = viewerState?.imageSize?.toString() ?: "-",
+                        Text(text = currentImagePage?.size?.toString() ?: "-",
                             style = MaterialTheme.typography.body2,
                             textAlign = TextAlign.Center,
                             onTextLayout = { sizeLabelWidth = it.size.width })
@@ -245,12 +250,17 @@ private fun ReaderMenuBottom(
                 }
 
                 if (!isOnlyOneChapter) ReaderMenuSurface(
-                    modifier = Modifier.size(48.dp), shape = CircleShape
+                    modifier = Modifier.size(48.dp),
+                    shape = CircleShape,
                 ) {
                     IconButton(onClick = { onAction(ReaderAction.OpenNextChapter) }) {
                         Icon(
-                            if (LocalLayoutDirection.current == LayoutDirection.Ltr) Icons.Filled.SkipNext else Icons.Filled.SkipPrevious,
-                            "next"
+                            if (LocalLayoutDirection.current == LayoutDirection.Ltr) {
+                                Icons.Filled.SkipNext
+                            } else {
+                                Icons.Filled.SkipPrevious
+                            },
+                            "next",
                         )
                     }
                 }
@@ -297,7 +307,7 @@ private fun ReaderMenuBottom(
 private fun ReaderMenuSurface(
     modifier: Modifier = Modifier,
     shape: Shape = RectangleShape,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) = Surface(
     modifier = modifier,
     shape = shape,

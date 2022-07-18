@@ -16,30 +16,25 @@ sealed class ViewerState(
 
     abstract val isRtl: Boolean
 
-    val size = pages.size
-
-    val imageSize = pages.count { it is ReaderPage.Image || it is ReaderPage.Empty }
-
-    val imagePosition
-        get() = when (val page = pages[position]) {
-            is ReaderPage.Image -> page.index
-            ReaderPage.Empty -> 0
-            is ReaderPage.NextChapterState -> imageSize - 1
-            is ReaderPage.PrevChapterState -> 0
-        }
-
     abstract suspend fun scrollToPage(@IntRange(from = 0) page: Int)
 
     suspend fun scrollToImagePage(@IntRange(from = 0) index: Int) {
-        pages.filterIsInstance<ReaderPage.Image>()
-            .getOrNull(index)
-            ?.let { pages.indexOf(it) }
-            .takeIf { it != -1 }
-            ?.let { scrollToPage(it) }
+        scrollToPage(
+            pages.indexOfFirst {
+                it is ReaderPage.Image && it.index == index
+            }
+        )
     }
 
-    abstract suspend fun toPrev()
-    abstract suspend fun toNext()
+    suspend fun toPrev() {
+        if (position > 0) scrollToPage(position - 1)
+        else requestMoveToPrevChapter()
+    }
+
+    suspend fun toNext() {
+        if (position < pages.size - 1) scrollToPage(position + 1)
+        else requestMoveToNextChapter()
+    }
 
     suspend fun toLeft() = if (isRtl) toNext() else toPrev()
     suspend fun toRight() = if (isRtl) toPrev() else toNext()
@@ -62,16 +57,6 @@ sealed class ViewerState(
         override suspend fun scrollToPage(page: Int) {
             state.scrollToPage(page)
         }
-
-        override suspend fun toPrev() {
-            if (position > 0) scrollToPage(position - 1)
-            else requestMoveToPrevChapter()
-        }
-
-        override suspend fun toNext() {
-            if (position < size - 1) scrollToPage(position + 1)
-            else requestMoveToNextChapter()
-        }
     }
 
     class Webtoon(
@@ -91,16 +76,6 @@ sealed class ViewerState(
 
         override suspend fun scrollToPage(page: Int) {
             state.scrollToItem(page)
-        }
-
-        override suspend fun toPrev() {
-            if (position > 0) scrollToPage(position - 1)
-            else requestMoveToPrevChapter()
-        }
-
-        override suspend fun toNext() {
-            if (position < size - 1) scrollToPage(position + 1)
-            else requestMoveToNextChapter()
         }
     }
 }

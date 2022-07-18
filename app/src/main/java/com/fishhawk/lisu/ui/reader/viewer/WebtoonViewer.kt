@@ -72,16 +72,20 @@ internal fun WebtoonViewer(
                     .fillMaxWidth()
                     .height(240.dp)
                 when (page) {
-                    is ReaderPage.Image -> ImagePage(
-                        page = page,
-                        contentScale = ContentScale.FillWidth,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(),
-                        stateModifier = pageModifier,
-                    )
-                    ReaderPage.Empty ->
-                        EmptyPage(modifier = pageModifier)
+                    is ReaderPage.Image -> {
+                        if (page.url.isBlank()) {
+                            EmptyPage(modifier = pageModifier)
+                        } else {
+                            ImagePage(
+                                page = page,
+                                contentScale = ContentScale.FillWidth,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight(),
+                                stateModifier = pageModifier,
+                            )
+                        }
+                    }
                     is ReaderPage.NextChapterState ->
                         NextChapterStatePage(page = page, modifier = pageModifier)
                     is ReaderPage.PrevChapterState ->

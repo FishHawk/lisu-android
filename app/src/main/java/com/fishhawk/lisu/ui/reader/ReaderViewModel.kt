@@ -1,9 +1,8 @@
 package com.fishhawk.lisu.ui.reader
 
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Bundle
-import androidx.core.graphics.drawable.toBitmap
+import android.os.Parcelable
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
@@ -19,12 +18,18 @@ import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import java.io.ByteArrayOutputStream
-import java.nio.ByteBuffer
 
 sealed interface ReaderPage {
-    object Empty : ReaderPage
-    data class Image(val index: Int, val url: String) : ReaderPage
+    @Parcelize
+    data class Image(
+        val index: Int,
+        val url: String,
+        val size: Int,
+    ) : ReaderPage, Parcelable
+
+
     data class NextChapterState(
         val currentChapterName: String,
         val currentChapterTitle: String,
@@ -45,7 +50,7 @@ sealed interface ReaderPage {
 class ReaderChapter(
     val collectionId: String,
     val index: Int,
-    chapter: ChapterDto
+    chapter: ChapterDto,
 ) {
     val id = chapter.id
     val title = chapter.title
@@ -161,13 +166,22 @@ class ReaderViewModel(
             pages = currChapter.content?.map {
                 if (it.isEmpty()) listOfNotNull(
                     prevChapterStatePage,
-                    ReaderPage.Empty,
+                    ReaderPage.Image(
+                        index = 0,
+                        url = "",
+                        size = 1,
+                    ),
                     nextChapterStatePage
                 )
                 else listOfNotNull(
                     prevChapterStatePage,
-                    *it.mapIndexed { index, url -> ReaderPage.Image(index = index, url = url) }
-                        .toTypedArray(),
+                    *it.mapIndexed { index, url ->
+                        ReaderPage.Image(
+                            index = index,
+                            url = url,
+                            size = it.size,
+                        )
+                    }.toTypedArray(),
                     nextChapterStatePage
                 )
             }
