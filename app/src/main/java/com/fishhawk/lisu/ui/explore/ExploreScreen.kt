@@ -103,8 +103,9 @@ fun ExploreScreen(navController: NavHostController) {
                         .padding(paddingValues)
                         .fillMaxSize(),
                 ) { providers ->
-                    if (providers.isEmpty()) EmptyView()
-                    else {
+                    if (providers.isEmpty()) {
+                        EmptyView(modifier = Modifier.fillMaxSize())
+                    } else {
                         LazyColumn {
                             lastUsedProvider?.let {
                                 item { ProviderListHeader(stringResource(R.string.explore_last_used)) }

@@ -28,7 +28,7 @@ fun <T> StateView(
 
 @Composable
 private fun LoadingView(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier) {
         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -39,7 +39,7 @@ private fun LoadingView(
 private fun ErrorView(
     modifier: Modifier = Modifier,
     throwable: Throwable,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
 ) {
     Box(
         modifier = modifier,
@@ -64,9 +64,11 @@ private fun ErrorView(
 }
 
 @Composable
-fun EmptyView() {
+fun EmptyView(
+    modifier: Modifier = Modifier,
+) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
         Text(text = "List is empty.")
@@ -87,7 +89,7 @@ fun LoadingItem(modifier: Modifier = Modifier) {
 @Composable
 fun ErrorItem(
     throwable: Throwable,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
 ) {
     Row(
         modifier = Modifier.padding(16.dp),

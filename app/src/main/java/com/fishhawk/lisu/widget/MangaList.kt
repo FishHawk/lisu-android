@@ -59,6 +59,9 @@ fun RefreshableMangaList(
         state = rememberSwipeRefreshState(isRefreshing),
         onRefresh = onRefresh,
     ) {
+        if (mangaList.list.isEmpty()) {
+            EmptyView(modifier = Modifier.fillMaxSize())
+        }
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 96.dp),
             modifier = Modifier.fillMaxSize(),

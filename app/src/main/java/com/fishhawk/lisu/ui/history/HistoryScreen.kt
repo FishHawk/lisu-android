@@ -25,11 +25,11 @@ import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToReader
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.util.toDisplayString
 import com.fishhawk.lisu.widget.EmptyView
 import com.fishhawk.lisu.widget.LisuDialog
 import com.fishhawk.lisu.widget.LisuToolBar
 import com.fishhawk.lisu.widget.MangaCover
-import com.fishhawk.lisu.util.toDisplayString
 import org.koin.androidx.compose.viewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -109,9 +109,11 @@ private fun ToolBar(onAction: HistoryActionHandler) {
 private fun HistoryList(
     histories: Map<LocalDate, List<ReadingHistory>>,
     onAction: HistoryActionHandler,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    if (histories.isEmpty()) EmptyView()
+    if (histories.isEmpty()) {
+        EmptyView(modifier = Modifier.fillMaxSize())
+    }
     LazyColumn(modifier = modifier) {
         histories.forEach { (date, list) ->
             item(key = date) {
@@ -134,7 +136,7 @@ private fun HistoryList(
 @Composable
 private fun HistoryListHeader(
     date: LocalDate,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Text(
@@ -150,7 +152,7 @@ private fun HistoryListHeader(
 private fun HistoryListItem(
     history: ReadingHistory,
     modifier: Modifier = Modifier,
-    onAction: HistoryActionHandler = {}
+    onAction: HistoryActionHandler = {},
 ) {
     val dismissState = rememberDismissState(
         confirmStateChange = {
