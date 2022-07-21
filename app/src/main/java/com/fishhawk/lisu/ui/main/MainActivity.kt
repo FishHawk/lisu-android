@@ -45,6 +45,7 @@ import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.data.network.model.GitHubReleaseDto
 import com.fishhawk.lisu.notification.AppUpdateNotification
 import com.fishhawk.lisu.ui.base.BaseActivity
+import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.explore.ExploreScreen
 import com.fishhawk.lisu.ui.gallery.GalleryCommentScreen
 import com.fishhawk.lisu.ui.gallery.GalleryEditScreen
@@ -57,14 +58,13 @@ import com.fishhawk.lisu.ui.provider.ProviderLoginScreen
 import com.fishhawk.lisu.ui.provider.ProviderScreen
 import com.fishhawk.lisu.ui.provider.ProviderSearchScreen
 import com.fishhawk.lisu.ui.theme.LisuTheme
-import com.fishhawk.lisu.widget.LisuModalBottomSheetLayout
 import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.util.toUriCompat
 import com.fishhawk.lisu.util.toast
+import com.fishhawk.lisu.widget.LisuModalBottomSheetLayout
 import com.google.accompanist.insets.ui.BottomNavigation
 import com.google.accompanist.insets.ui.Scaffold
 import org.koin.androidx.compose.viewModel
-import java.io.File
 
 class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,30 +81,29 @@ private fun MainApp() {
 
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        viewModel.event.collect { effect ->
-            when (effect) {
-                is MainEffect.Message -> context.toast(context.getString(effect.messageId))
-                is MainEffect.StringMessage -> context.toast(effect.message)
-                is MainEffect.ShowUpdateDialog -> latestRelease = effect.release
-                MainEffect.NotifyDownloadStart ->
-                    AppUpdateNotification.onDownloadStart(context)
-                is MainEffect.NotifyDownloadProgress ->
-                    AppUpdateNotification.onProgressChange(context, effect.progress)
-                is MainEffect.NotifyDownloadFinish ->
-                    AppUpdateNotification.onDownloadFinished(
-                        context,
-                        effect.file.toUriCompat(context)
-                    )
-                is MainEffect.NotifyDownloadError ->
-                    AppUpdateNotification.onDownloadError(context, effect.url)
-            }
+    OnEvent(viewModel.event) {
+        when (it) {
+            MainEvent.NoNewUpdates -> context.toast(R.string.update_check_no_new_updates)
+            is MainEvent.CheckUpdateFailure -> context.toast(it.exception)
+            is MainEvent.ShowUpdateDialog -> latestRelease = it.release
+            MainEvent.AlreadyDownloading -> context.toast("Already downloading apk.")
+            MainEvent.NotifyDownloadStart ->
+                AppUpdateNotification.onDownloadStart(context)
+            is MainEvent.NotifyDownloadProgress ->
+                AppUpdateNotification.onProgressChange(context, it.progress)
+            is MainEvent.NotifyDownloadFinish ->
+                AppUpdateNotification.onDownloadFinished(
+                    context,
+                    it.file.toUriCompat(context)
+                )
+            is MainEvent.NotifyDownloadError ->
+                AppUpdateNotification.onDownloadError(context, it.url)
         }
     }
 
     LaunchedEffect(Unit) {
         AppUpdateNotification.retryFlow.collect {
-            viewModel.downloadApk(File(context.externalCacheDir, "update.apk"), it)
+            viewModel.downloadApk(context.externalCacheDir, it)
         }
     }
 
@@ -135,10 +134,7 @@ private fun MainApp() {
                     it,
                     onDismiss = { latestRelease = null },
                     onConfirm = {
-                        viewModel.downloadApk(
-                            File(context.externalCacheDir, "update.apk"),
-                            it.getDownloadLink()
-                        )
+                        viewModel.downloadApk(context.externalCacheDir, it.getDownloadLink())
                     }
                 )
             }
@@ -166,7 +162,7 @@ private fun MainApp() {
 @Composable
 private fun MainNavHost(
     navController: NavHostController,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
     val startDestination = rememberSaveable {
         when (PR.startScreen.getBlocking()) {
@@ -251,7 +247,7 @@ private fun BottomBar(navController: NavHostController) {
 private fun RowScope.BottomBarTab(
     tab: Tab,
     currentDestination: NavDestination?,
-    navController: NavHostController
+    navController: NavHostController,
 ) = BottomNavigationItem(
     icon = { Icon(tab.icon, contentDescription = tab.route) },
     label = { Text(stringResource(tab.labelResId)) },
@@ -274,7 +270,7 @@ private fun RowScope.BottomBarTab(
 fun NewVersionAvailableDialog(
     release: GitHubReleaseDto,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = { },
