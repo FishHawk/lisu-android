@@ -27,7 +27,6 @@ import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.util.saveImage
 import com.fishhawk.lisu.util.shareImage
 import com.fishhawk.lisu.util.toast
-import com.fishhawk.lisu.widget.EmptyView
 import com.fishhawk.lisu.widget.LocalBottomSheetHelper
 import com.fishhawk.lisu.widget.StateView
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -124,7 +123,8 @@ fun ReaderScreen() {
             modifier = Modifier.fillMaxSize(),
         ) { mangaTitle ->
             Reader(
-                pointer = pointer ?: return@StateView,
+                pages = pointer?.pages,
+                startPage = viewModel.startPage,
                 readerMode = readerMode ?: return@StateView,
                 mangaTitle = mangaTitle,
                 isOnlyOneChapter = isOnlyOneChapter,
@@ -137,15 +137,16 @@ fun ReaderScreen() {
 @Composable
 @OptIn(ExperimentalPagerApi::class)
 private fun Reader(
-    pointer: ReaderViewModel.ReaderChapterPointer,
+    pages: Result<List<ReaderPage>>?,
+    startPage: Int,
     readerMode: ReaderMode,
     mangaTitle: String,
     isOnlyOneChapter: Boolean,
     onAction: ReaderActionHandler,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        val viewerStateResult = pointer.pages?.mapCatching { pages ->
-            rememberSaveable(pointer, readerMode, saver = listSaver(
+        val viewerStateResult = pages?.mapCatching { pages ->
+            rememberSaveable(pages, readerMode, saver = listSaver(
                 save = {
                     when (it) {
                         is ViewerState.Webtoon -> listOf(
@@ -182,7 +183,7 @@ private fun Reader(
             )) {
                 val startPage = pages
                     .filterIsInstance<ReaderPage.Image>()
-                    .let { it.getOrNull(pointer.startPage) ?: it.last() }
+                    .let { it.getOrNull(startPage) ?: it.last() }
                     .let { pages.indexOf(it) }
                 if (readerMode == ReaderMode.Continuous) ViewerState.Webtoon(
                     state = LazyListState(firstVisibleItemIndex = startPage),
@@ -230,8 +231,8 @@ private fun Reader(
         ReaderMenu(
             isOpened = isMenuOpened.value,
             mangaTitle = mangaTitle,
-            chapterName = pointer.chapterName,
-            chapterTitle = pointer.chapterTitle,
+            chapterName = "",
+            chapterTitle = "",
             readerMode = readerMode,
             isOnlyOneChapter = isOnlyOneChapter,
             currentImagePage = currentImagePage,

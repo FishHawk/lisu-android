@@ -130,7 +130,6 @@ class ReaderViewModel(
                 val chapterIndex = chapters.indexOfFirst { it.id == chapterId }
                 chapterPointer.value = ReaderChapterPointer(
                     index = if (chapterIndex < 0) 0 else chapterIndex,
-                    startPage = args.getInt("page", 0),
                 )
             }
             .launchIn(viewModelScope)
@@ -138,7 +137,6 @@ class ReaderViewModel(
 
     inner class ReaderChapterPointer(
         val index: Int,
-        val startPage: Int,
     ) {
         val chapterName get() = currChapter.name
         val chapterTitle get() = currChapter.title
@@ -194,6 +192,8 @@ class ReaderViewModel(
 
     val chapterPointer = MutableStateFlow<ReaderChapterPointer?>(null)
 
+    var startPage = args.getInt("page", 0)
+
     val isOnlyOneChapter = chapterList
         .map { it?.size == 1 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
@@ -248,7 +248,7 @@ class ReaderViewModel(
         fun refreshPointerIfNeed() {
             chapterPointer.value?.let { pointer ->
                 if (chapter.index - pointer.index <= 1) {
-                    chapterPointer.value = ReaderChapterPointer(pointer.index, pointer.startPage)
+                    chapterPointer.value = ReaderChapterPointer(pointer.index)
                 }
             }
         }
@@ -276,8 +276,8 @@ class ReaderViewModel(
         val pointer = chapterPointer.value ?: return
         val nextChapter = pointer.nextChapter
             ?: return sendMessage(R.string.no_next_chapter)
-        chapterPointer.value =
-            ReaderChapterPointer(nextChapter.index, 0)
+        startPage = 0
+        chapterPointer.value = ReaderChapterPointer(nextChapter.index)
         loadChapterPointer()
     }
 
@@ -285,8 +285,8 @@ class ReaderViewModel(
         val pointer = chapterPointer.value ?: return
         val prevChapter = pointer.prevChapter
             ?: return sendMessage(R.string.no_prev_chapter)
-        chapterPointer.value =
-            ReaderChapterPointer(prevChapter.index, 0)
+        startPage = 0
+        chapterPointer.value = ReaderChapterPointer(prevChapter.index)
         loadChapterPointer()
     }
 
@@ -296,8 +296,8 @@ class ReaderViewModel(
             ?: return sendMessage(R.string.no_next_chapter)
 
         if (nextChapter.content?.isSuccess == true) {
-            chapterPointer.value =
-                ReaderChapterPointer(nextChapter.index, 0)
+            startPage = 0
+            chapterPointer.value = ReaderChapterPointer(nextChapter.index)
             loadChapterPointer()
         } else {
             viewModelScope.launch { loadChapter(nextChapter) }
@@ -310,8 +310,8 @@ class ReaderViewModel(
             ?: return sendMessage(R.string.no_prev_chapter)
 
         if (prevChapter.content?.isSuccess == true) {
-            chapterPointer.value =
-                ReaderChapterPointer(prevChapter.index, Int.MAX_VALUE)
+            startPage = Int.MAX_VALUE
+            chapterPointer.value = ReaderChapterPointer(prevChapter.index)
             loadChapterPointer()
         } else {
             viewModelScope.launch { loadChapter(prevChapter) }

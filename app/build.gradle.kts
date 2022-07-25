@@ -1,8 +1,6 @@
 import java.io.FileInputStream
 import java.util.*
 
-val composeVersion by extra { "1.3.0-alpha01" }
-
 plugins {
     kotlin("plugin.serialization") version "1.7.0"
     id("com.android.application") version "7.2.1"
@@ -85,6 +83,7 @@ dependencies {
 
     implementation("androidx.activity:activity-compose:1.6.0-alpha05")
 
+    val composeVersion = "1.3.0-alpha01"
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
@@ -114,7 +113,6 @@ dependencies {
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-pager:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-pager-indicators:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-placeholder-material:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
