@@ -83,7 +83,7 @@ dependencies {
 
     implementation("androidx.activity:activity-compose:1.6.0-alpha05")
 
-    val composeVersion = "1.3.0-alpha01"
+    val composeVersion = "1.3.0-alpha02"
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
@@ -108,7 +108,7 @@ dependencies {
     implementation("io.insert-koin:koin-android:$koinVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
 
-    val accompanistVersion = "0.24.13-rc"
+    val accompanistVersion = "0.26.0-alpha"
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
