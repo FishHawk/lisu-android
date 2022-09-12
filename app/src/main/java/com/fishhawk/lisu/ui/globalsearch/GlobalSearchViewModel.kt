@@ -6,15 +6,20 @@ import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.SearchHistoryRepository
 import com.fishhawk.lisu.data.database.model.SearchHistory
 import com.fishhawk.lisu.data.network.LisuRepository
-import com.fishhawk.lisu.data.network.base.PagedList
+import com.fishhawk.lisu.data.network.base.RemoteList
+import com.fishhawk.lisu.data.network.model.BoardFilterValue
+import com.fishhawk.lisu.data.network.model.BoardId
 import com.fishhawk.lisu.data.network.model.MangaDto
 import com.fishhawk.lisu.data.network.model.ProviderDto
+import com.fishhawk.lisu.util.flatCombine
 import com.fishhawk.lisu.util.flatten
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
-data class SearchResult(
+data class SearchRecord(
+    val searchBoardId: BoardId,
     val provider: ProviderDto,
-    val mangas: Result<PagedList<MangaDto>>? = null
+    val remoteList: RemoteList<MangaDto>,
 )
 
 class GlobalSearchViewModel(
@@ -26,28 +31,44 @@ class GlobalSearchViewModel(
     private val _keywords = MutableStateFlow(args.getString("keywords") ?: "")
     val keywords = _keywords.asStateFlow()
 
-    private val _searchResultList =
-        combine(
+    private val providers =
+        lisuRepository.providers
+            .map { remoteProvider ->
+                remoteProvider?.value?.map { providers ->
+                    providers.mapNotNull { provider ->
+                        provider.searchBoardId?.let { it to provider }
+                    }
+                }
+            }
+
+    val searchRecordsResult =
+        flatCombine(
             keywords
                 .filter { it.isNotBlank() }
                 .onEach { searchHistoryRepository.update(SearchHistory("", it)) },
-            lisuRepository.providers
-                .mapNotNull { it?.value?.getOrNull() }
-                .filterNotNull(),
-        ) { keywords, providers ->
+            providers,
+        ) { keywords, providersResult ->
             flatten(
-                providers.map { provider ->
-                    lisuRepository.search(provider.id, keywords)
-                        .map { provider to it }
+                providersResult?.map { providers ->
+                    flatten(
+                        providers.map { (boardId, provider) ->
+                            lisuRepository.getBoard(
+                                providerId = provider.id,
+                                boardId = boardId,
+                                filterValues = BoardFilterValue.Empty,
+                                keywords = keywords,
+                            ).map {
+                                SearchRecord(
+                                    searchBoardId = boardId,
+                                    provider = provider,
+                                    remoteList = it,
+                                )
+                            }
+                        }
+                    )
                 }
             )
-        }
-            .flattenConcat()
-            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
-    val searchResultList = _searchResultList
-        .map { it.map { SearchResult(it.first, it.second.value) } }
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+        }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val suggestions = searchHistoryRepository.list()
         .map { list -> list.map { it.keywords }.distinct() }
@@ -55,5 +76,19 @@ class GlobalSearchViewModel(
 
     fun search(keywords: String) {
         _keywords.value = keywords
+    }
+
+    fun reload(providerId: String) {
+        viewModelScope.launch {
+            searchRecordsResult.value?.getOrNull()
+                ?.find { it.provider.id == providerId }
+                ?.remoteList?.reload()
+        }
+    }
+
+    fun reloadProviders() {
+        viewModelScope.launch {
+            lisuRepository.providers.value?.reload()
+        }
     }
 }

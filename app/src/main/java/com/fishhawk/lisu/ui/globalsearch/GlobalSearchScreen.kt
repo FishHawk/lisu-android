@@ -12,12 +12,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.data.network.model.BoardId
 import com.fishhawk.lisu.data.network.model.MangaDto
 import com.fishhawk.lisu.ui.main.navToGallery
-import com.fishhawk.lisu.ui.main.navToProviderSearch
+import com.fishhawk.lisu.ui.main.navToProvider
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.widget.*
 import org.koin.androidx.compose.viewModel
@@ -28,8 +30,10 @@ private typealias GlobalSearchActionHandler = (GlobalSearchAction) -> Unit
 private sealed interface GlobalSearchAction {
     object NavUp : GlobalSearchAction
     data class NavToGallery(val manga: MangaDto) : GlobalSearchAction
-    data class NavToProviderSearch(val providerId: String) : GlobalSearchAction
+    data class NavToProvider(val providerId: String, val boardId: BoardId) : GlobalSearchAction
     data class Search(val keywords: String) : GlobalSearchAction
+    data class Reload(val providerId: String) : GlobalSearchAction
+    object ReloadProviders : GlobalSearchAction
 }
 
 @Composable
@@ -39,16 +43,21 @@ fun GlobalSearchScreen(navController: NavHostController) {
     }
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
-    val searchResultList by viewModel.searchResultList.collectAsState()
+    val searchRecordsResult by viewModel.searchRecordsResult.collectAsState()
 
     val onAction: GlobalSearchActionHandler = { action ->
         when (action) {
             GlobalSearchAction.NavUp -> navController.navigateUp()
             is GlobalSearchAction.NavToGallery ->
                 navController.navToGallery(action.manga)
-            is GlobalSearchAction.NavToProviderSearch ->
-                navController.navToProviderSearch(action.providerId, keywords)
-            is GlobalSearchAction.Search -> viewModel.search(action.keywords)
+            is GlobalSearchAction.NavToProvider ->
+                navController.navToProvider(action.providerId, action.boardId, keywords)
+            is GlobalSearchAction.Search ->
+                viewModel.search(action.keywords)
+            is GlobalSearchAction.Reload ->
+                viewModel.reload(action.providerId)
+            GlobalSearchAction.ReloadProviders ->
+                viewModel.reloadProviders()
         }
     }
 
@@ -84,11 +93,11 @@ fun GlobalSearchScreen(navController: NavHostController) {
         },
         content = { paddingValues ->
             LisuTransition {
-                SearchResultList(
+                SearchRecordList(
                     modifier = Modifier
                         .padding(paddingValues)
                         .fillMaxSize(),
-                    searchResultList = searchResultList,
+                    searchRecordsResult = searchRecordsResult,
                     onAction = onAction
                 )
                 SuggestionList(
@@ -103,58 +112,89 @@ fun GlobalSearchScreen(navController: NavHostController) {
 }
 
 @Composable
-private fun SearchResultList(
-    searchResultList: List<SearchResult>,
+private fun SearchRecordList(
+    searchRecordsResult: Result<List<SearchRecord>>?,
     onAction: GlobalSearchActionHandler,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
+    StateView(
         modifier = modifier,
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(searchResultList) {
-            SearchResultItem(it, onAction)
+        result = searchRecordsResult,
+        onRetry = { onAction(GlobalSearchAction.ReloadProviders) },
+    ) { searchRecords ->
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(searchRecords) {
+                SearchRecord(it, onAction)
+            }
         }
     }
 }
 
 @Composable
-private fun SearchResultItem(
-    searchResult: SearchResult,
+private fun SearchRecord(
+    searchRecord: SearchRecord,
     onAction: GlobalSearchActionHandler
 ) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = searchResult.provider.run { "$id($lang)" },
+                text = searchRecord.provider.run { "$id($lang)" },
                 style = MaterialTheme.typography.body2
             )
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = {
-                onAction(GlobalSearchAction.NavToProviderSearch(searchResult.provider.id))
+                onAction(
+                    GlobalSearchAction.NavToProvider(
+                        searchRecord.provider.id,
+                        searchRecord.provider.searchBoardId!!,
+                    )
+                )
             }) {
                 Icon(Icons.Filled.ArrowForward, null)
             }
         }
 
-        StateView(
-            result = searchResult.mangas,
-            onRetry = { /*TODO*/ },
-        ) {
-            if (it.list.isEmpty()) NoResultFound()
-            else LazyRow(
-                modifier = Modifier.height(140.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(it.list) { manga ->
-                    MangaCard(
-                        manga = manga,
-                        onClick = { manga -> onAction(GlobalSearchAction.NavToGallery(manga)) },
-                    )
+        searchRecord.remoteList.value
+            ?.onSuccess { mangaList ->
+                if (mangaList.list.isEmpty()) NoResultFound()
+                else LazyRow(
+                    modifier = Modifier.height(140.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    items(mangaList.list) { manga ->
+                        MangaCard(
+                            manga = manga,
+                            onClick = { onAction(GlobalSearchAction.NavToGallery(it)) },
+                        )
+                    }
                 }
             }
-        }
+            ?.onFailure { throwable ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                            Text(
+                                text = throwable.localizedMessage
+                                    ?: stringResource(R.string.unknown_error),
+                                style = MaterialTheme.typography.caption,
+                                maxLines = 3,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
+                    TextButton(onClick = { onAction(GlobalSearchAction.Reload(searchRecord.provider.id)) }) {
+                        Text(text = stringResource(R.string.action_retry))
+                    }
+                }
+            }
+            ?: CircularProgressIndicator(modifier = Modifier.size(24.dp))
     }
 }
 

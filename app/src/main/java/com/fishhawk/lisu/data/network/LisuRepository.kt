@@ -3,6 +3,7 @@ package com.fishhawk.lisu.data.network
 import com.fishhawk.lisu.data.network.base.*
 import com.fishhawk.lisu.data.network.dao.LisuDao
 import com.fishhawk.lisu.data.network.model.*
+import com.fishhawk.lisu.ui.provider.Board
 import io.ktor.client.*
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
@@ -71,31 +72,24 @@ class LisuRepository(
             }
         }
 
-    suspend fun search(
-        providerId: String,
-        keywords: String,
-    ) = daoFlow.filterNotNull().flatMapLatest {
-        remotePagingList(
-            startKey = 0,
-            loader = { page ->
-                it.mapCatching { dao -> dao.search(providerId, page, keywords) }
-                    .map { Page(it, if (it.isEmpty()) null else page + 1) }
-            },
-            onStart = { providerMangaListActionChannels.add(it) },
-            onClose = { providerMangaListActionChannels.remove(it) },
-        )
-    }
-
     fun getBoard(
         providerId: String,
-        boardId: String,
-        filters: Map<String, Int>,
+        boardId: BoardId,
+        filterValues: BoardFilterValue,
+        keywords: String? = null,
     ) = daoFlow.filterNotNull().flatMapLatest {
         remotePagingList(
             startKey = 0,
             loader = { page ->
-                it.mapCatching { dao -> dao.getBoard(providerId, boardId, page, filters) }
-                    .map { Page(it, if (it.isEmpty()) null else page + 1) }
+                it.mapCatching { dao ->
+                    dao.getBoard(
+                        providerId = providerId,
+                        boardId = boardId.name,
+                        page = page,
+                        filterValues = filterValues,
+                        keywords = keywords,
+                    )
+                }.map { Page(it, if (it.isEmpty()) null else page + 1) }
             },
             onStart = { providerMangaListActionChannels.add(it) },
             onClose = { providerMangaListActionChannels.remove(it) },
@@ -104,7 +98,7 @@ class LisuRepository(
 
     fun getManga(
         providerId: String,
-        mangaId: String
+        mangaId: String,
     ): Flow<RemoteData<MangaDetailDto>> =
         daoFlow.filterNotNull().flatMapLatest {
             remoteData(
@@ -117,7 +111,7 @@ class LisuRepository(
     suspend fun updateMangaMetadata(
         providerId: String,
         mangaId: String,
-        metadata: MangaMetadataDto
+        metadata: MangaMetadataDto,
     ): Result<String> =
         oneshot { it.updateMangaMetadata(providerId, mangaId, metadata) }
             .onSuccess { /*TODO*/ }
@@ -147,7 +141,7 @@ class LisuRepository(
         providerId: String,
         mangaId: String,
         collectionId: String,
-        chapterId: String
+        chapterId: String,
     ): Result<List<String>> =
         oneshot { it.getContent(providerId, mangaId, collectionId, chapterId) }
 

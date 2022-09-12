@@ -56,7 +56,6 @@ import com.fishhawk.lisu.ui.library.LibraryScreen
 import com.fishhawk.lisu.ui.more.*
 import com.fishhawk.lisu.ui.provider.ProviderLoginScreen
 import com.fishhawk.lisu.ui.provider.ProviderScreen
-import com.fishhawk.lisu.ui.provider.ProviderSearchScreen
 import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.util.toUriCompat
@@ -186,16 +185,10 @@ private fun MainNavHost(
             navArgument("keywords") { nullable = true }
         )) { GlobalSearchScreen(navController) }
 
-        composable("provider/{providerId}/board/{boardId}") { ProviderScreen(navController) }
-        composable("provider/{providerId}/login?provider={provider}", listOf(
-            navArgument("provider") {
-                nullable = true
-                type = ProviderNavType
-            }
-        )) { ProviderLoginScreen(navController) }
-        composable("provider/{providerId}/search?keywords={keywords}", listOf(
+        composable("provider/{providerId}/board/{boardId}?keywords={keywords}", listOf(
             navArgument("keywords") { nullable = true }
-        )) { ProviderSearchScreen(navController) }
+        )) { ProviderScreen(navController) }
+        composable("provider/{providerId}/login") { ProviderLoginScreen(navController) }
 
         composable("gallery/{mangaId}/detail?manga={manga}", listOf(
             navArgument("manga") {

@@ -2,11 +2,9 @@ package com.fishhawk.lisu.ui.explore
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,10 +13,7 @@ import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.HowToReg
-import androidx.compose.material.icons.outlined.LocalLibrary
-import androidx.compose.material.icons.outlined.PersonOff
-import androidx.compose.material.icons.outlined.TravelExplore
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -36,15 +31,14 @@ import coil.size.Size
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.setBlocking
+import com.fishhawk.lisu.data.network.model.BoardId
 import com.fishhawk.lisu.data.network.model.ProviderDto
 import com.fishhawk.lisu.ui.main.navToGlobalSearch
 import com.fishhawk.lisu.ui.main.navToProvider
 import com.fishhawk.lisu.ui.main.navToProviderLogin
-import com.fishhawk.lisu.ui.main.navToProviderSearch
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.widget.*
-import com.google.accompanist.flowlayout.FlowRow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.viewModel
 import java.util.*
@@ -53,9 +47,8 @@ internal typealias ExploreActionHandler = (ExploreAction) -> Unit
 
 internal sealed interface ExploreAction {
     object NavToGlobalSearch : ExploreAction
-    data class NavToProvider(val providerId: String, val boardId: String) : ExploreAction
-    data class NavToProviderLogin(val provider: ProviderDto) : ExploreAction
-    data class NavToProviderSearch(val providerId: String) : ExploreAction
+    data class NavToProvider(val providerId: String, val boardId: BoardId) : ExploreAction
+    data class NavToProviderLogin(val providerId: String) : ExploreAction
 
     object Reload : ExploreAction
 
@@ -75,10 +68,8 @@ fun ExploreScreen(navController: NavHostController) {
                 navController.navToGlobalSearch()
             is ExploreAction.NavToProvider ->
                 navController.navToProvider(action.providerId, action.boardId)
-            is ExploreAction.NavToProviderSearch ->
-                navController.navToProviderSearch(action.providerId)
             is ExploreAction.NavToProviderLogin ->
-                navController.navToProviderLogin(action.provider)
+                navController.navToProviderLogin(action.providerId)
 
             ExploreAction.Reload -> viewModel.reload()
             is ExploreAction.Logout -> viewModel.logout(action.provider.id)
@@ -146,6 +137,9 @@ private fun ProviderListItem(
     ListItem(
         modifier = Modifier.combinedClickable(
             onClick = {
+                if (provider.boardModels.containsKey(BoardId.Main)) {
+                    onAction(ExploreAction.NavToProvider(provider.id, BoardId.Main))
+                }
             },
             onLongClick = {
                 val sheet = ExploreSheet(provider, onAction)
@@ -210,38 +204,23 @@ private fun ProviderListItem(
             )
         },
         trailing = {
-            IconButton(onClick = {
-                onAction(ExploreAction.NavToProviderSearch(providerId = provider.id))
-            }) {
-                Icon(Icons.Filled.Search, stringResource(R.string.action_search))
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                provider.boardModels.forEach { (boardId, _) ->
+                    val icon = when (boardId) {
+                        BoardId.Search -> LisuIcons.Search
+                        BoardId.Rank -> LisuIcons.FormatListNumbered
+                        else -> return@forEach
+                    }
+                    Icon(
+                        icon,
+                        stringResource(R.string.action_search),
+                        modifier = Modifier.clickable {
+                            onAction(ExploreAction.NavToProvider(provider.id, boardId))
+                            PR.lastUsedProvider.setBlocking(provider.id)
+                        },
+                    )
+                }
             }
         },
     )
-    FlowRow(modifier = Modifier.padding(start = 68.dp), mainAxisSpacing = 8.dp) {
-        provider.boardModels.forEach { (boardId, _) ->
-            Board(
-                providerId = provider.id,
-                boardId = boardId,
-                onAction = onAction,
-            )
-        }
-    }
-}
-
-@Composable
-@OptIn(ExperimentalMaterialApi::class)
-private fun Board(
-    providerId: String,
-    boardId: String,
-    onAction: ExploreActionHandler,
-) {
-    Chip(
-        onClick = {
-            onAction(ExploreAction.NavToProvider(providerId, boardId))
-            PR.lastUsedProvider.setBlocking(providerId)
-        },
-        modifier = Modifier.height(24.dp),
-    ) {
-        Text(text = boardId)
-    }
 }

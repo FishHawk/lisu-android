@@ -3,7 +3,7 @@ import java.util.*
 
 plugins {
     kotlin("plugin.serialization") version "1.7.0"
-    id("com.android.application") version "7.2.1"
+    id("com.android.application") version "7.3.0-rc01"
     id("com.google.devtools.ksp") version "1.7.0-1.0.6"
     id("org.jetbrains.kotlin.android") version "1.7.0"
     id("org.jetbrains.kotlin.plugin.parcelize") version "1.7.0"

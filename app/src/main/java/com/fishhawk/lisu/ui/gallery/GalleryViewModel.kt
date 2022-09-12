@@ -33,6 +33,11 @@ class GalleryViewModel(
     val providerId = manga.providerId
     val mangaId = manga.id
 
+    val searchBoardId = lisuRepository
+        .providers.value?.value?.getOrNull()
+        ?.find { it.id == providerId }
+        ?.searchBoardId
+
     private val _detail = lisuRepository.getManga(manga.providerId, manga.id)
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 

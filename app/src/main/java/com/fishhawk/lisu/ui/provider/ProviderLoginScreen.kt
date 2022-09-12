@@ -12,9 +12,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.LisuToolBar
 import com.fishhawk.lisu.widget.OneLineText
-import com.fishhawk.lisu.util.toast
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
 import org.koin.androidx.compose.viewModel
@@ -36,9 +36,9 @@ fun ProviderLoginScreen(navController: NavHostController) {
     }
 
     val context = LocalContext.current
-    val provider = viewModel.provider
-    val url = provider.loginSite
-    if (url.isNullOrBlank()) {
+    val providerId = viewModel.providerId
+    val loginSite = viewModel.loginSite
+    if (loginSite.isNullOrBlank()) {
         context.toast("Missing login site.")
         navController.navigateUp()
         return
@@ -50,7 +50,7 @@ fun ProviderLoginScreen(navController: NavHostController) {
             is ProviderLoginAction.Login -> {
                 val cm = CookieManager.getInstance()
                 cm.removeSessionCookies { }
-                val cookies = cm.getCookie(url).split(";")
+                val cookies = cm.getCookie(loginSite).split(";")
                     .associate {
                         val name = it.substringBefore('=').trim()
                         val value = it.substringAfter('=').trim()
@@ -78,8 +78,8 @@ fun ProviderLoginScreen(navController: NavHostController) {
             LisuToolBar(
                 title = {
                     ListItem(
-                        text = { OneLineText(text = "Login - ${provider.id}") },
-                        secondaryText = { OneLineText(text = url) },
+                        text = { OneLineText(text = "Login - $providerId") },
+                        secondaryText = { OneLineText(text = loginSite) },
                     )
                 },
                 onNavUp = { onAction(ProviderLoginAction.NavUp) },
@@ -91,7 +91,7 @@ fun ProviderLoginScreen(navController: NavHostController) {
         },
         content = { paddingValues ->
             LisuTransition {
-                val state = rememberWebViewState(url)
+                val state = rememberWebViewState(loginSite)
                 WebView(
                     state,
                     modifier = Modifier

@@ -105,7 +105,9 @@ fun GalleryScreen(navController: NavHostController) {
             is GalleryAction.NavToGlobalSearch ->
                 navController.navToGlobalSearch(action.keywords)
             is GalleryAction.NavToSearch ->
-                navController.navToProviderSearch(providerId, action.keywords)
+                viewModel.searchBoardId?.let {
+                    navController.navToProvider(providerId, it, action.keywords)
+                }
             is GalleryAction.NavToReader -> detail?.getOrNull()?.let {
                 context.navToReader(it, action.collectionId, action.chapterId, action.page)
             }

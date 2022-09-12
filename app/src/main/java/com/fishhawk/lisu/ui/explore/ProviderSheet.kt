@@ -42,7 +42,7 @@ private fun ExploreSheetContent(
                 icon = LisuIcons.Login,
                 title = "Re-login",
             ) {
-                onAction(ExploreAction.NavToProviderLogin(provider))
+                onAction(ExploreAction.NavToProviderLogin(provider.id))
                 scope.launch { bottomSheetHelper.state.hide() }
             }
             SheetListItem(
@@ -57,7 +57,7 @@ private fun ExploreSheetContent(
                 icon = LisuIcons.Login,
                 title = "Login",
             ) {
-                onAction(ExploreAction.NavToProviderLogin(provider))
+                onAction(ExploreAction.NavToProviderLogin(provider.id))
                 scope.launch { bottomSheetHelper.state.hide() }
             }
         }

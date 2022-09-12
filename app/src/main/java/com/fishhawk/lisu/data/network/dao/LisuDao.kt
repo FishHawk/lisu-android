@@ -9,7 +9,7 @@ import io.ktor.http.*
 
 class LisuDao(
     private val client: HttpClient,
-    private val url: String
+    private val url: String,
 ) {
     suspend fun listProvider(): List<ProviderDto> =
         client.get("$url/provider")
@@ -29,28 +29,21 @@ class LisuDao(
     ): String =
         client.post("$url/provider/${providerId.path}/logout").body()
 
-    suspend fun search(
-        providerId: String,
-        page: Int,
-        keywords: String,
-    ): List<MangaDto> =
-        client.get("$url/provider/${providerId.path}/search") {
-            parameter("page", page)
-            parameter("keywords", keywords)
-        }.let { response ->
-            response.body<List<MangaDto>>()
-                .map { it.copy(cover = processCover(it.providerId, it.id, it.cover)) }
-        }
-
     suspend fun getBoard(
         providerId: String,
         boardId: String,
         page: Int,
-        filters: Map<String, Int>
+        filterValues: BoardFilterValue,
+        keywords: String?,
     ): List<MangaDto> =
         client.get("$url/provider/${providerId.path}/board/${boardId.path}") {
             parameter("page", page)
-            filters.forEach { (key, value) -> parameter(key, value) }
+            keywords?.let { parameter("keywords", it) }
+            (filterValues.base + filterValues.advance).forEach {
+                val value = it.value.value
+                val str = if (value is Set<*>) value.joinToString(",") else value.toString()
+                parameter(it.key, str)
+            }
         }.let { response ->
             response.body<List<MangaDto>>()
                 .map { it.copy(cover = processCover(it.providerId, it.id, it.cover)) }
@@ -74,7 +67,7 @@ class LisuDao(
     suspend fun updateMangaMetadata(
         providerId: String,
         mangaId: String,
-        metadata: MangaMetadataDto
+        metadata: MangaMetadataDto,
     ): String =
         client.put("$url/library/manga/${providerId.path}/${mangaId.path}/metadata") {
             setBody(metadata)
@@ -111,7 +104,7 @@ class LisuDao(
         providerId: String,
         mangaId: String,
         collectionId: String,
-        chapterId: String
+        chapterId: String,
     ): List<String> =
         client.get("$url/provider/${providerId.path}/manga/${mangaId.path}/content/${collectionId.path}/${chapterId.path}")
             .let { response ->
@@ -124,14 +117,14 @@ class LisuDao(
 
     suspend fun addMangaToLibrary(
         providerId: String,
-        mangaId: String
+        mangaId: String,
     ): String =
         client.post("$url/library/manga/${providerId.path}/${mangaId.path}").body()
 
     // Library API
     suspend fun searchFromLibrary(
         page: Int,
-        keywords: String = ""
+        keywords: String = "",
     ): List<MangaDto> =
         client.get("$url/library/search") {
             parameter("page", page)
@@ -143,12 +136,12 @@ class LisuDao(
 
     suspend fun removeMangaFromLibrary(
         providerId: String,
-        mangaId: String
+        mangaId: String,
     ): String =
         client.delete("$url/library/manga/${providerId.path}/${mangaId.path}").body()
 
     suspend fun removeMultipleMangasFromLibrary(
-        mangas: List<MangaKeyDto>
+        mangas: List<MangaKeyDto>,
     ): String =
         client.post("$url/library/manga-delete") {
             setBody(mangas)
@@ -175,7 +168,7 @@ class LisuDao(
     private fun processCover(
         providerId: String,
         mangaId: String,
-        cover: String?
+        cover: String?,
     ): String {
         val builder = URLBuilder(url)
         builder.pathSegments = emptyList()
@@ -196,7 +189,7 @@ class LisuDao(
         mangaId: String,
         collectionId: String,
         chapterId: String,
-        imageId: String
+        imageId: String,
     ): String {
         val builder = URLBuilder(url)
         builder.pathSegments = emptyList()

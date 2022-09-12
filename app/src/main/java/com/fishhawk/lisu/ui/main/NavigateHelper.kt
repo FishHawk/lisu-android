@@ -7,9 +7,9 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
+import com.fishhawk.lisu.data.network.model.BoardId
 import com.fishhawk.lisu.data.network.model.MangaDetailDto
 import com.fishhawk.lisu.data.network.model.MangaDto
-import com.fishhawk.lisu.data.network.model.ProviderDto
 import com.fishhawk.lisu.ui.reader.ReaderActivity
 import kotlinx.serialization.json.Json
 
@@ -27,32 +27,17 @@ object MangaNavType : NavType<MangaDto>(isNullableAllowed = true) {
     }
 }
 
-object ProviderNavType : NavType<ProviderDto>(isNullableAllowed = true) {
-    override fun get(bundle: Bundle, key: String): ProviderDto? {
-        return bundle.getParcelable(key)
-    }
-
-    override fun parseValue(value: String): ProviderDto {
-        return Json.decodeFromString(ProviderDto.serializer(), value)
-    }
-
-    override fun put(bundle: Bundle, key: String, value: ProviderDto) {
-        bundle.putParcelable(key, value)
-    }
-}
-
-fun NavHostController.navToProvider(providerId: String, boardId: String) {
-    navigate("provider/${providerId}/board/${boardId}")
-}
-
-fun NavHostController.navToProviderLogin(provider: ProviderDto) {
-    val json = Uri.encode(Json.encodeToString(ProviderDto.serializer(), provider))
-    navigate("provider/${provider.id}/login?provider=${json}")
-}
-
-fun NavHostController.navToProviderSearch(providerId: String, keywords: String? = null) {
+fun NavHostController.navToProvider(
+    providerId: String,
+    boardId: BoardId,
+    keywords: String? = null
+) {
     val query = keywords?.let { "?keywords=${Uri.encode(keywords)}" } ?: ""
-    navigate("provider/${providerId}/search$query")
+    navigate("provider/${providerId}/board/${boardId.name}$query")
+}
+
+fun NavHostController.navToProviderLogin(providerId: String) {
+    navigate("provider/${providerId}/login")
 }
 
 fun NavHostController.navToGlobalSearch(keywords: String? = null) {
@@ -80,7 +65,7 @@ fun Context.navToReader(
     providerId: String,
     collectionId: String,
     chapterId: String,
-    page: Int = 0
+    page: Int = 0,
 ) {
     val bundle = bundleOf(
         "mangaId" to mangaId,
@@ -98,7 +83,7 @@ fun Context.navToReader(
     detail: MangaDetailDto,
     collectionId: String,
     chapterId: String,
-    page: Int
+    page: Int,
 ) {
     val bundle = bundleOf(
         "detail" to detail,
