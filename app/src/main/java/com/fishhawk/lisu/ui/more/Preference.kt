@@ -1,20 +1,15 @@
 package com.fishhawk.lisu.ui.more
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.fishhawk.lisu.data.datastore.Preference
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.get
+import com.fishhawk.lisu.widget.LisuSelectDialog
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -24,7 +19,7 @@ fun BasePreference(
     title: String,
     summary: String?,
     onClick: () -> Unit,
-    trailing: @Composable (() -> Unit)? = null
+    trailing: @Composable (() -> Unit)? = null,
 ) {
     ListItem(
         modifier = Modifier.clickable(onClick = { onClick() }),
@@ -42,7 +37,7 @@ fun TextPreference(
     icon: ImageVector? = null,
     title: String,
     summary: String? = null,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
 ) = BasePreference(icon, title, summary, onClick)
 
 @Composable
@@ -50,7 +45,7 @@ fun SwitchPreference(
     icon: ImageVector? = null,
     title: String,
     summary: String? = null,
-    preference: Preference<Boolean>
+    preference: Preference<Boolean>,
 ) {
     val scope = rememberCoroutineScope()
     BasePreference(
@@ -70,7 +65,7 @@ inline fun <reified T : Enum<T>> ListPreference(
     title: String,
     summary: String? = "%s",
     preference: Preference<T>,
-    crossinline translate: (T) -> Int
+    crossinline translate: (T) -> Int,
 ) {
     val isOpen = remember { mutableStateOf(false) }
     val selected by preference.collectAsState()
@@ -81,50 +76,15 @@ inline fun <reified T : Enum<T>> ListPreference(
         summary = summary?.format(selected.name),
         onClick = { isOpen.value = true }
     ) {
-        ListPreferenceDialog(isOpen, title, preference, translate)
-    }
-}
-
-@Composable
-inline fun <reified T : Enum<T>> ListPreferenceDialog(
-    isOpen: MutableState<Boolean>,
-    title: String,
-    preference: Preference<T>,
-    crossinline translate: (T) -> Int
-) {
-    if (!isOpen.value) return
-
-    val selected by preference.collectAsState()
-    val scope = rememberCoroutineScope()
-    AlertDialog(
-        onDismissRequest = { isOpen.value = false },
-        title = {
-            Text(
-                text = title,
-                style = LocalTextStyle.current.copy(fontWeight = FontWeight.Medium)
+        if (isOpen.value) {
+            val scope = rememberCoroutineScope()
+            LisuSelectDialog(
+                title = title,
+                options = enumValues<T>().map { stringResource(translate(it)) },
+                selected = selected.ordinal,
+                onSelectedChanged = { scope.launch { preference.set(enumValues<T>()[it]) } },
+                onDismiss = { isOpen.value = false },
             )
-        },
-        text = {
-            Column {
-                enumValues<T>().forEach {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { scope.launch { preference.set(it) } }
-                            .padding(vertical = 12.dp)
-                    ) {
-                        RadioButton(
-                            selected = (it == selected),
-                            onClick = null
-                        )
-                        Text(
-                            text = stringResource(translate(it)),
-                            modifier = Modifier.padding(start = 16.dp)
-                        )
-                    }
-                }
-            }
-        },
-        confirmButton = { }
-    )
+        }
+    }
 }

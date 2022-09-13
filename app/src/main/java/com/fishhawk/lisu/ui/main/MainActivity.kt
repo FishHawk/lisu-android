@@ -9,7 +9,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
@@ -25,7 +24,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavDestination
@@ -60,6 +58,7 @@ import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.util.toUriCompat
 import com.fishhawk.lisu.util.toast
+import com.fishhawk.lisu.widget.LisuDialog
 import com.fishhawk.lisu.widget.LisuModalBottomSheetLayout
 import com.google.accompanist.insets.ui.BottomNavigation
 import com.google.accompanist.insets.ui.Scaffold
@@ -129,12 +128,15 @@ private fun MainApp() {
             }
 
             latestRelease?.let {
-                NewVersionAvailableDialog(
-                    it,
-                    onDismiss = { latestRelease = null },
+                LisuDialog(
+                    title = stringResource(R.string.dialog_new_version_available),
+                    confirmText = stringResource(R.string.dialog_new_version_available_download),
+                    dismissText = stringResource(R.string.dialog_new_version_available_ignore),
                     onConfirm = {
                         viewModel.downloadApk(context.externalCacheDir, it.getDownloadLink())
-                    }
+                    },
+                    onDismiss = { latestRelease = null },
+                    text = it.info,
                 )
             }
 
@@ -258,29 +260,3 @@ private fun RowScope.BottomBarTab(
         }
     }
 )
-
-@Composable
-fun NewVersionAvailableDialog(
-    release: GitHubReleaseDto,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = { },
-        title = { Text(text = stringResource(R.string.dialog_new_version_available)) },
-        text = { Text(text = release.info, modifier = Modifier.heightIn(max = 400.dp)) },
-        confirmButton = {
-            TextButton(onClick = {
-                onConfirm()
-                onDismiss()
-            }) {
-                Text(stringResource(R.string.dialog_new_version_available_download))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = { onDismiss() }) {
-                Text(stringResource(R.string.dialog_new_version_available_ignore))
-            }
-        }
-    )
-}

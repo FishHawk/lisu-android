@@ -6,7 +6,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
 import androidx.compose.material.icons.outlined.Casino
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Search
@@ -175,10 +178,13 @@ private fun SelectingToolBar(
 ) {
     var isOpen by remember { mutableStateOf(false) }
     if (isOpen) {
-        DeleteMangaDialog(
-            size = selectedMangaList.size,
+        LisuDialog(
+            title = stringResource(R.string.library_remove_n_mangas_from_library)
+                .format(selectedMangaList.size),
+            confirmText = stringResource(R.string.action_ok),
+            dismissText = stringResource(R.string.action_cancel),
+            onConfirm = { onAction(LibraryAction.RemoveFromLibrary(selectedMangaList.toList())) },
             onDismiss = { isOpen = false },
-            onConfirm = { onAction(LibraryAction.RemoveFromLibrary(selectedMangaList.toList())) }
         )
     }
 
@@ -196,29 +202,4 @@ private fun SelectingToolBar(
             }
         }
     }
-}
-
-@Composable
-private fun DeleteMangaDialog(
-    size: Int,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = { onDismiss() },
-        title = { Text(stringResource(R.string.library_remove_n_mangas_from_library).format(size)) },
-        confirmButton = {
-            TextButton(onClick = {
-                onConfirm()
-                onDismiss()
-            }) {
-                Text(stringResource(R.string.action_ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = { onDismiss() }) {
-                Text(stringResource(R.string.action_cancel))
-            }
-        }
-    )
 }

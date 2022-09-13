@@ -96,6 +96,7 @@ private fun ToolBar(onAction: HistoryActionHandler) {
                 LisuDialog(
                     title = stringResource(R.string.dialog_clear_history),
                     confirmText = stringResource(R.string.action_clear),
+                    dismissText = stringResource(R.string.action_cancel),
                     onConfirm = { onAction(HistoryAction.ClearHistory) },
                     onDismiss = { isOpen = false },
                 )

@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -200,6 +199,7 @@ fun ProviderScreen(navController: NavHostController) {
                         LisuDialog(
                             title = it.titleOrId,
                             confirmText = "Add to library",
+                            dismissText = stringResource(R.string.action_cancel),
                             onConfirm = { onAction(ProviderAction.AddToLibrary(it)) },
                             onDismiss = { addDialogManga = null },
                         )
@@ -209,6 +209,7 @@ fun ProviderScreen(navController: NavHostController) {
                         LisuDialog(
                             title = it.titleOrId,
                             confirmText = "Remove from library",
+                            dismissText = stringResource(R.string.action_cancel),
                             onConfirm = { onAction(ProviderAction.RemoveFromLibrary(it)) },
                             onDismiss = { removeDialogManga = null },
                         )
@@ -415,31 +416,12 @@ private fun FilterSelectAdvance(
             Text(text = model.options[value], style = MaterialTheme.typography.subtitle2)
         }
         if (isOpen) {
-            AlertDialog(
-                onDismissRequest = { isOpen = false },
-                title = {
-                    Text(
-                        text = name,
-                        style = LocalTextStyle.current.copy(fontWeight = FontWeight.Medium)
-                    )
-                },
-                text = {
-                    Column {
-                        model.options.mapIndexed { index, text ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { onValueChange(index) }
-                                    .padding(vertical = 12.dp)
-                            ) {
-                                RadioButton(selected = (index == value), onClick = null)
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Text(text = text)
-                            }
-                        }
-                    }
-                },
-                confirmButton = { }
+            LisuSelectDialog(
+                title = name,
+                options = model.options,
+                selected = value,
+                onSelectedChanged = { onValueChange(it) },
+                onDismiss = { isOpen = false },
             )
         }
     }
@@ -463,36 +445,12 @@ private fun FilterMultipleSelectAdvance(
         Text(text = name, style = MaterialTheme.typography.subtitle2)
         Icon(imageVector = LisuIcons.Add, contentDescription = "edit")
         if (isOpen) {
-            AlertDialog(
-                onDismissRequest = { isOpen = false },
-                title = {
-                    Text(
-                        text = name,
-                        style = LocalTextStyle.current.copy(fontWeight = FontWeight.Medium)
-                    )
-                },
-                text = {
-                    Column {
-                        model.options.mapIndexed { index, text ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        onValueChange(
-                                            if (index in value) value - index
-                                            else value + index
-                                        )
-                                    }
-                                    .padding(vertical = 12.dp)
-                            ) {
-                                Checkbox(checked = index in value, onCheckedChange = null)
-                                Spacer(modifier = Modifier.width(16.dp))
-                                Text(text = text)
-                            }
-                        }
-                    }
-                },
-                confirmButton = { }
+            LisuMultipleSelectDialog(
+                title = name,
+                options = model.options,
+                selected = value,
+                onSelectedChanged = { onValueChange(if (it in value) value - it else value + it) },
+                onDismiss = { isOpen = false },
             )
         }
     }
