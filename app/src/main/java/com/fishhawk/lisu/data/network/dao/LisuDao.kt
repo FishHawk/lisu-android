@@ -18,11 +18,23 @@ class LisuDao(
                     .map { info -> info.copy(icon = generateProviderIcon(info.id)) }
             }
 
-    suspend fun login(
+    suspend fun loginByCookies(
         providerId: String,
         cookies: Map<String, String>,
     ): String =
-        client.post("$url/provider/${providerId.path}/login") { setBody(cookies) }.body()
+        client.post("$url/provider/${providerId.path}/login-cookies") {
+            setBody(cookies)
+        }.body()
+
+    suspend fun loginByPassword(
+        providerId: String,
+        username: String,
+        password: String,
+    ): String =
+        client.post("$url/provider/${providerId.path}/login-password") {
+            parameter("username", username)
+            parameter("password", password)
+        }.body()
 
     suspend fun logout(
         providerId: String,

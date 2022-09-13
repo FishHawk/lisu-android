@@ -44,7 +44,7 @@ import com.fishhawk.lisu.data.network.model.GitHubReleaseDto
 import com.fishhawk.lisu.notification.AppUpdateNotification
 import com.fishhawk.lisu.ui.base.BaseActivity
 import com.fishhawk.lisu.ui.base.OnEvent
-import com.fishhawk.lisu.ui.explore.ExploreScreen
+import com.fishhawk.lisu.ui.explore.*
 import com.fishhawk.lisu.ui.gallery.GalleryCommentScreen
 import com.fishhawk.lisu.ui.gallery.GalleryEditScreen
 import com.fishhawk.lisu.ui.gallery.GalleryScreen
@@ -52,7 +52,6 @@ import com.fishhawk.lisu.ui.globalsearch.GlobalSearchScreen
 import com.fishhawk.lisu.ui.history.HistoryScreen
 import com.fishhawk.lisu.ui.library.LibraryScreen
 import com.fishhawk.lisu.ui.more.*
-import com.fishhawk.lisu.ui.provider.ProviderLoginScreen
 import com.fishhawk.lisu.ui.provider.ProviderScreen
 import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.util.findActivity
@@ -183,6 +182,10 @@ private fun MainNavHost(
         composable(Tab.Explore.route) { ExploreScreen(navController) }
         composable(Tab.More.route) { MoreScreen(navController) }
 
+        composable("provider/{providerId}/login-website") { LoginWebsiteScreen(navController) }
+        composable("provider/{providerId}/login-cookies") { LoginCookiesScreen(navController) }
+        composable("provider/{providerId}/login-password") { LoginPasswordScreen(navController) }
+
         composable("global-search?keywords={keywords}", listOf(
             navArgument("keywords") { nullable = true }
         )) { GlobalSearchScreen(navController) }
@@ -190,7 +193,6 @@ private fun MainNavHost(
         composable("provider/{providerId}/board/{boardId}?keywords={keywords}", listOf(
             navArgument("keywords") { nullable = true }
         )) { ProviderScreen(navController) }
-        composable("provider/{providerId}/login") { ProviderLoginScreen(navController) }
 
         composable("gallery/{mangaId}/detail?manga={manga}", listOf(
             navArgument("manga") {

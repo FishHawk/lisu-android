@@ -37,29 +37,37 @@ private fun ExploreSheetContent(
     val bottomSheetHelper = LocalBottomSheetHelper.current
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        if (provider.isLogged == true) {
+        provider.cookiesLogin?.let {
             SheetListItem(
                 icon = LisuIcons.Login,
-                title = "Re-login",
+                title = "Login by website",
             ) {
-                onAction(ExploreAction.NavToProviderLogin(provider.id))
+                onAction(ExploreAction.NavToLoginWebsite(provider.id))
                 scope.launch { bottomSheetHelper.state.hide() }
             }
-            SheetListItem(
-                icon = LisuIcons.Logout,
-                title = "Logout",
-            ) {
-                onAction(ExploreAction.Logout(provider))
-                scope.launch { bottomSheetHelper.state.hide() }
-            }
-        } else if (provider.isLogged == false) {
             SheetListItem(
                 icon = LisuIcons.Login,
-                title = "Login",
+                title = "Login by cookies",
             ) {
-                onAction(ExploreAction.NavToProviderLogin(provider.id))
+                onAction(ExploreAction.NavToLoginCookies(provider.id))
                 scope.launch { bottomSheetHelper.state.hide() }
             }
+        }
+        if (provider.passwordLogin) {
+            SheetListItem(
+                icon = LisuIcons.Login,
+                title = "Login by passwords",
+            ) {
+                onAction(ExploreAction.NavToLoginPassword(provider.id))
+                scope.launch { bottomSheetHelper.state.hide() }
+            }
+        }
+        SheetListItem(
+            icon = LisuIcons.Logout,
+            title = "Logout",
+        ) {
+            onAction(ExploreAction.Logout(provider))
+            scope.launch { bottomSheetHelper.state.hide() }
         }
         SheetListItem(
             icon = LisuIcons.HideSource,

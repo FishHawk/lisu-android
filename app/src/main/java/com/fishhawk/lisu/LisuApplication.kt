@@ -18,7 +18,6 @@ import com.fishhawk.lisu.ui.history.HistoryViewModel
 import com.fishhawk.lisu.ui.library.LibraryViewModel
 import com.fishhawk.lisu.ui.main.MainViewModel
 import com.fishhawk.lisu.ui.more.MoreViewModel
-import com.fishhawk.lisu.ui.provider.ProviderLoginViewModel
 import com.fishhawk.lisu.ui.provider.ProviderViewModel
 import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import com.fishhawk.lisu.util.interceptor.ProgressInterceptor
@@ -109,7 +108,6 @@ val appModule = module {
 
     viewModel { GlobalSearchViewModel(get(), get(), get()) }
     viewModel { ProviderViewModel(get(), get(), get(), get()) }
-    viewModel { ProviderLoginViewModel(get(), get()) }
     viewModel { GalleryViewModel(get(), get(), get()) }
 
     viewModel { ReaderViewModel(get(), get(), get(), get()) }

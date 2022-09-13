@@ -3,7 +3,6 @@ package com.fishhawk.lisu.data.network
 import com.fishhawk.lisu.data.network.base.*
 import com.fishhawk.lisu.data.network.dao.LisuDao
 import com.fishhawk.lisu.data.network.model.*
-import com.fishhawk.lisu.ui.provider.Board
 import io.ktor.client.*
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
@@ -48,8 +47,27 @@ class LisuRepository(
             remoteData(loader = { it.mapCatching { dao -> dao.listProvider() } })
         }.stateIn(scope, SharingStarted.Eagerly, null)
 
-    suspend fun login(providerId: String, cookies: Map<String, String>): Result<String> =
-        oneshot { it.login(providerId, cookies) }.onSuccess {
+    suspend fun loginByCookies(
+        providerId: String,
+        cookies: Map<String, String>,
+    ): Result<String> =
+        oneshot { it.loginByCookies(providerId, cookies) }.onSuccess {
+            providers.value?.mutate { list ->
+                list.toMutableList().map {
+                    if (it.id == providerId &&
+                        it.isLogged == false
+                    ) it.copy(isLogged = true)
+                    else it
+                }
+            }
+        }
+
+    suspend fun loginByPassword(
+        providerId: String,
+        username: String,
+        password: String,
+    ): Result<String> =
+        oneshot { it.loginByPassword(providerId, username, password) }.onSuccess {
             providers.value?.mutate { list ->
                 list.toMutableList().map {
                     if (it.id == providerId &&

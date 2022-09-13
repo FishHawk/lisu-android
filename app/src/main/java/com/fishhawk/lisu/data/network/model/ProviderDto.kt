@@ -53,10 +53,18 @@ data class ProviderDto(
     var icon: String? = null,
     val boardModels: Map<BoardId, BoardModel>,
     val isLogged: Boolean? = null,
-    val loginSite: String? = null,
+    val cookiesLogin: CookiesLoginDto? = null,
+    val passwordLogin: Boolean = false,
 ) {
     val searchBoardId: BoardId?
         get() =
             if (boardModels.containsKey(BoardId.Search)) BoardId.Search
             else boardModels.entries.find { it.value.hasSearchBar }?.key
 }
+
+
+@Serializable
+data class CookiesLoginDto(
+    val loginSite: String,
+    val cookieNames: List<String>,
+)

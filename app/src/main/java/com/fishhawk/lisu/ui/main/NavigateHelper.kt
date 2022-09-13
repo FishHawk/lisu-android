@@ -27,6 +27,18 @@ object MangaNavType : NavType<MangaDto>(isNullableAllowed = true) {
     }
 }
 
+fun NavHostController.navToLoginWebsite(providerId: String) {
+    navigate("provider/${providerId}/login-website")
+}
+
+fun NavHostController.navToLoginCookies(providerId: String) {
+    navigate("provider/${providerId}/login-cookies")
+}
+
+fun NavHostController.navToLoginPassword(providerId: String) {
+    navigate("provider/${providerId}/login-password")
+}
+
 fun NavHostController.navToProvider(
     providerId: String,
     boardId: BoardId,
@@ -34,10 +46,6 @@ fun NavHostController.navToProvider(
 ) {
     val query = keywords?.let { "?keywords=${Uri.encode(keywords)}" } ?: ""
     navigate("provider/${providerId}/board/${boardId.name}$query")
-}
-
-fun NavHostController.navToProviderLogin(providerId: String) {
-    navigate("provider/${providerId}/login")
 }
 
 fun NavHostController.navToGlobalSearch(keywords: String? = null) {

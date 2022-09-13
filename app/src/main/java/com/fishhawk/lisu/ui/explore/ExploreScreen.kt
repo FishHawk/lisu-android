@@ -11,8 +11,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -33,9 +31,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.setBlocking
 import com.fishhawk.lisu.data.network.model.BoardId
 import com.fishhawk.lisu.data.network.model.ProviderDto
-import com.fishhawk.lisu.ui.main.navToGlobalSearch
-import com.fishhawk.lisu.ui.main.navToProvider
-import com.fishhawk.lisu.ui.main.navToProviderLogin
+import com.fishhawk.lisu.ui.main.*
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.widget.*
@@ -48,7 +44,9 @@ internal typealias ExploreActionHandler = (ExploreAction) -> Unit
 internal sealed interface ExploreAction {
     object NavToGlobalSearch : ExploreAction
     data class NavToProvider(val providerId: String, val boardId: BoardId) : ExploreAction
-    data class NavToProviderLogin(val providerId: String) : ExploreAction
+    data class NavToLoginWebsite(val providerId: String) : ExploreAction
+    data class NavToLoginCookies(val providerId: String) : ExploreAction
+    data class NavToLoginPassword(val providerId: String) : ExploreAction
 
     object Reload : ExploreAction
 
@@ -68,8 +66,12 @@ fun ExploreScreen(navController: NavHostController) {
                 navController.navToGlobalSearch()
             is ExploreAction.NavToProvider ->
                 navController.navToProvider(action.providerId, action.boardId)
-            is ExploreAction.NavToProviderLogin ->
-                navController.navToProviderLogin(action.providerId)
+            is ExploreAction.NavToLoginWebsite ->
+                navController.navToLoginWebsite(action.providerId)
+            is ExploreAction.NavToLoginCookies ->
+                navController.navToLoginCookies(action.providerId)
+            is ExploreAction.NavToLoginPassword ->
+                navController.navToLoginPassword(action.providerId)
 
             ExploreAction.Reload -> viewModel.reload()
             is ExploreAction.Logout -> viewModel.logout(action.provider.id)
