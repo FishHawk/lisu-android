@@ -63,6 +63,18 @@ class GalleryViewModel(
         }
     }
 
+    fun reloadComments() {
+        viewModelScope.launch {
+            _comments.value?.reload()
+        }
+    }
+
+    fun requestCommentsNextPage() {
+        viewModelScope.launch {
+            _comments.value?.requestNextPage()
+        }
+    }
+
     fun addToLibrary() {
         if (manga.state != MangaState.Remote) return
         viewModelScope.launch {

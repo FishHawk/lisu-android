@@ -3,14 +3,12 @@ package com.fishhawk.lisu.ui.gallery
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.Placeholder
@@ -20,11 +18,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.data.network.model.CommentDto
-import com.fishhawk.lisu.widget.LisuToolBar
-import com.fishhawk.lisu.widget.StateView
 import com.fishhawk.lisu.util.toDisplayString
 import com.fishhawk.lisu.util.toLocalDateTime
+import com.fishhawk.lisu.widget.ErrorItem
+import com.fishhawk.lisu.widget.LisuToolBar
+import com.fishhawk.lisu.widget.LoadingItem
+import com.fishhawk.lisu.widget.StateView
 import org.koin.androidx.compose.viewModel
+
+internal typealias GalleryCommentActionHandler = (GalleryCommentAction) -> Unit
+
+internal sealed interface GalleryCommentAction {
+    object NavUp : GalleryCommentAction
+    object Reload : GalleryCommentAction
+    object RequestNextPage : GalleryCommentAction
+}
 
 @Composable
 fun GalleryCommentScreen(navController: NavHostController) {
@@ -33,24 +41,48 @@ fun GalleryCommentScreen(navController: NavHostController) {
     )
     val commentList by viewModel.comments.collectAsState()
 
+    val onAction: GalleryCommentActionHandler = { action ->
+        when (action) {
+            GalleryCommentAction.NavUp ->
+                navController.navigateUp()
+            GalleryCommentAction.Reload ->
+                viewModel.reloadComments()
+            GalleryCommentAction.RequestNextPage ->
+                viewModel.requestCommentsNextPage()
+        }
+    }
+
     Scaffold(
         topBar = {
             LisuToolBar(
                 title = "Comments",
-                onNavUp = { navController.navigateUp() },
+                onNavUp = { onAction(GalleryCommentAction.NavUp) },
             )
         },
         content = { paddingValues ->
             StateView(
                 result = commentList,
-                onRetry = { },
-                modifier = Modifier.padding(paddingValues),
-            ) {
+                onRetry = { onAction(GalleryCommentAction.Reload) },
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize(),
+            ) { commentList ->
+                var maxAccessed by rememberSaveable { mutableStateOf(0) }
                 LazyColumn {
-                    items(it.list) {
+                    itemsIndexed(commentList.list) { index, it ->
+                        if (index > maxAccessed) {
+                            maxAccessed = index
+                            if (
+                                commentList.appendState?.isSuccess == true &&
+                                maxAccessed < commentList.list.size + 30
+                            ) onAction(GalleryCommentAction.RequestNextPage)
+                        }
                         CommentWithSubComments(comment = it)
                         Divider(color = MaterialTheme.colors.onSurface.copy(alpha = 0.06f))
                     }
+                    commentList.appendState
+                        ?.onFailure { item { ErrorItem(it) { onAction(GalleryCommentAction.RequestNextPage) } } }
+                        ?: item { LoadingItem() }
                 }
             }
         }
@@ -87,7 +119,7 @@ private fun CommentWithSubComments(comment: CommentDto) {
 @Composable
 private fun Comment(
     comment: CommentDto,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         ProvideTextStyle(value = MaterialTheme.typography.body2) {
