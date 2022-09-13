@@ -102,6 +102,10 @@ fun GlobalSearchScreen(navController: NavHostController) {
                 )
                 SuggestionList(
                     visible = editing,
+                    onDismiss = {
+                        editing = false
+                        if (keywords.isBlank()) onAction(GlobalSearchAction.NavUp)
+                    },
                     keywords = editingKeywords,
                     suggestions = suggestions,
                     onSuggestionSelected = { editingKeywords = it }
@@ -115,7 +119,7 @@ fun GlobalSearchScreen(navController: NavHostController) {
 private fun SearchRecordList(
     searchRecordsResult: Result<List<SearchRecord>>?,
     onAction: GlobalSearchActionHandler,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     StateView(
         modifier = modifier,
@@ -137,7 +141,7 @@ private fun SearchRecordList(
 @Composable
 private fun SearchRecord(
     searchRecord: SearchRecord,
-    onAction: GlobalSearchActionHandler
+    onAction: GlobalSearchActionHandler,
 ) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {

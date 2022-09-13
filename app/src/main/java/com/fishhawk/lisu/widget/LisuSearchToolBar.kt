@@ -1,10 +1,15 @@
 package com.fishhawk.lisu.widget
 
+import android.graphics.Rect
+import android.view.ViewTreeObserver
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,11 +22,15 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
@@ -39,7 +48,7 @@ fun LisuSearchToolBar(
     onValueChange: (String) -> Unit,
     onSearch: (String) -> Unit,
     onDismiss: () -> Unit,
-    placeholder: @Composable (() -> Unit)? = null
+    placeholder: @Composable (() -> Unit)? = null,
 ) {
     AnimatedVisibility(
         visible = visible,
@@ -106,14 +115,16 @@ fun LisuSearchToolBar(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SuggestionList(
     visible: Boolean,
+    onDismiss: () -> Unit,
     keywords: String,
     suggestions: List<String>,
     additionalBottom: Dp = 0.dp,
     onSuggestionSelected: ((String) -> Unit) = {},
-    onSuggestionDeleted: ((String) -> Unit)? = null
+    onSuggestionDeleted: ((String) -> Unit)? = null,
 ) {
     // hack, avoid extra space due to BottomNavigation
     val bottomPadding = with(LocalDensity.current) {
@@ -126,6 +137,33 @@ fun SuggestionList(
         enter = fadeIn(),
         exit = fadeOut(),
     ) {
+        val skController = LocalSoftwareKeyboardController.current
+        val onDismissWithCloseKeyboard = {
+            onDismiss()
+            skController?.hide()
+        }
+
+        // Dismiss when back
+        var hasKeyboardOpened by remember { mutableStateOf(false) }
+        val isKeyboardOpen by keyboardAsState()
+        LaunchedEffect(isKeyboardOpen) {
+            if (visible) {
+                if (!isKeyboardOpen && hasKeyboardOpened) {
+                    onDismiss()
+                    skController?.hide()
+                }
+                if (isKeyboardOpen) hasKeyboardOpened = true
+            }
+        }
+
+        // Dismiss when click scrim
+        val scrimColor = MaterialTheme.colors.onSurface.copy(alpha = 0.32f)
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) { detectTapGestures { onDismissWithCloseKeyboard() } },
+        ) { drawRect(color = scrimColor) }
+
         val relativeSuggestions = suggestions.filter {
             it.contains(keywords) && it != keywords
         }
@@ -149,7 +187,7 @@ private fun SuggestionItem(
     keywords: String,
     suggestion: String,
     onSuggestionSelected: ((String) -> Unit) = {},
-    onSuggestionDeleted: ((String) -> Unit)? = null
+    onSuggestionDeleted: ((String) -> Unit)? = null,
 ) {
     Row(
         modifier = Modifier
@@ -178,7 +216,7 @@ private fun SuggestionItem(
 
 private fun buildHighlightedSuggestion(
     keywords: String,
-    suggestion: String
+    suggestion: String,
 ): AnnotatedString {
     return buildAnnotatedString {
         if (keywords.isEmpty()) {
@@ -194,4 +232,25 @@ private fun buildHighlightedSuggestion(
                 else append(it)
             }
     }
+}
+
+
+@Composable
+private fun keyboardAsState(): State<Boolean> {
+    val keyboardState = remember { mutableStateOf(false) }
+    val view = LocalView.current
+    DisposableEffect(view) {
+        val onGlobalListener = ViewTreeObserver.OnGlobalLayoutListener {
+            val rect = Rect()
+            view.getWindowVisibleDisplayFrame(rect)
+            val screenHeight = view.rootView.height
+            val keypadHeight = screenHeight - rect.bottom
+            keyboardState.value = keypadHeight > screenHeight * 0.15
+        }
+        view.viewTreeObserver.addOnGlobalLayoutListener(onGlobalListener)
+        onDispose {
+            view.viewTreeObserver.removeOnGlobalLayoutListener(onGlobalListener)
+        }
+    }
+    return keyboardState
 }

@@ -79,9 +79,9 @@ fun ProviderScreen(navController: NavHostController) {
                 navController.navToGallery(action.manga)
 
             is ProviderAction.DeleteSuggestion ->
-                viewModel.search(action.keywords)
-            is ProviderAction.Search ->
                 viewModel.deleteSuggestion(action.keywords)
+            is ProviderAction.Search ->
+                viewModel.search(action.keywords)
             is ProviderAction.SetFilterValue ->
                 viewModel.updateFilterHistory(action.name, action.value)
             is ProviderAction.SetFilterValues ->
@@ -148,7 +148,8 @@ fun ProviderScreen(navController: NavHostController) {
                     }
                 },
                 onDismiss = {
-                    if (keywords.isBlank()) onAction(ProviderAction.NavUp)
+                    if (boardId == BoardId.Search && keywords.isBlank())
+                        onAction(ProviderAction.NavUp)
                     else editing = false
                 },
                 placeholder = { Text("${providerId}-${boardId}") }
@@ -189,6 +190,11 @@ fun ProviderScreen(navController: NavHostController) {
 
                     SuggestionList(
                         visible = editing,
+                        onDismiss = {
+                            editing = false
+                            if (boardId == BoardId.Search && keywords.isBlank())
+                                onAction(ProviderAction.NavUp)
+                        },
                         keywords = editingKeywords,
                         suggestions = suggestions,
                         onSuggestionSelected = { editingKeywords = it },

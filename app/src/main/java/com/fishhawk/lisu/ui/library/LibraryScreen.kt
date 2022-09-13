@@ -161,6 +161,7 @@ fun LibraryScreen(navController: NavHostController) {
                 }
                 SuggestionList(
                     visible = editing,
+                    onDismiss = { editing = false },
                     keywords = editingKeywords,
                     suggestions = suggestions,
                     additionalBottom = (-56).dp,
