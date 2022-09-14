@@ -2,11 +2,11 @@ import java.io.FileInputStream
 import java.util.*
 
 plugins {
-    kotlin("plugin.serialization") version "1.7.0"
+    kotlin("plugin.serialization") version "1.7.10"
     id("com.android.application") version "7.3.0-rc01"
-    id("com.google.devtools.ksp") version "1.7.0-1.0.6"
-    id("org.jetbrains.kotlin.android") version "1.7.0"
-    id("org.jetbrains.kotlin.plugin.parcelize") version "1.7.0"
+    id("com.google.devtools.ksp") version "1.7.10-1.0.6"
+    id("org.jetbrains.kotlin.android") version "1.7.10"
+    id("org.jetbrains.kotlin.plugin.parcelize") version "1.7.10"
     id("com.mikepenz.aboutlibraries.plugin") version "10.3.0"
 }
 
@@ -29,14 +29,14 @@ android {
     }
 
     namespace = "com.fishhawk.lisu"
-    compileSdk = 32
+    compileSdk = 33
 
     buildToolsVersion = "30.0.3"
 
     defaultConfig {
         applicationId = "com.fishhawk.lisu"
         minSdk = 21
-        targetSdk = 32
+        targetSdk = 33
         versionCode = 5
         versionName = "0.0.1"
 
@@ -74,16 +74,16 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.2.0"
+        kotlinCompilerExtensionVersion = "1.3.0"
     }
 }
 
 dependencies {
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
 
-    implementation("androidx.activity:activity-compose:1.6.0-alpha05")
+    implementation("androidx.activity:activity-compose:1.6.0-rc02")
 
-    val composeVersion = "1.3.0-alpha02"
+    val composeVersion = "1.3.0-beta02"
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
@@ -92,13 +92,13 @@ dependencies {
     implementation("androidx.compose.material:material-icons-core:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
 
-    implementation("androidx.navigation:navigation-compose:2.5.0")
+    implementation("androidx.navigation:navigation-compose:2.5.2")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0-alpha01")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0-alpha02")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    val roomVersion = "2.5.0-alpha02"
+    val roomVersion = "2.5.0-alpha03"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
@@ -108,7 +108,7 @@ dependencies {
     implementation("io.insert-koin:koin-android:$koinVersion")
     implementation("io.insert-koin:koin-androidx-compose:$koinVersion")
 
-    val accompanistVersion = "0.26.0-alpha"
+    val accompanistVersion = "0.26.3-beta"
     implementation("com.google.accompanist:accompanist-flowlayout:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
@@ -118,11 +118,11 @@ dependencies {
     implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-webview:$accompanistVersion")
 
-    val coilVersion = "2.1.0"
+    val coilVersion = "2.2.1"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
 
-    val ktorVersion = "2.0.2"
+    val ktorVersion = "2.1.1"
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
