@@ -2,7 +2,6 @@ package com.fishhawk.lisu.ui.reader
 
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
@@ -12,37 +11,36 @@ import com.fishhawk.lisu.data.database.model.MangaSetting
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.datastore.next
 import com.fishhawk.lisu.data.network.LisuRepository
-import com.fishhawk.lisu.data.network.model.ChapterDto
+import com.fishhawk.lisu.data.network.model.Chapter
+import com.fishhawk.lisu.data.network.model.MangaContent
 import com.fishhawk.lisu.data.network.model.MangaDetailDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.json.Json
 import java.io.ByteArrayOutputStream
 
 sealed interface ReaderPage {
-    @Parcelize
     data class Image(
         val index: Int,
         val url: String,
         val size: Int,
-    ) : ReaderPage, Parcelable
-
+    ) : ReaderPage
 
     data class NextChapterState(
-        val currentChapterName: String,
-        val currentChapterTitle: String,
-        val nextChapterName: String,
-        val nextChapterTitle: String,
+        val currentChapterName: String?,
+        val currentChapterTitle: String?,
+        val nextChapterName: String?,
+        val nextChapterTitle: String?,
         val nextChapterState: Result<Unit>?,
     ) : ReaderPage
 
     data class PrevChapterState(
-        val currentChapterName: String,
-        val currentChapterTitle: String,
-        val prevChapterName: String,
-        val prevChapterTitle: String,
+        val currentChapterName: String?,
+        val currentChapterTitle: String?,
+        val prevChapterName: String?,
+        val prevChapterTitle: String?,
         val prevChapterState: Result<Unit>?,
     ) : ReaderPage
 }
@@ -50,7 +48,7 @@ sealed interface ReaderPage {
 class ReaderChapter(
     val collectionId: String,
     val index: Int,
-    chapter: ChapterDto,
+    chapter: Chapter,
 ) {
     val id = chapter.id
     val title = chapter.title
@@ -70,11 +68,15 @@ class ReaderViewModel(
 ) : BaseViewModel<ReaderEffect>() {
 
     private val providerId =
-        args.getParcelable<MangaDetailDto>("detail")?.providerId
+        args.getString("detail")
+            ?.let { Json.decodeFromString(MangaDetailDto.serializer(), it) }
+            ?.providerId
             ?: args.getString("providerId")!!
 
     private val mangaId =
-        args.getParcelable<MangaDetailDto>("detail")?.id
+        args.getString("detail")
+            ?.let { Json.decodeFromString(MangaDetailDto.serializer(), it) }
+            ?.id
             ?: args.getString("mangaId")!!
 
     private val mangaData =
@@ -87,7 +89,10 @@ class ReaderViewModel(
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,
-                args.getParcelable<MangaDetailDto>("detail")?.let { Result.success(it) })
+                args.getString("detail")
+                    ?.let { Json.decodeFromString(MangaDetailDto.serializer(), it) }
+                    ?.let { Result.success(it) },
+            )
 
     val mangaTitleResult = mangaResult
         .map { result -> result?.map { it.title ?: it.id } }
@@ -97,27 +102,17 @@ class ReaderViewModel(
         .mapNotNull { it?.getOrNull() }
         .map { detail ->
             val collectionId = args.getString("collectionId")!!
-            val chapterId = args.getString("chapterId")!!
-            when {
-                collectionId.isNotBlank() -> {
-                    detail.collections[collectionId]!!.mapIndexed { index, chapter ->
+            when (val content = detail.content) {
+                is MangaContent.Collections ->
+                    content.collections[collectionId]!!.mapIndexed { index, chapter ->
                         ReaderChapter(collectionId, index, chapter)
                     }
-                }
-                chapterId.isNotBlank() -> {
-                    detail.chapters.mapIndexed { index, chapter ->
+                is MangaContent.Chapters ->
+                    content.chapters.mapIndexed { index, chapter ->
                         ReaderChapter(collectionId, index, chapter)
                     }
-                }
-                else -> {
-                    listOf(
-                        ReaderChapter(
-                            collectionId,
-                            0,
-                            ChapterDto(id = " ", name = "", title = "")
-                        )
-                    )
-                }
+                is MangaContent.SingleChapter ->
+                    listOf(ReaderChapter(collectionId, 0, Chapter(id = " ", name = "", title = "")))
             }
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
@@ -330,7 +325,7 @@ class ReaderViewModel(
                 authors = detail.authors.joinToString(separator = ";"),
                 collectionId = chapter.collectionId,
                 chapterId = chapter.id,
-                chapterName = chapter.name,
+                chapterName = chapter.name ?: chapter.id,
                 page = page
             )
             readingHistoryRepository.update(readingHistory)

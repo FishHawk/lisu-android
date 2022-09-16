@@ -10,13 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
+import com.fishhawk.lisu.data.network.model.MangaContent
 import com.fishhawk.lisu.data.network.model.MangaDetailDto
 
 @Composable
 internal fun MangaContent(
     detail: MangaDetailDto,
     history: ReadingHistory?,
-    onAction: GalleryActionHandler
+    onAction: GalleryActionHandler,
 ) {
     val isMarked = { collectionId: String, chapterId: String ->
         history?.let {
@@ -32,13 +33,20 @@ internal fun MangaContent(
         onAction(GalleryAction.NavToReader(" ", " ", page))
     }
 
-    if (detail.collections.isNotEmpty())
-        MangaContentCollections(detail.collections, isMarked, onChapterClick)
-    else if (detail.chapters.isNotEmpty()) {
-        MangaContentChapters(detail.chapters, isMarked, onChapterClick)
-    } else if (detail.preview.isNotEmpty())
-        MangaContentPreview(detail.preview, onPageClick)
-    else MangaNoChapter()
+    when (val content = detail.content) {
+        is MangaContent.Collections ->
+            if (content.collections.isNotEmpty())
+                MangaContentCollections(content.collections, isMarked, onChapterClick)
+            else MangaNoChapter()
+        is MangaContent.Chapters ->
+            if (content.chapters.isNotEmpty())
+                MangaContentChapters(content.chapters, isMarked, onChapterClick)
+            else MangaNoChapter()
+        is MangaContent.SingleChapter ->
+            if (content.preview.isNotEmpty())
+                MangaContentPreview(content.preview, onPageClick)
+            else MangaNoChapter()
+    }
 }
 
 @Composable

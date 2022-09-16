@@ -1,11 +1,8 @@
 package com.fishhawk.lisu.data.network.model
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
 @Serializable
-@Parcelize
 data class MangaMetadataDto(
     val title: String? = null,
     val authors: List<String>? = null,
@@ -15,14 +12,13 @@ data class MangaMetadataDto(
 
     val collections: Map<String, Map<String, ChapterMetadataDto>>? = null,
     val chapters: Map<String, ChapterMetadataDto>? = null,
-) : Parcelable
+)
 
 @Serializable
-@Parcelize
 data class ChapterMetadataDto(
     val name: String?,
     val title: String?,
-) : Parcelable
+)
 
 fun MangaDetailDto.toMetadataDetail(): MangaMetadataDto {
     return MangaMetadataDto(

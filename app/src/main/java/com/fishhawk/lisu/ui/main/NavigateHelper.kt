@@ -15,7 +15,7 @@ import kotlinx.serialization.json.Json
 
 object MangaNavType : NavType<MangaDto>(isNullableAllowed = true) {
     override fun get(bundle: Bundle, key: String): MangaDto? {
-        return bundle.getParcelable(key)
+        return bundle.getString(key)?.let { parseValue(it) }
     }
 
     override fun parseValue(value: String): MangaDto {
@@ -23,7 +23,7 @@ object MangaNavType : NavType<MangaDto>(isNullableAllowed = true) {
     }
 
     override fun put(bundle: Bundle, key: String, value: MangaDto) {
-        bundle.putParcelable(key, value)
+        bundle.putString(key, Json.encodeToString(MangaDto.serializer(), value))
     }
 }
 
@@ -42,7 +42,7 @@ fun NavHostController.navToLoginPassword(providerId: String) {
 fun NavHostController.navToProvider(
     providerId: String,
     boardId: BoardId,
-    keywords: String? = null
+    keywords: String? = null,
 ) {
     val query = keywords?.let { "?keywords=${Uri.encode(keywords)}" } ?: ""
     navigate("provider/${providerId}/board/${boardId.name}$query")
@@ -94,7 +94,7 @@ fun Context.navToReader(
     page: Int,
 ) {
     val bundle = bundleOf(
-        "detail" to detail,
+        "detail" to Json.encodeToString(MangaDetailDto.serializer(), detail),
         "collectionId" to collectionId,
         "chapterId" to chapterId,
         "page" to page

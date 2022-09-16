@@ -9,8 +9,12 @@ import com.fishhawk.lisu.data.network.model.MangaMetadataDto
 import com.fishhawk.lisu.data.network.model.MangaState
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 sealed interface GalleryEffect : Event {
     data class AddToLibraryFailure(val exception: Throwable) : GalleryEffect
@@ -28,7 +32,7 @@ class GalleryViewModel(
     private val lisuRepository: LisuRepository,
     readingHistoryRepository: ReadingHistoryRepository,
 ) : BaseViewModel<GalleryEffect>() {
-    val manga = args.getParcelable<MangaDto>("manga")!!
+    val manga = Json.decodeFromString(MangaDto.serializer(), args.getString("manga")!!)
 
     val providerId = manga.providerId
     val mangaId = manga.id

@@ -6,7 +6,6 @@ plugins {
     id("com.android.application") version "7.3.0-rc01"
     id("com.google.devtools.ksp") version "1.7.10-1.0.6"
     id("org.jetbrains.kotlin.android") version "1.7.10"
-    id("org.jetbrains.kotlin.plugin.parcelize") version "1.7.10"
     id("com.mikepenz.aboutlibraries.plugin") version "10.3.0"
 }
 

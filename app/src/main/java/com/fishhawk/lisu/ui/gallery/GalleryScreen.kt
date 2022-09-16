@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
+import com.fishhawk.lisu.data.network.model.MangaContent
 import com.fishhawk.lisu.data.network.model.MangaDetailDto
 import com.fishhawk.lisu.data.network.model.MangaState
 import com.fishhawk.lisu.ui.base.OnEvent
@@ -46,7 +47,7 @@ internal sealed interface GalleryAction {
     data class NavToReader(
         val collectionId: String,
         val chapterId: String,
-        val page: Int
+        val page: Int,
     ) : GalleryAction
 
     data class SaveCover(val cover: Drawable) : GalleryAction
@@ -120,15 +121,48 @@ fun GalleryScreen(navController: NavHostController) {
                 newCoverSelectorLauncher.launch("image/*")
 
             GalleryAction.Continue -> {
-                detail?.getOrNull()?.let {
-                    context.navToReader(
-                        it,
-                        collectionId = history?.collectionId
-                            ?: it.collections.keys.first(),
-                        chapterId = history?.chapterId
-                            ?: it.collections.values.first().first().id,
-                        page = history?.page ?: 0,
-                    )
+                detail?.getOrNull()?.let { detail ->
+                    history?.let { history ->
+                        context.navToReader(
+                            detail,
+                            collectionId = history.collectionId,
+                            chapterId = history.chapterId,
+                            page = history.page,
+                        )
+                    }
+                    if (history == null) {
+                        when (val content = detail.content) {
+                            is MangaContent.Collections ->
+                                content.firstOrNull()?.let { (collectionId, chapter) ->
+                                    context.navToReader(
+                                        detail,
+                                        collectionId = collectionId,
+                                        chapterId = chapter.id,
+                                        page = 0,
+                                    )
+                                }
+                            is MangaContent.Chapters ->
+                                content.chapters.firstOrNull()?.let {
+                                    context.navToReader(
+                                        detail,
+                                        collectionId = "",
+                                        chapterId = it.id,
+                                        page = 0,
+                                    )
+                                }
+                            is MangaContent.SingleChapter -> {
+                                content.preview.firstOrNull()?.let {
+                                    context.navToReader(
+                                        detail,
+                                        collectionId = "",
+                                        chapterId = "",
+                                        page = 0,
+                                    )
+                                }
+                            }
+                        }
+
+                    }
                 }
             }
             GalleryAction.Reload -> viewModel.reloadManga()
@@ -177,7 +211,7 @@ private fun ToolBar(
     state: MangaState,
     title: String,
     scrollState: ScrollState,
-    onAction: GalleryActionHandler
+    onAction: GalleryActionHandler,
 ) {
     val toolBarVisibleState = remember { MutableTransitionState(false) }
     val mangaHeaderHeightPx = with(LocalDensity.current) { MangaHeaderHeight.toPx() }
@@ -240,7 +274,7 @@ private fun MangaDetail(
     detailResult: Result<MangaDetailDto>?,
     history: ReadingHistory?,
     scrollState: ScrollState,
-    onAction: GalleryActionHandler
+    onAction: GalleryActionHandler,
 ) {
     Column(
         modifier = Modifier

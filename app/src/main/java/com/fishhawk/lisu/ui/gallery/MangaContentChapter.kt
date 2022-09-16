@@ -29,20 +29,21 @@ import com.fishhawk.lisu.data.datastore.ChapterDisplayMode
 import com.fishhawk.lisu.data.datastore.ChapterDisplayOrder
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.setNext
-import com.fishhawk.lisu.data.network.model.ChapterDto
+import com.fishhawk.lisu.data.network.model.Chapter
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.widget.VerticalGrid
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
 @Composable
 internal fun MangaContentCollections(
-    collections: Map<String, List<ChapterDto>>,
+    collections: Map<String, List<Chapter>>,
     isMarked: (String, String) -> Boolean,
-    onChapterClick: (String, String) -> Unit
+    onChapterClick: (String, String) -> Unit,
 ) {
     MangaContentChapterHeader()
     collections.onEach { (collectionId, chapters) ->
@@ -64,9 +65,9 @@ internal fun MangaContentCollections(
 
 @Composable
 internal fun MangaContentChapters(
-    chapters: List<ChapterDto>,
+    chapters: List<Chapter>,
     isMarked: (String, String) -> Boolean,
-    onChapterClick: (String, String) -> Unit
+    onChapterClick: (String, String) -> Unit,
 ) {
     MangaContentChapterHeader()
     ChapterList(chapters, { isMarked(" ", it) }, { onChapterClick(" ", it) })
@@ -101,9 +102,9 @@ private fun MangaContentChapterHeader() {
 
 @Composable
 private fun ChapterList(
-    chapters: List<ChapterDto>,
+    chapters: List<Chapter>,
     isMarked: (String) -> Boolean,
-    onChapterClick: (String) -> Unit = {}
+    onChapterClick: (String) -> Unit = {},
 ) {
     val mode by PR.chapterDisplayMode.collectAsState()
     val order by PR.chapterDisplayOrder.collectAsState()
@@ -119,9 +120,9 @@ private fun ChapterList(
 
 @Composable
 private fun ChapterListGrid(
-    chapters: List<ChapterDto>,
+    chapters: List<Chapter>,
     isMarked: (String) -> Boolean,
-    onChapterClick: (String) -> Unit = {}
+    onChapterClick: (String) -> Unit = {},
 ) {
     VerticalGrid(
         items = chapters,
@@ -142,15 +143,15 @@ private fun ChapterListGrid(
 
 @Composable
 private fun ChapterGrid(
-    chapter: ChapterDto,
+    chapter: Chapter,
     isMarked: Boolean,
     onChapterClick: () -> Unit = {},
 ) {
-    val isLocked = chapter.isLocked == true
+    val isLocked = chapter.isLocked
 
     val modifier =
         if (isLocked) Modifier
-        else Modifier.clickable { if (chapter.isLocked != true) onChapterClick() }
+        else Modifier.clickable { onChapterClick() }
     val color = MaterialTheme.colors
         .run { if (isMarked) primary else surface }
         .let { if (isLocked) it.copy(alpha = ContentAlpha.disabled) else it }
@@ -194,7 +195,7 @@ private fun ChapterGrid(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 2.dp, vertical = 8.dp),
-                text = chapter.name,
+                text = chapter.name ?: chapter.id,
                 style = MaterialTheme.typography.body1.copy(fontSize = 12.sp),
                 color = textColor,
                 maxLines = 1,
@@ -207,9 +208,9 @@ private fun ChapterGrid(
 
 @Composable
 private fun ChapterListLinear(
-    chapters: List<ChapterDto>,
+    chapters: List<Chapter>,
     isMarked: (String) -> Boolean,
-    onChapterClick: (String) -> Unit = {}
+    onChapterClick: (String) -> Unit = {},
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         chapters.onEach {
@@ -225,15 +226,15 @@ private fun ChapterListLinear(
 
 @Composable
 private fun ChapterLinear(
-    chapter: ChapterDto,
+    chapter: Chapter,
     isMarked: Boolean,
     onChapterClick: () -> Unit = {},
 ) {
-    val isLocked = chapter.isLocked == true
+    val isLocked = chapter.isLocked
     val modifier = Modifier
         .fillMaxWidth()
         .let {
-            if (!isLocked) it.clickable { if (chapter.isLocked != true) onChapterClick() }
+            if (!isLocked) it.clickable { onChapterClick() }
             else it
         }
         .padding(vertical = 12.dp, horizontal = 16.dp)
