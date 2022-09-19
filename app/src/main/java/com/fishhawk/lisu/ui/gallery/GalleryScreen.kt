@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
-import com.fishhawk.lisu.data.network.model.MangaContent
 import com.fishhawk.lisu.data.network.model.MangaDetailDto
 import com.fishhawk.lisu.data.network.model.MangaState
 import com.fishhawk.lisu.ui.base.OnEvent
@@ -131,37 +130,16 @@ fun GalleryScreen(navController: NavHostController) {
                         )
                     }
                     if (history == null) {
-                        when (val content = detail.content) {
-                            is MangaContent.Collections ->
-                                content.firstOrNull()?.let { (collectionId, chapter) ->
-                                    context.navToReader(
-                                        detail,
-                                        collectionId = collectionId,
-                                        chapterId = chapter.id,
-                                        page = 0,
-                                    )
-                                }
-                            is MangaContent.Chapters ->
-                                content.chapters.firstOrNull()?.let {
-                                    context.navToReader(
-                                        detail,
-                                        collectionId = "",
-                                        chapterId = it.id,
-                                        page = 0,
-                                    )
-                                }
-                            is MangaContent.SingleChapter -> {
-                                content.preview.firstOrNull()?.let {
-                                    context.navToReader(
-                                        detail,
-                                        collectionId = "",
-                                        chapterId = "",
-                                        page = 0,
-                                    )
-                                }
+                        detail.collections.entries
+                            .firstOrNull { it.value.isNotEmpty() }
+                            ?.let { (collectionId, chapters) ->
+                                context.navToReader(
+                                    detail,
+                                    collectionId = collectionId,
+                                    chapterId = chapters.first().id,
+                                    page = 0,
+                                )
                             }
-                        }
-
                     }
                 }
             }

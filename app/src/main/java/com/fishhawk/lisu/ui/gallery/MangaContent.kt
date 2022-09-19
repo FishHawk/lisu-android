@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
-import com.fishhawk.lisu.data.network.model.MangaContent
 import com.fishhawk.lisu.data.network.model.MangaDetailDto
 
 @Composable
@@ -33,19 +32,19 @@ internal fun MangaContent(
         onAction(GalleryAction.NavToReader(" ", " ", page))
     }
 
-    when (val content = detail.content) {
-        is MangaContent.Collections ->
-            if (content.collections.isNotEmpty())
-                MangaContentCollections(content.collections, isMarked, onChapterClick)
-            else MangaNoChapter()
-        is MangaContent.Chapters ->
-            if (content.chapters.isNotEmpty())
-                MangaContentChapters(content.chapters, isMarked, onChapterClick)
-            else MangaNoChapter()
-        is MangaContent.SingleChapter ->
-            if (content.preview.isNotEmpty())
-                MangaContentPreview(content.preview, onPageClick)
-            else MangaNoChapter()
+    val collections = detail.collections.filterValues { it.isNotEmpty() }
+    if (collections.isEmpty()) {
+        MangaNoChapter()
+    } else if (
+        detail.chapterPreviews.isNotEmpty() &&
+        collections.keys.size == 1 &&
+        collections.keys.first().isEmpty() &&
+        collections.values.first().size == 1 &&
+        collections.values.first().first().id.isEmpty()
+    ) {
+        MangaContentPreview(detail.chapterPreviews, onPageClick)
+    } else {
+        MangaContentCollections(collections, isMarked, onChapterClick)
     }
 }
 

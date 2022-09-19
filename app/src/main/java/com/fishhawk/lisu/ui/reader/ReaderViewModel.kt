@@ -12,7 +12,6 @@ import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.datastore.next
 import com.fishhawk.lisu.data.network.LisuRepository
 import com.fishhawk.lisu.data.network.model.Chapter
-import com.fishhawk.lisu.data.network.model.MangaContent
 import com.fishhawk.lisu.data.network.model.MangaDetailDto
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
@@ -102,18 +101,8 @@ class ReaderViewModel(
         .mapNotNull { it?.getOrNull() }
         .map { detail ->
             val collectionId = args.getString("collectionId")!!
-            when (val content = detail.content) {
-                is MangaContent.Collections ->
-                    content.collections[collectionId]!!.mapIndexed { index, chapter ->
-                        ReaderChapter(collectionId, index, chapter)
-                    }
-                is MangaContent.Chapters ->
-                    content.chapters.mapIndexed { index, chapter ->
-                        ReaderChapter(collectionId, index, chapter)
-                    }
-                is MangaContent.SingleChapter ->
-                    listOf(ReaderChapter(collectionId, 0, Chapter(id = " ", name = "", title = "")))
-            }
+            detail.collections[collectionId]!!
+                .mapIndexed { index, chapter -> ReaderChapter(collectionId, index, chapter) }
         }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 

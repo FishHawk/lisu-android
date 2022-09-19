@@ -70,15 +70,9 @@ class LisuDao(
                 val detail = response.body<MangaDetailDto>()
                 detail.copy(
                     cover = processCover(detail.providerId, detail.id, detail.cover),
-                    content = when (detail.content) {
-                        is MangaContent.SingleChapter ->
-                            MangaContent.SingleChapter(
-                                preview = detail.content.preview.map {
-                                    processImage(providerId, mangaId, " ", " ", it)
-                                }
-                            )
-                        else -> detail.content
-                    }
+                    chapterPreviews = detail.chapterPreviews.map {
+                        processImage(providerId, mangaId, " ", " ", it)
+                    },
                 )
             }
 

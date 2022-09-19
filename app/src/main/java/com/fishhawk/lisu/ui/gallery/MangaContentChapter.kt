@@ -35,7 +35,6 @@ import com.fishhawk.lisu.widget.VerticalGrid
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
@@ -47,30 +46,22 @@ internal fun MangaContentCollections(
 ) {
     MangaContentChapterHeader()
     collections.onEach { (collectionId, chapters) ->
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(2.dp),
-            text = collectionId,
-            style = MaterialTheme.typography.body2,
-            textAlign = TextAlign.Center
-        )
+        if (collectionId.isNotEmpty()) {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(2.dp),
+                text = collectionId,
+                style = MaterialTheme.typography.body2,
+                textAlign = TextAlign.Center
+            )
+        }
         ChapterList(
             chapters,
             { isMarked(collectionId, it) },
             { onChapterClick(collectionId, it) }
         )
     }
-}
-
-@Composable
-internal fun MangaContentChapters(
-    chapters: List<Chapter>,
-    isMarked: (String, String) -> Boolean,
-    onChapterClick: (String, String) -> Unit,
-) {
-    MangaContentChapterHeader()
-    ChapterList(chapters, { isMarked(" ", it) }, { onChapterClick(" ", it) })
 }
 
 @Composable
