@@ -13,6 +13,7 @@
     <string name="label_about">About</string>
     <string name="label_open_source_license">Open source license</string>
     <string name="label_gallery_edit">Edit</string>
+    <string name="label_download">Download</string>
 
 
     <!-- library screen -->
@@ -31,6 +32,7 @@
     <string name="explore_last_used">Last used</string>
 
     <!-- more screen -->
+    <string name="more_download">Download</string>
     <string name="more_setting_general">Setting general</string>
     <string name="more_setting_reader">Setting reader</string>
     <string name="more_setting_advanced">Setting advanced</string>

@@ -3,9 +3,15 @@ package com.fishhawk.lisu.data.network.dao
 import com.fishhawk.lisu.data.network.model.*
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
+import io.ktor.utils.io.*
+import io.ktor.websocket.*
+import kotlinx.coroutines.flow.*
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
 
 class LisuDao(
     private val client: HttpClient,
@@ -158,6 +164,65 @@ class LisuDao(
         client.post("$url/library/manga-delete") {
             setBody(mangas)
         }.body()
+
+
+    // Download API
+    suspend fun listMangaDownloadTask(): Flow<List<MangaDownloadTask>> = flow {
+        client.webSocket(
+            urlString = "$url/download/list",
+            request = { url.protocol = URLProtocol.WS },
+        ) {
+            incoming
+                .receiveAsFlow()
+                .filterIsInstance<Frame.Text>()
+                .collect { frame ->
+                    val list = Json.decodeFromString(
+                        ListSerializer(MangaDownloadTask.serializer()),
+                        frame.readText()
+                    ).map {
+                        it.copy(cover = processCover(it.providerId, it.mangaId, it.cover))
+                    }
+                    emit(list)
+                }
+        }
+    }
+
+
+    suspend fun startAllTasks(): String =
+        client.post("$url/download/start-all").body()
+
+    suspend fun startMangaTask(
+        providerId: String,
+        mangaId: String,
+    ): String =
+        client.post("$url/download/start-manga/${providerId.path}/${mangaId.path}").body()
+
+    suspend fun startChapterTask(
+        providerId: String,
+        mangaId: String,
+        collectionId: String,
+        chapterId: String,
+    ): String =
+        client.post("$url/download/start-chapter/${providerId.path}/${mangaId.path}/${collectionId.path}/${chapterId.path}")
+            .body()
+
+    suspend fun cancelAllTasks(): String =
+        client.post("$url/download/cancel-all").body()
+
+    suspend fun cancelMangaTask(
+        providerId: String,
+        mangaId: String,
+    ): String =
+        client.post("$url/download/cancel-manga/${providerId.path}/${mangaId.path}").body()
+
+    suspend fun cancelChapterTask(
+        providerId: String,
+        mangaId: String,
+        collectionId: String,
+        chapterId: String,
+    ): String =
+        client.post("$url/download/cancel-chapter/${providerId.path}/${mangaId.path}/${collectionId.path}/${chapterId.path}")
+            .body()
 
 
     private val String.path

@@ -5,7 +5,6 @@ import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.network.LisuRepository
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 

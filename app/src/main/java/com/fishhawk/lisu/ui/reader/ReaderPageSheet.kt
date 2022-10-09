@@ -1,7 +1,6 @@
 package com.fishhawk.lisu.ui.reader
 
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.outlined.Image

@@ -79,7 +79,7 @@ fun SheetListItem(
 ) {
     ListItem(
         modifier = Modifier.clickable(onClick = { onClick() }),
-        icon = { Icon(icon, contentDescription = title) },
+        icon = { Icon(imageVector = icon, contentDescription = title) },
         text = { Text(text = title) }
     )
 }

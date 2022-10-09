@@ -95,9 +95,9 @@ fun ExploreScreen(navController: NavHostController) {
                     modifier = Modifier
                         .padding(paddingValues)
                         .fillMaxSize(),
-                ) { providers ->
+                ) { providers, modifier ->
                     if (providers.isEmpty()) {
-                        EmptyView(modifier = Modifier.fillMaxSize())
+                        EmptyView(modifier = modifier)
                     } else {
                         LazyColumn {
                             lastUsedProvider?.let {

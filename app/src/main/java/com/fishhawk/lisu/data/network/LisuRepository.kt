@@ -3,6 +3,7 @@ package com.fishhawk.lisu.data.network
 import com.fishhawk.lisu.data.network.base.*
 import com.fishhawk.lisu.data.network.dao.LisuDao
 import com.fishhawk.lisu.data.network.model.*
+import com.fishhawk.lisu.util.flatten
 import io.ktor.client.*
 import io.ktor.http.*
 import kotlinx.coroutines.CoroutineScope
@@ -268,4 +269,44 @@ class LisuRepository(
                 }
             }
         }
+
+    // Download API
+    fun listMangaDownloadTask(): Flow<Result<List<MangaDownloadTask>>?> =
+        daoFlow.filterNotNull().flatMapLatest {
+            flatten(it.map { dao -> dao.listMangaDownloadTask() })
+        }.catch { emit(Result.failure(it)) }
+
+    suspend fun startAllTasks(): Result<String> =
+        oneshot { it.startAllTasks() }
+
+    suspend fun startMangaTask(
+        providerId: String,
+        mangaId: String,
+    ): Result<String> =
+        oneshot { it.startMangaTask(providerId, mangaId) }
+
+    suspend fun startChapterTask(
+        providerId: String,
+        mangaId: String,
+        collectionId: String,
+        chapterId: String,
+    ): Result<String> =
+        oneshot { it.startChapterTask(providerId, mangaId, collectionId, chapterId) }
+
+    suspend fun cancelAllTasks(): Result<String> =
+        oneshot { it.cancelAllTasks() }
+
+    suspend fun cancelMangaTask(
+        providerId: String,
+        mangaId: String,
+    ): Result<String> =
+        oneshot { it.cancelMangaTask(providerId, mangaId) }
+
+    suspend fun cancelChapterTask(
+        providerId: String,
+        mangaId: String,
+        collectionId: String,
+        chapterId: String,
+    ): Result<String> =
+        oneshot { it.cancelChapterTask(providerId, mangaId, collectionId, chapterId) }
 }

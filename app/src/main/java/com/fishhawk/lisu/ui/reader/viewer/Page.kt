@@ -69,7 +69,8 @@ internal fun NextChapterStatePage(
                 StateView(
                     result = page.nextChapterState,
                     onRetry = { },
-                ) { }
+                ) { _ ->
+                }
             }
         }
     }

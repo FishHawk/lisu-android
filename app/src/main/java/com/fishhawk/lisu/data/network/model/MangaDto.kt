@@ -1,6 +1,5 @@
 package com.fishhawk.lisu.data.network.model
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -52,23 +51,6 @@ data class MangaDetailDto(
     val collections: Map<String, List<Chapter>> = emptyMap(),
     val chapterPreviews: List<String> = emptyList(),
 )
-
-//@Serializable
-//sealed interface MangaContent {
-//    @Serializable
-//    @SerialName("Collections")
-//    data class Collections(
-//        val collections: Map<String, List<Chapter>> = emptyMap(),
-//    ) : MangaContent {
-//        fun isEmpty() = collections.values.all { it.isEmpty() }
-//        fun firstOrNull(): Pair<String, Chapter>? {
-//            return collections.entries
-//                .firstOrNull { it.value.isNotEmpty() }
-//                ?.let { (collectionId, chapters) ->
-//                    collectionId to chapters.first()
-//                }
-//        }
-//    }
 
 @Serializable
 data class Chapter(

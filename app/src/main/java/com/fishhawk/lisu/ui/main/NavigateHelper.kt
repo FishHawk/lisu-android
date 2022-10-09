@@ -62,6 +62,7 @@ fun NavHostController.navToGalleryEdit() = navigate("edit")
 
 fun NavHostController.navToGalleryComment() = navigate("comment")
 
+fun NavHostController.navToDownload() = navigate("download")
 fun NavHostController.navToSettingGeneral() = navigate("setting-general")
 fun NavHostController.navToSettingReader() = navigate("setting-reader")
 fun NavHostController.navToSettingAdvanced() = navigate("setting-advanced")
@@ -69,8 +70,8 @@ fun NavHostController.navToAbout() = navigate("about")
 fun NavHostController.navToOpenSourceLicense() = navigate("open-source-license")
 
 fun Context.navToReader(
-    mangaId: String,
     providerId: String,
+    mangaId: String,
     collectionId: String,
     chapterId: String,
     page: Int = 0,

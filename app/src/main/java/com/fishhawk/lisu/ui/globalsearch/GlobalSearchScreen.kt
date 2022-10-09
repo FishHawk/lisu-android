@@ -125,9 +125,9 @@ private fun SearchRecordList(
         modifier = modifier,
         result = searchRecordsResult,
         onRetry = { onAction(GlobalSearchAction.ReloadProviders) },
-    ) { searchRecords ->
+    ) { searchRecords, _ ->
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier,
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {

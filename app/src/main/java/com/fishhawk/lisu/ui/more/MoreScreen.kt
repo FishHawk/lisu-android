@@ -20,19 +20,17 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.ui.main.navToAbout
-import com.fishhawk.lisu.ui.main.navToSettingAdvanced
-import com.fishhawk.lisu.ui.main.navToSettingGeneral
-import com.fishhawk.lisu.ui.main.navToSettingReader
+import com.fishhawk.lisu.ui.main.*
 import com.fishhawk.lisu.ui.theme.LisuTransition
-import com.fishhawk.lisu.widget.LisuToolBar
 import com.fishhawk.lisu.util.nsdManager
+import com.fishhawk.lisu.widget.LisuToolBar
 import okhttp3.HttpUrl
 import org.koin.androidx.compose.viewModel
 
 private typealias MoreActionHandler = (MoreAction) -> Unit
 
 private sealed interface MoreAction {
+    object NavToDownload : MoreAction
     object NavToSettingGeneral : MoreAction
     object NavToSettingReader : MoreAction
     object NavToSettingAdvanced : MoreAction
@@ -49,6 +47,7 @@ fun MoreScreen(navController: NavHostController) {
 
     val onAction: MoreActionHandler = { action ->
         when (action) {
+            MoreAction.NavToDownload -> navController.navToDownload()
             MoreAction.NavToSettingGeneral -> navController.navToSettingGeneral()
             MoreAction.NavToSettingReader -> navController.navToSettingReader()
             MoreAction.NavToSettingAdvanced -> navController.navToSettingAdvanced()
@@ -78,10 +77,17 @@ private fun Content(
     initAddress: String,
     suggestions: List<String>,
     onAction: MoreActionHandler,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         ServerAddressSelector(initAddress, suggestions, onAction)
+
+        Divider()
+
+        TextPreference(
+            icon = Icons.Filled.Download,
+            title = stringResource(R.string.more_download)
+        ) { onAction(MoreAction.NavToDownload) }
 
         Divider()
 
@@ -114,7 +120,7 @@ data class NsdService(val name: String, val address: HttpUrl)
 private fun ServerAddressSelector(
     initAddress: String,
     suggestions: List<String>,
-    onAction: MoreActionHandler
+    onAction: MoreActionHandler,
 ) {
     val nsdServices = remember { mutableStateListOf<NsdService>() }
     var address by remember { mutableStateOf(initAddress) }
@@ -226,7 +232,7 @@ fun TextFieldWithDropdownMenu(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
     hasContent: Boolean,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(

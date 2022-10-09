@@ -44,6 +44,7 @@ import com.fishhawk.lisu.data.network.model.GitHubReleaseDto
 import com.fishhawk.lisu.notification.AppUpdateNotification
 import com.fishhawk.lisu.ui.base.BaseActivity
 import com.fishhawk.lisu.ui.base.OnEvent
+import com.fishhawk.lisu.ui.download.DownloadScreen
 import com.fishhawk.lisu.ui.explore.*
 import com.fishhawk.lisu.ui.gallery.GalleryCommentScreen
 import com.fishhawk.lisu.ui.gallery.GalleryEditScreen
@@ -204,6 +205,8 @@ private fun MainNavHost(
         composable("edit") { GalleryEditScreen(navController) }
 
         composable("comment") { GalleryCommentScreen(navController) }
+
+        composable("download") { DownloadScreen(navController) }
 
         composable("setting-general") { SettingGeneralScreen(navController) }
         composable("setting-reader") { SettingReaderScreen(navController) }
