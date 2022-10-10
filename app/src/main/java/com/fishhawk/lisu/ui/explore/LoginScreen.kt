@@ -34,9 +34,7 @@ import com.google.accompanist.web.rememberWebViewState
 import org.koin.androidx.compose.viewModel
 import java.net.URLDecoder
 
-internal typealias LoginActionHandler = (LoginAction) -> Unit
-
-internal sealed interface LoginAction {
+private sealed interface LoginAction {
     object NavUp : LoginAction
     data class LoginByCookies(val cookies: Map<String, String>) : LoginAction
     data class LoginByPassword(val username: String, val password: String) : LoginAction
@@ -45,7 +43,7 @@ internal sealed interface LoginAction {
 @Composable
 private fun LoginScreen(
     navController: NavHostController,
-    content: @Composable (ProviderDto, LoginActionHandler) -> Unit,
+    content: @Composable (ProviderDto, (LoginAction) -> Unit) -> Unit,
 ) {
     val viewModel by viewModel<ExploreViewModel>()
 
@@ -63,7 +61,7 @@ private fun LoginScreen(
         provider
     }
 
-    val onAction: LoginActionHandler = { action ->
+    val onAction: (LoginAction) -> Unit = { action ->
         when (action) {
             LoginAction.NavUp ->
                 navController.navigateUp()

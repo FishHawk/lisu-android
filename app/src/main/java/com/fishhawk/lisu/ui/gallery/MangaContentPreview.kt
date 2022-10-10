@@ -3,6 +3,8 @@ package com.fishhawk.lisu.ui.gallery
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
@@ -16,27 +18,26 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.fishhawk.lisu.widget.VerticalGrid
 
-@Composable
-internal fun MangaContentPreview(
+internal fun LazyListScope.mangaContentPreview(
     previews: List<String>,
-    onPageClick: (Int) -> Unit = {}
+    onPageClick: (Int) -> Unit = {},
 ) {
-    VerticalGrid(
-        items = previews,
-        nColumns = 3,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) { index, it ->
-        Box(
-            modifier = Modifier.weight(1f),
-            propagateMinConstraints = true
+    items(previews.withIndex().chunked(3)) { rowItems ->
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            PreviewPage(it, index + 1, onPageClick)
+            rowItems.forEach { (index, url) ->
+                PreviewPage(
+                    url = url,
+                    page = index + 1,
+                    onPageClick = onPageClick,
+                )
+            }
+            repeat(3 - rowItems.size) {
+                Spacer(modifier = Modifier.weight(1f))
+            }
         }
     }
 }
@@ -45,7 +46,7 @@ internal fun MangaContentPreview(
 private fun PreviewPage(
     url: String,
     page: Int,
-    onPageClick: (Int) -> Unit = {}
+    onPageClick: (Int) -> Unit = {},
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Image(

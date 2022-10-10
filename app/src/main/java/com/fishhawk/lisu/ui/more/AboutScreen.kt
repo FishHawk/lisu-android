@@ -29,13 +29,13 @@ fun AboutScreen(navController: NavHostController) {
                 onNavUp = { navController.navigateUp() }
             )
         },
-        content = {paddingValues->
+        content = { paddingValues ->
             LisuTransition {
                 Content(
-                    navController,
+                    navController = navController,
                     modifier = Modifier
                         .padding(paddingValues)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
                 )
             }
         }
@@ -43,7 +43,10 @@ fun AboutScreen(navController: NavHostController) {
 }
 
 @Composable
-private fun Content(navController: NavHostController, modifier: Modifier = Modifier) {
+private fun Content(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+) {
     val viewModel by viewModel<MainViewModel>()
     Column(modifier = modifier) {
         val context = LocalContext.current

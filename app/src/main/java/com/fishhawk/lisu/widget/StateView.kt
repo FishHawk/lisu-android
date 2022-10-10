@@ -22,7 +22,7 @@ fun <T> StateView(
 ) {
     result
         ?.onSuccess { content(it, modifier) }
-        ?.onFailure { ErrorView(modifier, it, onRetry) }
+        ?.onFailure { ErrorView(it, onRetry, modifier) }
         ?: LoadingView(modifier)
 }
 
@@ -35,24 +35,24 @@ fun <T> StateView(
 ) {
     result
         ?.onSuccess { content(it) }
-        ?.onFailure { ErrorView(modifier, it, onRetry) }
+        ?.onFailure { ErrorView(it, onRetry, modifier) }
         ?: LoadingView(modifier)
 }
 
 @Composable
-private fun LoadingView(
+fun LoadingView(
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier) {
+    Box(modifier = modifier.padding(48.dp)) {
         CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
     }
 }
 
 @Composable
-private fun ErrorView(
-    modifier: Modifier = Modifier,
+fun ErrorView(
     throwable: Throwable,
     onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier,

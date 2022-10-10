@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
@@ -37,16 +36,17 @@ import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RefreshableMangaList(
     mangaList: PagedList<MangaDto>,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     onRequestNextPage: () -> Unit,
+    onCardClick: (manga: MangaDto) -> Unit,
+    onCardLongClick: (manga: MangaDto) -> Unit,
     selectedMangaList: SnapshotStateList<MangaKeyDto>? = null,
     decorator: @Composable BoxScope.(manga: MangaDto?) -> Unit = {},
-    onCardClick: (manga: MangaDto) -> Unit = {},
-    onCardLongClick: (manga: MangaDto) -> Unit = {},
 ) {
     var maxAccessed by rememberSaveable { mutableStateOf(0) }
     var hasRefreshed by rememberSaveable { mutableStateOf(false) }
@@ -81,8 +81,10 @@ fun RefreshableMangaList(
                     MangaCard(
                         manga = manga,
                         selected = selectedMangaList?.contains(manga.key) ?: false,
-                        onClick = onCardClick,
-                        onLongClick = onCardLongClick
+                        modifier = Modifier.combinedClickable(
+                            onClick = { onCardClick(manga) },
+                            onLongClick = { onCardLongClick(manga) },
+                        )
                     )
                     decorator(manga)
                 }
@@ -102,51 +104,40 @@ fun RefreshableMangaList(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MangaCard(
-    manga: MangaDto?,
+    manga: MangaDto,
     selected: Boolean = false,
-    onClick: (manga: MangaDto) -> Unit = {},
-    onLongClick: (manga: MangaDto) -> Unit = {},
+    modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = Modifier.combinedClickable(
-            onClick = { manga?.let { onClick(it) } },
-            onLongClick = { manga?.let { onLongClick(it) } }
-        )
+        modifier = modifier
     ) {
         Box {
-            MangaCover(manga?.cover)
+            MangaCover(manga.cover)
 
-            val textStyle = MaterialTheme.typography.subtitle2.copy(
-                shadow = Shadow(Color.White, Offset.Zero, 2f)
+            val textStyle = MaterialTheme.typography.caption.copy(
+                shadow = Shadow(Color.White, Offset.Zero, 1f)
             )
-            val textLineHeight = with(LocalDensity.current) {
-                (textStyle.fontSize * 4 / 3).toDp() + 4.dp
+            Canvas(modifier = Modifier.matchParentSize()) {
+                val shadowHeight = ((textStyle.fontSize * 4 / 3).toPx() + 8.dp.toPx()) * 2
+                drawRect(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            Color(0xAA000000)
+                        ),
+                        startY = size.height - shadowHeight,
+                    ),
+                )
             }
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .fillMaxWidth()
-                    .height(textLineHeight * 2)
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                Color(0xAA000000)
-                            )
-                        )
-                    )
-            )
             Text(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .padding(8.dp),
-                text = manga?.title ?: manga?.id ?: "",
-                style = MaterialTheme.typography.caption.copy(
-                    shadow = Shadow(Color.White, Offset.Zero, 1f)
-                ),
+                text = manga.title ?: manga.id,
                 color = Color.White,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                style = textStyle,
             )
 
             if (selected) {
@@ -155,7 +146,7 @@ fun MangaCard(
                     drawRect(
                         color = color,
                         size = size,
-                        blendMode = BlendMode.SrcOver
+                        blendMode = BlendMode.SrcOver,
                     )
                 }
             }

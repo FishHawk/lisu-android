@@ -32,8 +32,6 @@ import com.fishhawk.lisu.widget.LocalBottomSheetHelper
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
-internal val MangaHeaderHeight = 290.dp
-
 @Composable
 internal fun MangaHeader(
     state: MangaState,
@@ -43,12 +41,12 @@ internal fun MangaHeader(
     authors: List<String>,
     isFinished: Boolean?,
     history: ReadingHistory?,
-    onAction: GalleryActionHandler
+    onAction: (GalleryAction) -> Unit,
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(MangaHeaderHeight)
+            .height(290.dp)
     ) {
         val context = LocalContext.current
         var loadedCover by remember { mutableStateOf(cover) }
@@ -156,9 +154,8 @@ private fun MangaInfo(
     title: String,
     authors: List<String>,
     isFinished: Boolean?,
-    onAction: GalleryActionHandler,
+    onAction: (GalleryAction) -> Unit,
 ) {
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -200,7 +197,7 @@ private fun MangaInfo(
 @Composable
 private fun MangaInfoTitle(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val defaultTextStyle = MaterialTheme.typography.h6
     var textStyle by remember { mutableStateOf(defaultTextStyle) }
@@ -230,7 +227,7 @@ private fun MangaInfoTitle(
 @Composable
 private fun MangaInfoSubtitle(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Text(
         text = text,
@@ -245,7 +242,7 @@ private fun MangaInfoSubtitle(
 private fun MangaActionButtons(
     state: MangaState,
     history: ReadingHistory?,
-    onAction: GalleryActionHandler
+    onAction: (GalleryAction) -> Unit,
 ) {
     Row(modifier = Modifier.padding(horizontal = 16.dp)) {
         when (state) {
@@ -287,7 +284,7 @@ private fun MangaActionButtons(
 private fun RowScope.MangaActionButton(
     icon: ImageVector,
     text: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier

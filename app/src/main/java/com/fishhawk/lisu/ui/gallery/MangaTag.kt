@@ -18,7 +18,7 @@ import com.google.accompanist.flowlayout.FlowRow
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MangaTagGroups(
+internal fun MangaTagGroups(
     tagGroups: Map<String, List<String>>,
     onTagClick: (String) -> Unit = {},
     onTagLongClick: (String) -> Unit = {},
@@ -56,7 +56,7 @@ fun MangaTagGroups(
 }
 
 @Composable
-fun EditMangaTagGroup(
+internal fun EditMangaTagGroup(
     tags: List<String>,
     onTagClick: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -84,7 +84,7 @@ fun EditMangaTagGroup(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun Tag(
+private fun Tag(
     tag: String,
     modifier: Modifier = Modifier,
     trailingIcon: @Composable (() -> Unit)? = null,

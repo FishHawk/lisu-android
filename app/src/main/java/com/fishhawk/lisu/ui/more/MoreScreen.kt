@@ -27,8 +27,6 @@ import com.fishhawk.lisu.widget.LisuToolBar
 import okhttp3.HttpUrl
 import org.koin.androidx.compose.viewModel
 
-private typealias MoreActionHandler = (MoreAction) -> Unit
-
 private sealed interface MoreAction {
     object NavToDownload : MoreAction
     object NavToSettingGeneral : MoreAction
@@ -45,7 +43,7 @@ fun MoreScreen(navController: NavHostController) {
     val address by viewModel.address.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
 
-    val onAction: MoreActionHandler = { action ->
+    val onAction: (MoreAction) -> Unit = { action ->
         when (action) {
             MoreAction.NavToDownload -> navController.navToDownload()
             MoreAction.NavToSettingGeneral -> navController.navToSettingGeneral()
@@ -62,10 +60,12 @@ fun MoreScreen(navController: NavHostController) {
         content = { paddingValues ->
             LisuTransition {
                 Content(
-                    address, suggestions, onAction,
+                    initAddress = address,
+                    suggestions = suggestions,
+                    onAction = onAction,
                     modifier = Modifier
                         .padding(paddingValues)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
                 )
             }
         }
@@ -76,7 +76,7 @@ fun MoreScreen(navController: NavHostController) {
 private fun Content(
     initAddress: String,
     suggestions: List<String>,
-    onAction: MoreActionHandler,
+    onAction: (MoreAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
@@ -113,14 +113,17 @@ private fun Content(
     }
 }
 
-data class NsdService(val name: String, val address: HttpUrl)
+private data class NsdService(
+    val name: String,
+    val address: HttpUrl,
+)
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ServerAddressSelector(
     initAddress: String,
     suggestions: List<String>,
-    onAction: MoreActionHandler,
+    onAction: (MoreAction) -> Unit,
 ) {
     val nsdServices = remember { mutableStateListOf<NsdService>() }
     var address by remember { mutableStateOf(initAddress) }
@@ -222,7 +225,7 @@ private fun ServerAddressSelector(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TextFieldWithDropdownMenu(
+private fun TextFieldWithDropdownMenu(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,

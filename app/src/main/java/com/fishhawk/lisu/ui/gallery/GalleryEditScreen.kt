@@ -33,8 +33,6 @@ import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.LisuToolBar
 import org.koin.androidx.compose.viewModel
 
-internal typealias GalleryEditActionHandler = (GalleryEditAction) -> Unit
-
 internal sealed interface GalleryEditAction {
     object NavUp : GalleryEditAction
     object Publish : GalleryEditAction
@@ -55,7 +53,7 @@ fun GalleryEditScreen(navController: NavHostController) {
     }
     var detail by remember { mutableStateOf(initDetail.toMetadataDetail()) }
 
-    val onAction: GalleryEditActionHandler = { action ->
+    val onAction: (GalleryEditAction) -> Unit = { action ->
         when (action) {
             GalleryEditAction.NavUp -> navController.navigateUp()
             GalleryEditAction.Publish -> {
@@ -223,7 +221,7 @@ private fun CustomTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = TextFieldDefaults.TextFieldShape,
-    colors: TextFieldColors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent)
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
 ) {
     BasicTextField(
         value = value,

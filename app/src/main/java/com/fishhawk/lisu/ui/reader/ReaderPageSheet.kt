@@ -17,7 +17,7 @@ import com.fishhawk.lisu.widget.SheetListItem
 internal class ReaderPageSheet(
     private val bitmap: Bitmap,
     private val position: Int,
-    private val onAction: ReaderActionHandler
+    private val onAction: (ReaderAction) -> Unit,
 ) : BottomSheet() {
     @Composable
     override fun Content() {
@@ -30,7 +30,7 @@ internal class ReaderPageSheet(
 private fun ReaderPageSheetContent(
     bitmap: Bitmap,
     position: Int,
-    onAction: ReaderActionHandler,
+    onAction: (ReaderAction) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         SheetListItem(

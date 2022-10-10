@@ -68,7 +68,7 @@ internal fun BoxScope.ReaderMenu(
     isOnlyOneChapter: Boolean,
     currentImagePage: ReaderPage.Image?,
     onSnapToPage: suspend (Int) -> Unit,
-    onAction: ReaderActionHandler,
+    onAction: (ReaderAction) -> Unit,
 ) {
     val systemUiController = rememberSystemUiController()
     val useDarkIcons = MaterialTheme.colors.isLight
@@ -155,7 +155,7 @@ private fun ReaderMenuBottom(
     isOnlyOneChapter: Boolean,
     currentImagePage: ReaderPage.Image?,
     onSnapToPage: suspend (Int) -> Unit,
-    onAction: ReaderActionHandler,
+    onAction: (ReaderAction) -> Unit,
 ) {
     Column(modifier = Modifier.navigationBarsPadding()) {
         CompositionLocalProvider(

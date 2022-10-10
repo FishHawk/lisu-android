@@ -25,7 +25,7 @@ import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToReader
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
-import com.fishhawk.lisu.util.toDisplayString
+import com.fishhawk.lisu.util.readableString
 import com.fishhawk.lisu.widget.EmptyView
 import com.fishhawk.lisu.widget.LisuDialog
 import com.fishhawk.lisu.widget.LisuToolBar
@@ -33,8 +33,6 @@ import com.fishhawk.lisu.widget.MangaCover
 import org.koin.androidx.compose.viewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
-private typealias HistoryActionHandler = (HistoryAction) -> Unit
 
 private sealed interface HistoryAction {
     data class NavToGallery(val history: ReadingHistory) : HistoryAction
@@ -50,7 +48,7 @@ fun HistoryScreen(navController: NavHostController) {
     val viewModel by viewModel<HistoryViewModel>()
     val histories by viewModel.histories.collectAsState()
 
-    val onAction: HistoryActionHandler = { action ->
+    val onAction: (HistoryAction) -> Unit = { action ->
         when (action) {
             is HistoryAction.NavToGallery -> with(action.history) {
                 navController.navToGallery(MangaDto(
@@ -72,62 +70,72 @@ fun HistoryScreen(navController: NavHostController) {
         }
     }
 
+    HistoryScaffold(
+        histories = histories,
+        onAction = onAction,
+    )
+}
+
+@Composable
+private fun HistoryScaffold(
+    histories: Map<LocalDate, List<ReadingHistory>>,
+    onAction: (HistoryAction) -> Unit,
+) {
     Scaffold(
-        topBar = { ToolBar(onAction) },
+        topBar = {
+            LisuToolBar(title = stringResource(R.string.label_history)) {
+                var isOpen by remember { mutableStateOf(false) }
+                IconButton(onClick = { isOpen = true }) {
+                    Icon(LisuIcons.ClearAll, stringResource(R.string.action_clear_history))
+                    if (isOpen) {
+                        LisuDialog(
+                            title = stringResource(R.string.dialog_clear_history),
+                            confirmText = stringResource(R.string.action_clear),
+                            dismissText = stringResource(R.string.action_cancel),
+                            onConfirm = { onAction(HistoryAction.ClearHistory) },
+                            onDismiss = { isOpen = false },
+                        )
+                    }
+                }
+            }
+        },
         content = { paddingValues ->
             LisuTransition {
                 HistoryList(
-                    histories,
-                    onAction,
-                    modifier = Modifier.padding(paddingValues)
+                    histories = histories,
+                    onAction = onAction,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
                 )
             }
         }
     )
 }
 
-@Composable
-private fun ToolBar(onAction: HistoryActionHandler) {
-    LisuToolBar(title = stringResource(R.string.label_history)) {
-        var isOpen by remember { mutableStateOf(false) }
-        IconButton(onClick = { isOpen = true }) {
-            Icon(LisuIcons.ClearAll, stringResource(R.string.action_clear_history))
-            if (isOpen) {
-                LisuDialog(
-                    title = stringResource(R.string.dialog_clear_history),
-                    confirmText = stringResource(R.string.action_clear),
-                    dismissText = stringResource(R.string.action_cancel),
-                    onConfirm = { onAction(HistoryAction.ClearHistory) },
-                    onDismiss = { isOpen = false },
-                )
-            }
-        }
-    }
-}
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HistoryList(
     histories: Map<LocalDate, List<ReadingHistory>>,
-    onAction: HistoryActionHandler,
+    onAction: (HistoryAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (histories.isEmpty()) {
-        EmptyView(modifier = Modifier.fillMaxSize())
+        EmptyView(modifier = modifier)
     }
     LazyColumn(modifier = modifier) {
         histories.forEach { (date, list) ->
             item(key = date) {
                 HistoryListHeader(
                     date = date,
-                    modifier = Modifier.animateItemPlacement()
+                    modifier = Modifier.animateItemPlacement(),
                 )
             }
             items(list, key = { Pair(it.providerId, it.mangaId) }) {
                 HistoryListItem(
                     history = it,
+                    onAction = onAction,
                     modifier = Modifier.animateItemPlacement(),
-                    onAction = onAction
                 )
             }
         }
@@ -141,9 +149,9 @@ private fun HistoryListHeader(
 ) {
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Text(
-            text = date.toDisplayString(),
+            text = date.readableString(),
             modifier = modifier.padding(horizontal = 8.dp, vertical = 12.dp),
-            style = MaterialTheme.typography.subtitle2
+            style = MaterialTheme.typography.subtitle2,
         )
     }
 }
@@ -152,8 +160,8 @@ private fun HistoryListHeader(
 @Composable
 private fun HistoryListItem(
     history: ReadingHistory,
+    onAction: (HistoryAction) -> Unit,
     modifier: Modifier = Modifier,
-    onAction: HistoryActionHandler = {},
 ) {
     val dismissState = rememberDismissState(
         confirmStateChange = {
@@ -171,41 +179,48 @@ private fun HistoryListItem(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.LightGray)
+                    .background(Color.LightGray),
             )
         }
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
                 .background(MaterialTheme.colors.background)
                 .clickable { onAction(HistoryAction.NavToReader(history)) }
-                .padding(horizontal = 8.dp),
+                .height(92.dp)
+                .padding(horizontal = 8.dp, vertical = 2.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             MangaCover(
                 cover = history.cover,
                 modifier = Modifier
-                    .height(92.dp)
-                    .padding(vertical = 2.dp)
-                    .clickable { onAction(HistoryAction.NavToGallery(history)) }
+                    .fillMaxHeight()
+                    .clickable { onAction(HistoryAction.NavToGallery(history)) },
             )
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
                 Text(
                     text = history.title ?: history.mangaId,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
-                    style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium)
+                    style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
                 )
+
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     ProvideTextStyle(value = MaterialTheme.typography.body2) {
                         val seen = listOf(
                             history.collectionId,
                             history.chapterName,
-                            stringResource(R.string.history_page_n, history.page + 1)
-                        ).filter { it.isNotBlank() }.joinToString("-")
-                        Text(text = seen)
+                        ).filter { it.isNotBlank() }.joinToString(" ")
+                        Text(
+                            text = seen,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                        )
 
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             val time = history.date.toLocalTime()

@@ -4,25 +4,25 @@ import android.graphics.drawable.Drawable
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
+import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.network.model.MangaDetailDto
 import com.fishhawk.lisu.data.network.model.MangaState
 import com.fishhawk.lisu.ui.base.OnEvent
@@ -30,12 +30,9 @@ import com.fishhawk.lisu.ui.main.*
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.util.*
-import com.fishhawk.lisu.widget.LisuToolBar
-import com.fishhawk.lisu.widget.StateView
+import com.fishhawk.lisu.widget.*
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
-
-internal typealias GalleryActionHandler = (GalleryAction) -> Unit
 
 internal sealed interface GalleryAction {
     object NavUp : GalleryAction
@@ -94,7 +91,7 @@ fun GalleryScreen(navController: NavHostController) {
             }
         }
 
-    val onAction: GalleryActionHandler = { action ->
+    val onAction:  (GalleryAction) -> Unit = { action ->
         when (action) {
             GalleryAction.NavUp ->
                 navController.navigateUp()
@@ -162,7 +159,7 @@ fun GalleryScreen(navController: NavHostController) {
     }
 
     LisuTransition {
-        val scrollState = rememberScrollState()
+        val scrollState = rememberLazyListState()
         MangaDetail(
             state = state,
             providerId = providerId,
@@ -188,40 +185,43 @@ fun GalleryScreen(navController: NavHostController) {
 private fun ToolBar(
     state: MangaState,
     title: String,
-    scrollState: ScrollState,
-    onAction: GalleryActionHandler,
+    scrollState: LazyListState,
+    onAction:  (GalleryAction) -> Unit,
 ) {
-    val toolBarVisibleState = remember { MutableTransitionState(false) }
-    val mangaHeaderHeightPx = with(LocalDensity.current) { MangaHeaderHeight.toPx() }
-    toolBarVisibleState.targetState = scrollState.value > mangaHeaderHeightPx
+    val toolBarVisible by remember {
+        derivedStateOf { scrollState.firstVisibleItemIndex > 0 }
+    }
     AnimatedVisibility(
-        visibleState = toolBarVisibleState,
+        visible = toolBarVisible,
         enter = fadeIn(),
-        exit = fadeOut()
+        exit = fadeOut(),
     ) {
         LisuToolBar(
             title = title,
-            onNavUp = { onAction(GalleryAction.NavUp) }
+            onNavUp = { onAction(GalleryAction.NavUp) },
         ) {
             when (state) {
                 MangaState.Local -> {
                     IconButton(onClick = { onAction(GalleryAction.NavToEdit) }) {
-                        Icon(LisuIcons.Edit, stringResource(R.string.action_edit_manga))
+                        Icon(
+                            imageVector = LisuIcons.Edit,
+                            contentDescription = stringResource(R.string.action_edit_manga)
+                        )
                     }
                 }
                 MangaState.Remote -> {
                     IconButton(onClick = { onAction(GalleryAction.AddToLibrary) }) {
                         Icon(
-                            LisuIcons.FavoriteBorder,
-                            stringResource(R.string.action_add_to_library)
+                            imageVector = LisuIcons.FavoriteBorder,
+                            contentDescription = stringResource(R.string.action_add_to_library)
                         )
                     }
                 }
                 MangaState.RemoteInLibrary -> {
                     IconButton(onClick = { onAction(GalleryAction.RemoveFromLibrary) }) {
                         Icon(
-                            LisuIcons.Favorite,
-                            stringResource(R.string.action_remove_from_library)
+                            imageVector = LisuIcons.Favorite,
+                            contentDescription = stringResource(R.string.action_remove_from_library)
                         )
                     }
                 }
@@ -229,13 +229,16 @@ private fun ToolBar(
             if (state != MangaState.Local) {
                 IconButton(onClick = { onAction(GalleryAction.NavToComment) }) {
                     Icon(
-                        LisuIcons.Comment,
-                        "Comment"
+                        imageVector = LisuIcons.Comment,
+                        contentDescription = "Comment"
                     )
                 }
             }
             IconButton(onClick = { onAction(GalleryAction.Share) }) {
-                Icon(LisuIcons.Share, stringResource(R.string.action_share_manga))
+                Icon(
+                    imageVector = LisuIcons.Share,
+                    contentDescription = stringResource(R.string.action_share_manga),
+                )
             }
         }
     }
@@ -251,47 +254,61 @@ private fun MangaDetail(
     isFinished: Boolean?,
     detailResult: Result<MangaDetailDto>?,
     history: ReadingHistory?,
-    scrollState: ScrollState,
-    onAction: GalleryActionHandler,
+    scrollState: LazyListState,
+    onAction:  (GalleryAction) -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
+    val mode by PR.chapterDisplayMode.collectAsState()
+    val order by PR.chapterDisplayOrder.collectAsState()
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        state = scrollState,
     ) {
-        MangaHeader(
-            state = state,
-            providerId = providerId,
-            cover = cover,
-            title = title,
-            authors = authors,
-            isFinished = isFinished,
-            history = history,
-            onAction = onAction,
-        )
-        StateView(
-            result = detailResult,
-            onRetry = { onAction(GalleryAction.Reload) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-        ) { detail ->
-            Column(
-                modifier = Modifier.padding(top = 16.dp, bottom = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (!detail.description.isNullOrBlank()) {
-                    MangaDescription(detail.description)
-                }
-                MangaTagGroups(
-                    detail.tags,
-                    onTagClick = { onAction(GalleryAction.NavToSearch(it)) },
-                    onTagLongClick = {
-                        onAction(GalleryAction.Copy(it, R.string.tag_copied))
+        item {
+            MangaHeader(
+                state = state,
+                providerId = providerId,
+                cover = cover,
+                title = title,
+                authors = authors,
+                isFinished = isFinished,
+                history = history,
+                onAction = onAction,
+            )
+        }
+
+        detailResult?.onSuccess { detail ->
+            item {
+                Column {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    if (!detail.description.isNullOrBlank()) {
+                        MangaDescription(detail.description)
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
-                )
-                MangaContent(detail, history, onAction)
+                    MangaTagGroups(
+                        detail.tags,
+                        onTagClick = { onAction(GalleryAction.NavToSearch(it)) },
+                        onTagLongClick = { onAction(GalleryAction.Copy(it, R.string.tag_copied)) },
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
+            mangaContent(
+                mode = mode,
+                order = order,
+                detail = detail,
+                history = history,
+                onAction = onAction,
+            )
+        }?.onFailure {
+            item {
+                ErrorView(
+                    throwable = it,
+                    onRetry = { onAction(GalleryAction.Reload) },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        } ?: item {
+            LoadingView(modifier = Modifier.fillMaxWidth())
         }
     }
 }

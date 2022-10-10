@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.ui.globalsearch
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -25,7 +26,6 @@ import com.fishhawk.lisu.widget.*
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 
-private typealias GlobalSearchActionHandler = (GlobalSearchAction) -> Unit
 
 private sealed interface GlobalSearchAction {
     object NavUp : GlobalSearchAction
@@ -45,7 +45,7 @@ fun GlobalSearchScreen(navController: NavHostController) {
     val suggestions by viewModel.suggestions.collectAsState()
     val searchRecordsResult by viewModel.searchRecordsResult.collectAsState()
 
-    val onAction: GlobalSearchActionHandler = { action ->
+    val onAction: (GlobalSearchAction) -> Unit = { action ->
         when (action) {
             GlobalSearchAction.NavUp -> navController.navigateUp()
             is GlobalSearchAction.NavToGallery ->
@@ -61,8 +61,23 @@ fun GlobalSearchScreen(navController: NavHostController) {
         }
     }
 
-    var editing by remember { mutableStateOf(viewModel.keywords.value.isBlank()) }
-    var editingKeywords by remember { mutableStateOf(viewModel.keywords.value) }
+    GlobalSearchScaffold(
+        keywords = keywords,
+        suggestions = suggestions,
+        searchRecordsResult = searchRecordsResult,
+        onAction = onAction,
+    )
+}
+
+@Composable
+private fun GlobalSearchScaffold(
+    keywords: String,
+    suggestions: List<String>,
+    searchRecordsResult: Result<List<SearchRecord>>?,
+    onAction: (GlobalSearchAction) -> Unit,
+) {
+    var editing by remember { mutableStateOf(keywords.isBlank()) }
+    var editingKeywords by remember { mutableStateOf(keywords) }
 
     Scaffold(
         topBar = {
@@ -93,13 +108,19 @@ fun GlobalSearchScreen(navController: NavHostController) {
         },
         content = { paddingValues ->
             LisuTransition {
-                SearchRecordList(
+                StateView(
+                    result = searchRecordsResult,
+                    onRetry = { onAction(GlobalSearchAction.ReloadProviders) },
                     modifier = Modifier
                         .padding(paddingValues)
                         .fillMaxSize(),
-                    searchRecordsResult = searchRecordsResult,
-                    onAction = onAction
-                )
+                ) { searchRecords, modifier ->
+                    SearchRecordList(
+                        searchRecords = searchRecords,
+                        onAction = onAction,
+                        modifier = modifier,
+                    )
+                }
                 SuggestionList(
                     visible = editing,
                     onDismiss = {
@@ -117,23 +138,17 @@ fun GlobalSearchScreen(navController: NavHostController) {
 
 @Composable
 private fun SearchRecordList(
-    searchRecordsResult: Result<List<SearchRecord>>?,
-    onAction: GlobalSearchActionHandler,
+    searchRecords: List<SearchRecord>,
+    onAction: (GlobalSearchAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    StateView(
+    LazyColumn(
         modifier = modifier,
-        result = searchRecordsResult,
-        onRetry = { onAction(GlobalSearchAction.ReloadProviders) },
-    ) { searchRecords, _ ->
-        LazyColumn(
-            modifier = modifier,
-            contentPadding = PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(searchRecords) {
-                SearchRecord(it, onAction)
-            }
+        contentPadding = PaddingValues(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(searchRecords) {
+            SearchRecord(it, onAction)
         }
     }
 }
@@ -141,7 +156,7 @@ private fun SearchRecordList(
 @Composable
 private fun SearchRecord(
     searchRecord: SearchRecord,
-    onAction: GlobalSearchActionHandler,
+    onAction: (GlobalSearchAction) -> Unit,
 ) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -162,52 +177,50 @@ private fun SearchRecord(
             }
         }
 
-        searchRecord.remoteList.value
-            ?.onSuccess { mangaList ->
-                if (mangaList.list.isEmpty()) NoResultFound()
-                else LazyRow(
-                    modifier = Modifier.height(140.dp),
+        searchRecord.remoteList.value?.onSuccess { mangaList ->
+            if (mangaList.list.isEmpty()) {
+                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    Text(
+                        text = "No result found.",
+                        style = MaterialTheme.typography.body2
+                    )
+                }
+            } else {
+                LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     items(mangaList.list) { manga ->
                         MangaCard(
                             manga = manga,
-                            onClick = { onAction(GlobalSearchAction.NavToGallery(it)) },
+                            modifier = Modifier
+                                .width(104.dp)
+                                .clickable { onAction(GlobalSearchAction.NavToGallery(manga)) },
                         )
                     }
                 }
             }
-            ?.onFailure { throwable ->
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                            Text(
-                                text = throwable.localizedMessage
-                                    ?: stringResource(R.string.unknown_error),
-                                style = MaterialTheme.typography.caption,
-                                maxLines = 3,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                    }
-                    TextButton(onClick = { onAction(GlobalSearchAction.Reload(searchRecord.provider.id)) }) {
-                        Text(text = stringResource(R.string.action_retry))
+        }?.onFailure { throwable ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Box(modifier = Modifier.weight(1f)) {
+                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                        Text(
+                            text = throwable.localizedMessage
+                                ?: stringResource(R.string.unknown_error),
+                            style = MaterialTheme.typography.caption,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis,
+                        )
                     }
                 }
+                TextButton(onClick = {
+                    onAction(GlobalSearchAction.Reload(searchRecord.provider.id))
+                }) {
+                    Text(text = stringResource(R.string.action_retry))
+                }
             }
-            ?: CircularProgressIndicator(modifier = Modifier.size(24.dp))
-    }
-}
-
-@Composable
-private fun NoResultFound() {
-    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-        Text(
-            text = "No result found.",
-            style = MaterialTheme.typography.body2
-        )
+        } ?: CircularProgressIndicator(modifier = Modifier.size(24.dp))
     }
 }

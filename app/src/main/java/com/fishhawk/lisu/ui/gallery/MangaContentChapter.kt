@@ -4,6 +4,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.Lock
@@ -31,36 +33,72 @@ import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.setNext
 import com.fishhawk.lisu.data.network.model.Chapter
 import com.fishhawk.lisu.ui.theme.LisuIcons
-import com.fishhawk.lisu.widget.VerticalGrid
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
-@Composable
-internal fun MangaContentCollections(
+internal fun LazyListScope.mangaContentCollections(
+    mode: ChapterDisplayMode,
+    order: ChapterDisplayOrder,
     collections: Map<String, List<Chapter>>,
     isMarked: (String, String) -> Boolean,
     onChapterClick: (String, String) -> Unit,
 ) {
-    MangaContentChapterHeader()
+    item { MangaContentChapterHeader() }
     collections.onEach { (collectionId, chapters) ->
         if (collectionId.isNotEmpty()) {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(2.dp),
-                text = collectionId,
-                style = MaterialTheme.typography.body2,
-                textAlign = TextAlign.Center
-            )
+            item {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(2.dp),
+                    text = collectionId,
+                    style = MaterialTheme.typography.body2,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
-        ChapterList(
-            chapters,
-            { isMarked(collectionId, it) },
-            { onChapterClick(collectionId, it) }
-        )
+
+        val orderedChapters = when (order) {
+            ChapterDisplayOrder.Ascend -> chapters
+            ChapterDisplayOrder.Descend -> chapters.reversed()
+        }
+        when (mode) {
+            ChapterDisplayMode.Grid -> {
+                items(orderedChapters.chunked(4)) { rowItems ->
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        rowItems.forEach { chapter ->
+                            ChapterGrid(
+                                chapter = chapter,
+                                isMarked = isMarked(collectionId, chapter.id),
+                                onChapterClick = { onChapterClick(collectionId, chapter.id) },
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                        repeat(4 - rowItems.size) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
+            ChapterDisplayMode.Linear -> {
+                items(orderedChapters) { chapter ->
+                    ChapterLinear(
+                        chapter = chapter,
+                        isMarked = isMarked(collectionId, chapter.id),
+                        onChapterClick = { onChapterClick(collectionId, chapter.id) },
+                    )
+                    if (chapter != orderedChapters.lastOrNull()) {
+                        Divider(color = MaterialTheme.colors.onSurface.copy(alpha = 0.06f))
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -92,57 +130,14 @@ private fun MangaContentChapterHeader() {
 }
 
 @Composable
-private fun ChapterList(
-    chapters: List<Chapter>,
-    isMarked: (String) -> Boolean,
-    onChapterClick: (String) -> Unit = {},
-) {
-    val mode by PR.chapterDisplayMode.collectAsState()
-    val order by PR.chapterDisplayOrder.collectAsState()
-    val orderedChapters = when (order) {
-        ChapterDisplayOrder.Ascend -> chapters
-        ChapterDisplayOrder.Descend -> chapters.reversed()
-    }
-    when (mode) {
-        ChapterDisplayMode.Grid -> ChapterListGrid(orderedChapters, isMarked, onChapterClick)
-        ChapterDisplayMode.Linear -> ChapterListLinear(orderedChapters, isMarked, onChapterClick)
-    }
-}
-
-@Composable
-private fun ChapterListGrid(
-    chapters: List<Chapter>,
-    isMarked: (String) -> Boolean,
-    onChapterClick: (String) -> Unit = {},
-) {
-    VerticalGrid(
-        items = chapters,
-        nColumns = 4,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) { _, it ->
-        Box(modifier = Modifier.weight(1f)) {
-            ChapterGrid(it, isMarked(it.id)) {
-                onChapterClick(it.id)
-            }
-        }
-    }
-}
-
-@Composable
 private fun ChapterGrid(
     chapter: Chapter,
     isMarked: Boolean,
-    onChapterClick: () -> Unit = {},
+    onChapterClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val isLocked = chapter.isLocked
 
-    val modifier =
-        if (isLocked) Modifier
-        else Modifier.clickable { onChapterClick() }
     val color = MaterialTheme.colors
         .run { if (isMarked) primary else surface }
         .let { if (isLocked) it.copy(alpha = ContentAlpha.disabled) else it }
@@ -157,7 +152,7 @@ private fun ChapterGrid(
         .let { if (isLocked) it.copy(alpha = ContentAlpha.disabled) else it }
 
     Surface(
-        modifier = modifier,
+        modifier = if (isLocked) modifier else modifier.clickable { onChapterClick() },
         shape = RectangleShape,
         color = color,
         border = border,
@@ -193,24 +188,6 @@ private fun ChapterGrid(
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center
             )
-        }
-    }
-}
-
-@Composable
-private fun ChapterListLinear(
-    chapters: List<Chapter>,
-    isMarked: (String) -> Boolean,
-    onChapterClick: (String) -> Unit = {},
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        chapters.onEach {
-            ChapterLinear(it, isMarked(it.id)) {
-                onChapterClick(it.id)
-            }
-            if (it != chapters.lastOrNull()) {
-                Divider(color = MaterialTheme.colors.onSurface.copy(alpha = 0.06f))
-            }
         }
     }
 }

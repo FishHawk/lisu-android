@@ -18,7 +18,7 @@ import com.fishhawk.lisu.util.toast
 
 internal class GalleryCoverSheet(
     private val drawable: Drawable?,
-    private val onAction: GalleryActionHandler
+    private val onAction: (GalleryAction) -> Unit,
 ) : BottomSheet() {
     @Composable
     override fun Content() {
@@ -30,7 +30,7 @@ internal class GalleryCoverSheet(
 @Composable
 private fun GalleryCoverSheetContent(
     cover: Drawable?,
-    onAction: GalleryActionHandler
+    onAction: (GalleryAction) -> Unit,
 ) {
     val context = LocalContext.current
     Column(modifier = Modifier.fillMaxWidth()) {

@@ -23,6 +23,7 @@ import androidx.navigation.NavHostController
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.collectAsState
+import com.fishhawk.lisu.data.network.base.PagedList
 import com.fishhawk.lisu.data.network.model.MangaDto
 import com.fishhawk.lisu.data.network.model.MangaKeyDto
 import com.fishhawk.lisu.ui.base.OnEvent
@@ -32,8 +33,6 @@ import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.*
 import org.koin.androidx.compose.viewModel
-
-private typealias LibraryActionHandler = (LibraryAction) -> Unit
 
 private sealed interface LibraryAction {
     data class NavToGallery(val manga: MangaDto) : LibraryAction
@@ -53,7 +52,7 @@ fun LibraryScreen(navController: NavHostController) {
     val mangaListResult by viewModel.mangas.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-    val onAction: LibraryActionHandler = { action ->
+    val onAction: (LibraryAction) -> Unit = { action ->
         when (action) {
             is LibraryAction.NavToGallery -> navController.navToGallery(action.manga)
             is LibraryAction.Search -> viewModel.search(action.keywords)
@@ -79,6 +78,23 @@ fun LibraryScreen(navController: NavHostController) {
         }
     }
 
+    LibraryScaffold(
+        keywords = keywords,
+        suggestions = suggestions,
+        isRefreshing = isRefreshing,
+        mangaListResult = mangaListResult,
+        onAction = onAction,
+    )
+}
+
+@Composable
+private fun LibraryScaffold(
+    keywords: String,
+    suggestions: List<String>,
+    isRefreshing: Boolean,
+    mangaListResult: Result<PagedList<MangaDto>>?,
+    onAction: (LibraryAction) -> Unit,
+) {
     var editingKeywords by remember { mutableStateOf(keywords) }
     var editing by remember { mutableStateOf(false) }
     val selectedMangaList = remember { mutableStateListOf<MangaKeyDto>() }
@@ -175,7 +191,7 @@ fun LibraryScreen(navController: NavHostController) {
 @Composable
 private fun SelectingToolBar(
     selectedMangaList: SnapshotStateList<MangaKeyDto>,
-    onAction: LibraryActionHandler,
+    onAction: (LibraryAction) -> Unit,
 ) {
     var isOpen by remember { mutableStateOf(false) }
     if (isOpen) {

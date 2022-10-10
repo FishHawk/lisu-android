@@ -36,8 +36,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 
-internal typealias ReaderActionHandler = (ReaderAction) -> Unit
-
 sealed interface ReaderAction {
     object NavUp : ReaderAction
 
@@ -71,7 +69,7 @@ fun ReaderScreen() {
     val readerOrientation by viewModel.readerOrientation.collectAsState()
     val pointer by viewModel.chapterPointer.collectAsState()
 
-    val onAction: ReaderActionHandler = { action ->
+    val onAction: (ReaderAction) -> Unit = { action ->
         when (action) {
             ReaderAction.NavUp -> context.findActivity().finish()
             ReaderAction.ReloadManga -> viewModel.reloadManga()
@@ -142,7 +140,7 @@ private fun Reader(
     readerMode: ReaderMode,
     mangaTitle: String,
     isOnlyOneChapter: Boolean,
-    onAction: ReaderActionHandler,
+    onAction: (ReaderAction) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         val viewerStateResult = pages?.mapCatching { pages ->
@@ -247,7 +245,7 @@ private fun Reader(
 private fun ReaderPages(
     viewerState: ViewerState,
     isMenuOpened: MutableState<Boolean>,
-    onAction: ReaderActionHandler,
+    onAction: (ReaderAction) -> Unit,
 ) {
     val context = LocalContext.current
 

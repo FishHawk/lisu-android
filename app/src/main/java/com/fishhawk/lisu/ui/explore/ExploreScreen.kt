@@ -1,9 +1,7 @@
 package com.fishhawk.lisu.ui.explore
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavHostController
@@ -35,13 +34,10 @@ import com.fishhawk.lisu.ui.main.*
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.widget.*
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.viewModel
 import java.util.*
 
-internal typealias ExploreActionHandler = (ExploreAction) -> Unit
-
-internal sealed interface ExploreAction {
+private sealed interface ExploreAction {
     object NavToGlobalSearch : ExploreAction
     data class NavToProvider(val providerId: String, val boardId: BoardId) : ExploreAction
     data class NavToLoginWebsite(val providerId: String) : ExploreAction
@@ -60,7 +56,7 @@ fun ExploreScreen(navController: NavHostController) {
     val providersResult by viewModel.providersLoadState.collectAsState()
     val lastUsedProvider by viewModel.lastUsedProvider.collectAsState()
 
-    val onAction: ExploreActionHandler = { action ->
+    val onAction: (ExploreAction) -> Unit = { action ->
         when (action) {
             ExploreAction.NavToGlobalSearch ->
                 navController.navToGlobalSearch()
@@ -79,6 +75,19 @@ fun ExploreScreen(navController: NavHostController) {
         }
     }
 
+    ExploreScaffold(
+        providersResult = providersResult,
+        lastUsedProvider = lastUsedProvider,
+        onAction = onAction,
+    )
+}
+
+@Composable
+private fun ExploreScaffold(
+    providersResult: Result<Map<String, List<ProviderDto>>>?,
+    lastUsedProvider: ProviderDto?,
+    onAction: (ExploreAction) -> Unit,
+) {
     Scaffold(
         topBar = {
             LisuToolBar(title = stringResource(R.string.label_explore)) {
@@ -99,21 +108,34 @@ fun ExploreScreen(navController: NavHostController) {
                     if (providers.isEmpty()) {
                         EmptyView(modifier = modifier)
                     } else {
-                        LazyColumn {
-                            lastUsedProvider?.let {
-                                item { ProviderListHeader(stringResource(R.string.explore_last_used)) }
-                                item { ProviderListItem(it, onAction) }
-                            }
-                            providers.forEach { (lang, list) ->
-                                item { ProviderListHeader(Locale(lang).displayLanguage) }
-                                items(list) { ProviderListItem(it, onAction) }
-                            }
-                        }
+                        ProviderList(
+                            providers = providers,
+                            lastUsedProvider = lastUsedProvider,
+                            onAction = onAction,
+                        )
                     }
                 }
             }
         }
     )
+}
+
+@Composable
+private fun ProviderList(
+    providers: Map<String, List<ProviderDto>>,
+    lastUsedProvider: ProviderDto?,
+    onAction: (ExploreAction) -> Unit,
+) {
+    LazyColumn {
+        lastUsedProvider?.let {
+            item { ProviderListHeader(stringResource(R.string.explore_last_used)) }
+            item { ProviderListItem(it, onAction) }
+        }
+        providers.forEach { (lang, list) ->
+            item { ProviderListHeader(Locale(lang).displayLanguage) }
+            items(list) { ProviderListItem(it, onAction) }
+        }
+    }
 }
 
 @Composable
@@ -127,37 +149,31 @@ private fun ProviderListHeader(label: String) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ProviderListItem(
     provider: ProviderDto,
-    onAction: ExploreActionHandler,
+    onAction: (ExploreAction) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
-    val bottomSheetHelper = LocalBottomSheetHelper.current
-
     ListItem(
-        modifier = Modifier.combinedClickable(
-            onClick = {
-                if (provider.boardModels.containsKey(BoardId.Main)) {
-                    onAction(ExploreAction.NavToProvider(provider.id, BoardId.Main))
-                }
-            },
-            onLongClick = {
-                val sheet = ExploreSheet(provider, onAction)
-                scope.launch { bottomSheetHelper.open(sheet) }
-            },
-        ),
+        modifier = Modifier.clickable {
+            if (provider.boardModels.containsKey(BoardId.Main)) {
+                onAction(ExploreAction.NavToProvider(provider.id, BoardId.Main))
+            }
+        },
         icon = {
             val painter =
-                if (provider.lang == "local") rememberVectorPainter(LisuIcons.LocalLibrary)
-                else rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(provider.icon)
-                        .size(Size.ORIGINAL)
-                        .crossfade(true)
-                        .build()
-                )
+                if (provider.lang == "local") {
+                    rememberVectorPainter(LisuIcons.LocalLibrary)
+                } else {
+                    rememberAsyncImagePainter(
+                        ImageRequest.Builder(LocalContext.current)
+                            .data(provider.icon)
+                            .size(Size.ORIGINAL)
+                            .crossfade(true)
+                            .build()
+                    )
+                }
             Surface(
                 shape = RoundedCornerShape(4.dp),
                 elevation = 2.dp,
@@ -169,7 +185,13 @@ private fun ProviderListItem(
                 )
             }
         },
-        text = { OneLineText(text = provider.id) },
+        text = {
+            Text(
+                text = provider.id,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
         secondaryText = {
             Text(
                 text = buildAnnotatedString {
@@ -206,21 +228,49 @@ private fun ProviderListItem(
             )
         },
         trailing = {
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                provider.boardModels.forEach { (boardId, _) ->
-                    val icon = when (boardId) {
-                        BoardId.Search -> LisuIcons.Search
-                        BoardId.Rank -> LisuIcons.FormatListNumbered
+            OverflowMenuButton {
+                provider.boardModels.keys.forEach { boardId ->
+                    val text = when (boardId) {
+                        BoardId.Search -> "Search"
+                        BoardId.Rank -> "Rank"
                         else -> return@forEach
                     }
-                    Icon(
-                        icon,
-                        stringResource(R.string.action_search),
-                        modifier = Modifier.clickable {
+                    DropdownMenuItem(
+                        onClick = {
                             onAction(ExploreAction.NavToProvider(provider.id, boardId))
                             PR.lastUsedProvider.setBlocking(provider.id)
                         },
-                    )
+                    ) {
+                        Text(text)
+                    }
+                }
+
+                provider.cookiesLogin?.let {
+                    DropdownMenuItem(onClick = {
+                        onAction(ExploreAction.NavToLoginWebsite(provider.id))
+                    }) {
+                        Text("Login by website")
+                    }
+
+                    DropdownMenuItem(onClick = {
+                        onAction(ExploreAction.NavToLoginCookies(provider.id))
+                    }) {
+                        Text("Login by cookies")
+                    }
+                }
+                if (provider.passwordLogin) {
+                    DropdownMenuItem(onClick = {
+                        onAction(ExploreAction.NavToLoginPassword(provider.id))
+                    }) {
+                        Text("Login by passwords")
+                    }
+                }
+                if (provider.cookiesLogin != null || provider.passwordLogin) {
+                    DropdownMenuItem(onClick = {
+                        onAction(ExploreAction.Logout(provider))
+                    }) {
+                        Text("Logout")
+                    }
                 }
             }
         },

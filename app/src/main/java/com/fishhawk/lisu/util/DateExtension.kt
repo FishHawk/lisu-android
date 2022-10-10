@@ -17,7 +17,7 @@ fun Long.toLocalDate(): LocalDate =
     Instant.ofEpochSecond(this).atZone(ZoneId.systemDefault()).toLocalDate()
 
 @Composable
-fun LocalDateTime.toDisplayString(): String {
+fun LocalDateTime.readableString(): String {
     val now = LocalDateTime.now()
     val days = ChronoUnit.DAYS.between(this, now)
     return when {
@@ -39,7 +39,7 @@ fun LocalDateTime.toDisplayString(): String {
 }
 
 @Composable
-fun LocalDate.toDisplayString(): String {
+fun LocalDate.readableString(): String {
     val now = LocalDate.now()
     val days = ChronoUnit.DAYS.between(this, now)
     return when {

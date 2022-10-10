@@ -17,8 +17,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.navigation.NavHostController
+import com.fishhawk.lisu.data.network.base.PagedList
 import com.fishhawk.lisu.data.network.model.CommentDto
-import com.fishhawk.lisu.util.toDisplayString
+import com.fishhawk.lisu.util.readableString
 import com.fishhawk.lisu.util.toLocalDateTime
 import com.fishhawk.lisu.widget.ErrorItem
 import com.fishhawk.lisu.widget.LisuToolBar
@@ -26,9 +27,7 @@ import com.fishhawk.lisu.widget.LoadingItem
 import com.fishhawk.lisu.widget.StateView
 import org.koin.androidx.compose.viewModel
 
-internal typealias GalleryCommentActionHandler = (GalleryCommentAction) -> Unit
-
-internal sealed interface GalleryCommentAction {
+private sealed interface GalleryCommentAction {
     object NavUp : GalleryCommentAction
     object Reload : GalleryCommentAction
     object RequestNextPage : GalleryCommentAction
@@ -41,7 +40,7 @@ fun GalleryCommentScreen(navController: NavHostController) {
     )
     val commentList by viewModel.comments.collectAsState()
 
-    val onAction: GalleryCommentActionHandler = { action ->
+    val onAction: (GalleryCommentAction) -> Unit = { action ->
         when (action) {
             GalleryCommentAction.NavUp ->
                 navController.navigateUp()
@@ -52,6 +51,17 @@ fun GalleryCommentScreen(navController: NavHostController) {
         }
     }
 
+    GalleryCommentScaffold(
+        commentList = commentList,
+        onAction = onAction,
+    )
+}
+
+@Composable
+private fun GalleryCommentScaffold(
+    commentList: Result<PagedList<CommentDto>>?,
+    onAction: (GalleryCommentAction) -> Unit,
+) {
     Scaffold(
         topBar = {
             LisuToolBar(
@@ -67,26 +77,34 @@ fun GalleryCommentScreen(navController: NavHostController) {
                     .padding(paddingValues)
                     .fillMaxSize(),
             ) { commentList ->
-                var maxAccessed by rememberSaveable { mutableStateOf(0) }
-                LazyColumn {
-                    itemsIndexed(commentList.list) { index, it ->
-                        if (index > maxAccessed) {
-                            maxAccessed = index
-                            if (
-                                commentList.appendState?.isSuccess == true &&
-                                maxAccessed < commentList.list.size + 30
-                            ) onAction(GalleryCommentAction.RequestNextPage)
-                        }
-                        CommentWithSubComments(comment = it)
-                        Divider(color = MaterialTheme.colors.onSurface.copy(alpha = 0.06f))
-                    }
-                    commentList.appendState
-                        ?.onFailure { item { ErrorItem(it) { onAction(GalleryCommentAction.RequestNextPage) } } }
-                        ?: item { LoadingItem() }
-                }
+                CommentList(commentList, onAction)
             }
         }
     )
+}
+
+@Composable
+private fun CommentList(
+    commentList: PagedList<CommentDto>,
+    onAction: (GalleryCommentAction) -> Unit,
+) {
+    var maxAccessed by rememberSaveable { mutableStateOf(0) }
+    LazyColumn {
+        itemsIndexed(commentList.list) { index, it ->
+            if (index > maxAccessed) {
+                maxAccessed = index
+                if (
+                    commentList.appendState?.isSuccess == true &&
+                    maxAccessed < commentList.list.size + 30
+                ) onAction(GalleryCommentAction.RequestNextPage)
+            }
+            CommentWithSubComments(comment = it)
+            Divider(color = MaterialTheme.colors.onSurface.copy(alpha = 0.06f))
+        }
+        commentList.appendState
+            ?.onFailure { item { ErrorItem(it) { onAction(GalleryCommentAction.RequestNextPage) } } }
+            ?: item { LoadingItem() }
+    }
 }
 
 @Composable
@@ -129,7 +147,7 @@ private fun Comment(
             ) {
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     Text(text = comment.username)
-                    comment.createTime?.toLocalDateTime()?.toDisplayString()?.let {
+                    comment.createTime?.toLocalDateTime()?.readableString()?.let {
                         Text(text = it)
                     }
                 }

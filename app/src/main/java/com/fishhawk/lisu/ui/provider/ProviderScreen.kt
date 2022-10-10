@@ -37,9 +37,7 @@ import com.google.accompanist.flowlayout.FlowRow
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 
-internal typealias ProviderActionHandler = (ProviderAction) -> Unit
-
-internal sealed interface ProviderAction {
+private sealed interface ProviderAction {
     object NavUp : ProviderAction
     data class NavToGallery(val manga: MangaDto) : ProviderAction
 
@@ -71,7 +69,7 @@ fun ProviderScreen(navController: NavHostController) {
     val board = viewModel.board.collectAsState().value ?: return
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-    val onAction: ProviderActionHandler = { action ->
+    val onAction: (ProviderAction) -> Unit = { action ->
         when (action) {
             ProviderAction.NavUp ->
                 navController.navigateUp()
@@ -113,10 +111,33 @@ fun ProviderScreen(navController: NavHostController) {
         }
     }
 
+    ProviderScaffold(
+        providerId = providerId,
+        boardId = boardId,
+        keywords = keywords,
+        suggestions = suggestions,
+        hasSearchBar = hasSearchBar,
+        hasAdvanceFilters = hasAdvanceFilters,
+        isRefreshing = isRefreshing,
+        board = board,
+        onAction = onAction,
+    )
+}
+
+@Composable
+private fun ProviderScaffold(
+    providerId: String,
+    boardId: BoardId,
+    keywords: String,
+    suggestions: List<String>,
+    hasSearchBar: Boolean,
+    hasAdvanceFilters: Boolean,
+    isRefreshing: Boolean,
+    board: Board,
+    onAction: (ProviderAction) -> Unit,
+) {
     var editingKeywords by remember { mutableStateOf(keywords) }
-    var editing by remember {
-        mutableStateOf(boardId == BoardId.Search && viewModel.keywords.value.isBlank())
-    }
+    var editing by remember { mutableStateOf(boardId == BoardId.Search && keywords.isBlank()) }
 
     var showAdvanceFilterList by remember { mutableStateOf(false) }
 
@@ -231,7 +252,7 @@ private fun ProviderMangaList(
     board: Board,
     isRefreshing: Boolean,
     onCardLongClick: (manga: MangaDto) -> Unit,
-    onAction: ProviderActionHandler,
+    onAction: (ProviderAction) -> Unit,
 ) {
     Column {
         board.filterValues.base.forEach { (name, filterValue) ->
@@ -271,7 +292,7 @@ private fun FilterSelectBase(
     name: String,
     model: FilterModel.Select,
     value: Int,
-    onAction: ProviderActionHandler,
+    onAction: (ProviderAction) -> Unit,
 ) {
     FlowRow(mainAxisSpacing = 4.dp, crossAxisSpacing = 2.dp) {
         model.options.mapIndexed { index, text ->
@@ -293,7 +314,7 @@ private fun FilterSelectBase(
 private fun ProviderFilterList(
     filters: BoardFilterValue,
     onBack: () -> Unit,
-    onAction: ProviderActionHandler,
+    onAction: (ProviderAction) -> Unit,
 ) {
     val tempFilterValues = remember(filters) {
         mutableStateMapOf<String, Any>().apply {
