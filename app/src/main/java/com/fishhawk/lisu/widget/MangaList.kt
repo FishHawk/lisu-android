@@ -1,6 +1,9 @@
 package com.fishhawk.lisu.widget
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -12,11 +15,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -29,7 +30,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.fishhawk.lisu.data.network.base.PagedList
 import com.fishhawk.lisu.data.network.model.MangaDto
-import com.fishhawk.lisu.data.network.model.MangaKeyDto
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.fade
 import com.google.accompanist.placeholder.material.placeholder
@@ -45,8 +45,8 @@ fun RefreshableMangaList(
     onRequestNextPage: () -> Unit,
     onCardClick: (manga: MangaDto) -> Unit,
     onCardLongClick: (manga: MangaDto) -> Unit,
-    selectedMangaList: SnapshotStateList<MangaKeyDto>? = null,
-    decorator: @Composable BoxScope.(manga: MangaDto?) -> Unit = {},
+    aboveCover: @Composable BoxScope.(manga: MangaDto) -> Unit = {},
+    behindCover: @Composable BoxScope.(manga: MangaDto) -> Unit = {},
 ) {
     var maxAccessed by rememberSaveable { mutableStateOf(0) }
     var hasRefreshed by rememberSaveable { mutableStateOf(false) }
@@ -78,15 +78,15 @@ fun RefreshableMangaList(
                     ) onRequestNextPage()
                 }
                 Box {
+                    behindCover(manga)
                     MangaCard(
                         manga = manga,
-                        selected = selectedMangaList?.contains(manga.key) ?: false,
                         modifier = Modifier.combinedClickable(
                             onClick = { onCardClick(manga) },
                             onLongClick = { onCardLongClick(manga) },
                         )
                     )
-                    decorator(manga)
+                    aboveCover(manga)
                 }
             }
 
@@ -101,16 +101,12 @@ fun RefreshableMangaList(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MangaCard(
     manga: MangaDto,
-    selected: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        modifier = modifier
-    ) {
+    Card(modifier = modifier) {
         Box {
             MangaCover(manga.cover)
 
@@ -139,17 +135,6 @@ fun MangaCard(
                 overflow = TextOverflow.Ellipsis,
                 style = textStyle,
             )
-
-            if (selected) {
-                val color = MaterialTheme.colors.primary.copy(alpha = 0.3f)
-                Canvas(modifier = Modifier.matchParentSize()) {
-                    drawRect(
-                        color = color,
-                        size = size,
-                        blendMode = BlendMode.SrcOver,
-                    )
-                }
-            }
         }
     }
 }

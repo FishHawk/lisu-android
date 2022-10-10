@@ -275,8 +275,8 @@ private fun ProviderMangaList(
                 isRefreshing = isRefreshing,
                 onRefresh = { onAction(ProviderAction.Refresh) },
                 onRequestNextPage = { onAction(ProviderAction.RequestNextPage) },
-                decorator = {
-                    if (it != null && it.state == MangaState.RemoteInLibrary) {
+                aboveCover = {
+                    if (it.state == MangaState.RemoteInLibrary) {
                         MangaBadge(text = "in library")
                     }
                 },

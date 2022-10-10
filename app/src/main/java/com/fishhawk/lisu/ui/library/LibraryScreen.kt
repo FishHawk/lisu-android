@@ -4,18 +4,19 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.Casino
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -141,7 +142,6 @@ private fun LibraryScaffold(
                         isRefreshing = isRefreshing,
                         onRefresh = { onAction(LibraryAction.Refresh) },
                         onRequestNextPage = { onAction(LibraryAction.RequestNextPage) },
-                        selectedMangaList = selectedMangaList,
                         onCardClick = {
                             if (selectedMangaList.isEmpty()) {
                                 onAction(LibraryAction.NavToGallery(it))
@@ -168,6 +168,34 @@ private fun LibraryScaffold(
                                 }
                                 selectedMangaList.removeIf { pendingList.contains(it) }
                                 selectedMangaList.addAll(pendingList)
+                            }
+                        },
+                        aboveCover = { manga ->
+                            if (selectedMangaList.contains(manga.key)) {
+                                val color = MaterialTheme.colors.primary.copy(alpha = 0.3f)
+                                Canvas(modifier = Modifier.matchParentSize()) {
+                                    drawRoundRect(
+                                        color = color,
+                                        cornerRadius = CornerRadius(4.dp.toPx()),
+                                    )
+                                }
+                            }
+                        },
+                        behindCover = { manga ->
+                            if (selectedMangaList.contains(manga.key)) {
+                                val color = MaterialTheme.colors.primary.copy(alpha = 0.7f)
+                                val boardSize = 8f
+                                Canvas(modifier = Modifier.matchParentSize()) {
+                                    drawRoundRect(
+                                        color = color,
+                                        topLeft = Offset(-boardSize, -boardSize),
+                                        size = Size(
+                                            size.width + 2 * boardSize,
+                                            size.height + 2 * boardSize,
+                                        ),
+                                        cornerRadius = CornerRadius(4.dp.toPx()),
+                                    )
+                                }
                             }
                         }
                     )
