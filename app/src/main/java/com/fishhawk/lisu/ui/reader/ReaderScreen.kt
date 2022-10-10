@@ -13,6 +13,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalContext
+import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
 import coil.memory.MemoryCache
 import coil.request.ImageRequest
@@ -23,10 +24,7 @@ import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.ui.reader.viewer.PagerViewer
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
 import com.fishhawk.lisu.ui.reader.viewer.WebtoonViewer
-import com.fishhawk.lisu.util.findActivity
-import com.fishhawk.lisu.util.saveImage
-import com.fishhawk.lisu.util.shareImage
-import com.fishhawk.lisu.util.toast
+import com.fishhawk.lisu.util.*
 import com.fishhawk.lisu.widget.LocalBottomSheetHelper
 import com.fishhawk.lisu.widget.StateView
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -35,6 +33,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
+import java.io.File
 
 sealed interface ReaderAction {
     object NavUp : ReaderAction
@@ -42,9 +41,12 @@ sealed interface ReaderAction {
     object ReloadManga : ReaderAction
     object ReloadChapter : ReaderAction
 
-    data class SetAsImage(val bitmap: Bitmap) : ReaderAction
+    data class SetAsCover(val bitmap: Bitmap) : ReaderAction
     data class SavePage(val bitmap: Bitmap, val position: Int) : ReaderAction
     data class SharePage(val bitmap: Bitmap, val position: Int) : ReaderAction
+
+    data class SaveGifPage(val file: File, val position: Int) : ReaderAction
+    data class ShareGifPage(val file: File, val position: Int) : ReaderAction
 
     object OpenPrevChapter : ReaderAction
     object OpenNextChapter : ReaderAction
@@ -74,16 +76,26 @@ fun ReaderScreen() {
             ReaderAction.NavUp -> context.findActivity().finish()
             ReaderAction.ReloadManga -> viewModel.reloadManga()
             ReaderAction.ReloadChapter -> viewModel.loadChapterPointer()
-            is ReaderAction.SetAsImage -> viewModel.updateCover(action.bitmap)
-            is ReaderAction.SavePage -> context.saveImage(
+            is ReaderAction.SetAsCover -> viewModel.updateCover(action.bitmap)
+            is ReaderAction.SavePage -> context.saveDrawable(
                 action.bitmap,
                 "${mangaTitleResult?.getOrNull()!!}-${action.position}"
             )
-            is ReaderAction.SharePage -> context.shareImage(
+            is ReaderAction.SharePage -> context.shareBitmap(
                 "Share page via",
                 action.bitmap,
                 "${mangaTitleResult?.getOrNull()!!}-${action.position}"
             )
+            is ReaderAction.SaveGifPage -> context.saveGifFile(
+                action.file,
+                "${mangaTitleResult?.getOrNull()!!}-${action.position}"
+            )
+            is ReaderAction.ShareGifPage -> context.shareGifFile(
+                "Share page via",
+                action.file,
+                "${mangaTitleResult?.getOrNull()!!}-${action.position}"
+            )
+
             ReaderAction.OpenPrevChapter -> viewModel.openPrevChapter()
             ReaderAction.OpenNextChapter -> viewModel.openNextChapter()
             ReaderAction.MoveToPrevChapter -> viewModel.moveToPrevChapter()
@@ -240,7 +252,7 @@ private fun Reader(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalCoilApi::class)
 @Composable
 private fun ReaderPages(
     viewerState: ViewerState,
@@ -254,9 +266,14 @@ private fun ReaderPages(
     val bottomSheetHelper = LocalBottomSheetHelper.current
     val onLongPress = { page: ReaderPage.Image ->
         if (isLongTapDialogEnabled) {
-            val bitmap = context.imageLoader.memoryCache?.get(MemoryCache.Key(page.url))?.bitmap
-            if (bitmap != null) {
-                val sheet = ReaderPageSheet(bitmap, page.index + 1, onAction)
+            context.imageLoader.memoryCache?.get(MemoryCache.Key(page.url))?.let {
+                // Image types other than gif
+                val sheet = ReaderPageSheet(it.bitmap, page.index + 1, onAction)
+                scope.launch { bottomSheetHelper.open(sheet) }
+            } ?: context.imageLoader.diskCache?.get(page.url)?.use { snapshot ->
+                // Gif
+                val imageFile = snapshot.data.toFile()
+                val sheet = ReaderPageGifSheet(imageFile, page.index + 1, onAction)
                 scope.launch { bottomSheetHelper.open(sheet) }
             }
         }

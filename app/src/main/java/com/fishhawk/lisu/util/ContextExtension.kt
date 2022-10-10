@@ -19,6 +19,7 @@ import com.fishhawk.lisu.ui.base.BaseActivity
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
 
 fun Context.findActivity(): Activity {
     var context = this
@@ -46,12 +47,16 @@ fun Context.openWebPage(url: String) {
     }
 }
 
-fun Context.saveImage(image: Bitmap, filename: String) {
+private fun Context.saveImage(
+    filename: String,
+    type: String,
+    onSave: (OutputStream) -> Unit,
+) {
     try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val contentValues = ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
-                put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
+                put(MediaStore.MediaColumns.MIME_TYPE, type)
                 put(
                     MediaStore.MediaColumns.RELATIVE_PATH,
                     Environment.DIRECTORY_PICTURES + File.separator + "Lisu"
@@ -70,11 +75,10 @@ fun Context.saveImage(image: Bitmap, filename: String) {
                 "Lisu"
             )
             if (!imagesDir.exists()) imagesDir.mkdirs()
-            val imageFile = File(imagesDir, "$filename.png")
+            val imageFile = File(imagesDir, "$filename.gif")
             FileOutputStream(imageFile)
         }?.use {
-            if (!image.compress(CompressFormat.PNG, 100, it))
-                throw IOException("Failed to save bitmap.")
+            onSave(it)
             toast(R.string.image_saved)
         } ?: throw IOException("Failed to open output stream.")
     } catch (e: Throwable) {
@@ -82,8 +86,21 @@ fun Context.saveImage(image: Bitmap, filename: String) {
     }
 }
 
-fun Context.saveImage(image: Drawable, filename: String) {
-    saveImage(image.toBitmap(), filename)
+fun Context.saveGifFile(file: File, filename: String) {
+    saveImage(filename, "image/gif") {
+        file.inputStream().copyTo(it)
+    }
+}
+
+fun Context.saveDrawable(image: Bitmap, filename: String) {
+    saveImage(filename, "image/gif") {
+        if (!image.compress(CompressFormat.PNG, 100, it))
+            throw IOException("Failed to save bitmap.")
+    }
+}
+
+fun Context.saveDrawable(image: Drawable, filename: String) {
+    saveDrawable(image.toBitmap(), filename)
 }
 
 fun Context.shareText(title: String, text: String) {
@@ -95,7 +112,17 @@ fun Context.shareText(title: String, text: String) {
     startActivity(Intent.createChooser(shareIntent, title))
 }
 
-fun Context.shareImage(title: String, image: Bitmap, filename: String) {
+fun Context.shareGifFile(title: String, file: File, filename: String) {
+    val uri = file.toUriCompat(this)
+    val shareIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        type = "image/gif"
+        putExtra(Intent.EXTRA_STREAM, uri)
+    }
+    startActivity(Intent.createChooser(shareIntent, title))
+}
+
+fun Context.shareBitmap(title: String, image: Bitmap, filename: String) {
     val file = try {
         val outputFile = File(cacheDir, "$filename.png")
         val outPutStream = FileOutputStream(outputFile)
@@ -115,8 +142,8 @@ fun Context.shareImage(title: String, image: Bitmap, filename: String) {
     startActivity(Intent.createChooser(shareIntent, title))
 }
 
-fun Context.shareImage(title: String, image: Drawable, filename: String) {
-    shareImage(title, image.toBitmap(), filename)
+fun Context.shareDrawable(title: String, image: Drawable, filename: String) {
+    shareBitmap(title, image.toBitmap(), filename)
 }
 
 fun Context.toast(message: String) {

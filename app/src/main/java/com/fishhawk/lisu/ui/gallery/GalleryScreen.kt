@@ -110,9 +110,9 @@ fun GalleryScreen(navController: NavHostController) {
             }
 
             is GalleryAction.SaveCover ->
-                context.saveImage(action.cover, "$title-cover")
+                context.saveDrawable(action.cover, "$title-cover")
             is GalleryAction.ShareCover ->
-                context.shareImage("Share cover via", action.cover, "$title-cover")
+                context.shareDrawable("Share cover via", action.cover, "$title-cover")
             GalleryAction.EditCover ->
                 newCoverSelectorLauncher.launch("image/*")
 
