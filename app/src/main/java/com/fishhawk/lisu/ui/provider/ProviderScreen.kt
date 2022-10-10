@@ -25,7 +25,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.data.datastore.getBlocking
+import com.fishhawk.lisu.data.datastore.setBlocking
 import com.fishhawk.lisu.data.network.model.*
 import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.main.navToGallery
@@ -34,6 +37,7 @@ import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.*
 import com.google.accompanist.flowlayout.FlowRow
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -136,6 +140,11 @@ private fun ProviderScaffold(
     board: Board,
     onAction: (ProviderAction) -> Unit,
 ) {
+    LaunchedEffect(Unit) {
+        delay(100)
+        PR.lastUsedProvider.set(providerId)
+    }
+
     var editingKeywords by remember { mutableStateOf(keywords) }
     var editing by remember { mutableStateOf(boardId == BoardId.Search && keywords.isBlank()) }
 

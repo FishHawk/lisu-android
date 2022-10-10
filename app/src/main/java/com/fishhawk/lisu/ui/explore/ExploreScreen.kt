@@ -236,10 +236,7 @@ private fun ProviderListItem(
                         else -> return@forEach
                     }
                     DropdownMenuItem(
-                        onClick = {
-                            onAction(ExploreAction.NavToProvider(provider.id, boardId))
-                            PR.lastUsedProvider.setBlocking(provider.id)
-                        },
+                        onClick = { onAction(ExploreAction.NavToProvider(provider.id, boardId)) },
                     ) {
                         Text(text)
                     }
