@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -28,7 +29,6 @@ import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.LisuToolBar
-import com.fishhawk.lisu.widget.OneLineText
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
 import org.koin.androidx.compose.viewModel
@@ -106,8 +106,20 @@ fun LoginWebsiteScreen(
             LisuToolBar(
                 title = {
                     ListItem(
-                        text = { OneLineText(text = "${provider.id}-Login") },
-                        secondaryText = { OneLineText(text = cookiesLogin.loginSite) },
+                        text = {
+                            Text(
+                                text = "${provider.id}-Login",
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        },
+                        secondaryText = {
+                            Text(
+                                text = cookiesLogin.loginSite,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        },
                     )
                 },
                 onNavUp = { onAction(LoginAction.NavUp) },

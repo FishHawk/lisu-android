@@ -1,30 +1,29 @@
 package com.fishhawk.lisu.widget
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
-@Composable
-fun <T> VerticalGrid(
-    items: List<T>,
+fun <T> LazyListScope.itemsVerticalGrid(
+    items: Iterable<T>,
     nColumns: Int,
     modifier: Modifier = Modifier,
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
-    content: @Composable RowScope.(index: Int, item: T) -> Unit
+    content: @Composable RowScope.(item: T) -> Unit,
 ) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = verticalArrangement,
-    ) {
-        items.chunked(nColumns).onEachIndexed { rowIndex, rowItems ->
-            Row(horizontalArrangement = horizontalArrangement) {
-                rowItems.onEachIndexed { columnIndex, it ->
-                    content(rowIndex * nColumns + columnIndex, it)
-                }
-                repeat(nColumns - rowItems.size) {
-                    Spacer(Modifier.weight(1f))
-                }
+    items(items.chunked(nColumns)) { rowItems ->
+        Row(
+            modifier = modifier,
+            horizontalArrangement = horizontalArrangement,
+        ) {
+            rowItems.forEach { item ->
+                content(item)
+            }
+            repeat(nColumns - rowItems.size) {
+                Spacer(modifier = Modifier.weight(1f))
             }
         }
     }
