@@ -191,7 +191,7 @@ private fun HistoryListItem(
             modifier = Modifier
                 .background(MaterialTheme.colors.background)
                 .clickable { onAction(HistoryAction.NavToReader(history)) }
-                .height(92.dp)
+                .height(100.dp)
                 .padding(horizontal = 8.dp, vertical = 2.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -203,34 +203,32 @@ private fun HistoryListItem(
                     .clickable { onAction(HistoryAction.NavToGallery(history)) },
             )
 
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = history.title ?: history.mangaId,
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
+                    maxLines = 2,
+                    style = MaterialTheme.typography.subtitle2,
                 )
 
                 CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                     ProvideTextStyle(value = MaterialTheme.typography.body2) {
-                        val seen = listOf(
-                            history.collectionId,
-                            history.chapterName,
-                        ).filter { it.isNotBlank() }.joinToString(" ")
-                        Text(
-                            text = seen,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1,
-                        )
-
                         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             val time = history.date.toLocalTime()
                                 .format(DateTimeFormatter.ofPattern(stringResource(R.string.history_time_format)))
                             Text(text = time)
                             Text(text = history.providerId)
+                        }
+                        val seen = listOf(
+                            history.collectionId,
+                            history.chapterName,
+                        ).filter { it.isNotBlank() }.joinToString(" ")
+                        if (seen.isNotBlank()) {
+                            Text(
+                                text = seen,
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                            )
                         }
                     }
                 }

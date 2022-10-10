@@ -216,7 +216,7 @@ private fun DownloadTaskList(
 
     LaunchedEffect(mangaTasks, selectedManga) {
         items.clear()
-        mangaTasks.forEach { mangaTask ->
+        mangaTasks.filter { it.chapterTasks.isNotEmpty() }.forEach { mangaTask ->
             items.add(
                 DownloadTaskListItem.Manga(
                     mangaTask = mangaTask,
@@ -318,19 +318,19 @@ private fun MangaDownloadTask(
                         is ChapterDownloadTask.State.Failed ->
                             "Failed(${size})"
                     }
-                    Text(
-                        text = chapterHint,
-                        style = MaterialTheme.typography.body2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f),
-                        maxLines = 1,
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stateHint,
-                        style = MaterialTheme.typography.body2,
-                        maxLines = 1,
-                    )
+                    ProvideTextStyle(value = MaterialTheme.typography.body2) {
+                        Text(
+                            text = chapterHint,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 1,
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stateHint,
+                            maxLines = 1,
+                        )
+                    }
                 }
             }
 
