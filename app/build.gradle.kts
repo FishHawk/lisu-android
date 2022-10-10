@@ -121,6 +121,7 @@ dependencies {
     val coilVersion = "2.2.1"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
+    implementation("io.coil-kt:coil-gif:$coilVersion")
 
     val ktorVersion = "2.1.1"
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")

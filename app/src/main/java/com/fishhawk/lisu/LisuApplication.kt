@@ -1,9 +1,12 @@
 package com.fishhawk.lisu
 
 import android.app.Application
+import android.os.Build.VERSION.SDK_INT
 import androidx.room.Room
 import coil.ImageLoader
 import coil.ImageLoaderFactory
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
 import com.fishhawk.lisu.data.database.*
 import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
@@ -57,7 +60,15 @@ class LisuApplication : Application(), ImageLoaderFactory {
     }
 
     override fun newImageLoader(): ImageLoader {
-        return ImageLoader.Builder(applicationContext)
+        return ImageLoader
+            .Builder(applicationContext)
+            .components {
+                if (SDK_INT >= 28) {
+                    add(ImageDecoderDecoder.Factory())
+                } else {
+                    add(GifDecoder.Factory())
+                }
+            }
             .okHttpClient {
                 OkHttpClient.Builder()
                     .addInterceptor(ProgressInterceptor())
