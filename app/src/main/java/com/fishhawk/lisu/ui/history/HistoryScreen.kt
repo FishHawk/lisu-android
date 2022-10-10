@@ -56,13 +56,16 @@ fun HistoryScreen(navController: NavHostController) {
                     id = mangaId,
                     cover = cover,
                     title = title,
-                    authors = authors?.let { listOf(it) } ?: emptyList()
+                    authors = authors?.let { listOf(it) } ?: emptyList(),
                 ))
             }
             is HistoryAction.NavToReader -> with(action.history) {
                 context.navToReader(
-                    mangaId, providerId,
-                    collectionId, chapterId, page
+                    providerId = providerId,
+                    mangaId = mangaId,
+                    collectionId = collectionId,
+                    chapterId = chapterId,
+                    page = page,
                 )
             }
             is HistoryAction.DeleteHistory -> viewModel.deleteHistory(action.history)

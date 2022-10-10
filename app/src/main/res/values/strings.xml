@@ -112,8 +112,7 @@
 
 
     <!-- gallery screen -->
-    <string name="gallery_no_chapters_hint">No chapters</string>
-
+    <string name="gallery_no_content_hint">No content</string>
 
     <string name="search_hint">Search…</string>
     <string name="search_library_hint">Search library…</string>

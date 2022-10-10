@@ -2,6 +2,7 @@ package com.fishhawk.lisu.ui.reader
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
@@ -17,15 +18,17 @@ import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.json.Json
 import java.io.ByteArrayOutputStream
 
 sealed interface ReaderPage {
+    @Parcelize
     data class Image(
         val index: Int,
         val url: String,
         val size: Int,
-    ) : ReaderPage
+    ) : ReaderPage, Parcelable
 
     data class NextChapterState(
         val currentChapterName: String?,

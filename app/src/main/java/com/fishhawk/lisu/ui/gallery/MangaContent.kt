@@ -55,42 +55,52 @@ internal fun LazyListScope.mangaContent(
     history: ReadingHistory?,
     onAction: (GalleryAction) -> Unit,
 ) {
-    val collections = detail.collections
-    if (collections.isEmpty()) {
-        item {
-            Text(
-                text = stringResource(R.string.gallery_no_chapters_hint),
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colors.primary,
-                textAlign = TextAlign.Center,
+    val enablePreview = detail.collections.keys.size == 1 &&
+            detail.collections.keys.first().isEmpty() &&
+            detail.collections.values.first().size == 1 &&
+            detail.collections.values.first().first().id.isEmpty()
+
+    if (enablePreview) {
+        if (detail.chapterPreviews.isEmpty()) {
+            mangaContentEmpty()
+        } else {
+            mangaContentPreview(
+                previews = detail.chapterPreviews,
+                onPageClick = { page ->
+                    onAction(GalleryAction.NavToReader("", "", page))
+                },
             )
         }
-    } else if (
-        detail.chapterPreviews.isNotEmpty() &&
-        collections.keys.size == 1 &&
-        collections.keys.first().isEmpty() &&
-        collections.values.first().size == 1 &&
-        collections.values.first().first().id.isEmpty()
-    ) {
-        mangaContentPreview(
-            previews = detail.chapterPreviews,
-            onPageClick = { page ->
-                onAction(GalleryAction.NavToReader(" ", " ", page))
-            },
-        )
     } else {
-        val isMarked = { collectionId: String, chapterId: String ->
-            history?.let { it.collectionId == collectionId && it.chapterId == chapterId } ?: false
+        if (detail.collections.isEmpty()) {
+            mangaContentEmpty()
+        } else {
+            val isMarked = { collectionId: String, chapterId: String ->
+                history
+                    ?.let { it.collectionId == collectionId && it.chapterId == chapterId }
+                    ?: false
+            }
+            mangaContentCollections(
+                mode = mode,
+                order = order,
+                collections = detail.collections,
+                isMarked = isMarked,
+                onChapterClick = { collectionId, chapterId ->
+                    val page = if (isMarked(collectionId, chapterId)) history!!.page else 0
+                    onAction(GalleryAction.NavToReader(collectionId, chapterId, page))
+                },
+            )
         }
-        mangaContentCollections(
-            mode = mode,
-            order = order,
-            collections = collections,
-            isMarked = isMarked,
-            onChapterClick = { collectionId, chapterId ->
-                val page = if (isMarked(collectionId, chapterId)) history!!.page else 0
-                onAction(GalleryAction.NavToReader(collectionId, chapterId, page))
-            },
+    }
+}
+
+private fun LazyListScope.mangaContentEmpty() {
+    item {
+        Text(
+            text = stringResource(R.string.gallery_no_content_hint),
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colors.primary,
+            textAlign = TextAlign.Center,
         )
     }
 }
@@ -109,6 +119,7 @@ private fun LazyListScope.mangaContentPreview(
             url = url,
             page = index + 1,
             onPageClick = onPageClick,
+            modifier = Modifier.weight(1f)
         )
     }
 }
@@ -117,13 +128,18 @@ private fun LazyListScope.mangaContentPreview(
 private fun PreviewPage(
     url: String,
     page: Int,
-    onPageClick: (Int) -> Unit = {},
+    onPageClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Image(
             modifier = Modifier
-                .aspectRatio(0.75f)
-                .clickable { onPageClick(page) },
+                .clickable { onPageClick(page) }
+                .fillMaxWidth()
+                .aspectRatio(0.75f),
             painter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
                     .data(url)

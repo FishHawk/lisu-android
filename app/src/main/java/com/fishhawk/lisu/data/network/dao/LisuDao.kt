@@ -124,11 +124,11 @@ class LisuDao(
         collectionId: String,
         chapterId: String,
     ): List<String> =
-        client.get("$url/provider/${providerId.path}/manga/${mangaId.path}/content/${collectionId.path}/${chapterId.path}")
-            .let { response ->
-                response.body<List<String>>()
-                    .map { processImage(providerId, mangaId, collectionId, chapterId, it) }
-            }
+        client.get("$url/provider/${providerId.path}/manga/${mangaId.path}/content") {
+            parameter("collectionId", collectionId)
+            parameter("chapterId", chapterId)
+        }.body<List<String>>()
+            .map { processImage(providerId, mangaId, collectionId, chapterId, it) }
 
     suspend fun getRandomMangaFromLibrary(): MangaDto =
         client.get("$url/library/random-manga").body()
@@ -277,10 +277,10 @@ class LisuDao(
             "manga",
             mangaId.path,
             "image",
-            collectionId.path,
-            chapterId.path,
-            imageId.path,
         )
+        builder.parameters.append("collectionId", collectionId)
+        builder.parameters.append("chapterId", chapterId)
+        builder.parameters.append("imageId", imageId)
         return builder.build().toString()
     }
 }
