@@ -310,6 +310,7 @@ class ReaderViewModel(
             val detail = mangaResult.value?.getOrNull() ?: return@launch
             val chapter = chapterPointer.value?.currChapter ?: return@launch
             val readingHistory = ReadingHistory(
+                state = detail.state,
                 providerId = detail.providerId,
                 mangaId = mangaId,
                 cover = detail.cover,
@@ -318,7 +319,7 @@ class ReaderViewModel(
                 collectionId = chapter.collectionId,
                 chapterId = chapter.id,
                 chapterName = chapter.name ?: chapter.id,
-                page = page
+                page = page,
             )
             readingHistoryRepository.update(readingHistory)
         }
@@ -330,10 +331,10 @@ class ReaderViewModel(
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
             val byteArray = stream.toByteArray()
             lisuRepository.updateMangaCover(
-                providerId,
-                mangaId,
-                byteArray,
-                "image/png",
+                providerId = providerId,
+                mangaId = mangaId,
+                cover = byteArray,
+                coverType = "image/png",
             ).onSuccess { sendEvent(ReaderEffect.Message(R.string.cover_updated)) }
                 .onFailure { sendEvent(ReaderEffect.Message(R.string.cover_update_failed)) }
         }

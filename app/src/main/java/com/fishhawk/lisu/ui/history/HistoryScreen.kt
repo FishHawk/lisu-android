@@ -52,6 +52,7 @@ fun HistoryScreen(navController: NavHostController) {
         when (action) {
             is HistoryAction.NavToGallery -> with(action.history) {
                 navController.navToGallery(MangaDto(
+                    state = state,
                     providerId = providerId,
                     id = mangaId,
                     cover = cover,
