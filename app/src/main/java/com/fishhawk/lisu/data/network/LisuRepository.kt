@@ -38,11 +38,11 @@ class LisuRepository(
         return daoFlow.filterNotNull().first().mapCatching { func(it) }
     }
 
-    // Provider API
     private val mangaActionChannels = mutableListOf<RemoteDataActionChannel<MangaDetailDto>>()
     private val providerMangaListActionChannels = mutableListOf<RemoteListActionChannel<MangaDto>>()
     private val libraryMangaListActionChannels = mutableListOf<RemoteListActionChannel<MangaDto>>()
 
+    // Provider API
     val providers =
         daoFlow.filterNotNull().flatMapLatest {
             remoteData(loader = { it.mapCatching { dao -> dao.listProvider() } })
@@ -53,13 +53,8 @@ class LisuRepository(
         cookies: Map<String, String>,
     ): Result<String> =
         oneshot { it.loginByCookies(providerId, cookies) }.onSuccess {
-            providers.value?.mutate { list ->
-                list.toMutableList().map {
-                    if (it.id == providerId &&
-                        it.isLogged == false
-                    ) it.copy(isLogged = true)
-                    else it
-                }
+            mutateProvider(providerId = providerId) {
+                it.copy(isLogged = true)
             }
         }
 
@@ -69,25 +64,15 @@ class LisuRepository(
         password: String,
     ): Result<String> =
         oneshot { it.loginByPassword(providerId, username, password) }.onSuccess {
-            providers.value?.mutate { list ->
-                list.toMutableList().map {
-                    if (it.id == providerId &&
-                        it.isLogged == false
-                    ) it.copy(isLogged = true)
-                    else it
-                }
+            mutateProvider(providerId = providerId) {
+                it.copy(isLogged = true)
             }
         }
 
     suspend fun logout(providerId: String): Result<String> =
         oneshot { it.logout(providerId) }.onSuccess {
-            providers.value?.mutate { list ->
-                list.toMutableList().map {
-                    if (it.id == providerId &&
-                        it.isLogged == true
-                    ) it.copy(isLogged = false)
-                    else it
-                }
+            mutateProvider(providerId = providerId) {
+                it.copy(isLogged = false)
             }
         }
 
@@ -130,10 +115,33 @@ class LisuRepository(
     suspend fun updateMangaMetadata(
         providerId: String,
         mangaId: String,
-        metadata: MangaMetadataDto,
-    ): Result<String> =
-        oneshot { it.updateMangaMetadata(providerId, mangaId, metadata) }
-            .onSuccess { /*TODO*/ }
+        metadata: MangaMetadata,
+    ): Result<MangaMetadata> =
+        oneshot { it.updateMangaMetadata(providerId, mangaId, metadata) }.onSuccess { newMetadata ->
+            mutateManga(providerId = providerId, mangaId = mangaId) {
+                it.copy(
+                    title = newMetadata.title,
+                    authors = newMetadata.authors,
+                    isFinished = newMetadata.isFinished,
+                    description = newMetadata.description,
+                    tags = newMetadata.tags,
+                )
+            }
+            mutateMangaInLibraryList(providerId = providerId, mangaId = mangaId) {
+                it.copy(
+                    title = newMetadata.title,
+                    authors = newMetadata.authors,
+                    isFinished = newMetadata.isFinished,
+                )
+            }
+            mutateMangaInProviderList(providerId = providerId, mangaId = mangaId) {
+                it.copy(
+                    title = newMetadata.title,
+                    authors = newMetadata.authors,
+                    isFinished = newMetadata.isFinished,
+                )
+            }
+        }
 
     suspend fun updateMangaCover(
         providerId: String,
@@ -183,56 +191,22 @@ class LisuRepository(
 
     suspend fun addMangaToLibrary(providerId: String, mangaId: String): Result<String> =
         oneshot { it.addMangaToLibrary(providerId, mangaId) }.onSuccess {
-            mangaActionChannels.forEach { ch ->
-                ch.mutate {
-                    if (it.providerId == providerId &&
-                        it.id == mangaId &&
-                        it.state == MangaState.Remote
-                    ) it.copy(state = MangaState.RemoteInLibrary)
-                    else it
-                }
+            mutateManga(providerId = providerId, mangaId = mangaId) {
+                it.copy(state = MangaState.RemoteInLibrary)
             }
-            providerMangaListActionChannels.forEach { ch ->
-                ch.mutate { list ->
-                    if (list.firstOrNull()?.providerId != providerId) list
-                    else {
-                        list.map {
-                            if (
-                                it.id == mangaId &&
-                                it.state == MangaState.Remote
-                            ) it.copy(state = MangaState.RemoteInLibrary)
-                            else it
-                        }.toMutableList()
-                    }
-                }
+            mutateMangaInProviderList(providerId = providerId, mangaId = mangaId) {
+                it.copy(state = MangaState.RemoteInLibrary)
             }
             libraryMangaListActionChannels.forEach { ch -> ch.reload() }
         }
 
     suspend fun removeMangaFromLibrary(providerId: String, mangaId: String): Result<String> =
         oneshot { it.removeMangaFromLibrary(providerId, mangaId) }.onSuccess {
-            mangaActionChannels.forEach { manga ->
-                manga.mutate {
-                    if (it.providerId == providerId &&
-                        it.id == mangaId &&
-                        it.state == MangaState.RemoteInLibrary
-                    ) it.copy(state = MangaState.Remote)
-                    else it
-                }
+            mutateManga(providerId = providerId, mangaId = mangaId) {
+                it.copy(state = MangaState.Remote)
             }
-            providerMangaListActionChannels.forEach { ch ->
-                ch.mutate { list ->
-                    if (list.firstOrNull()?.providerId != providerId) list
-                    else {
-                        list.map {
-                            if (
-                                it.id == mangaId &&
-                                it.state == MangaState.RemoteInLibrary
-                            ) it.copy(state = MangaState.Remote)
-                            else it
-                        }.toMutableList()
-                    }
-                }
+            mutateMangaInProviderList(providerId = providerId, mangaId = mangaId) {
+                it.copy(state = MangaState.Remote)
             }
             libraryMangaListActionChannels.forEach { ch ->
                 ch.mutate { list ->
@@ -309,4 +283,62 @@ class LisuRepository(
         chapterId: String,
     ): Result<String> =
         oneshot { it.cancelChapterTask(providerId, mangaId, collectionId, chapterId) }
+
+    // Util
+    private suspend fun mutateProvider(
+        providerId: String,
+        transform: (ProviderDto) -> ProviderDto,
+    ) {
+        providers.value?.mutate { list ->
+            list.toMutableList().map {
+                if (it.id == providerId) transform(it)
+                else it
+            }
+        }
+    }
+
+    private suspend fun mutateManga(
+        providerId: String,
+        mangaId: String,
+        transform: (MangaDetailDto) -> MangaDetailDto,
+    ) {
+        mangaActionChannels.forEach { ch ->
+            ch.mutate {
+                if (it.providerId == providerId && it.id == mangaId) transform(it)
+                else it
+            }
+        }
+    }
+
+    private suspend fun mutateMangaInProviderList(
+        providerId: String,
+        mangaId: String,
+        transform: (MangaDto) -> MangaDto,
+    ) {
+        providerMangaListActionChannels.forEach { ch ->
+            ch.mutate { list ->
+                if (list.firstOrNull()?.providerId != providerId) {
+                    list
+                } else {
+                    list
+                        .map { if (it.id == mangaId) transform(it) else it }
+                        .toMutableList()
+                }
+            }
+        }
+    }
+
+    private suspend fun mutateMangaInLibraryList(
+        providerId: String,
+        mangaId: String,
+        transform: (MangaDto) -> MangaDto,
+    ) {
+        libraryMangaListActionChannels.forEach { ch ->
+            ch.mutate { list ->
+                list
+                    .map { if (it.providerId == providerId && it.id == mangaId) transform(it) else it }
+                    .toMutableList()
+            }
+        }
+    }
 }

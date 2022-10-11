@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.ReadingHistoryRepository
 import com.fishhawk.lisu.data.network.LisuRepository
 import com.fishhawk.lisu.data.network.model.MangaDto
-import com.fishhawk.lisu.data.network.model.MangaMetadataDto
+import com.fishhawk.lisu.data.network.model.MangaMetadata
 import com.fishhawk.lisu.data.network.model.MangaState
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
@@ -113,7 +113,7 @@ class GalleryViewModel(
         }
     }
 
-    fun updateMetadata(metadata: MangaMetadataDto) {
+    fun updateMetadata(metadata: MangaMetadata) {
         if (manga.state != MangaState.Local) return
         viewModelScope.launch {
             lisuRepository.updateMangaMetadata(

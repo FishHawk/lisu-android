@@ -13,6 +13,8 @@ import androidx.compose.material.*
 import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Publish
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,14 +28,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.data.network.model.MangaMetadataDto
+import com.fishhawk.lisu.data.network.model.MangaMetadata
 import com.fishhawk.lisu.data.network.model.toMetadataDetail
 import com.fishhawk.lisu.ui.base.OnEvent
+import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.LisuToolBar
 import org.koin.androidx.compose.viewModel
 
-internal sealed interface GalleryEditAction {
+private sealed interface GalleryEditAction {
     object NavUp : GalleryEditAction
     object Publish : GalleryEditAction
 }
@@ -51,18 +54,18 @@ fun GalleryEditScreen(navController: NavHostController) {
         navController.navigateUp()
         return
     }
-    var detail by remember { mutableStateOf(initDetail.toMetadataDetail()) }
+    var metadata by remember { mutableStateOf(initDetail.toMetadataDetail()) }
 
     val onAction: (GalleryEditAction) -> Unit = { action ->
         when (action) {
             GalleryEditAction.NavUp -> navController.navigateUp()
             GalleryEditAction.Publish -> {
-                val detailToPublish = detail.copy(
-                    title = detail.title?.takeIf { it.isNotEmpty() && it != id },
-                    authors = detail.authors?.ifEmpty { null },
-                    description = detail.description?.ifEmpty { null }
+                val metadataToPublish = metadata.copy(
+                    title = metadata.title?.takeIf { it.isNotEmpty() && it != id },
+                    authors = metadata.authors,
+                    description = metadata.description?.ifEmpty { null }
                 )
-                viewModel.updateMetadata(detailToPublish)
+                viewModel.updateMetadata(metadataToPublish)
             }
         }
     }
@@ -77,10 +80,27 @@ fun GalleryEditScreen(navController: NavHostController) {
         }
     }
 
+
+    GalleryEditScaffold(
+        mangaId = id,
+        metadata = metadata,
+        onMetadataChanged = { metadata = it },
+        onAction = onAction,
+    )
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun GalleryEditScaffold(
+    mangaId: String,
+    metadata: MangaMetadata,
+    onMetadataChanged: (MangaMetadata) -> Unit,
+    onAction: (GalleryEditAction) -> Unit,
+) {
     Scaffold(
         topBar = {
             LisuToolBar(
-                title = "${stringResource(R.string.label_gallery_edit)} - $id",
+                title = stringResource(R.string.label_gallery_edit),
                 onNavUp = { onAction(GalleryEditAction.NavUp) },
             ) {
                 IconButton(onClick = { onAction(GalleryEditAction.Publish) }) {
@@ -97,11 +117,13 @@ fun GalleryEditScreen(navController: NavHostController) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(32.dp),
             ) {
+                Label(text = "ID: $mangaId")
+
                 Column {
                     Label(text = "Title:")
                     CustomTextField(
-                        value = detail.title ?: initDetail.id,
-                        onValueChange = { detail = detail.copy(title = it) },
+                        value = metadata.title ?: mangaId,
+                        onValueChange = { onMetadataChanged(metadata.copy(title = it)) },
                         placeholder = "input title",
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -115,8 +137,8 @@ fun GalleryEditScreen(navController: NavHostController) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
-                                selected = it == detail.isFinished,
-                                onClick = { detail = detail.copy(isFinished = it) }
+                                selected = it == metadata.isFinished,
+                                onClick = { onMetadataChanged(metadata.copy(isFinished = it)) }
                             )
                             Text(
                                 text = when (it) {
@@ -125,39 +147,60 @@ fun GalleryEditScreen(navController: NavHostController) {
                                     null -> "Unknown"
                                 },
                                 style = MaterialTheme.typography.body1,
-                                modifier = Modifier.padding(start = 16.dp)
+                                modifier = Modifier.padding(start = 16.dp),
                             )
                         }
                     }
                 }
 
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Label(text = "Authors:")
                     EditMangaTagGroup(
-                        tags = detail.authors ?: emptyList(),
-                        onTagClick = { author -> detail = detail.copyWithoutAuthor(author) }
+                        tags = metadata.authors,
+                        onTagClick = { onMetadataChanged(metadata.copyWithoutAuthor(it)) }
                     )
                     TagTextField(
                         placeholder = "new author",
-                        onDone = { author -> detail = detail.copyWithNewAuthor(author) },
+                        onDone = { onMetadataChanged(metadata.copyWithNewAuthor(it)) },
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
 
-                detail.tags.forEach { (key, tags) ->
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Label(text = "Tags-$key:")
+                Column {
+                    Label(text = "Tags:")
+                    TagTextField(
+                        placeholder = "new tag group",
+                        onDone = { onMetadataChanged(metadata.copyWithNewTagGroup(it)) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+
+                metadata.tags.forEach { (key, tags) ->
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Label(text = "Tags-$key:")
+                            CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                                IconButton(onClick = {
+                                    onMetadataChanged(metadata.copyWithoutTagGroup(key))
+                                }) {
+                                    Icon(
+                                        imageVector = LisuIcons.Close,
+                                        contentDescription = null,
+                                    )
+                                }
+                            }
+                        }
                         EditMangaTagGroup(
                             tags = tags,
-                            onTagClick = { tag -> detail = detail.copyWithoutTag(key, tag) },
+                            onTagClick = { onMetadataChanged(metadata.copyWithoutTag(key, it)) },
                         )
                         TagTextField(
                             placeholder = "new tag",
-                            onDone = { tag -> detail = detail.copyWithNewTag(key, tag) },
+                            onDone = { onMetadataChanged(metadata.copyWithNewTag(key, it)) },
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
@@ -166,8 +209,8 @@ fun GalleryEditScreen(navController: NavHostController) {
                 Column {
                     Label(text = "Description:")
                     CustomTextField(
-                        value = detail.description ?: "",
-                        onValueChange = { detail = detail.copy(description = it) },
+                        value = metadata.description ?: "",
+                        onValueChange = { onMetadataChanged(metadata.copy(description = it)) },
                         placeholder = "input description",
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -257,24 +300,27 @@ private fun CustomTextField(
     )
 }
 
-private fun MangaMetadataDto.copyWithoutAuthor(author: String) =
-    copy(authors = authors?.toMutableList()?.apply { remove(author) })
+private fun MangaMetadata.copyWithoutAuthor(author: String) =
+    copy(authors = authors.filter { it != author })
 
-private fun MangaMetadataDto.copyWithNewAuthor(newAuthor: String) =
-    copy(authors = (authors ?: emptyList()).toMutableList().apply { add(newAuthor) })
+private fun MangaMetadata.copyWithNewAuthor(newAuthor: String) =
+    copy(authors = authors.toMutableList().apply { add(newAuthor) })
 
-private fun MangaMetadataDto.copyWithoutTag(key: String, tag: String) =
-    copy(tags = tags.toMutableMap().also { tags ->
-        tags[key]?.toMutableList()?.let {
-            it.remove(tag)
-            tags[key] = it
-        }
+private fun MangaMetadata.copyWithoutTagGroup(key: String) =
+    copy(tags = tags.filter { it.key != key })
+
+private fun MangaMetadata.copyWithNewTagGroup(key: String) =
+    copy(tags = tags.toMutableMap().apply { putIfAbsent(key, emptyList()) })
+
+private fun MangaMetadata.copyWithoutTag(key: String, tag: String) =
+    copy(tags = tags.toMutableMap().apply {
+        get(key)?.filter { it != tag }?.let { put(key, it) }
     })
 
-private fun MangaMetadataDto.copyWithNewTag(key: String, newTag: String) =
-    copy(tags = tags.toMutableMap().also { tags ->
-        (tags[key] ?: emptyList()).toMutableList().let {
+private fun MangaMetadata.copyWithNewTag(key: String, newTag: String) =
+    copy(tags = tags.toMutableMap().apply {
+        get(key)?.toMutableList()?.let {
             it.add(newTag)
-            tags[key] = it
+            put(key, it)
         }
     })

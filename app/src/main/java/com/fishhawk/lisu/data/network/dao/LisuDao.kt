@@ -7,7 +7,6 @@ import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
-import io.ktor.utils.io.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.builtins.ListSerializer
@@ -77,7 +76,7 @@ class LisuDao(
                 detail.copy(
                     cover = processCover(detail.providerId, detail.id, detail.cover),
                     chapterPreviews = detail.chapterPreviews.map {
-                        processImage(providerId, mangaId, " ", " ", it)
+                        processImage(providerId, mangaId, "", "", it)
                     },
                 )
             }
@@ -85,9 +84,10 @@ class LisuDao(
     suspend fun updateMangaMetadata(
         providerId: String,
         mangaId: String,
-        metadata: MangaMetadataDto,
-    ): String =
+        metadata: MangaMetadata,
+    ): MangaMetadata =
         client.put("$url/library/manga/${providerId.path}/${mangaId.path}/metadata") {
+            contentType(ContentType.Application.Json)
             setBody(metadata)
         }.body()
 
