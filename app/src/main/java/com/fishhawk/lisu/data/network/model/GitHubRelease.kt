@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GitHubReleaseDto(
+data class GitHubRelease(
     @SerialName("tag_name") val version: String,
     @SerialName("body") val info: String,
     @SerialName("html_url") val releaseLink: String,

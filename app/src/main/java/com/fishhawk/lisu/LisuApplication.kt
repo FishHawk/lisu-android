@@ -10,9 +10,9 @@ import coil.decode.ImageDecoderDecoder
 import com.fishhawk.lisu.data.database.*
 import com.fishhawk.lisu.data.datastore.PreferenceRepository
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
-import com.fishhawk.lisu.data.network.base.Connectivity
 import com.fishhawk.lisu.data.network.GitHubRepository
 import com.fishhawk.lisu.data.network.LisuRepository
+import com.fishhawk.lisu.data.network.base.Connectivity
 import com.fishhawk.lisu.notification.Notifications
 import com.fishhawk.lisu.ui.download.DownloadViewModel
 import com.fishhawk.lisu.ui.explore.ExploreViewModel
@@ -25,12 +25,6 @@ import com.fishhawk.lisu.ui.more.MoreViewModel
 import com.fishhawk.lisu.ui.provider.ProviderViewModel
 import com.fishhawk.lisu.ui.reader.ReaderViewModel
 import com.fishhawk.lisu.util.interceptor.ProgressInterceptor
-import io.ktor.client.*
-import io.ktor.client.engine.okhttp.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.websocket.*
-import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -62,6 +56,7 @@ class LisuApplication : Application(), ImageLoaderFactory {
     override fun newImageLoader(): ImageLoader {
         return ImageLoader
             .Builder(applicationContext)
+            .respectCacheHeaders(false)
             .components {
                 if (SDK_INT >= 28) {
                     add(ImageDecoderDecoder.Factory())
@@ -88,16 +83,8 @@ val appModule = module {
         get<PreferenceRepository>().serverAddress.flow
     }
 
-    single {
-        HttpClient(OkHttp) {
-            install(ContentNegotiation) { json(Json) }
-            install(WebSockets) { pingInterval = 20_000 }
-            expectSuccess = true
-        }
-    }
-
-    single { LisuRepository(get(named("address")), get()) }
-    single { GitHubRepository(get()) }
+    single { LisuRepository(get(named("address"))) }
+    single { GitHubRepository() }
 
     single {
         Room.databaseBuilder(

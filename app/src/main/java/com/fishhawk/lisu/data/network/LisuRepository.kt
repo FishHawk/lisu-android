@@ -1,99 +1,128 @@
 package com.fishhawk.lisu.data.network
 
 import com.fishhawk.lisu.data.network.base.*
-import com.fishhawk.lisu.data.network.dao.LisuDao
+import com.fishhawk.lisu.data.network.dao.LisuDownloadDao
+import com.fishhawk.lisu.data.network.dao.LisuLibraryDao
+import com.fishhawk.lisu.data.network.dao.LisuProviderDao
 import com.fishhawk.lisu.data.network.model.*
 import com.fishhawk.lisu.util.flatten
 import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.resources.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
+import kotlinx.serialization.json.Json
 
-class LisuRepository(
-    urlFlow: Flow<String>,
-    private val client: HttpClient,
-) {
+class LisuRepository(urlFlow: Flow<String>) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    private val daoFlow = urlFlow
-        .map {
-            if (it.isBlank()) {
-                Result.failure(Exception("sdaf"))
-            } else {
-                val url = if (
-                    it.startsWith("https:", ignoreCase = true) ||
-                    it.startsWith("http:", ignoreCase = true)
-                ) it else "http://$it"
-                runCatching { URLBuilder(url).buildString() }
-            }
+    private val urlState = urlFlow
+        .map { runCatching { URLBuilder(it).buildString() } }
+        .stateIn(scope, SharingStarted.Eagerly, Result.failure(Exception("No url set.")))
+
+    private val client: HttpClient = HttpClient(OkHttp) {
+        expectSuccess = true
+
+        install(Resources)
+        install(WebSockets) { pingInterval = 20_000 }
+        install(ContentNegotiation) { json(Json) }
+
+        defaultRequest {
+            urlState.value.onSuccess { url(it) }
         }
-        .distinctUntilChanged()
-        .map { it.map { url -> LisuDao(client, url) } }
-        .stateIn(scope, SharingStarted.Eagerly, null)
-
-
-    private suspend inline fun <T> oneshot(crossinline func: suspend (LisuDao) -> T): Result<T> {
-        return daoFlow.filterNotNull().first().mapCatching { func(it) }
     }
+
+    private val providerDaoFlow = urlState.map { it.map { LisuProviderDao(client) } }
+    private val libraryDaoFlow = urlState.map { it.map { LisuLibraryDao(client) } }
+    private val downloadDaoFlow = urlState.map { it.map { LisuDownloadDao(client) } }
+
+    private suspend inline fun <T> providerOneshot(
+        action: LisuProviderDao.() -> T,
+    ) = providerDaoFlow.first().mapCatching { with(it) { action() } }
+
+    private suspend inline fun <T> libraryOneshot(
+        action: LisuLibraryDao.() -> T,
+    ) = libraryDaoFlow.first().mapCatching { with(it) { action() } }
+
+    private suspend inline fun <T> downloadOneshot(
+        action: LisuDownloadDao.() -> T,
+    ) = downloadDaoFlow.first().mapCatching { with(it) { action() } }
 
     private val mangaActionChannels = mutableListOf<RemoteDataActionChannel<MangaDetailDto>>()
     private val providerMangaListActionChannels = mutableListOf<RemoteListActionChannel<MangaDto>>()
     private val libraryMangaListActionChannels = mutableListOf<RemoteListActionChannel<MangaDto>>()
 
     // Provider API
-    val providers =
-        daoFlow.filterNotNull().flatMapLatest {
-            remoteData(loader = { it.mapCatching { dao -> dao.listProvider() } })
-        }.stateIn(scope, SharingStarted.Eagerly, null)
+    val providers = providerDaoFlow.flatMapLatest {
+        remoteData(loader = { it.mapCatching { dao -> dao.listProvider() } })
+    }.stateIn(scope, SharingStarted.Eagerly, null)
 
     suspend fun loginByCookies(
         providerId: String,
         cookies: Map<String, String>,
-    ): Result<String> =
-        oneshot { it.loginByCookies(providerId, cookies) }.onSuccess {
-            mutateProvider(providerId = providerId) {
-                it.copy(isLogged = true)
-            }
+    ): Result<String> = providerOneshot {
+        loginByCookies(
+            providerId = providerId,
+            cookies = cookies,
+        )
+    }.onSuccess {
+        mutateProvider(providerId = providerId) {
+            it.copy(isLogged = true)
         }
+    }
 
     suspend fun loginByPassword(
         providerId: String,
         username: String,
         password: String,
-    ): Result<String> =
-        oneshot { it.loginByPassword(providerId, username, password) }.onSuccess {
-            mutateProvider(providerId = providerId) {
-                it.copy(isLogged = true)
-            }
+    ): Result<String> = providerOneshot {
+        loginByPassword(
+            providerId = providerId,
+            username = username,
+            password = password,
+        )
+    }.onSuccess {
+        mutateProvider(providerId = providerId) {
+            it.copy(isLogged = true)
         }
+    }
 
-    suspend fun logout(providerId: String): Result<String> =
-        oneshot { it.logout(providerId) }.onSuccess {
-            mutateProvider(providerId = providerId) {
-                it.copy(isLogged = false)
-            }
+    suspend fun logout(
+        providerId: String,
+    ): Result<String> = providerOneshot {
+        logout(
+            providerId = providerId,
+        )
+    }.onSuccess {
+        mutateProvider(providerId = providerId) {
+            it.copy(isLogged = false)
         }
+    }
 
     fun getBoard(
         providerId: String,
         boardId: BoardId,
         filterValues: BoardFilterValue,
         keywords: String? = null,
-    ) = daoFlow.filterNotNull().flatMapLatest {
+    ): Flow<RemoteList<MangaDto>> = providerDaoFlow.flatMapLatest {
         remotePagingList(
-            startKey = 0,
             loader = { page ->
                 it.mapCatching { dao ->
                     dao.getBoard(
                         providerId = providerId,
-                        boardId = boardId.name,
+                        boardId = boardId,
                         page = page,
-                        filterValues = filterValues,
                         keywords = keywords,
+                        filterValues = filterValues,
                     )
-                }.map { Page(it, if (it.isEmpty()) null else page + 1) }
+                }
             },
             onStart = { providerMangaListActionChannels.add(it) },
             onClose = { providerMangaListActionChannels.remove(it) },
@@ -103,63 +132,34 @@ class LisuRepository(
     fun getManga(
         providerId: String,
         mangaId: String,
-    ): Flow<RemoteData<MangaDetailDto>> =
-        daoFlow.filterNotNull().flatMapLatest {
-            remoteData(
-                loader = { it.mapCatching { dao -> dao.getManga(providerId, mangaId) } },
-                onStart = { mangaActionChannels.add(it) },
-                onClose = { mangaActionChannels.remove(it) },
-            )
-        }
-
-    suspend fun updateMangaMetadata(
-        providerId: String,
-        mangaId: String,
-        metadata: MangaMetadata,
-    ): Result<MangaMetadata> =
-        oneshot { it.updateMangaMetadata(providerId, mangaId, metadata) }.onSuccess { newMetadata ->
-            mutateManga(providerId = providerId, mangaId = mangaId) {
-                it.copy(
-                    title = newMetadata.title,
-                    authors = newMetadata.authors,
-                    isFinished = newMetadata.isFinished,
-                    description = newMetadata.description,
-                    tags = newMetadata.tags,
-                )
-            }
-            mutateMangaInLibraryList(providerId = providerId, mangaId = mangaId) {
-                it.copy(
-                    title = newMetadata.title,
-                    authors = newMetadata.authors,
-                    isFinished = newMetadata.isFinished,
-                )
-            }
-            mutateMangaInProviderList(providerId = providerId, mangaId = mangaId) {
-                it.copy(
-                    title = newMetadata.title,
-                    authors = newMetadata.authors,
-                    isFinished = newMetadata.isFinished,
-                )
-            }
-        }
-
-    suspend fun updateMangaCover(
-        providerId: String,
-        mangaId: String,
-        cover: ByteArray,
-        coverType: String,
-    ): Result<String> =
-        oneshot { it.updateMangaCover(providerId, mangaId, cover, coverType) }
+    ): Flow<RemoteData<MangaDetailDto>> = providerDaoFlow.flatMapLatest {
+        remoteData(
+            loader = {
+                it.mapCatching { dao ->
+                    dao.getManga(
+                        providerId = providerId,
+                        mangaId = mangaId,
+                    )
+                }
+            },
+            onStart = { mangaActionChannels.add(it) },
+            onClose = { mangaActionChannels.remove(it) },
+        )
+    }
 
     fun getComment(
         providerId: String,
         mangaId: String,
-    ) = daoFlow.filterNotNull().flatMapLatest {
+    ): Flow<RemoteList<CommentDto>> = providerDaoFlow.flatMapLatest {
         remotePagingList(
-            startKey = 0,
             loader = { page ->
-                it.mapCatching { dao -> dao.getComment(providerId, mangaId, page) }
-                    .map { Page(it, if (it.isEmpty()) null else page + 1) }
+                it.mapCatching { dao ->
+                    dao.getComment(
+                        providerId = providerId,
+                        mangaId = mangaId,
+                        page = page,
+                    )
+                }
             },
         )
     }
@@ -169,120 +169,219 @@ class LisuRepository(
         mangaId: String,
         collectionId: String,
         chapterId: String,
-    ): Result<List<String>> =
-        oneshot { it.getContent(providerId, mangaId, collectionId, chapterId) }
-
-    suspend fun getRandomMangaFromLibrary(): Result<MangaDto> =
-        oneshot { it.getRandomMangaFromLibrary() }
+    ): Result<List<String>> = providerOneshot {
+        getContent(
+            providerId = providerId,
+            mangaId = mangaId,
+            collectionId = collectionId,
+            chapterId = chapterId,
+        )
+    }
 
     // Library API
-    suspend fun searchFromLibrary(keywords: String = "") =
-        daoFlow.filterNotNull().flatMapLatest {
-            remotePagingList(
-                startKey = 0,
-                loader = { page ->
-                    it.mapCatching { dao -> dao.searchFromLibrary(page, keywords) }
-                        .map { Page(it, if (it.isEmpty()) null else page + 1) }
-                },
-                onStart = { libraryMangaListActionChannels.add(it) },
-                onClose = { libraryMangaListActionChannels.remove(it) },
-            )
-        }
+    suspend fun searchFromLibrary(
+        keywords: String,
+    ): Flow<RemoteList<MangaDto>> = libraryDaoFlow.flatMapLatest {
+        remotePagingList(
+            loader = { page -> it.mapCatching { dao -> dao.search(page, keywords) } },
+            onStart = { libraryMangaListActionChannels.add(it) },
+            onClose = { libraryMangaListActionChannels.remove(it) },
+        )
+    }
 
-    suspend fun addMangaToLibrary(providerId: String, mangaId: String): Result<String> =
-        oneshot { it.addMangaToLibrary(providerId, mangaId) }.onSuccess {
-            mutateManga(providerId = providerId, mangaId = mangaId) {
-                it.copy(state = MangaState.RemoteInLibrary)
-            }
-            mutateMangaInProviderList(providerId = providerId, mangaId = mangaId) {
-                it.copy(state = MangaState.RemoteInLibrary)
-            }
-            libraryMangaListActionChannels.forEach { ch -> ch.reload() }
-        }
+    suspend fun getRandomMangaFromLibrary(
+    ): Result<MangaDto> = libraryOneshot {
+        getRandomManga()
+    }
 
-    suspend fun removeMangaFromLibrary(providerId: String, mangaId: String): Result<String> =
-        oneshot { it.removeMangaFromLibrary(providerId, mangaId) }.onSuccess {
-            mutateManga(providerId = providerId, mangaId = mangaId) {
-                it.copy(state = MangaState.Remote)
-            }
-            mutateMangaInProviderList(providerId = providerId, mangaId = mangaId) {
-                it.copy(state = MangaState.Remote)
-            }
-            libraryMangaListActionChannels.forEach { ch ->
-                ch.mutate { list ->
-                    val removed = list.removeIf { it.providerId == providerId && it.id == mangaId }
-                    if (removed) list.toMutableList() else list
-                }
-            }
-        }
-
-    suspend fun removeMultipleMangasFromLibrary(mangas: List<MangaKeyDto>): Result<String> =
-        oneshot { it.removeMultipleMangasFromLibrary(mangas) }.onSuccess {
-            providerMangaListActionChannels.forEach { ch ->
-                ch.mutate { list ->
-                    list.map {
-                        if (
-                            mangas.any { removedManga ->
-                                it.providerId == removedManga.providerId &&
-                                        it.id == removedManga.id
-                            }
-                        ) it.copy(state = MangaState.Remote)
-                        else it
-                    }.toMutableList()
-                }
-            }
-            libraryMangaListActionChannels.forEach { ch ->
-                ch.mutate { list ->
-                    val removed = list.removeIf {
+    suspend fun removeMultipleMangasFromLibrary(
+        mangas: List<MangaKeyDto>,
+    ): Result<String> = libraryOneshot {
+        removeMultipleMangas(
+            mangas = mangas,
+        )
+    }.onSuccess {
+        providerMangaListActionChannels.forEach { ch ->
+            ch.mutate { list ->
+                list.map {
+                    if (
                         mangas.any { removedManga ->
                             it.providerId == removedManga.providerId &&
                                     it.id == removedManga.id
                         }
-                    }
-                    if (removed) list.toMutableList() else list
-                }
+                    ) it.copy(state = MangaState.Remote)
+                    else it
+                }.toMutableList()
             }
         }
+        libraryMangaListActionChannels.forEach { ch ->
+            ch.mutate { list ->
+                val removed = list.removeIf {
+                    mangas.any { removedManga ->
+                        it.providerId == removedManga.providerId &&
+                                it.id == removedManga.id
+                    }
+                }
+                if (removed) list.toMutableList() else list
+            }
+        }
+    }
+
+    suspend fun addMangaToLibrary(
+        providerId: String,
+        mangaId: String,
+    ): Result<String> = libraryOneshot {
+        addManga(
+            providerId = providerId,
+            mangaId = mangaId,
+        )
+    }.onSuccess {
+        mutateManga(providerId = providerId, mangaId = mangaId) {
+            it.copy(state = MangaState.RemoteInLibrary)
+        }
+        mutateMangaInProviderList(providerId = providerId, mangaId = mangaId) {
+            it.copy(state = MangaState.RemoteInLibrary)
+        }
+        libraryMangaListActionChannels.forEach { ch -> ch.reload() }
+    }
+
+    suspend fun removeMangaFromLibrary(
+        providerId: String,
+        mangaId: String,
+    ): Result<String> = libraryOneshot {
+        removeManga(
+            providerId = providerId,
+            mangaId = mangaId,
+        )
+    }.onSuccess {
+        mutateManga(providerId = providerId, mangaId = mangaId) {
+            it.copy(state = MangaState.Remote)
+        }
+        mutateMangaInProviderList(providerId = providerId, mangaId = mangaId) {
+            it.copy(state = MangaState.Remote)
+        }
+        libraryMangaListActionChannels.forEach { ch ->
+            ch.mutate { list ->
+                val removed = list.removeIf { it.providerId == providerId && it.id == mangaId }
+                if (removed) list.toMutableList() else list
+            }
+        }
+    }
+
+    suspend fun updateMangaCover(
+        providerId: String,
+        mangaId: String,
+        cover: ByteArray,
+        coverType: String,
+    ): Result<String> = libraryOneshot {
+        updateMangaCover(
+            providerId = providerId,
+            mangaId = mangaId,
+            cover = cover,
+            coverType = coverType,
+        )
+    }
+
+    suspend fun updateMangaMetadata(
+        providerId: String,
+        mangaId: String,
+        metadata: MangaMetadata,
+    ): Result<MangaMetadata> = libraryOneshot {
+        updateMangaMetadata(
+            providerId = providerId,
+            mangaId = mangaId,
+            metadata = metadata,
+        )
+    }.onSuccess { newMetadata ->
+        mutateManga(providerId = providerId, mangaId = mangaId) {
+            it.copy(
+                title = newMetadata.title,
+                authors = newMetadata.authors,
+                isFinished = newMetadata.isFinished,
+                description = newMetadata.description,
+                tags = newMetadata.tags,
+            )
+        }
+        mutateMangaInLibraryList(providerId = providerId, mangaId = mangaId) {
+            it.copy(
+                title = newMetadata.title,
+                authors = newMetadata.authors,
+                isFinished = newMetadata.isFinished,
+            )
+        }
+        mutateMangaInProviderList(providerId = providerId, mangaId = mangaId) {
+            it.copy(
+                title = newMetadata.title,
+                authors = newMetadata.authors,
+                isFinished = newMetadata.isFinished,
+            )
+        }
+    }
 
     // Download API
-    fun listMangaDownloadTask(): Flow<Result<List<MangaDownloadTask>>?> =
-        daoFlow.filterNotNull().flatMapLatest {
+    fun listMangaDownloadTask(
+    ): Flow<Result<List<MangaDownloadTask>>?> =
+        downloadDaoFlow.flatMapLatest {
             flatten(it.map { dao -> dao.listMangaDownloadTask() })
         }.catch { emit(Result.failure(it)) }
 
-    suspend fun startAllTasks(): Result<String> =
-        oneshot { it.startAllTasks() }
+    suspend fun startAllTasks(
+    ): Result<String> = downloadOneshot {
+        startAllTasks()
+    }
 
     suspend fun startMangaTask(
         providerId: String,
         mangaId: String,
-    ): Result<String> =
-        oneshot { it.startMangaTask(providerId, mangaId) }
+    ): Result<String> = downloadOneshot {
+        startMangaTask(
+            providerId = providerId,
+            mangaId = mangaId,
+        )
+    }
 
     suspend fun startChapterTask(
         providerId: String,
         mangaId: String,
         collectionId: String,
         chapterId: String,
-    ): Result<String> =
-        oneshot { it.startChapterTask(providerId, mangaId, collectionId, chapterId) }
+    ): Result<String> = downloadOneshot {
+        startChapterTask(
+            providerId = providerId,
+            mangaId = mangaId,
+            collectionId = collectionId,
+            chapterId = chapterId,
+        )
+    }
 
-    suspend fun cancelAllTasks(): Result<String> =
-        oneshot { it.cancelAllTasks() }
+    suspend fun cancelAllTasks(
+    ): Result<String> = downloadOneshot {
+        cancelAllTasks()
+    }
 
     suspend fun cancelMangaTask(
         providerId: String,
         mangaId: String,
-    ): Result<String> =
-        oneshot { it.cancelMangaTask(providerId, mangaId) }
+    ): Result<String> = downloadOneshot {
+        cancelMangaTask(
+            providerId = providerId,
+            mangaId = mangaId,
+        )
+    }
 
     suspend fun cancelChapterTask(
         providerId: String,
         mangaId: String,
         collectionId: String,
         chapterId: String,
-    ): Result<String> =
-        oneshot { it.cancelChapterTask(providerId, mangaId, collectionId, chapterId) }
+    ): Result<String> = downloadOneshot {
+        cancelChapterTask(
+            providerId = providerId,
+            mangaId = mangaId,
+            collectionId = collectionId,
+            chapterId = chapterId,
+        )
+    }
 
     // Util
     private suspend fun mutateProvider(

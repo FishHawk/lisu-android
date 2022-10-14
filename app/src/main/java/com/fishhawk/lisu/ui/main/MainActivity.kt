@@ -40,7 +40,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.StartScreen
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.getBlocking
-import com.fishhawk.lisu.data.network.model.GitHubReleaseDto
+import com.fishhawk.lisu.data.network.model.GitHubRelease
 import com.fishhawk.lisu.notification.AppUpdateNotification
 import com.fishhawk.lisu.ui.base.BaseActivity
 import com.fishhawk.lisu.ui.base.OnEvent
@@ -75,7 +75,7 @@ class MainActivity : BaseActivity() {
 private fun MainApp() {
     val viewModel by viewModel<MainViewModel>()
 
-    var latestRelease by remember { mutableStateOf<GitHubReleaseDto?>(null) }
+    var latestRelease by remember { mutableStateOf<GitHubRelease?>(null) }
 
     val context = LocalContext.current
 

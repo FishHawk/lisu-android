@@ -128,6 +128,7 @@ dependencies {
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-client-resources:$ktorVersion")
 
     // Licenses
     implementation("com.mikepenz:aboutlibraries-compose:10.3.0")

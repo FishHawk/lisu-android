@@ -5,7 +5,7 @@ import com.fishhawk.lisu.BuildConfig
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.get
 import com.fishhawk.lisu.data.network.GitHubRepository
-import com.fishhawk.lisu.data.network.model.GitHubReleaseDto
+import com.fishhawk.lisu.data.network.model.GitHubRelease
 import com.fishhawk.lisu.ui.base.BaseViewModel
 import com.fishhawk.lisu.ui.base.Event
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +18,7 @@ import java.time.Instant
 sealed interface MainEvent : Event {
     object NoNewUpdates : MainEvent
     data class CheckUpdateFailure(val exception: Throwable) : MainEvent
-    data class ShowUpdateDialog(val release: GitHubReleaseDto) : MainEvent
+    data class ShowUpdateDialog(val release: GitHubRelease) : MainEvent
     object AlreadyDownloading : MainEvent
     object NotifyDownloadStart : MainEvent
     data class NotifyDownloadProgress(val progress: Float) : MainEvent

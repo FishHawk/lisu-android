@@ -54,6 +54,17 @@ data class Page<Key : Any, T>(
     val nextKey: Key?,
 )
 
+fun <T> remotePagingList(
+    loader: suspend (Int) -> Result<List<T>>,
+    onStart: ((actionChannel: RemoteListActionChannel<T>) -> Unit)? = null,
+    onClose: ((actionChannel: RemoteListActionChannel<T>) -> Unit)? = null,
+): Flow<RemoteList<T>> = remotePagingList(
+    startKey = 0,
+    loader = { page -> loader(page).map { Page(it, if (it.isEmpty()) null else page + 1) } },
+    onStart = onStart,
+    onClose = onClose,
+)
+
 fun <Key : Any, T> remotePagingList(
     startKey: Key,
     loader: suspend (Key) -> Result<Page<Key, T>>,
