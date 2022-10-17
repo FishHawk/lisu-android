@@ -83,7 +83,7 @@ val appModule = module {
         get<PreferenceRepository>().serverAddress.flow
     }
 
-    single { LisuRepository(get(named("address"))) }
+    single { LisuRepository(get(), get(named("address"))) }
     single { GitHubRepository() }
 
     single {

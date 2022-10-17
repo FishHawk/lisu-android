@@ -20,7 +20,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
 
-class LisuRepository(urlFlow: Flow<String>) {
+class LisuRepository(
+    private val connectivity: Connectivity,
+    urlFlow: Flow<String>,
+) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private val urlState = urlFlow
@@ -61,7 +64,10 @@ class LisuRepository(urlFlow: Flow<String>) {
 
     // Provider API
     val providers = providerDaoFlow.flatMapLatest {
-        remoteData(loader = { it.mapCatching { dao -> dao.listProvider() } })
+        remoteData(
+            connectivity = connectivity,
+            loader = { it.mapCatching { dao -> dao.listProvider() } },
+        )
     }.stateIn(scope, SharingStarted.Eagerly, null)
 
     suspend fun loginByCookies(
@@ -113,6 +119,7 @@ class LisuRepository(urlFlow: Flow<String>) {
         keywords: String? = null,
     ): Flow<RemoteList<MangaDto>> = providerDaoFlow.flatMapLatest {
         remotePagingList(
+            connectivity = connectivity,
             loader = { page ->
                 it.mapCatching { dao ->
                     dao.getBoard(
@@ -134,6 +141,7 @@ class LisuRepository(urlFlow: Flow<String>) {
         mangaId: String,
     ): Flow<RemoteData<MangaDetailDto>> = providerDaoFlow.flatMapLatest {
         remoteData(
+            connectivity = connectivity,
             loader = {
                 it.mapCatching { dao ->
                     dao.getManga(
@@ -152,6 +160,7 @@ class LisuRepository(urlFlow: Flow<String>) {
         mangaId: String,
     ): Flow<RemoteList<CommentDto>> = providerDaoFlow.flatMapLatest {
         remotePagingList(
+            connectivity = connectivity,
             loader = { page ->
                 it.mapCatching { dao ->
                     dao.getComment(
@@ -183,6 +192,7 @@ class LisuRepository(urlFlow: Flow<String>) {
         keywords: String,
     ): Flow<RemoteList<MangaDto>> = libraryDaoFlow.flatMapLatest {
         remotePagingList(
+            connectivity = connectivity,
             loader = { page -> it.mapCatching { dao -> dao.search(page, keywords) } },
             onStart = { libraryMangaListActionChannels.add(it) },
             onClose = { libraryMangaListActionChannels.remove(it) },

@@ -1,15 +1,12 @@
 package com.fishhawk.lisu.data.network.base
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 sealed interface RemoteListAction<out T> {
     data class Mutate<T>(val transformer: (MutableList<T>) -> MutableList<T>) : RemoteListAction<T>
@@ -55,10 +52,12 @@ data class Page<Key : Any, T>(
 )
 
 fun <T> remotePagingList(
+    connectivity: Connectivity,
     loader: suspend (Int) -> Result<List<T>>,
     onStart: ((actionChannel: RemoteListActionChannel<T>) -> Unit)? = null,
     onClose: ((actionChannel: RemoteListActionChannel<T>) -> Unit)? = null,
 ): Flow<RemoteList<T>> = remotePagingList(
+    connectivity = connectivity,
     startKey = 0,
     loader = { page -> loader(page).map { Page(it, if (it.isEmpty()) null else page + 1) } },
     onStart = onStart,
@@ -66,6 +65,7 @@ fun <T> remotePagingList(
 )
 
 fun <Key : Any, T> remotePagingList(
+    connectivity: Connectivity,
     startKey: Key,
     loader: suspend (Key) -> Result<Page<Key, T>>,
     onStart: ((actionChannel: RemoteListActionChannel<T>) -> Unit)? = null,
@@ -161,10 +161,12 @@ fun <Key : Any, T> remotePagingList(
         }
     }
     launch(dispatcher) {
-        Connectivity.instance?.interfaceName?.collect {
-            if (job.isActive) {
-                job.cancel()
-                job = requestNextPage()
+        connectivity.interfaceName.collect {
+            delay(250)
+            if (listState?.isSuccess != true) {
+                actionChannel.reload()
+            } else if (appendState?.isSuccess != true) {
+                actionChannel.requestNextPage()
             }
         }
     }

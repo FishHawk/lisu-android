@@ -37,10 +37,5 @@ class Connectivity(context: Context) {
                     _interfaceName.trySend(linkProperties.interfaceName)
                 }
             })
-        instance = this
-    }
-
-    companion object {
-        var instance: Connectivity? = null
     }
 }

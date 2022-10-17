@@ -3,6 +3,7 @@ package com.fishhawk.lisu.data.network.base
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
@@ -33,6 +34,7 @@ class RemoteData<T>(
 }
 
 fun <T> remoteData(
+    connectivity: Connectivity,
     loader: suspend () -> Result<T>,
     onStart: ((actionChannel: RemoteDataActionChannel<T>) -> Unit)? = null,
     onClose: ((actionChannel: RemoteDataActionChannel<T>) -> Unit)? = null,
@@ -66,10 +68,10 @@ fun <T> remoteData(
         }
     }
     launch(dispatcher) {
-        Connectivity.instance?.interfaceName?.collect {
-            if (job.isActive) {
-                job.cancel()
-                job = launch(dispatcher) { mySend(loader()) }
+        connectivity.interfaceName.collect {
+            delay(250)
+            if (value?.isSuccess != true) {
+                actionChannel.reload()
             }
         }
     }
