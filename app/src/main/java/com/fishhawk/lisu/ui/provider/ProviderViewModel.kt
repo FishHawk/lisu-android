@@ -3,6 +3,7 @@ package com.fishhawk.lisu.ui.provider
 import android.os.Bundle
 import androidx.lifecycle.viewModelScope
 import com.fishhawk.lisu.data.database.SearchHistoryRepository
+import com.fishhawk.lisu.data.database.model.SearchHistory
 import com.fishhawk.lisu.data.datastore.ProviderBrowseHistoryRepository
 import com.fishhawk.lisu.data.network.LisuRepository
 import com.fishhawk.lisu.data.network.base.PagedList
@@ -48,7 +49,7 @@ class ProviderViewModel(
 
     val suggestions = searchHistoryRepository.listByProvider(providerId)
         .map { list -> list.map { it.keywords }.distinct() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     private val filterValues =
         providerBrowseHistoryRepository
@@ -56,7 +57,11 @@ class ProviderViewModel(
             .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     private val remoteMangaList = flatCombine(
-        keywords,
+        keywords.onEach {
+            if (it.isNotBlank()) {
+                searchHistoryRepository.update(SearchHistory(providerId, it))
+            }
+        },
         filterValues.filterNotNull(),
     ) { keywords, filterValues ->
         lisuRepository.getBoard(providerId, boardId, filterValues, keywords)

@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -37,6 +37,7 @@ private sealed interface MoreAction {
     data class DeleteSuggestion(val address: String) : MoreAction
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreScreen(navController: NavHostController) {
     val viewModel by viewModel<MoreViewModel>()
@@ -118,7 +119,7 @@ private data class NsdService(
     val address: HttpUrl,
 )
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ServerAddressSelector(
     initAddress: String,
@@ -148,30 +149,36 @@ private fun ServerAddressSelector(
         hasContent = relativeSuggestions.isNotEmpty() || nsdServices.isNotEmpty(),
     ) {
         nsdServices.forEach {
-            DropdownMenuItem(onClick = { address = it.address.toString() }) {
-                ListItem(modifier = Modifier.weight(1f),
-                    secondaryText = { Text(text = it.address.toString()) }
-                ) {
-                    Text(text = it.name)
-                }
-            }
+            DropdownMenuItem(
+                text = {
+                    ListItem(
+                        headlineText = { Text(text = it.name) },
+                        modifier = Modifier.weight(1f),
+                        supportingText = { Text(text = it.address.toString()) }
+                    )
+                },
+                onClick = { address = it.address.toString() },
+            )
         }
         if (relativeSuggestions.isNotEmpty() && nsdServices.isNotEmpty()) {
             Divider()
         }
         relativeSuggestions.forEach {
-            DropdownMenuItem(onClick = { address = it }) {
-                ListItem(
-                    modifier = Modifier.weight(1f),
-                    trailing = {
-                        IconButton(onClick = { onAction(MoreAction.DeleteSuggestion(it)) }) {
-                            Icon(Icons.Default.Close, null)
+            DropdownMenuItem(
+                text = {
+                    ListItem(
+                        headlineText = { Text(text = it) },
+                        modifier = Modifier.weight(1f),
+                        trailingContent = {
+                            IconButton(onClick = { onAction(MoreAction.DeleteSuggestion(it)) }) {
+                                Icon(Icons.Default.Close, null)
+                            }
                         }
-                    }
-                ) {
-                    Text(text = it)
-                }
-            }
+                    )
+                },
+                onClick = { address = it },
+            )
+
         }
     }
 
@@ -223,7 +230,7 @@ private fun ServerAddressSelector(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TextFieldWithDropdownMenu(
     value: String,
@@ -245,7 +252,7 @@ private fun TextFieldWithDropdownMenu(
         TextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = modifier,
+            modifier = modifier.menuAnchor(),
             singleLine = true,
             placeholder = placeholder,
             leadingIcon = leadingIcon,
@@ -257,7 +264,6 @@ private fun TextFieldWithDropdownMenu(
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             )

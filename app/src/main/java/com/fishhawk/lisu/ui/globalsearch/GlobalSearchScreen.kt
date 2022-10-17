@@ -5,10 +5,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,10 +22,10 @@ import com.fishhawk.lisu.data.network.model.MangaDto
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToProvider
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.widget.*
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
-
 
 private sealed interface GlobalSearchAction {
     object NavUp : GlobalSearchAction
@@ -69,6 +69,7 @@ fun GlobalSearchScreen(navController: NavHostController) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GlobalSearchScaffold(
     keywords: String,
@@ -76,7 +77,8 @@ private fun GlobalSearchScaffold(
     searchRecordsResult: Result<List<SearchRecord>>?,
     onAction: (GlobalSearchAction) -> Unit,
 ) {
-    var editing by remember { mutableStateOf(keywords.isBlank()) }
+    val searchAndWaitInput = keywords.isBlank()
+    var editing by remember { mutableStateOf(searchAndWaitInput) }
     var editingKeywords by remember { mutableStateOf(keywords) }
 
     Scaffold(
@@ -100,7 +102,7 @@ private fun GlobalSearchScaffold(
                     }
                 },
                 onDismiss = {
-                    if (keywords.isBlank()) onAction(GlobalSearchAction.NavUp)
+                    if (searchAndWaitInput) onAction(GlobalSearchAction.NavUp)
                     else editing = false
                 },
                 placeholder = { Text(stringResource(R.string.search_global_hint)) }
@@ -108,29 +110,31 @@ private fun GlobalSearchScaffold(
         },
         content = { paddingValues ->
             LisuTransition {
-                StateView(
-                    result = searchRecordsResult,
-                    onRetry = { onAction(GlobalSearchAction.ReloadProviders) },
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .fillMaxSize(),
-                ) { searchRecords, modifier ->
-                    SearchRecordList(
-                        searchRecords = searchRecords,
-                        onAction = onAction,
-                        modifier = modifier,
+                Box(modifier = Modifier.padding(paddingValues)) {
+                    if (!searchAndWaitInput) {
+                        StateView(
+                            result = searchRecordsResult,
+                            onRetry = { onAction(GlobalSearchAction.ReloadProviders) },
+                            modifier = Modifier.fillMaxSize(),
+                        ) { searchRecords, modifier ->
+                            SearchRecordList(
+                                searchRecords = searchRecords,
+                                onAction = onAction,
+                                modifier = modifier,
+                            )
+                        }
+                    }
+                    SuggestionList(
+                        visible = editing,
+                        onDismiss = {
+                            editing = false
+                            if (searchAndWaitInput) onAction(GlobalSearchAction.NavUp)
+                        },
+                        keywords = editingKeywords,
+                        suggestions = suggestions,
+                        onSuggestionSelected = { editingKeywords = it }
                     )
                 }
-                SuggestionList(
-                    visible = editing,
-                    onDismiss = {
-                        editing = false
-                        if (keywords.isBlank()) onAction(GlobalSearchAction.NavUp)
-                    },
-                    keywords = editingKeywords,
-                    suggestions = suggestions,
-                    onSuggestionSelected = { editingKeywords = it }
-                )
             }
         }
     )
@@ -162,7 +166,7 @@ private fun SearchRecord(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = searchRecord.provider.run { "$id($lang)" },
-                style = MaterialTheme.typography.body2
+                style = MaterialTheme.typography.bodyMedium,
             )
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = {
@@ -179,10 +183,10 @@ private fun SearchRecord(
 
         searchRecord.remoteList.value?.onSuccess { mangaList ->
             if (mangaList.list.isEmpty()) {
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                MediumEmphasis {
                     Text(
                         text = "No result found.",
-                        style = MaterialTheme.typography.body2
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             } else {
@@ -205,11 +209,11 @@ private fun SearchRecord(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(modifier = Modifier.weight(1f)) {
-                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                    MediumEmphasis {
                         Text(
                             text = throwable.localizedMessage
                                 ?: stringResource(R.string.unknown_error),
-                            style = MaterialTheme.typography.caption,
+                            style = MaterialTheme.typography.bodySmall,
                             maxLines = 3,
                             overflow = TextOverflow.Ellipsis,
                         )

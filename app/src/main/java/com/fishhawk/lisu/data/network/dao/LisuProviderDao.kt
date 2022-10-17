@@ -280,7 +280,7 @@ internal fun HttpClient.processCover(
         ),
         builder,
     )
-    return builder.build().toString().apply { println(this) }
+    return builder.build().toString()
 }
 
 private fun HttpClient.processImage(

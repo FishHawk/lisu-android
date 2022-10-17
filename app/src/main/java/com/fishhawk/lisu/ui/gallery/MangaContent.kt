@@ -8,11 +8,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.GenericShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material.icons.outlined.ViewList
 import androidx.compose.material.icons.outlined.ViewModule
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -41,6 +41,7 @@ import com.fishhawk.lisu.data.datastore.setNext
 import com.fishhawk.lisu.data.network.model.Chapter
 import com.fishhawk.lisu.data.network.model.MangaDetailDto
 import com.fishhawk.lisu.ui.theme.LisuIcons
+import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.widget.itemsVerticalGrid
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -96,12 +97,16 @@ internal fun LazyListScope.mangaContent(
 
 private fun LazyListScope.mangaContentEmpty() {
     item {
-        Text(
-            text = stringResource(R.string.gallery_no_content_hint),
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colors.primary,
-            textAlign = TextAlign.Center,
-        )
+        MediumEmphasis {
+            Text(
+                text = stringResource(R.string.gallery_no_content_hint),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium,
+            )
+        }
     }
 }
 
@@ -150,10 +155,10 @@ private fun PreviewPage(
             contentDescription = null,
             contentScale = ContentScale.Fit,
         )
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        MediumEmphasis {
             Text(
                 text = page.toString(),
-                style = MaterialTheme.typography.body2,
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
     }
@@ -170,14 +175,16 @@ private fun LazyListScope.mangaContentCollections(
     collections.onEach { (collectionId, chapters) ->
         if (collectionId.isNotEmpty()) {
             item {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(2.dp),
-                    text = collectionId,
-                    style = MaterialTheme.typography.body2,
-                    textAlign = TextAlign.Center,
-                )
+                MediumEmphasis {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(2.dp),
+                        text = collectionId,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                }
             }
         }
 
@@ -209,7 +216,7 @@ private fun LazyListScope.mangaContentCollections(
                         onChapterClick = { onChapterClick(collectionId, chapter.id) },
                     )
                     if (chapter != orderedChapters.lastOrNull()) {
-                        Divider(color = MaterialTheme.colors.onSurface.copy(alpha = 0.06f))
+                        Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f))
                     }
                 }
             }
@@ -225,7 +232,7 @@ private fun MangaContentChapterHeader() {
     ) {
         Text(
             "Chapters:",
-            style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium)
+            style = MaterialTheme.typography.titleMedium,
         )
         Spacer(modifier = Modifier.weight(1f))
 
@@ -253,25 +260,25 @@ private fun ChapterGrid(
 ) {
     val isLocked = chapter.isLocked
 
-    val color = MaterialTheme.colors
+    val color = MaterialTheme.colorScheme
         .run { if (isMarked) primary else surface }
-        .let { if (isLocked) it.copy(alpha = ContentAlpha.disabled) else it }
+        .let { if (isLocked) it.copy(alpha = 0.1f) else it }
     val border = if (isLocked) BorderStroke(
         width = 1.dp,
-        color = MaterialTheme.colors.onSurface.copy(alpha = 0.05f)
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
     ) else null
     val elevation = if (isLocked) 0.dp else 2.dp
 
-    val textColor = MaterialTheme.colors
+    val textColor = MaterialTheme.colorScheme
         .run { if (isMarked) onPrimary else onSurface }
-        .let { if (isLocked) it.copy(alpha = ContentAlpha.disabled) else it }
+        .let { if (isLocked) it.copy(alpha = 0.1f) else it }
 
     Surface(
         modifier = if (isLocked) modifier else modifier.clickable { onChapterClick() },
         shape = RectangleShape,
         color = color,
         border = border,
-        elevation = elevation,
+        shadowElevation = elevation,
     ) {
         Box {
             if (isLocked) {
@@ -282,7 +289,7 @@ private fun ChapterGrid(
                         .padding(2.dp)
                         .size(12.dp)
                         .align(Alignment.TopStart),
-                    tint = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
                 )
             } else {
                 ChapterNewMark(
@@ -297,11 +304,11 @@ private fun ChapterGrid(
                     .fillMaxWidth()
                     .padding(horizontal = 2.dp, vertical = 8.dp),
                 text = chapter.name ?: chapter.id,
-                style = MaterialTheme.typography.body1.copy(fontSize = 12.sp),
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 12.sp),
                 color = textColor,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
     }
@@ -322,20 +329,23 @@ private fun ChapterLinear(
         }
         .padding(vertical = 12.dp, horizontal = 16.dp)
 
-    val textColor = MaterialTheme.colors
+    val textColor = MaterialTheme.colorScheme
         .run { if (isMarked) primary else onSurface }
-        .let { if (isLocked) it.copy(alpha = ContentAlpha.disabled) else it }
+        .let { if (isLocked) it.copy(alpha = 0.1f) else it }
 
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = listOf("¶", chapter.name, chapter.title).joinToString(" "),
-            color = textColor,
-            style = MaterialTheme.typography.caption,
-        )
+    ProvideTextStyle(value = MaterialTheme.typography.bodyMedium.copy(color = textColor)) {
+        Row(
+            modifier = modifier,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(text = "¶")
+            Text(
+                text = listOf(chapter.name, chapter.title).joinToString(" "),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
 
@@ -352,7 +362,7 @@ private fun ChapterNewMark(modifier: Modifier, updateTime: Long?) {
         if (days <= 5L) Box(
             modifier = modifier
                 .clip(TriangleShape)
-                .background(MaterialTheme.colors.primary)
+                .background(MaterialTheme.colorScheme.primary)
         )
     }
 }

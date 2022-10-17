@@ -1,7 +1,7 @@
 package com.fishhawk.lisu.ui.more
 
 import androidx.compose.foundation.clickable
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -10,9 +10,10 @@ import com.fishhawk.lisu.data.datastore.Preference
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.get
 import com.fishhawk.lisu.widget.LisuSelectDialog
+import com.fishhawk.lisu.widget.m3.LisuSwitch
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BasePreference(
     icon: ImageVector?,
@@ -22,13 +23,13 @@ fun BasePreference(
     trailing: @Composable (() -> Unit)? = null,
 ) {
     ListItem(
+        headlineText = { Text(text = title) },
         modifier = Modifier.clickable(onClick = { onClick() }),
-        icon = icon?.let {
-            { Icon(it, contentDescription = "", tint = MaterialTheme.colors.primary) }
+        leadingContent = icon?.let {
+            { Icon(it, contentDescription = "", tint = MaterialTheme.colorScheme.primary) }
         },
-        text = { Text(text = title) },
-        secondaryText = summary?.let { { Text(text = it) } },
-        trailing = trailing
+        supportingText = summary?.let { { Text(text = it) } },
+        trailingContent = trailing
     )
 }
 
@@ -55,7 +56,7 @@ fun SwitchPreference(
         onClick = { scope.launch { preference.set(!preference.get()) } }
     ) {
         val checked by preference.collectAsState()
-        Switch(checked = checked, onCheckedChange = null)
+        LisuSwitch(checked = checked, onCheckedChange = null)
     }
 }
 

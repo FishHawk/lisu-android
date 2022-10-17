@@ -11,10 +11,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,13 +27,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
-import com.fishhawk.lisu.data.datastore.getBlocking
-import com.fishhawk.lisu.data.datastore.setBlocking
 import com.fishhawk.lisu.data.network.model.*
 import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.*
 import com.google.accompanist.flowlayout.FlowRow
@@ -128,6 +127,7 @@ fun ProviderScreen(navController: NavHostController) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProviderScaffold(
     providerId: String,
@@ -145,8 +145,9 @@ private fun ProviderScaffold(
         PR.lastUsedProvider.set(providerId)
     }
 
+    val searchAndWaitInput = boardId == BoardId.Search && keywords.isBlank()
     var editingKeywords by remember { mutableStateOf(keywords) }
-    var editing by remember { mutableStateOf(boardId == BoardId.Search && keywords.isBlank()) }
+    var editing by remember { mutableStateOf(searchAndWaitInput) }
 
     var showAdvanceFilterList by remember { mutableStateOf(false) }
 
@@ -156,7 +157,7 @@ private fun ProviderScaffold(
                 title = keywords.ifBlank { providerId },
                 onNavUp = { onAction(ProviderAction.NavUp) },
             ) {
-                if (hasSearchBar) {
+                if (hasSearchBar || boardId == BoardId.Search) {
                     IconButton(onClick = { editing = true }) {
                         Icon(Icons.Default.Search, stringResource(R.string.action_search))
                     }
@@ -172,14 +173,13 @@ private fun ProviderScaffold(
                 value = editingKeywords,
                 onValueChange = { editingKeywords = it },
                 onSearch = {
-                    if (it.isNotBlank()) {
+                    if (boardId != BoardId.Search || it.isNotBlank()) {
                         onAction(ProviderAction.Search(it))
                         editing = false
                     }
                 },
                 onDismiss = {
-                    if (boardId == BoardId.Search && keywords.isBlank())
-                        onAction(ProviderAction.NavUp)
+                    if (searchAndWaitInput) onAction(ProviderAction.NavUp)
                     else editing = false
                 },
                 placeholder = { Text("${providerId}-${boardId}") }
@@ -191,18 +191,20 @@ private fun ProviderScaffold(
                     var addDialogManga by remember { mutableStateOf<MangaDto?>(null) }
                     var removeDialogManga by remember { mutableStateOf<MangaDto?>(null) }
 
-                    ProviderMangaList(
-                        board = board,
-                        isRefreshing = isRefreshing,
-                        onCardLongClick = {
-                            when (it.state) {
-                                MangaState.Remote -> addDialogManga = it
-                                MangaState.RemoteInLibrary -> removeDialogManga = it
-                                else -> Unit
-                            }
-                        },
-                        onAction = onAction,
-                    )
+                    if (!searchAndWaitInput) {
+                        ProviderMangaList(
+                            board = board,
+                            isRefreshing = isRefreshing,
+                            onCardLongClick = {
+                                when (it.state) {
+                                    MangaState.Remote -> addDialogManga = it
+                                    MangaState.RemoteInLibrary -> removeDialogManga = it
+                                    else -> Unit
+                                }
+                            },
+                            onAction = onAction,
+                        )
+                    }
 
                     if (board.filterValues.advance.isNotEmpty()) {
                         AnimatedVisibility(
@@ -222,8 +224,7 @@ private fun ProviderScaffold(
                         visible = editing,
                         onDismiss = {
                             editing = false
-                            if (boardId == BoardId.Search && keywords.isBlank())
-                                onAction(ProviderAction.NavUp)
+                            if (searchAndWaitInput) onAction(ProviderAction.NavUp)
                         },
                         keywords = editingKeywords,
                         suggestions = suggestions,
@@ -311,7 +312,7 @@ private fun FilterSelectBase(
                 },
                 text = text,
                 style = TextStyle(fontSize = 12.sp).merge(),
-                color = MaterialTheme.colors.run {
+                color = MaterialTheme.colorScheme.run {
                     if (index != value) onSurface else primary
                 }
             )
@@ -338,7 +339,7 @@ private fun ProviderFilterList(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(state)
-            .background(MaterialTheme.colors.background)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         (filters.base + filters.advance).forEach { (name, filterValue) ->
             FilterAdvance(
@@ -394,6 +395,7 @@ private fun FilterAdvance(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FilterText(
     name: String,
@@ -401,11 +403,13 @@ private fun FilterText(
     onValueChange: (String) -> Unit,
 ) {
     var text by remember { mutableStateOf(value) }
-    TextField(
+    OutlinedTextField(
         value = value,
         onValueChange = { text = it },
-        modifier = Modifier.padding(12.dp),
-        placeholder = { Text(name) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        label = { Text(name) },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Uri,
             imeAction = ImeAction.Done
@@ -427,8 +431,14 @@ private fun FilterSwitch(
             .padding(12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Checkbox(checked = value, onCheckedChange = null)
-        Text(text = name, style = MaterialTheme.typography.subtitle2)
+        Checkbox(
+            checked = value,
+            onCheckedChange = null,
+        )
+        Text(
+            text = name,
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }
 
@@ -447,9 +457,15 @@ private fun FilterSelectAdvance(
             .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(text = name, style = MaterialTheme.typography.subtitle2)
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            Text(text = model.options[value], style = MaterialTheme.typography.subtitle2)
+        Text(
+            text = name,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        MediumEmphasis {
+            Text(
+                text = model.options[value],
+                style = MaterialTheme.typography.bodyMedium,
+            )
         }
         if (isOpen) {
             LisuSelectDialog(
@@ -478,8 +494,15 @@ private fun FilterMultipleSelectAdvance(
             .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(text = name, style = MaterialTheme.typography.subtitle2)
-        Icon(imageVector = LisuIcons.Add, contentDescription = "edit")
+        Text(
+            text = name,
+            style =
+            MaterialTheme.typography.bodyMedium,
+        )
+        Icon(
+            imageVector = LisuIcons.Add,
+            contentDescription = "edit",
+        )
         if (isOpen) {
             LisuMultipleSelectDialog(
                 title = name,

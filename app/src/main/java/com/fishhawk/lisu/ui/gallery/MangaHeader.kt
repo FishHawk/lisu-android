@@ -3,8 +3,8 @@ package com.fishhawk.lisu.ui.gallery
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +27,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.network.model.MangaState
 import com.fishhawk.lisu.ui.theme.LisuIcons
+import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.widget.LisuToolBar
 import com.fishhawk.lisu.widget.LocalBottomSheetHelper
 import kotlinx.coroutines.flow.filterNotNull
@@ -46,7 +47,7 @@ internal fun MangaHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(290.dp)
+            .height(290.dp),
     ) {
         val context = LocalContext.current
         var loadedCover by remember { mutableStateOf(cover) }
@@ -87,7 +88,7 @@ internal fun MangaHeader(
                     Brush.verticalGradient(
                         colors = listOf(
                             Color.Transparent,
-                            MaterialTheme.colors.background
+                            MaterialTheme.colorScheme.background
                         ),
                     )
                 )
@@ -113,7 +114,7 @@ internal fun MangaHeader(
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 val scope = rememberCoroutineScope()
                 val bottomSheetHelper = LocalBottomSheetHelper.current
@@ -125,13 +126,12 @@ internal fun MangaHeader(
                             val sheet = GalleryCoverSheet(drawable, onAction)
                             scope.launch { bottomSheetHelper.open(sheet) }
                         },
-                    shape = RoundedCornerShape(4.dp),
-                    elevation = 4.dp,
+                    shape = MaterialTheme.shapes.extraSmall,
                 ) {
                     Image(
                         painter = painter,
                         contentDescription = null,
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
                     )
                 }
                 MangaInfo(
@@ -173,22 +173,36 @@ private fun MangaInfo(
                     ),
             )
         }
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            if (authors.isNotEmpty()) {
-                val authorsText = authors.joinToString(separator = ";")
-                MangaInfoSubtitle(
-                    text = authorsText,
-                    modifier = Modifier.combinedClickable(
-                        onClick = { onAction(GalleryAction.NavToGlobalSearch(authorsText)) },
-                        onLongClick = {
-                            onAction(GalleryAction.Copy(authorsText, R.string.author_copied))
-                        },
-                    ),
-                )
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                isFinished?.let { MangaInfoSubtitle(text = if (it) "Finished" else "Ongoing") }
-                MangaInfoSubtitle(text = providerId)
+        MediumEmphasis {
+            ProvideTextStyle(value = MaterialTheme.typography.bodyMedium) {
+                if (authors.isNotEmpty()) {
+                    val authorsText = authors.joinToString(separator = ";")
+                    Text(
+                        text = authorsText,
+                        modifier = Modifier.combinedClickable(
+                            onClick = { onAction(GalleryAction.NavToGlobalSearch(authorsText)) },
+                            onLongClick = {
+                                onAction(GalleryAction.Copy(authorsText, R.string.author_copied))
+                            },
+                        ),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    isFinished?.let {
+                        Text(
+                            text = if (it) "Finished" else "Ongoing",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                    Text(
+                        text = providerId,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
         }
     }
@@ -199,7 +213,7 @@ private fun MangaInfoTitle(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    val defaultTextStyle = MaterialTheme.typography.h6
+    val defaultTextStyle = MaterialTheme.typography.titleLarge
     var textStyle by remember { mutableStateOf(defaultTextStyle) }
     var readyToDraw by remember { mutableStateOf(false) }
 
@@ -210,31 +224,19 @@ private fun MangaInfoTitle(
                 drawContent()
             }
         },
-        style = textStyle,
         onTextLayout = { textLayoutResult ->
             if (textLayoutResult.didOverflowHeight && textStyle.fontSize > 12.sp) {
                 readyToDraw = false
-                textStyle = textStyle.copy(fontSize = textStyle.fontSize.times(0.9))
+                textStyle = textStyle.copy(
+                    fontSize = textStyle.fontSize.times(0.9),
+                    lineHeight = textStyle.fontSize.times(0.9) / 4 * 5,
+                )
             } else {
                 readyToDraw = true
             }
         },
-        overflow = TextOverflow.Ellipsis
-    )
-}
-
-
-@Composable
-private fun MangaInfoSubtitle(
-    text: String,
-    modifier: Modifier = Modifier,
-) {
-    Text(
-        text = text,
-        modifier = modifier,
-        style = MaterialTheme.typography.body2,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
+        overflow = TextOverflow.Ellipsis,
+        style = textStyle,
     )
 }
 
@@ -247,7 +249,7 @@ private fun MangaActionButtons(
     Row(modifier = Modifier.padding(horizontal = 16.dp)) {
         when (state) {
             MangaState.Local -> {
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                MediumEmphasis {
                     MangaActionButton(
                         icon = LisuIcons.Edit,
                         text = "Edit metadata"
@@ -255,7 +257,7 @@ private fun MangaActionButtons(
                 }
             }
             MangaState.Remote -> {
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                MediumEmphasis {
                     MangaActionButton(
                         icon = LisuIcons.FavoriteBorder,
                         text = "Add to library"
@@ -263,7 +265,7 @@ private fun MangaActionButtons(
                 }
             }
             MangaState.RemoteInLibrary -> {
-                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.primary) {
+                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.primary) {
                     MangaActionButton(
                         icon = LisuIcons.Favorite,
                         text = "In library"
@@ -271,7 +273,7 @@ private fun MangaActionButtons(
                 }
             }
         }
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        MediumEmphasis {
             MangaActionButton(
                 icon = LisuIcons.AutoStories,
                 text = if (history == null) "Read" else "Continue"
@@ -291,13 +293,16 @@ private fun RowScope.MangaActionButton(
             .weight(1f)
             .clickable(onClick = onClick)
             .padding(vertical = 4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Icon(
-            icon,
+            imageVector = icon,
             modifier = Modifier.size(24.dp),
-            contentDescription = text
+            contentDescription = text,
         )
-        Text(text, style = MaterialTheme.typography.caption)
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium,
+        )
     }
 }

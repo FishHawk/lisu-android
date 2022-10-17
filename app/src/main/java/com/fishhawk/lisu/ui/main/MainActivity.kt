@@ -8,25 +8,25 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CollectionsBookmark
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -45,7 +45,10 @@ import com.fishhawk.lisu.notification.AppUpdateNotification
 import com.fishhawk.lisu.ui.base.BaseActivity
 import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.download.DownloadScreen
-import com.fishhawk.lisu.ui.explore.*
+import com.fishhawk.lisu.ui.explore.ExploreScreen
+import com.fishhawk.lisu.ui.explore.LoginCookiesScreen
+import com.fishhawk.lisu.ui.explore.LoginPasswordScreen
+import com.fishhawk.lisu.ui.explore.LoginWebsiteScreen
 import com.fishhawk.lisu.ui.gallery.GalleryCommentScreen
 import com.fishhawk.lisu.ui.gallery.GalleryEditScreen
 import com.fishhawk.lisu.ui.gallery.GalleryScreen
@@ -53,6 +56,9 @@ import com.fishhawk.lisu.ui.globalsearch.GlobalSearchScreen
 import com.fishhawk.lisu.ui.history.HistoryScreen
 import com.fishhawk.lisu.ui.library.LibraryScreen
 import com.fishhawk.lisu.ui.more.*
+import com.fishhawk.lisu.ui.more.SettingGeneralScreen
+import com.fishhawk.lisu.ui.more.SettingReaderScreen
+import com.fishhawk.lisu.ui.more.SettingAdvancedScreen
 import com.fishhawk.lisu.ui.provider.ProviderScreen
 import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.util.findActivity
@@ -60,7 +66,6 @@ import com.fishhawk.lisu.util.toUriCompat
 import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.LisuDialog
 import com.fishhawk.lisu.widget.LisuModalBottomSheetLayout
-import com.google.accompanist.insets.ui.BottomNavigation
 import com.google.accompanist.insets.ui.Scaffold
 import org.koin.androidx.compose.viewModel
 
@@ -123,7 +128,9 @@ private fun MainApp() {
             ) { innerPadding ->
                 MainNavHost(
                     navController = navController,
-                    modifier = Modifier.padding(innerPadding)
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .imePadding(),
                 )
             }
 
@@ -227,18 +234,30 @@ sealed class Tab(val route: String, val labelResId: Int, val icon: ImageVector) 
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun BottomBar(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
     AnimatedVisibility(
-        visible = (Tab.items.any { it.route == currentDestination?.route }),
+        visible = (Tab.items.any { it.route == currentDestination?.route }) && !WindowInsets.isImeVisible,
         enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        exit = slideOutVertically(targetOffsetY = { it }),
     ) {
-        BottomNavigation(backgroundColor = MaterialTheme.colors.surface) {
-            Tab.items.forEach { tab -> BottomBarTab(tab, currentDestination, navController) }
+        Surface(shadowElevation = 16.dp) {
+            NavigationBar {
+                Tab.items.forEach { tab ->
+                    val selected = currentDestination?.hierarchy?.any {
+                        it.route == tab.route
+                    } ?: false
+                    BottomBarTab(
+                        tab = tab,
+                        selected = selected,
+                        navController = navController,
+                    )
+                }
+            }
         }
     }
 }
@@ -246,22 +265,27 @@ private fun BottomBar(navController: NavHostController) {
 @Composable
 private fun RowScope.BottomBarTab(
     tab: Tab,
-    currentDestination: NavDestination?,
+    selected: Boolean,
     navController: NavHostController,
-) = BottomNavigationItem(
-    icon = { Icon(tab.icon, contentDescription = tab.route) },
-    label = { Text(stringResource(tab.labelResId)) },
-    selected = currentDestination?.hierarchy?.any { it.route == tab.route } == true,
-    selectedContentColor = MaterialTheme.colors.primary,
-    unselectedContentColor = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium),
-    onClick = {
-        if (tab.route == navController.currentDestination?.route) return@BottomNavigationItem
-        navController.navigate(tab.route) {
-            popUpTo(navController.graph.findStartDestination().id) {
-                saveState = true
+) {
+    NavigationBarItem(
+        icon = { Icon(tab.icon, contentDescription = tab.route) },
+        label = { Text(stringResource(tab.labelResId)) },
+        selected = selected,
+        colors = NavigationBarItemDefaults.colors(
+            selectedIconColor = MaterialTheme.colorScheme.primary,
+            selectedTextColor = MaterialTheme.colorScheme.primary,
+            indicatorColor = MaterialTheme.colorScheme.surface,
+        ),
+        onClick = {
+            if (tab.route == navController.currentDestination?.route) return@NavigationBarItem
+            navController.navigate(tab.route) {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
             }
-            launchSingleTop = true
-            restoreState = true
         }
-    }
-)
+    )
+}

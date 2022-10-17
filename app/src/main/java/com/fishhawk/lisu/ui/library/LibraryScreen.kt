@@ -5,12 +5,13 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.Casino
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
@@ -88,6 +89,7 @@ fun LibraryScreen(navController: NavHostController) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LibraryScaffold(
     keywords: String,
@@ -136,81 +138,82 @@ private fun LibraryScaffold(
                     modifier = Modifier
                         .padding(paddingValues)
                         .fillMaxSize(),
-                ) { mangaList ->
-                    RefreshableMangaList(
-                        mangaList = mangaList,
-                        isRefreshing = isRefreshing,
-                        onRefresh = { onAction(LibraryAction.Refresh) },
-                        onRequestNextPage = { onAction(LibraryAction.RequestNextPage) },
-                        onCardClick = {
-                            if (selectedMangaList.isEmpty()) {
-                                onAction(LibraryAction.NavToGallery(it))
-                            } else {
-                                val key = it.key
-                                if (selectedMangaList.contains(key)) {
-                                    selectedMangaList.remove(key)
+                ) { mangaList, modifier ->
+                    Box(modifier = modifier) {
+                        RefreshableMangaList(
+                            mangaList = mangaList,
+                            isRefreshing = isRefreshing,
+                            onRefresh = { onAction(LibraryAction.Refresh) },
+                            onRequestNextPage = { onAction(LibraryAction.RequestNextPage) },
+                            onCardClick = {
+                                if (selectedMangaList.isEmpty()) {
+                                    onAction(LibraryAction.NavToGallery(it))
                                 } else {
-                                    selectedMangaList.add(key)
+                                    val key = it.key
+                                    if (selectedMangaList.contains(key)) {
+                                        selectedMangaList.remove(key)
+                                    } else {
+                                        selectedMangaList.add(key)
+                                    }
                                 }
-                            }
-                        },
-                        onCardLongClick = { manga ->
-                            if (selectedMangaList.isEmpty()) {
-                                selectedMangaList.add(manga.key)
-                            } else {
-                                val list = mangaList.list.map { it.key }
-                                val start = list.indexOf(selectedMangaList.last())
-                                val end = list.indexOf(manga.key)
-                                val pendingList = if (start > end) {
-                                    list.slice(end..start).reversed()
+                            },
+                            onCardLongClick = { manga ->
+                                if (selectedMangaList.isEmpty()) {
+                                    selectedMangaList.add(manga.key)
                                 } else {
-                                    list.slice(start..end)
+                                    val list = mangaList.list.map { it.key }
+                                    val start = list.indexOf(selectedMangaList.last())
+                                    val end = list.indexOf(manga.key)
+                                    val pendingList = if (start > end) {
+                                        list.slice(end..start).reversed()
+                                    } else {
+                                        list.slice(start..end)
+                                    }
+                                    selectedMangaList.removeIf { pendingList.contains(it) }
+                                    selectedMangaList.addAll(pendingList)
                                 }
-                                selectedMangaList.removeIf { pendingList.contains(it) }
-                                selectedMangaList.addAll(pendingList)
-                            }
-                        },
-                        aboveCover = { manga ->
-                            if (selectedMangaList.contains(manga.key)) {
-                                val color = MaterialTheme.colors.primary.copy(alpha = 0.3f)
-                                Canvas(modifier = Modifier.matchParentSize()) {
-                                    drawRoundRect(
-                                        color = color,
-                                        cornerRadius = CornerRadius(4.dp.toPx()),
-                                    )
+                            },
+                            aboveCover = { manga ->
+                                if (selectedMangaList.contains(manga.key)) {
+                                    val color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                                    Canvas(modifier = Modifier.matchParentSize()) {
+                                        drawRoundRect(
+                                            color = color,
+                                            cornerRadius = CornerRadius(4.dp.toPx()),
+                                        )
+                                    }
+                                }
+                            },
+                            behindCover = { manga ->
+                                if (selectedMangaList.contains(manga.key)) {
+                                    val color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                                    val boardSize = 8f
+                                    Canvas(modifier = Modifier.matchParentSize()) {
+                                        drawRoundRect(
+                                            color = color,
+                                            topLeft = Offset(-boardSize, -boardSize),
+                                            size = Size(
+                                                size.width + 2 * boardSize,
+                                                size.height + 2 * boardSize,
+                                            ),
+                                            cornerRadius = CornerRadius(4.dp.toPx()),
+                                        )
+                                    }
                                 }
                             }
-                        },
-                        behindCover = { manga ->
-                            if (selectedMangaList.contains(manga.key)) {
-                                val color = MaterialTheme.colors.primary.copy(alpha = 0.7f)
-                                val boardSize = 8f
-                                Canvas(modifier = Modifier.matchParentSize()) {
-                                    drawRoundRect(
-                                        color = color,
-                                        topLeft = Offset(-boardSize, -boardSize),
-                                        size = Size(
-                                            size.width + 2 * boardSize,
-                                            size.height + 2 * boardSize,
-                                        ),
-                                        cornerRadius = CornerRadius(4.dp.toPx()),
-                                    )
-                                }
-                            }
-                        }
+                        )
+                    }
+                    BackHandler(selectedMangaList.isNotEmpty()) {
+                        selectedMangaList.clear()
+                    }
+                    SuggestionList(
+                        visible = editing,
+                        onDismiss = { editing = false },
+                        keywords = editingKeywords,
+                        suggestions = suggestions,
+                        onSuggestionSelected = { editingKeywords = it }
                     )
                 }
-                BackHandler(selectedMangaList.isNotEmpty()) {
-                    selectedMangaList.clear()
-                }
-                SuggestionList(
-                    visible = editing,
-                    onDismiss = { editing = false },
-                    keywords = editingKeywords,
-                    suggestions = suggestions,
-                    additionalBottom = (-56).dp,
-                    onSuggestionSelected = { editingKeywords = it }
-                )
             }
         }
     )

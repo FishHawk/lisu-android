@@ -2,11 +2,11 @@ package com.fishhawk.lisu.ui.reader
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.Slider
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BrightnessHigh
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +23,7 @@ import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.ui.more.ListPreference
 import com.fishhawk.lisu.ui.more.SwitchPreference
 import com.fishhawk.lisu.widget.BottomSheet
+import com.fishhawk.lisu.widget.m3.LisuSlider
 import kotlinx.coroutines.launch
 
 @Composable
@@ -106,7 +107,7 @@ private fun ReaderOverlaySheetContent() {
 private fun SliderPreference(
     enabled: Boolean,
     label: String,
-    preference: Preference<Float>
+    preference: Preference<Float>,
 ) {
     Row(
         modifier = Modifier.padding(horizontal = 16.dp),
@@ -115,7 +116,7 @@ private fun SliderPreference(
         val scope = rememberCoroutineScope()
         var p by remember { mutableStateOf(preference.getBlocking()) }
         Text(text = label)
-        Slider(
+        LisuSlider(
             modifier = Modifier.height(36.dp),
             enabled = enabled,
             value = p,
@@ -130,7 +131,7 @@ private fun SliderPreference(
 private fun SliderPreference(
     enabled: Boolean,
     icon: ImageVector,
-    preference: Preference<Float>
+    preference: Preference<Float>,
 ) {
     Row(
         modifier = Modifier.padding(horizontal = 16.dp),
@@ -139,7 +140,7 @@ private fun SliderPreference(
         val scope = rememberCoroutineScope()
         var p by remember { mutableStateOf(preference.getBlocking()) }
         Icon(icon, contentDescription = null)
-        Slider(
+        LisuSlider(
             modifier = Modifier.height(36.dp),
             enabled = enabled,
             value = p,

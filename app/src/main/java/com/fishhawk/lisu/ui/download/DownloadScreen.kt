@@ -6,30 +6,28 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Replay
-import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.data.LoremIpsum
 import com.fishhawk.lisu.data.network.model.ChapterDownloadTask
 import com.fishhawk.lisu.data.network.model.MangaDownloadTask
 import com.fishhawk.lisu.data.network.model.MangaDto
 import com.fishhawk.lisu.data.network.model.MangaState
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToReader
-import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.widget.*
@@ -151,6 +149,7 @@ fun DownloadScreen(navController: NavHostController) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DownloadScaffold(
     tasksResult: Result<List<MangaDownloadTask>>?,
@@ -270,68 +269,49 @@ private fun MangaDownloadTask(
     onAction: (DownloadAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier
-            .clickable(onClick = onClick)
-            .height(92.dp)
-            .padding(horizontal = 8.dp, vertical = 2.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        MangaCover(
-            cover = task.cover,
-            modifier = Modifier.fillMaxHeight(),
-        )
-
-        Column(modifier = Modifier.weight(1f)) {
+    LisuListItem(
+        leadingContent = {
+            MangaCard(
+                cover = task.cover,
+                modifier = Modifier.fillMaxHeight(),
+            )
+        },
+        headlineText = {
             Text(
                 text = task.title ?: task.mangaId,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
-                style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium),
             )
-
+        },
+        modifier = modifier.clickable(onClick = onClick),
+        supportingText = {
             val displayChapterTask =
                 task.chapterTasks.firstOrNull { it.state is ChapterDownloadTask.State.Downloading }
                     ?: task.chapterTasks.firstOrNull { it.state is ChapterDownloadTask.State.Waiting }
                     ?: task.chapterTasks.first()
 
             Row {
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    val state = displayChapterTask.state
-                    val size = task.chapterTasks.size
-                    val chapterHint = when (state) {
-                        is ChapterDownloadTask.State.Downloading ->
-                            listOf(
-                                task.providerId,
-                                displayChapterTask.collectionId,
-                                displayChapterTask.name,
-                            ).filter { !it.isNullOrBlank() }
-                                .joinToString(" ")
-                        else -> task.providerId
-                    }
-                    val stateHint = when (state) {
-                        is ChapterDownloadTask.State.Downloading ->
-                            "${state.downloadedPageNumber ?: "-"}/${state.totalPageNumber ?: "-"}(${size})"
-                        ChapterDownloadTask.State.Waiting ->
-                            "Waiting(${size})"
-                        is ChapterDownloadTask.State.Failed ->
-                            "Failed(${size})"
-                    }
-                    ProvideTextStyle(value = MaterialTheme.typography.body2) {
-                        Text(
-                            text = chapterHint,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f),
-                            maxLines = 1,
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stateHint,
-                            maxLines = 1,
-                        )
-                    }
+                val state = displayChapterTask.state
+                val size = task.chapterTasks.size
+                val stateHint = when (state) {
+                    is ChapterDownloadTask.State.Downloading ->
+                        "${state.downloadedPageNumber ?: "-"}/${state.totalPageNumber ?: "-"}(${size})"
+                    ChapterDownloadTask.State.Waiting ->
+                        "Waiting(${size})"
+                    is ChapterDownloadTask.State.Failed ->
+                        "Failed(${size})"
                 }
+                Text(
+                    text = task.providerId,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 1,
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stateHint,
+                    maxLines = 1,
+                )
             }
 
             (displayChapterTask.state as? ChapterDownloadTask.State.Downloading)?.let {
@@ -352,26 +332,24 @@ private fun MangaDownloadTask(
                     )
                 }
             }
-        }
-
-        OverflowMenuButton {
-            DropdownMenuItem(
-                onClick = { onAction(DownloadAction.NavToGallery(task)) },
-            ) {
-                Text("Open gallery")
+        },
+        trailingContent = {
+            OverflowMenuButton {
+                DropdownMenuItem(
+                    text = { Text("Open gallery") },
+                    onClick = { onAction(DownloadAction.NavToGallery(task)) },
+                )
+                DropdownMenuItem(
+                    text = { Text("Recover all tasks") },
+                    onClick = { onAction(DownloadAction.StartMangaTask(task)) },
+                )
+                DropdownMenuItem(
+                    text = { Text("Cancel all tasks") },
+                    onClick = { onAction(DownloadAction.CancelMangaTask(task)) },
+                )
             }
-            DropdownMenuItem(
-                onClick = { onAction(DownloadAction.StartMangaTask(task)) },
-            ) {
-                Text("Recover all tasks")
-            }
-            DropdownMenuItem(
-                onClick = { onAction(DownloadAction.CancelMangaTask(task)) },
-            ) {
-                Text("Cancel all tasks")
-            }
-        }
-    }
+        },
+    )
 }
 
 @Composable
@@ -401,45 +379,50 @@ private fun ChapterDownloadTask(
                 is ChapterDownloadTask.State.Failed -> "Failed:${state.errorMessage}"
             }
 
-            CompositionLocalProvider(
-                LocalContentAlpha provides
-                        if (chapterHint.isBlank()) ContentAlpha.medium
-                        else ContentAlpha.high
-            ) {
+            ProvideTextStyle(value = MaterialTheme.typography.bodySmall) {
                 Text(
                     text = chapterHint.ifBlank { "<no title>" },
-                    style = MaterialTheme.typography.caption,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
+                    style = MaterialTheme.typography.bodySmall,
                 )
-            }
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                 Text(
                     text = stateHint,
-                    style = MaterialTheme.typography.caption,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
         }
 
         OverflowMenuButton {
             DropdownMenuItem(
+                text = { Text("Read") },
                 onClick = { onAction(DownloadAction.NavToReader(mangaTask, chapterTask)) },
-            ) {
-                Text("Read")
-            }
+            )
             DropdownMenuItem(
+                text = { Text("Recover task") },
+                onClick = {
+                    onAction(
+                        DownloadAction.StartChapterTask(
+                            mangaTask,
+                            chapterTask
+                        )
+                    )
+                },
                 enabled = chapterTask.state is ChapterDownloadTask.State.Failed,
-                onClick = { onAction(DownloadAction.StartChapterTask(mangaTask, chapterTask)) },
-            ) {
-                Text("Recover task")
-            }
+            )
             DropdownMenuItem(
-                onClick = { onAction(DownloadAction.CancelChapterTask(mangaTask, chapterTask)) },
-            ) {
-                Text("Cancel task")
-            }
+                text = { Text("Cancel task") },
+                onClick = {
+                    onAction(
+                        DownloadAction.CancelChapterTask(
+                            mangaTask,
+                            chapterTask
+                        )
+                    )
+                },
+            )
         }
     }
 }
@@ -487,12 +470,8 @@ private fun DownloadScaffoldPreview() {
     }
 
     fun dummyMangaTaskList(): List<MangaDownloadTask> {
-        return (1..100).map {
-            MangaDownloadTask(
-                providerId = "漫画人",
-                mangaId = it.toString(),
-                cover = "https://api.lorem.space/image/book",
-                title = "龙珠",
+        return List(100) {
+            LoremIpsum.mangaDownloadTask().copy(
                 chapterTasks = when (it) {
                     1 -> dummyChapterTaskList()
                     2 -> dummyChapterTaskList(100)
@@ -501,12 +480,11 @@ private fun DownloadScaffoldPreview() {
             )
         }
     }
+
     LisuTheme {
-        LisuModalBottomSheetLayout {
-            DownloadScaffold(
-                tasksResult = Result.success(dummyMangaTaskList()),
-                onAction = { println(it) }
-            )
-        }
+        DownloadScaffold(
+            tasksResult = Result.success(dummyMangaTaskList()),
+            onAction = { println(it) },
+        )
     }
 }

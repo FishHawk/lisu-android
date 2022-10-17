@@ -2,11 +2,15 @@ package com.fishhawk.lisu.widget
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
-import androidx.compose.material.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.fishhawk.lisu.widget.m2.*
 import kotlinx.coroutines.launch
 
 open class BottomSheet {
@@ -19,7 +23,6 @@ open class BottomSheet {
         Text("No content")
     }
 
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     protected fun BackHandler() {
         val helper = LocalBottomSheetHelper.current
@@ -30,7 +33,6 @@ open class BottomSheet {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 class BottomSheetHelper(
     private val sheetState: MutableState<BottomSheet>,
     val state: ModalBottomSheetState
@@ -51,7 +53,6 @@ val LocalBottomSheetHelper = compositionLocalOf<BottomSheetHelper> {
     error("CompositionLocal LocalBottomSheetHelper not present")
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LisuModalBottomSheetLayout(
     content: @Composable () -> Unit
@@ -70,7 +71,7 @@ fun LisuModalBottomSheetLayout(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SheetListItem(
     icon: ImageVector,
@@ -79,7 +80,7 @@ fun SheetListItem(
 ) {
     ListItem(
         modifier = Modifier.clickable(onClick = { onClick() }),
-        icon = { Icon(imageVector = icon, contentDescription = title) },
-        text = { Text(text = title) }
+        leadingContent = { Icon(imageVector = icon, contentDescription = title) },
+        headlineText = { Text(text = title) }
     )
 }

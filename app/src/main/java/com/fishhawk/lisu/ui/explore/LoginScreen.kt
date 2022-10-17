@@ -7,8 +7,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -18,14 +18,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import com.fishhawk.lisu.data.LoremIpsum
+import com.fishhawk.lisu.data.network.model.CookiesLoginDto
 import com.fishhawk.lisu.data.network.model.ProviderDto
 import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.theme.LisuIcons
+import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.LisuToolBar
@@ -46,19 +50,17 @@ private fun LoginScreen(
     content: @Composable (ProviderDto, (LoginAction) -> Unit) -> Unit,
 ) {
     val viewModel by viewModel<ExploreViewModel>()
-
     val context = LocalContext.current
+    val providerId = navController.currentBackStackEntry!!.arguments!!.getString("providerId")!!
+
     val provider = remember {
-        val providerId = navController.currentBackStackEntry!!.arguments!!.getString("providerId")!!
         val providersResult = viewModel.providersLoadState.value
-        val provider = providersResult?.getOrNull()?.values?.flatten()
-            ?.find { it.id == providerId }
-        if (provider == null) {
-            context.toast("Provider $providerId not found.")
-            navController.navigateUp()
-            return
-        }
-        provider
+        providersResult?.getOrNull()?.values?.flatten()?.find { it.id == providerId }
+    }
+    if (provider == null) {
+        context.toast("Provider $providerId not found.")
+        navController.navigateUp()
+        return
     }
 
     val onAction: (LoginAction) -> Unit = { action ->
@@ -86,19 +88,38 @@ private fun LoginScreen(
 }
 
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 fun LoginWebsiteScreen(
     navController: NavHostController,
 ) = LoginScreen(navController = navController) { provider, onAction ->
+    LoginWebsiteScaffold(provider, onAction)
+}
+
+@Composable
+fun LoginCookiesScreen(
+    navController: NavHostController,
+) = LoginScreen(navController = navController) { provider, onAction ->
+    LoginCookiesScaffold(provider, onAction)
+}
+
+@Composable
+fun LoginPasswordScreen(
+    navController: NavHostController,
+) = LoginScreen(navController = navController) { provider, onAction ->
+    LoginPasswordScaffold(provider, onAction)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun LoginWebsiteScaffold(
+    provider: ProviderDto,
+    onAction: (LoginAction) -> Unit
+) {
     val context = LocalContext.current
-    val cookiesLogin = remember {
-        val cookiesLogin = provider.cookiesLogin
-        if (cookiesLogin == null) {
-            context.toast("Provider ${provider.id} not support website login.")
-            onAction(LoginAction.NavUp)
-            return@LoginScreen
-        }
-        cookiesLogin
+    val cookiesLogin = provider.cookiesLogin
+    if (cookiesLogin == null) {
+        context.toast("Provider ${provider.id} not support website login.")
+        onAction(LoginAction.NavUp)
+        return
     }
 
     Scaffold(
@@ -106,14 +127,14 @@ fun LoginWebsiteScreen(
             LisuToolBar(
                 title = {
                     ListItem(
-                        text = {
+                        headlineText = {
                             Text(
                                 text = "${provider.id}-Login",
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
                         },
-                        secondaryText = {
+                        supportingText = {
                             Text(
                                 text = cookiesLogin.loginSite,
                                 maxLines = 1,
@@ -166,19 +187,18 @@ fun LoginWebsiteScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginCookiesScreen(
-    navController: NavHostController,
-) = LoginScreen(navController = navController) { provider, onAction ->
+private fun LoginCookiesScaffold(
+    provider: ProviderDto,
+    onAction: (LoginAction) -> Unit
+) {
     val context = LocalContext.current
-    val cookiesLogin = remember {
-        val cookiesLogin = provider.cookiesLogin
-        if (cookiesLogin == null) {
-            context.toast("Provider ${provider.id} not support website login.")
-            onAction(LoginAction.NavUp)
-            return@LoginScreen
-        }
-        cookiesLogin
+    val cookiesLogin = provider.cookiesLogin
+    if (cookiesLogin == null) {
+        context.toast("Provider ${provider.id} not support website login.")
+        onAction(LoginAction.NavUp)
+        return
     }
 
     Scaffold(
@@ -205,7 +225,7 @@ fun LoginCookiesScreen(
                     ) {
                         Surface(
                             shape = RoundedCornerShape(4.dp),
-                            elevation = 2.dp,
+                            tonalElevation = 2.dp,
                         ) {
                             val painter = rememberAsyncImagePainter(
                                 ImageRequest.Builder(LocalContext.current)
@@ -254,10 +274,12 @@ fun LoginCookiesScreen(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginPasswordScreen(
-    navController: NavHostController,
-) = LoginScreen(navController = navController) { provider, onAction ->
+private fun LoginPasswordScaffold(
+    provider: ProviderDto,
+    onAction: (LoginAction) -> Unit
+) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         if (!provider.passwordLogin) {
@@ -290,7 +312,7 @@ fun LoginPasswordScreen(
                     ) {
                         Surface(
                             shape = RoundedCornerShape(4.dp),
-                            elevation = 2.dp,
+                            tonalElevation = 2.dp,
                         ) {
                             val painter = rememberAsyncImagePainter(
                                 ImageRequest.Builder(LocalContext.current)
@@ -348,4 +370,49 @@ fun LoginPasswordScreen(
             }
         }
     )
+}
+
+@Preview
+@Composable
+private fun LoginWebsiteScreen() {
+    LisuTheme {
+        LoginWebsiteScaffold(
+            provider = LoremIpsum.provider().copy(
+                cookiesLogin = CookiesLoginDto(
+                    loginSite = "https://manga.bilibili.com/",
+                    cookieNames = listOf("SESSDATA"),
+                )
+            ),
+            onAction = { println(it) },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun LoginCookiesScreen() {
+    LisuTheme {
+        LoginCookiesScaffold(
+            provider = LoremIpsum.provider().copy(
+                cookiesLogin = CookiesLoginDto(
+                    loginSite = "https://manga.bilibili.com/",
+                    cookieNames = listOf("SESSDATA"),
+                )
+            ),
+            onAction = { println(it) },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun LoginPasswordScreen() {
+    LisuTheme {
+        LoginPasswordScaffold(
+            provider = LoremIpsum.provider().copy(
+                passwordLogin = true,
+            ),
+            onAction = { println(it) },
+        )
+    }
 }

@@ -2,12 +2,9 @@ package com.fishhawk.lisu.widget
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -62,7 +59,10 @@ fun LisuSelectDialog(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         RadioButton(selected = index == selected, onClick = null)
-                        Text(text = text)
+                        Text(
+                            text = text,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
                     }
                 }
             }
@@ -93,7 +93,10 @@ fun LisuMultipleSelectDialog(
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         Checkbox(checked = index in selected, onCheckedChange = null)
-                        Text(text = text)
+                        Text(
+                            text = text,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
                     }
                 }
             }

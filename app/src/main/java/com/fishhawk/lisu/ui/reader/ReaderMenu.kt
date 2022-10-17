@@ -6,9 +6,9 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,9 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
+import com.fishhawk.lisu.data.datastore.Theme
 import com.fishhawk.lisu.data.datastore.collectAsState
+import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.widget.LocalBottomSheetHelper
+import com.fishhawk.lisu.widget.m3.LisuSlider
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapNotNull
@@ -49,7 +52,7 @@ internal fun BoxScope.ReaderInfoBar(
             .align(Alignment.BottomCenter)
             .padding(bottom = 4.dp),
         color = Color.White,
-        style = MaterialTheme.typography.subtitle2.copy(
+        style = MaterialTheme.typography.titleMedium.copy(
             shadow = Shadow(
                 color = Color.Black,
                 blurRadius = 3f,
@@ -71,7 +74,8 @@ internal fun BoxScope.ReaderMenu(
     onAction: (ReaderAction) -> Unit,
 ) {
     val systemUiController = rememberSystemUiController()
-    val useDarkIcons = MaterialTheme.colors.isLight
+    val theme by PR.theme.collectAsState()
+    val useDarkIcons = theme == Theme.Light
     LaunchedEffect(isOpened) {
         systemUiController.setStatusBarColor(
             Color.Transparent, darkIcons = useDarkIcons && !isOpened
@@ -85,9 +89,8 @@ internal fun BoxScope.ReaderMenu(
         exit = slideOutVertically(targetOffsetY = { -it })
     ) {
         ReaderMenuTop(
-            mangaTitle = mangaTitle,
-            chapterName = chapterName,
-            chapterTitle = chapterTitle
+            firstLineText = mangaTitle,
+            secondLineText = "$chapterName $chapterTitle",
         )
     }
 
@@ -109,9 +112,8 @@ internal fun BoxScope.ReaderMenu(
 
 @Composable
 private fun ReaderMenuTop(
-    mangaTitle: String,
-    chapterName: String,
-    chapterTitle: String,
+    firstLineText: String,
+    secondLineText: String,
 ) {
     ReaderMenuSurface {
         Row(
@@ -128,21 +130,23 @@ private fun ReaderMenuTop(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(8.dp)
+                    .padding(8.dp),
             ) {
                 Text(
-                    text = mangaTitle,
-                    style = MaterialTheme.typography.subtitle1.copy(fontSize = 18.sp),
+                    text = firstLineText,
+                    style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    Text(
-                        text = "$chapterName $chapterTitle",
-                        style = MaterialTheme.typography.body2,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                if (secondLineText.isNotBlank()) {
+                    MediumEmphasis {
+                        Text(
+                            text = secondLineText,
+                            style = MaterialTheme.typography.bodyMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
             }
         }
@@ -203,7 +207,7 @@ private fun ReaderMenuBottom(
                         Text(
                             modifier = widthModifier,
                             text = currentImagePage?.index?.plus(1)?.toString() ?: "-",
-                            style = MaterialTheme.typography.body2,
+                            style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center
                         )
 
@@ -230,7 +234,7 @@ private fun ReaderMenuBottom(
                                 }
                                 .collectLatest(onSnapToPage)
                         }
-                        Slider(
+                        LisuSlider(
                             value = sliderValue,
                             onValueChange = {
                                 isSliderChanging = true
@@ -242,7 +246,7 @@ private fun ReaderMenuBottom(
                         )
 
                         Text(text = currentImagePage?.size?.toString() ?: "-",
-                            style = MaterialTheme.typography.body2,
+                            style = MaterialTheme.typography.bodyMedium,
                             textAlign = TextAlign.Center,
                             onTextLayout = { sizeLabelWidth = it.size.width })
                     }

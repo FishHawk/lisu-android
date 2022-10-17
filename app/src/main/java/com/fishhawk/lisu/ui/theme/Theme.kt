@@ -4,47 +4,59 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.material.Colors
-import androidx.compose.material.LocalElevationOverlay
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.Theme
 import com.fishhawk.lisu.data.datastore.collectAsState
+import com.fishhawk.lisu.widget.LisuModalBottomSheetLayout
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 val LisuIcons = Icons.Outlined
 
 @Composable
+fun MediumEmphasis(content: @Composable () -> Unit) {
+    CompositionLocalProvider(
+        LocalContentColor provides mediumEmphasisColor(),
+        content = content,
+    )
+}
+
+@Composable
+fun mediumEmphasisColor(): Color {
+    return LocalContentColor.current.copy(alpha = 0.70f)
+}
+
+@Composable
 fun LisuTheme(content: @Composable () -> Unit) {
     val theme by PR.theme.collectAsState()
+    val colorScheme = when (theme) {
+        Theme.Light -> ColorsLight
+        Theme.Dark -> ColorsDark
+    }
 
-    CompositionLocalProvider(LocalElevationOverlay provides LisuElevationOverlay) {
-        val colors = when (theme) {
-            Theme.Light -> ColorsLight
-            Theme.Dark -> ColorsDark
-        }
-        MaterialTheme(
-            colors = animateColors(colors),
-            typography = Typography
-        ) {
-            val systemUiController = rememberSystemUiController()
-            val useDarkIcons = MaterialTheme.colors.isLight
-            SideEffect {
-                // hack, see https://github.com/google/accompanist/issues/683
-                systemUiController.setStatusBarColor(Color.Transparent, true)
-                systemUiController.setStatusBarColor(Color.Transparent, useDarkIcons)
-            }
+    MaterialTheme(colorScheme = animateColors(colorScheme)) {
+        LisuModalBottomSheetLayout {
             content()
         }
+    }
+
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = theme == Theme.Light
+    SideEffect {
+        // hack, see https://github.com/google/accompanist/issues/683
+        systemUiController.setStatusBarColor(Color.Transparent, true)
+        systemUiController.setStatusBarColor(Color.Transparent, useDarkIcons)
     }
 }
 
 @Composable
 fun LisuTransition(
-    content: @Composable AnimatedVisibilityScope.() -> Unit
+    content: @Composable AnimatedVisibilityScope.() -> Unit,
 ) = AnimatedVisibility(
     visibleState = remember {
         MutableTransitionState(false)
@@ -55,7 +67,7 @@ fun LisuTransition(
 )
 
 @Composable
-private fun animateColors(colors: Colors): Colors {
+private fun animateColors(colors: ColorScheme): ColorScheme {
     val animationSpec = remember {
         spring<Color>(stiffness = 500f)
     }
@@ -66,19 +78,10 @@ private fun animateColors(colors: Colors): Colors {
         animationSpec = animationSpec
     ).value
 
-    return Colors(
+    return colors.copy(
         primary = animateColor(colors.primary),
-        primaryVariant = animateColor(colors.primaryVariant),
         secondary = animateColor(colors.secondary),
-        secondaryVariant = animateColor(colors.secondaryVariant),
         background = animateColor(colors.background),
         surface = animateColor(colors.surface),
-        error = animateColor(colors.error),
-        onPrimary = animateColor(colors.onPrimary),
-        onSecondary = animateColor(colors.onSecondary),
-        onBackground = animateColor(colors.onBackground),
-        onSurface = animateColor(colors.onSurface),
-        onError = animateColor(colors.onError),
-        isLight = colors.isLight,
     )
 }

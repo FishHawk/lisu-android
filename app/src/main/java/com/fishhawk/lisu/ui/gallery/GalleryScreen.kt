@@ -6,21 +6,28 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.data.LoremIpsum
 import com.fishhawk.lisu.data.database.model.ReadingHistory
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.network.model.MangaDetailDto
@@ -28,9 +35,12 @@ import com.fishhawk.lisu.data.network.model.MangaState
 import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.main.*
 import com.fishhawk.lisu.ui.theme.LisuIcons
+import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.ui.theme.LisuTransition
+import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.util.*
 import com.fishhawk.lisu.widget.*
+import com.google.accompanist.flowlayout.FlowRow
 import org.koin.androidx.compose.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -91,7 +101,7 @@ fun GalleryScreen(navController: NavHostController) {
             }
         }
 
-    val onAction:  (GalleryAction) -> Unit = { action ->
+    val onAction: (GalleryAction) -> Unit = { action ->
         when (action) {
             GalleryAction.NavUp ->
                 navController.navigateUp()
@@ -159,26 +169,51 @@ fun GalleryScreen(navController: NavHostController) {
     }
 
     LisuTransition {
-        val scrollState = rememberLazyListState()
-        MangaDetail(
+        GalleryScaffold(
             state = state,
             providerId = providerId,
             cover = cover,
             title = title,
             authors = authors,
             isFinished = isFinished,
-            detailResult = detail,
+            detail = detail,
             history = history,
-            scrollState = scrollState,
-            onAction = onAction,
-        )
-        ToolBar(
-            state = state,
-            title = title,
-            scrollState = scrollState,
             onAction = onAction,
         )
     }
+}
+
+@Composable
+private fun GalleryScaffold(
+    state: MangaState,
+    providerId: String,
+    cover: String?,
+    title: String,
+    authors: List<String>,
+    isFinished: Boolean?,
+    detail: Result<MangaDetailDto>?,
+    history: ReadingHistory?,
+    onAction: (GalleryAction) -> Unit
+) {
+    val scrollState = rememberLazyListState()
+    MangaDetail(
+        state = state,
+        providerId = providerId,
+        cover = cover,
+        title = title,
+        authors = authors,
+        isFinished = isFinished,
+        detailResult = detail,
+        history = history,
+        scrollState = scrollState,
+        onAction = onAction,
+    )
+    ToolBar(
+        state = state,
+        title = title,
+        scrollState = scrollState,
+        onAction = onAction,
+    )
 }
 
 @Composable
@@ -186,7 +221,7 @@ private fun ToolBar(
     state: MangaState,
     title: String,
     scrollState: LazyListState,
-    onAction:  (GalleryAction) -> Unit,
+    onAction: (GalleryAction) -> Unit,
 ) {
     val toolBarVisible by remember {
         derivedStateOf { scrollState.firstVisibleItemIndex > 0 }
@@ -255,7 +290,7 @@ private fun MangaDetail(
     detailResult: Result<MangaDetailDto>?,
     history: ReadingHistory?,
     scrollState: LazyListState,
-    onAction:  (GalleryAction) -> Unit,
+    onAction: (GalleryAction) -> Unit,
 ) {
     val mode by PR.chapterDisplayMode.collectAsState()
     val order by PR.chapterDisplayOrder.collectAsState()
@@ -313,15 +348,100 @@ private fun MangaDetail(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+internal fun MangaTagGroups(
+    tagGroups: Map<String, List<String>>,
+    onTagClick: (String) -> Unit = {},
+    onTagLongClick: (String) -> Unit = {},
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+    ) {
+        tagGroups.forEach { (key, tags) ->
+            Row {
+                if (key.isNotBlank()) {
+                    Tag(key)
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                FlowRow(
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    mainAxisSpacing = 4.dp,
+                    crossAxisSpacing = 4.dp
+                ) {
+                    tags.forEach { tag ->
+                        val fullTag = if (key.isBlank()) tag else "$key:$tag"
+                        Tag(
+                            tag = tag,
+                            modifier = Modifier.combinedClickable(
+                                onClick = { onTagClick(fullTag) },
+                                onLongClick = { onTagLongClick(fullTag) },
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Tag(
+    tag: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)
+            .compositeOver(MaterialTheme.colorScheme.surface),
+        contentColor = MaterialTheme.colorScheme.onSurface,
+    ) {
+        Row(
+            modifier = Modifier
+                .defaultMinSize(minHeight = 28.dp)
+                .padding(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = tag,
+                style = MaterialTheme.typography.labelMedium,
+            )
+        }
+    }
+}
+
 @Composable
 private fun MangaDescription(description: String) {
     SelectionContainer {
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        MediumEmphasis {
             Text(
                 text = description,
                 modifier = Modifier.padding(horizontal = 16.dp),
-                style = MaterialTheme.typography.body2
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun GalleryScaffoldPreview() {
+    val detail = LoremIpsum.mangaDetail()
+    LisuTheme {
+        GalleryScaffold(
+            state = detail.state,
+            providerId = detail.providerId,
+            cover = detail.cover,
+            title = detail.title ?: detail.id,
+            authors = detail.authors,
+            isFinished = detail.isFinished,
+            detail = Result.success(detail),
+            history = null,
+            onAction = { println(it) },
+        )
     }
 }

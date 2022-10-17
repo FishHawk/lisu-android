@@ -1,53 +1,25 @@
 package com.fishhawk.lisu.ui.theme
 
-import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import kotlin.math.ln
 
-internal object LisuElevationOverlay : ElevationOverlay {
-    @ReadOnlyComposable
-    @Composable
-    override fun apply(color: Color, elevation: Dp): Color {
-        val colors = MaterialTheme.colors
-        return if (elevation > 0.dp && !colors.isLight) {
-            val foregroundColor = calculateForegroundColor(color, elevation)
-            foregroundColor.compositeOver(color)
-        } else {
-            color
-        }
-    }
-}
-
-@ReadOnlyComposable
-@Composable
-private fun calculateForegroundColor(backgroundColor: Color, elevation: Dp): Color {
-    val alpha = ((1f * ln(elevation.value + 1)) + 2f) / 100f
-    val baseForegroundColor = contentColorFor(backgroundColor)
-    return baseForegroundColor.copy(alpha = alpha)
-}
-
-
-val ColorsLight = lightColors(
+val ColorsLight = lightColorScheme(
     primary = MaterialColors.BlueA400,
-    primaryVariant = MaterialColors.BlueA400,
     secondary = MaterialColors.BlueA400,
-    secondaryVariant = MaterialColors.BlueA400,
-    background = MaterialColors.Gray50,
+    background = MaterialColors.White,
     surface = MaterialColors.White,
+    surfaceVariant = MaterialColors.White,
+    surfaceTint = MaterialColors.White,
 )
 
-val ColorsDark = darkColors(
+val ColorsDark = darkColorScheme(
     primary = Color(0xFF3399FF),
-    primaryVariant = Color(0xFF3399FF),
     secondary = Color(0xFF3399FF),
-    secondaryVariant = Color(0xFF3399FF),
     background = Color(0xFF212121),
     surface = Color(0xFF212121),
+    surfaceVariant = Color(0xFF212121),
+    surfaceTint = Color(0xFF212121),
 )
 
 @Suppress("unused")

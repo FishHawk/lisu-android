@@ -1,10 +1,10 @@
 package com.fishhawk.lisu.widget
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme.typography
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,7 +66,7 @@ fun ErrorView(
             Text(
                 text = throwable.localizedMessage
                     ?: stringResource(R.string.unknown_error),
-                style = typography.subtitle2,
+                style = typography.titleMedium,
                 textAlign = TextAlign.Center
             )
             TextButton(onClick = onRetry) {
@@ -113,7 +113,7 @@ fun ErrorItem(
             text = throwable.localizedMessage
                 ?: stringResource(R.string.unknown_error),
             modifier = Modifier.weight(1f),
-            style = typography.subtitle2,
+            style = typography.titleMedium,
             textAlign = TextAlign.Center
         )
         TextButton(onClick = onRetry) {

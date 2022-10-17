@@ -41,6 +41,10 @@ class GlobalSearchViewModel(
                 }
             }
 
+    val suggestions = searchHistoryRepository.list()
+        .map { list -> list.map { it.keywords }.distinct() }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
     val searchRecordsResult =
         flatCombine(
             keywords
@@ -69,10 +73,6 @@ class GlobalSearchViewModel(
                 }
             )
         }.stateIn(viewModelScope, SharingStarted.Lazily, null)
-
-    val suggestions = searchHistoryRepository.list()
-        .map { list -> list.map { it.keywords }.distinct() }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     fun search(keywords: String) {
         _keywords.value = keywords

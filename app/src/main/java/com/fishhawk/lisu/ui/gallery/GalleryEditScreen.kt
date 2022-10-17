@@ -1,44 +1,38 @@
 package com.fishhawk.lisu.ui.gallery
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
-import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Publish
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.data.LoremIpsum
 import com.fishhawk.lisu.data.network.model.MangaMetadata
-import com.fishhawk.lisu.data.network.model.toMetadataDetail
+import com.fishhawk.lisu.data.network.model.toMetadata
 import com.fishhawk.lisu.ui.base.OnEvent
 import com.fishhawk.lisu.ui.theme.LisuIcons
+import com.fishhawk.lisu.ui.theme.LisuTheme
+import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.LisuToolBar
+import com.google.accompanist.flowlayout.FlowRow
 import org.koin.androidx.compose.viewModel
 
 private sealed interface GalleryEditAction {
     object NavUp : GalleryEditAction
-    object Publish : GalleryEditAction
+    data class Publish(val metadata: MangaMetadata) : GalleryEditAction
 }
 
 @Composable
@@ -46,24 +40,23 @@ fun GalleryEditScreen(navController: NavHostController) {
     val viewModel by viewModel<GalleryViewModel>(
         owner = navController.previousBackStackEntry!!
     )
-    val id = viewModel.mangaId
+    val mangaId = viewModel.mangaId
     val detailResult by viewModel.detail.collectAsState()
-    val initDetail = detailResult?.getOrNull()
+    val initMetadata = detailResult?.getOrNull()?.toMetadata()
 
-    if (initDetail == null) {
+    if (initMetadata == null) {
         navController.navigateUp()
         return
     }
-    var metadata by remember { mutableStateOf(initDetail.toMetadataDetail()) }
 
     val onAction: (GalleryEditAction) -> Unit = { action ->
         when (action) {
             GalleryEditAction.NavUp -> navController.navigateUp()
-            GalleryEditAction.Publish -> {
-                val metadataToPublish = metadata.copy(
-                    title = metadata.title?.takeIf { it.isNotEmpty() && it != id },
-                    authors = metadata.authors,
-                    description = metadata.description?.ifEmpty { null }
+            is GalleryEditAction.Publish -> {
+                val metadataToPublish = action.metadata.copy(
+                    title = action.metadata.title?.takeIf { it.isNotEmpty() && it != mangaId },
+                    authors = action.metadata.authors,
+                    description = action.metadata.description?.ifEmpty { null }
                 )
                 viewModel.updateMetadata(metadataToPublish)
             }
@@ -71,7 +64,6 @@ fun GalleryEditScreen(navController: NavHostController) {
     }
 
     val context = LocalContext.current
-
     OnEvent(viewModel.event) {
         when (it) {
             GalleryEffect.UpdateMetadataSuccess -> context.toast(R.string.metadata_updated)
@@ -80,30 +72,29 @@ fun GalleryEditScreen(navController: NavHostController) {
         }
     }
 
-
     GalleryEditScaffold(
-        mangaId = id,
-        metadata = metadata,
-        onMetadataChanged = { metadata = it },
+        mangaId = mangaId,
+        initMetadata = initMetadata,
         onAction = onAction,
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GalleryEditScaffold(
     mangaId: String,
-    metadata: MangaMetadata,
-    onMetadataChanged: (MangaMetadata) -> Unit,
+    initMetadata: MangaMetadata,
     onAction: (GalleryEditAction) -> Unit,
 ) {
+    var metadata by remember { mutableStateOf(initMetadata) }
+
     Scaffold(
         topBar = {
             LisuToolBar(
                 title = stringResource(R.string.label_gallery_edit),
                 onNavUp = { onAction(GalleryEditAction.NavUp) },
             ) {
-                IconButton(onClick = { onAction(GalleryEditAction.Publish) }) {
+                IconButton(onClick = { onAction(GalleryEditAction.Publish(metadata)) }) {
                     Icon(Icons.Filled.Publish, contentDescription = "publish")
                 }
             }
@@ -117,101 +108,86 @@ private fun GalleryEditScaffold(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(32.dp),
             ) {
-                Label(text = "ID: $mangaId")
-
-                Column {
-                    Label(text = "Title:")
-                    CustomTextField(
-                        value = metadata.title ?: mangaId,
-                        onValueChange = { onMetadataChanged(metadata.copy(title = it)) },
-                        placeholder = "input title",
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                MediumEmphasis {
+                    Text(text = "Manga ID: $mangaId")
                 }
 
-                Column {
-                    Label(text = "State:")
-                    listOf(true, false, null).forEach {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = it == metadata.isFinished,
-                                onClick = { onMetadataChanged(metadata.copy(isFinished = it)) }
-                            )
-                            Text(
-                                text = when (it) {
-                                    true -> "Finished"
-                                    false -> "Ongoing"
-                                    null -> "Unknown"
+                OutlinedTextField(
+                    value = metadata.title ?: mangaId,
+                    onValueChange = { metadata = metadata.copy(title = it) },
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                    label = { Text(text = "Title") },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                var expanded by remember { mutableStateOf(false) }
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = when (metadata.isFinished) {
+                            true -> "Finished"
+                            false -> "Ongoing"
+                            null -> "Unknown"
+                        },
+                        onValueChange = { },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .menuAnchor(),
+                        readOnly = true,
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                        label = { Text(text = "State") },
+                        singleLine = true,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors()
+                    )
+
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                    ) {
+                        listOf(
+                            "Finished" to true,
+                            "Outgoing" to false,
+                            "Unknown" to null,
+                        ).forEach { (text, isFinished) ->
+                            DropdownMenuItem(
+                                text = { Text(text = text) },
+                                onClick = {
+                                    metadata = metadata.copy(isFinished = isFinished)
+                                    expanded = false
                                 },
-                                style = MaterialTheme.typography.body1,
-                                modifier = Modifier.padding(start = 16.dp),
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                             )
                         }
                     }
                 }
 
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Label(text = "Authors:")
-                    EditMangaTagGroup(
-                        tags = metadata.authors,
-                        onTagClick = { onMetadataChanged(metadata.copyWithoutAuthor(it)) }
-                    )
-                    TagTextField(
-                        placeholder = "new author",
-                        onDone = { onMetadataChanged(metadata.copyWithNewAuthor(it)) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
-
-                Column {
-                    Label(text = "Tags:")
-                    TagTextField(
-                        placeholder = "new tag group",
-                        onDone = { onMetadataChanged(metadata.copyWithNewTagGroup(it)) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+                TagTextField(
+                    label = "Authors",
+                    tags = metadata.authors,
+                    onTagClick = { metadata = metadata.copyWithoutAuthor(it) },
+                    onAddTag = { metadata = metadata.copyWithNewAuthor(it) },
+                )
 
                 metadata.tags.forEach { (key, tags) ->
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Label(text = "Tags-$key:")
-                            CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
-                                IconButton(onClick = {
-                                    onMetadataChanged(metadata.copyWithoutTagGroup(key))
-                                }) {
-                                    Icon(
-                                        imageVector = LisuIcons.Close,
-                                        contentDescription = null,
-                                    )
-                                }
-                            }
-                        }
-                        EditMangaTagGroup(
-                            tags = tags,
-                            onTagClick = { onMetadataChanged(metadata.copyWithoutTag(key, it)) },
-                        )
-                        TagTextField(
-                            placeholder = "new tag",
-                            onDone = { onMetadataChanged(metadata.copyWithNewTag(key, it)) },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
+                    TagTextField(
+                        label = if (key.isBlank()) "Tags" else "Tags:$key",
+                        tags = tags,
+                        onTagClick = { metadata = metadata.copyWithoutTag(key, it) },
+                        onAddTag = { metadata = metadata.copyWithNewTag(key, it) },
+                    )
                 }
 
                 Column {
-                    Label(text = "Description:")
-                    CustomTextField(
+                    OutlinedTextField(
                         value = metadata.description ?: "",
-                        onValueChange = { onMetadataChanged(metadata.copy(description = it)) },
-                        placeholder = "input description",
+                        onValueChange = { metadata = metadata.copy(description = it) },
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                        label = { Text(text = "Description") },
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -220,85 +196,50 @@ private fun GalleryEditScaffold(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun Label(text: String) {
-    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.subtitle2,
+private fun TagTextField(
+    label: String,
+    tags: List<String>,
+    onTagClick: (String) -> Unit,
+    onAddTag: (String) -> Unit,
+) {
+    Column {
+        FlowRow(mainAxisSpacing = 4.dp, crossAxisSpacing = 4.dp) {
+            tags.forEach { tag ->
+                InputChip(
+                    selected = false,
+                    onClick = { onTagClick(tag) },
+                    label = { Text(text = tag) },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = LisuIcons.Close,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        var newTag by remember { mutableStateOf("") }
+        OutlinedTextField(
+            value = newTag,
+            onValueChange = { newTag = it },
+            textStyle = MaterialTheme.typography.bodyMedium,
+            label = { Text(text = label) },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = {
+                if (newTag.isNotBlank()) {
+                    onAddTag(newTag.trim())
+                    newTag = ""
+                }
+            }),
         )
     }
 }
 
-@Composable
-private fun TagTextField(
-    placeholder: String,
-    onDone: (String) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    var newTag by remember { mutableStateOf("") }
-    CustomTextField(
-        value = newTag,
-        onValueChange = { newTag = it },
-        placeholder = placeholder,
-        modifier = modifier,
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = {
-            if (newTag.isNotBlank()) {
-                onDone(newTag.trim())
-                newTag = ""
-            }
-        })
-    )
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-private fun CustomTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    modifier: Modifier = Modifier,
-    textStyle: TextStyle = LocalTextStyle.current,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions.Default,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    shape: Shape = TextFieldDefaults.TextFieldShape,
-    colors: TextFieldColors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
-) {
-    BasicTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier
-            .background(colors.backgroundColor(true).value, shape)
-            .indicatorLine(
-                enabled = true,
-                isError = false,
-                interactionSource,
-                colors
-            ),
-        cursorBrush = SolidColor(MaterialTheme.colors.primary),
-        textStyle = textStyle,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        interactionSource = interactionSource,
-        decorationBox = { innerTextField ->
-            val isFocused = interactionSource.collectIsFocusedAsState().value
-            Row(
-                modifier = Modifier.padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (value.isEmpty() && !isFocused) {
-                    Text(
-                        text = placeholder,
-                        style = textStyle.copy(color = MaterialTheme.colors.onSurface.copy(alpha = 0.3f))
-                    )
-                }
-                innerTextField()
-            }
-        }
-    )
-}
 
 private fun MangaMetadata.copyWithoutAuthor(author: String) =
     copy(authors = authors.filter { it != author })
@@ -324,3 +265,16 @@ private fun MangaMetadata.copyWithNewTag(key: String, newTag: String) =
             put(key, it)
         }
     })
+
+@Preview
+@Composable
+private fun GalleryEditScaffoldPreview() {
+    LisuTheme {
+        val detail = LoremIpsum.mangaDetail()
+        GalleryEditScaffold(
+            mangaId = detail.id,
+            initMetadata = detail.toMetadata(),
+            onAction = { println(it) },
+        )
+    }
+}

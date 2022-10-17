@@ -2,10 +2,10 @@ package com.fishhawk.lisu.ui.reader.viewer
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +38,7 @@ internal fun EmptyPage(
         Text(
             modifier = Modifier.padding(48.dp),
             text = "Chapter is empty",
-            style = MaterialTheme.typography.subtitle2,
+            style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center
         )
     }
@@ -55,8 +55,8 @@ internal fun NextChapterStatePage(
             contentAlignment = Alignment.Center
         ) {
             Column(modifier = Modifier.padding(48.dp)) {
-                val style1 = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Bold)
-                val style2 = MaterialTheme.typography.subtitle1
+                val style1 = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                val style2 = MaterialTheme.typography.titleMedium
                 val currChapterText = "${page.currentChapterName} ${page.currentChapterTitle}"
                 val nextChapterText = "${page.nextChapterName} ${page.nextChapterTitle}"
 
@@ -87,8 +87,9 @@ internal fun PrevChapterStatePage(
             contentAlignment = Alignment.Center
         ) {
             Column(modifier = Modifier.padding(48.dp)) {
-                val style1 = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.Medium)
-                val style2 = MaterialTheme.typography.subtitle1
+                val style1 =
+                    MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium)
+                val style2 = MaterialTheme.typography.titleMedium
                 val prevChapterText = "${page.prevChapterName} ${page.prevChapterTitle}"
                 val currChapterText = "${page.currentChapterName} ${page.currentChapterTitle}"
 
@@ -152,7 +153,7 @@ private fun LoadingState(modifier: Modifier, position: Int, url: String) {
         ) {
             Text(
                 text = position.toString(),
-                style = MaterialTheme.typography.h3
+                style = MaterialTheme.typography.headlineLarge
             )
             var progress by remember { mutableStateOf(0f) }
             if (progress > 0f) CircularProgressIndicator(progress = progress)
@@ -184,11 +185,11 @@ private fun ErrorState(
         ) {
             Text(
                 text = position.toString(),
-                style = MaterialTheme.typography.h3
+                style = MaterialTheme.typography.headlineLarge
             )
             Text(
                 text = throwable.message ?: "",
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.bodyLarge,
             )
             TextButton(onClick = { onRetry() }) {
                 Text(stringResource(R.string.action_retry))

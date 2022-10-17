@@ -8,18 +8,15 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -28,7 +25,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -36,11 +32,10 @@ import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.fishhawk.lisu.R
-import com.google.accompanist.insets.LocalWindowInsets
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LisuSearchToolBar(
     visible: Boolean,
@@ -93,7 +88,6 @@ fun LisuSearchToolBar(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions { onSearch(value) },
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 )
@@ -101,39 +95,22 @@ fun LisuSearchToolBar(
             LaunchedEffect(Unit) {
                 focusRequester.requestFocus()
             }
-
-            // hack, see https://stackoverflow.com/questions/68389802/how-to-clear-textfield-focus-when-closing-the-keyboard-and-prevent-two-back-pres
-            var imeIsVisiblePrev by remember { mutableStateOf(false) }
-            val imeIsVisible = LocalWindowInsets.current.ime.isVisible
-            LaunchedEffect(imeIsVisible) {
-                if (!imeIsVisible && imeIsVisiblePrev) {
-                    onDismiss()
-                }
-                imeIsVisiblePrev = imeIsVisible
-            }
         }
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun SuggestionList(
     visible: Boolean,
     onDismiss: () -> Unit,
     keywords: String,
     suggestions: List<String>,
-    additionalBottom: Dp = 0.dp,
     onSuggestionSelected: ((String) -> Unit) = {},
     onSuggestionDeleted: ((String) -> Unit)? = null,
 ) {
-    // hack, avoid extra space due to BottomNavigation
-    val bottomPadding = with(LocalDensity.current) {
-        LocalWindowInsets.current.ime.bottom.toDp() + additionalBottom
-    }.coerceAtLeast(0.dp)
-
     AnimatedVisibility(
-        visible,
-        modifier = Modifier.padding(bottom = bottomPadding),
+        visible = visible,
         enter = fadeIn(),
         exit = fadeOut(),
     ) {
@@ -144,20 +121,19 @@ fun SuggestionList(
         }
 
         // Dismiss when back
-        var hasKeyboardOpened by remember { mutableStateOf(false) }
-        val isKeyboardOpen by keyboardAsState()
-        LaunchedEffect(isKeyboardOpen) {
+        var imeIsVisiblePrev by remember { mutableStateOf(false) }
+        val imeIsVisible = WindowInsets.isImeVisible
+        LaunchedEffect(imeIsVisible) {
             if (visible) {
-                if (!isKeyboardOpen && hasKeyboardOpened) {
+                if (!imeIsVisible && imeIsVisiblePrev) {
                     onDismiss()
-                    skController?.hide()
                 }
-                if (isKeyboardOpen) hasKeyboardOpened = true
+                imeIsVisiblePrev = imeIsVisible
             }
         }
 
         // Dismiss when click scrim
-        val scrimColor = MaterialTheme.colors.onSurface.copy(alpha = 0.32f)
+        val scrimColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.32f)
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
@@ -167,14 +143,14 @@ fun SuggestionList(
         val relativeSuggestions = suggestions.filter {
             it.contains(keywords) && it != keywords
         }
-        Surface(elevation = 4.dp) {
+        Surface {
             LazyColumn {
                 items(relativeSuggestions) {
                     SuggestionItem(
                         keywords = keywords,
                         suggestion = it,
                         onSuggestionSelected = onSuggestionSelected,
-                        onSuggestionDeleted = onSuggestionDeleted
+                        onSuggestionDeleted = onSuggestionDeleted,
                     )
                 }
             }
@@ -204,7 +180,7 @@ private fun SuggestionItem(
             modifier = Modifier
                 .weight(1f)
                 .padding(vertical = 12.dp),
-            style = MaterialTheme.typography.subtitle1
+            style = MaterialTheme.typography.bodyLarge,
         )
         if (onSuggestionDeleted != null) {
             IconButton(onClick = { onSuggestionDeleted(suggestion) }) {

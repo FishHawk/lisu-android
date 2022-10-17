@@ -11,7 +11,7 @@ data class MangaMetadata(
     val tags: Map<String, List<String>> = emptyMap(),
 )
 
-fun MangaDetailDto.toMetadataDetail(): MangaMetadata {
+fun MangaDetailDto.toMetadata(): MangaMetadata {
     return MangaMetadata(
         title = title,
         authors = authors,

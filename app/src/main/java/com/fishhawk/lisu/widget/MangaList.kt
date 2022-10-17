@@ -9,10 +9,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.material.Badge
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -106,11 +103,14 @@ fun MangaCard(
     manga: MangaDto,
     modifier: Modifier = Modifier,
 ) {
-    Card(modifier = modifier) {
+    Card(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.extraSmall,
+    ) {
         Box {
             MangaCover(manga.cover)
 
-            val textStyle = MaterialTheme.typography.caption.copy(
+            val textStyle = MaterialTheme.typography.bodySmall.copy(
                 shadow = Shadow(Color.White, Offset.Zero, 1f)
             )
             Canvas(modifier = Modifier.matchParentSize()) {
@@ -140,7 +140,22 @@ fun MangaCard(
 }
 
 @Composable
-fun MangaCover(
+fun MangaCard(
+    cover: String?,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.extraSmall,
+    ) {
+        Box {
+            MangaCover(cover)
+        }
+    }
+}
+
+@Composable
+private fun MangaCover(
     cover: String?,
     modifier: Modifier = Modifier,
 ) {
@@ -166,17 +181,21 @@ fun MangaCover(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BoxScope.MangaBadge(
     text: String,
-    backgroundColor: Color = MaterialTheme.colors.primary,
+    backgroundColor: Color = MaterialTheme.colorScheme.primary,
 ) {
     Badge(
         modifier = Modifier
             .align(Alignment.TopStart)
             .padding(4.dp),
-        backgroundColor = backgroundColor
+        containerColor = backgroundColor,
     ) {
-        Text(text = text, modifier = Modifier.padding(2.dp))
+        Text(
+            text = text,
+            modifier = Modifier.padding(2.dp),
+        )
     }
 }
