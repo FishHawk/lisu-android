@@ -9,7 +9,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CollectionsBookmark
 import androidx.compose.material.icons.filled.Explore
@@ -19,7 +18,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -67,7 +65,7 @@ import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.LisuDialog
 import com.fishhawk.lisu.widget.LisuModalBottomSheetLayout
 import com.google.accompanist.insets.ui.Scaffold
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,8 +75,9 @@ class MainActivity : BaseActivity() {
 }
 
 @Composable
-private fun MainApp() {
-    val viewModel by viewModel<MainViewModel>()
+private fun MainApp(
+    viewModel: MainViewModel = koinViewModel(),
+) {
 
     var latestRelease by remember { mutableStateOf<GitHubRelease?>(null) }
 

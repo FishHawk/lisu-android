@@ -25,7 +25,7 @@ import com.fishhawk.lisu.ui.theme.mediumEmphasisColor
 import com.fishhawk.lisu.util.readableString
 import com.fishhawk.lisu.util.toLocalDateTime
 import com.fishhawk.lisu.widget.*
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 
 private sealed interface GalleryCommentAction {
     object NavUp : GalleryCommentAction
@@ -34,10 +34,12 @@ private sealed interface GalleryCommentAction {
 }
 
 @Composable
-fun GalleryCommentScreen(navController: NavHostController) {
-    val viewModel by viewModel<GalleryViewModel>(
+fun GalleryCommentScreen(
+    navController: NavHostController,
+    viewModel: GalleryViewModel = koinViewModel(
         owner = navController.previousBackStackEntry!!
-    )
+    ),
+) {
     val commentList by viewModel.comments.collectAsState()
 
     val onAction: (GalleryCommentAction) -> Unit = { action ->

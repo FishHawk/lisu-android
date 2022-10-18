@@ -28,7 +28,7 @@ import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.LisuToolBar
 import com.google.accompanist.flowlayout.FlowRow
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 
 private sealed interface GalleryEditAction {
     object NavUp : GalleryEditAction
@@ -36,10 +36,12 @@ private sealed interface GalleryEditAction {
 }
 
 @Composable
-fun GalleryEditScreen(navController: NavHostController) {
-    val viewModel by viewModel<GalleryViewModel>(
+fun GalleryEditScreen(
+    navController: NavHostController,
+    viewModel: GalleryViewModel = koinViewModel(
         owner = navController.previousBackStackEntry!!
-    )
+    ),
+) {
     val mangaId = viewModel.mangaId
     val detailResult by viewModel.detail.collectAsState()
     val initMetadata = detailResult?.getOrNull()?.toMetadata()

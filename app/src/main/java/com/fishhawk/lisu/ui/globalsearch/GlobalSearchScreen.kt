@@ -24,7 +24,7 @@ import com.fishhawk.lisu.ui.main.navToProvider
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.widget.*
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 private sealed interface GlobalSearchAction {
@@ -37,10 +37,12 @@ private sealed interface GlobalSearchAction {
 }
 
 @Composable
-fun GlobalSearchScreen(navController: NavHostController) {
-    val viewModel by viewModel<GlobalSearchViewModel> {
+fun GlobalSearchScreen(
+    navController: NavHostController,
+    viewModel: GlobalSearchViewModel = koinViewModel {
         parametersOf(navController.currentBackStackEntry!!.arguments!!)
-    }
+    },
+) {
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
     val searchRecordsResult by viewModel.searchRecordsResult.collectAsState()

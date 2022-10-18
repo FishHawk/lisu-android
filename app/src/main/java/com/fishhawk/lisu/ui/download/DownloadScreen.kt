@@ -32,7 +32,7 @@ import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.widget.*
 import kotlinx.parcelize.Parcelize
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 
 private sealed interface DownloadTaskListItem {
     val key: String
@@ -101,8 +101,10 @@ private sealed interface DownloadAction {
 }
 
 @Composable
-fun DownloadScreen(navController: NavHostController) {
-    val viewModel by viewModel<DownloadViewModel>()
+fun DownloadScreen(
+    navController: NavHostController,
+    viewModel: DownloadViewModel = koinViewModel(),
+) {
     val tasksResult by viewModel.tasksResult.collectAsState()
 
     val context = LocalContext.current

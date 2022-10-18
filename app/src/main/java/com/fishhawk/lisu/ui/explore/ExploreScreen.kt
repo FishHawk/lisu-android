@@ -44,6 +44,7 @@ import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.widget.*
+import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.compose.viewModel
 import java.util.*
 
@@ -61,8 +62,10 @@ private sealed interface ExploreAction {
 }
 
 @Composable
-fun ExploreScreen(navController: NavHostController) {
-    val viewModel by viewModel<ExploreViewModel>()
+fun ExploreScreen(
+    navController: NavHostController,
+    viewModel: ExploreViewModel = koinViewModel(),
+) {
     val providersResult by viewModel.providersLoadState.collectAsState()
     val lastUsedProvider by viewModel.lastUsedProvider.collectAsState()
 

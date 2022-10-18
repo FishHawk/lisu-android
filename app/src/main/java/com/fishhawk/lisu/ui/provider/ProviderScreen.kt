@@ -37,7 +37,7 @@ import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.*
 import com.google.accompanist.flowlayout.FlowRow
 import kotlinx.coroutines.delay
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 private sealed interface ProviderAction {
@@ -58,10 +58,12 @@ private sealed interface ProviderAction {
 }
 
 @Composable
-fun ProviderScreen(navController: NavHostController) {
-    val viewModel by viewModel<ProviderViewModel> {
+fun ProviderScreen(
+    navController: NavHostController,
+    viewModel: ProviderViewModel = koinViewModel {
         parametersOf(navController.currentBackStackEntry!!.arguments!!)
-    }
+    },
+) {
     val providerId = viewModel.providerId
     val boardId = viewModel.boardId
     val hasAdvanceFilters = viewModel.hasAdvanceFilters

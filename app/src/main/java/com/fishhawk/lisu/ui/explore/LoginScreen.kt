@@ -35,7 +35,7 @@ import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.LisuToolBar
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import java.net.URLDecoder
 
 private sealed interface LoginAction {
@@ -47,9 +47,9 @@ private sealed interface LoginAction {
 @Composable
 private fun LoginScreen(
     navController: NavHostController,
+    viewModel: ExploreViewModel = koinViewModel(),
     content: @Composable (ProviderDto, (LoginAction) -> Unit) -> Unit,
 ) {
-    val viewModel by viewModel<ExploreViewModel>()
     val context = LocalContext.current
     val providerId = navController.currentBackStackEntry!!.arguments!!.getString("providerId")!!
 
@@ -112,7 +112,7 @@ fun LoginPasswordScreen(
 @Composable
 private fun LoginWebsiteScaffold(
     provider: ProviderDto,
-    onAction: (LoginAction) -> Unit
+    onAction: (LoginAction) -> Unit,
 ) {
     val context = LocalContext.current
     val cookiesLogin = provider.cookiesLogin
@@ -191,7 +191,7 @@ private fun LoginWebsiteScaffold(
 @Composable
 private fun LoginCookiesScaffold(
     provider: ProviderDto,
-    onAction: (LoginAction) -> Unit
+    onAction: (LoginAction) -> Unit,
 ) {
     val context = LocalContext.current
     val cookiesLogin = provider.cookiesLogin
@@ -278,7 +278,7 @@ private fun LoginCookiesScaffold(
 @Composable
 private fun LoginPasswordScaffold(
     provider: ProviderDto,
-    onAction: (LoginAction) -> Unit
+    onAction: (LoginAction) -> Unit,
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {

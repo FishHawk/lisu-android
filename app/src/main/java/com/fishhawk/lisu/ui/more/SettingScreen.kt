@@ -27,7 +27,7 @@ import com.fishhawk.lisu.util.openWebPage
 import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.LisuToolBar
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -221,11 +221,11 @@ fun SettingAdvancedScreen(
 @Composable
 fun AboutScreen(
     navController: NavHostController,
+    viewModel: MainViewModel = koinViewModel(),
 ) = SettingScreen(
     title = stringResource(R.string.label_about),
     navController = navController,
 ) {
-    val viewModel by viewModel<MainViewModel>()
     val context = LocalContext.current
     val versionPrefix = if (BuildConfig.DEBUG) "Preview" else "Stable"
     val version = "$versionPrefix ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"

@@ -34,7 +34,7 @@ import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.*
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 
 private sealed interface LibraryAction {
     data class NavToGallery(val manga: MangaDto) : LibraryAction
@@ -47,8 +47,10 @@ private sealed interface LibraryAction {
 }
 
 @Composable
-fun LibraryScreen(navController: NavHostController) {
-    val viewModel by viewModel<LibraryViewModel>()
+fun LibraryScreen(
+    navController: NavHostController,
+    viewModel: LibraryViewModel = koinViewModel(),
+) {
     val keywords by viewModel.keywords.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
     val mangaListResult by viewModel.mangas.collectAsState()

@@ -29,7 +29,7 @@ import com.fishhawk.lisu.widget.m2.DismissDirection
 import com.fishhawk.lisu.widget.m2.DismissValue
 import com.fishhawk.lisu.widget.m2.SwipeToDismiss
 import com.fishhawk.lisu.widget.m2.rememberDismissState
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -41,10 +41,11 @@ private sealed interface HistoryAction {
 }
 
 @Composable
-fun HistoryScreen(navController: NavHostController) {
+fun HistoryScreen(
+    navController: NavHostController,
+    viewModel: HistoryViewModel = koinViewModel(),
+) {
     val context = LocalContext.current
-
-    val viewModel by viewModel<HistoryViewModel>()
     val histories by viewModel.histories.collectAsState()
 
     val onAction: (HistoryAction) -> Unit = { action ->

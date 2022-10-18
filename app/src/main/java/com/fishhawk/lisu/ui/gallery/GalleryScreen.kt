@@ -41,7 +41,7 @@ import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.util.*
 import com.fishhawk.lisu.widget.*
 import com.google.accompanist.flowlayout.FlowRow
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 internal sealed interface GalleryAction {
@@ -69,10 +69,12 @@ internal sealed interface GalleryAction {
 }
 
 @Composable
-fun GalleryScreen(navController: NavHostController) {
-    val viewModel by viewModel<GalleryViewModel> {
+fun GalleryScreen(
+    navController: NavHostController,
+    viewModel: GalleryViewModel = koinViewModel {
         parametersOf(navController.currentBackStackEntry!!.arguments!!)
-    }
+    },
+) {
     val providerId = viewModel.providerId
     val manga = viewModel.manga
     val detail by viewModel.detail.collectAsState()
@@ -193,7 +195,7 @@ private fun GalleryScaffold(
     isFinished: Boolean?,
     detail: Result<MangaDetailDto>?,
     history: ReadingHistory?,
-    onAction: (GalleryAction) -> Unit
+    onAction: (GalleryAction) -> Unit,
 ) {
     val scrollState = rememberLazyListState()
     MangaDetail(

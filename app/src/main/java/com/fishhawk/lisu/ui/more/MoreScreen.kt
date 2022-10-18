@@ -25,7 +25,7 @@ import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.util.nsdManager
 import com.fishhawk.lisu.widget.LisuToolBar
 import okhttp3.HttpUrl
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 
 private sealed interface MoreAction {
     object NavToDownload : MoreAction
@@ -39,8 +39,10 @@ private sealed interface MoreAction {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MoreScreen(navController: NavHostController) {
-    val viewModel by viewModel<MoreViewModel>()
+fun MoreScreen(
+    navController: NavHostController,
+    viewModel: MoreViewModel = koinViewModel(),
+) {
     val address by viewModel.address.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
 

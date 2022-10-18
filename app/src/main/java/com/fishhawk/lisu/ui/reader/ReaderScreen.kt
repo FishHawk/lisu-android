@@ -31,7 +31,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.io.File
 
@@ -61,7 +61,7 @@ sealed interface ReaderAction {
 @Composable
 fun ReaderScreen() {
     val context = LocalContext.current
-    val viewModel by viewModel<ReaderViewModel> {
+    val viewModel = koinViewModel<ReaderViewModel> {
         parametersOf(context.findActivity().intent.extras!!)
     }
 
