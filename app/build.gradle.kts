@@ -1,6 +1,3 @@
-import java.io.FileInputStream
-import java.util.*
-
 plugins {
     kotlin("plugin.serialization") version "1.7.10"
     id("com.android.application") version "7.3.0-rc01"
@@ -11,23 +8,6 @@ plugins {
 }
 
 android {
-    signingConfigs {
-        val properties = Properties()
-        properties.load(FileInputStream(project.rootProject.file("local.properties")))
-        getByName("debug") {
-            storeFile = file(properties.getProperty("signingConfigs.storeFile"))
-            storePassword = properties.getProperty("signingConfigs.storePassword")
-            keyAlias = properties.getProperty("signingConfigs.keyAlias")
-            keyPassword = properties.getProperty("signingConfigs.keyPassword")
-        }
-        create("release") {
-            storeFile = file(properties.getProperty("signingConfigs.storeFile"))
-            storePassword = properties.getProperty("signingConfigs.storePassword")
-            keyAlias = properties.getProperty("signingConfigs.keyAlias")
-            keyPassword = properties.getProperty("signingConfigs.keyPassword")
-        }
-    }
-
     namespace = "com.fishhawk.lisu"
     compileSdk = 33
 
@@ -48,7 +28,19 @@ android {
 //        }
     }
 
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            isUniversalApk = true
+        }
+    }
+
     buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(

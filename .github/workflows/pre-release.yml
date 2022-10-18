@@ -1,0 +1,103 @@
+name: pre-release
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build app
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v3
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: 11
+          distribution: adopt
+
+      - name: Build app and run unit tests
+        uses: gradle/gradle-command-action@v2
+        with:
+          arguments: assembleRelease
+
+      - name: Sign APK
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Retrieve version
+        run: |
+          set -x
+          echo "VERSION=v$(grep "versionName" app/build.gradle.kts | awk '{print $3}' | tr -d '"')" >> $GITHUB_ENV
+
+      - name: Clean up build artifacts
+        run: |
+          set -e
+
+          mv app/build/outputs/apk/release/app-universal-release-unsigned-signed.apk lisu-${{ env.VERSION }}.apk
+          sha=`sha256sum lisu-${{ env.VERSION }}.apk | awk '{ print $1 }'`
+          echo "APK_UNIVERSAL_SHA=$sha" >> $GITHUB_ENV
+
+          cp app/build/outputs/apk/release/app-arm64-v8a-release-unsigned-signed.apk lisu-arm64-v8a-${{ env.VERSION }}.apk
+          sha=`sha256sum lisu-arm64-v8a-${{ env.VERSION }}.apk | awk '{ print $1 }'`
+          echo "APK_ARM64_V8A_SHA=$sha" >> $GITHUB_ENV
+
+          cp app/build/outputs/apk/release/app-armeabi-v7a-release-unsigned-signed.apk lisu-armeabi-v7a-${{ env.VERSION }}.apk
+          sha=`sha256sum lisu-armeabi-v7a-${{ env.VERSION }}.apk | awk '{ print $1 }'`
+          echo "APK_ARMEABI_V7A_SHA=$sha" >> $GITHUB_ENV
+
+          cp app/build/outputs/apk/release/app-x86-release-unsigned-signed.apk lisu-x86-${{ env.VERSION }}.apk
+          sha=`sha256sum lisu-x86-${{ env.VERSION }}.apk | awk '{ print $1 }'`
+          echo "APK_X86_SHA=$sha" >> $GITHUB_ENV
+
+          cp app/build/outputs/apk/release/app-x86_64-release-unsigned-signed.apk lisu-x86_64-${{ env.VERSION }}.apk
+          sha=`sha256sum lisu-x86_64-${{ env.VERSION }}.apk | awk '{ print $1 }'`
+          echo "APK_X86_64_SHA=$sha" >> $GITHUB_ENV
+
+      - name: Delete old pre-release
+        uses: dev-drprasad/delete-tag-and-release@v0.2.0
+        with:
+          delete_release: true
+          tag_name: latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pre-release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: latest
+          name: Lisu-android ${{ env.VERSION }}-SNAPSHOT
+          body: |
+            ### Checksums
+            | Variant | SHA-256 |
+            | ------- | ------- |
+            | Universal | ${{ env.APK_UNIVERSAL_SHA }}
+            | arm64-v8a | ${{ env.APK_ARM64_V8A_SHA }}
+            | armeabi-v7a | ${{ env.APK_ARMEABI_V7A_SHA }}
+            | x86 | ${{ env.APK_X86_SHA }} |
+            | x86_64 | ${{ env.APK_X86_64_SHA }} |
+          files: |
+            lisu-${{ env.VERSION }}.apk
+            lisu-arm64-v8a-${{ env.VERSION }}.apk
+            lisu-armeabi-v7a-${{ env.VERSION }}.apk
+            lisu-x86-${{ env.VERSION }}.apk
+            lisu-x86_64-${{ env.VERSION }}.apk
+          draft: false
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

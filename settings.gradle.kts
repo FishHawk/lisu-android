@@ -7,6 +7,7 @@ pluginManagement {
         maven { setUrl("https://plugins.gradle.org/m2") }
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -15,5 +16,7 @@ dependencyResolutionManagement {
         maven { setUrl("https://jitpack.io") }
     }
 }
-rootProject.name = "DriftingLibraryAndroid"
+
+rootProject.name = "lisu-android"
+
 include(":app")
