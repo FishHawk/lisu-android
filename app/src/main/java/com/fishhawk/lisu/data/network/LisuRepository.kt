@@ -5,7 +5,6 @@ import com.fishhawk.lisu.data.network.dao.LisuDownloadDao
 import com.fishhawk.lisu.data.network.dao.LisuLibraryDao
 import com.fishhawk.lisu.data.network.dao.LisuProviderDao
 import com.fishhawk.lisu.data.network.model.*
-import com.fishhawk.lisu.util.flatten
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
@@ -28,7 +27,7 @@ class LisuRepository(
 
     private val urlState = urlFlow
         .map { runCatching { URLBuilder(it).buildString() } }
-        .stateIn(scope, SharingStarted.Eagerly, Result.failure(Exception("No url set.")))
+        .stateIn(scope, SharingStarted.Eagerly, null)
 
     private val client: HttpClient = HttpClient(OkHttp) {
         expectSuccess = true
@@ -38,13 +37,18 @@ class LisuRepository(
         install(ContentNegotiation) { json(Json) }
 
         defaultRequest {
-            urlState.value.onSuccess { url(it) }
+            urlState.value?.onSuccess { url(it) }
         }
     }
 
-    private val providerDaoFlow = urlState.map { it.map { LisuProviderDao(client) } }
-    private val libraryDaoFlow = urlState.map { it.map { LisuLibraryDao(client) } }
-    private val downloadDaoFlow = urlState.map { it.map { LisuDownloadDao(client) } }
+    private val providerDaoFlow =
+        urlState.filterNotNull().map { it.map { LisuProviderDao(client) } }
+
+    private val libraryDaoFlow =
+        urlState.filterNotNull().map { it.map { LisuLibraryDao(client) } }
+
+    private val downloadDaoFlow =
+        urlState.filterNotNull().map { it.map { LisuDownloadDao(client) } }
 
     private suspend inline fun <T> providerOneshot(
         action: LisuProviderDao.() -> T,
