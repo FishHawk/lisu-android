@@ -4,10 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 sealed interface RemoteDataAction<out T> {
@@ -38,6 +35,41 @@ fun <T> remoteData(
     loader: suspend () -> Result<T>,
     onStart: ((actionChannel: RemoteDataActionChannel<T>) -> Unit)? = null,
     onClose: ((actionChannel: RemoteDataActionChannel<T>) -> Unit)? = null,
+): Flow<RemoteData<T>> =
+    remoteData(
+        connectivity = connectivity,
+        block = { emit(loader()) },
+        onStart = onStart,
+        onClose = onClose,
+    )
+
+fun <T> remoteDataFromFlow(
+    connectivity: Connectivity,
+    loader: suspend () -> Result<Flow<T>>,
+    onStart: ((actionChannel: RemoteDataActionChannel<T>) -> Unit)? = null,
+    onClose: ((actionChannel: RemoteDataActionChannel<T>) -> Unit)? = null,
+): Flow<RemoteData<T>> =
+    remoteData(
+        connectivity = connectivity,
+        block = {
+            loader()
+                .onSuccess {
+                    it.catch { emit(Result.failure(it)) }
+                        .collect { emit(Result.success(it)) }
+                }
+                .onFailure {
+                    emit(Result.failure(it))
+                }
+        },
+        onStart = onStart,
+        onClose = onClose,
+    )
+
+private fun <T> remoteData(
+    connectivity: Connectivity,
+    block: suspend RemoteDataScope<T>.() -> Unit,
+    onStart: ((actionChannel: RemoteDataActionChannel<T>) -> Unit)? = null,
+    onClose: ((actionChannel: RemoteDataActionChannel<T>) -> Unit)? = null,
 ): Flow<RemoteData<T>> = callbackFlow {
     val dispatcher = Dispatchers.IO.limitedParallelism(1)
 
@@ -46,23 +78,23 @@ fun <T> remoteData(
 
     onStart?.invoke(actionChannel)
 
-    suspend fun mySend(newValue: Result<T>?) {
+    val remoteDataScope = RemoteDataScope { newValue ->
         value = newValue
         send(RemoteData(actionChannel, newValue))
     }
 
-    var job = launch(dispatcher) { mySend(loader()) }
+    var job = launch(dispatcher) { remoteDataScope.block() }
 
     launch(dispatcher) {
         actionChannel.receiveAsFlow().flowOn(dispatcher).collect { action ->
             when (action) {
                 is RemoteDataAction.Mutate -> {
-                    value?.onSuccess { mySend(Result.success(action.transformer(it))) }
+                    value?.onSuccess { remoteDataScope.emit(Result.success(action.transformer(it))) }
                 }
                 is RemoteDataAction.Reload -> {
                     job.cancel()
-                    mySend(null)
-                    job = launch(dispatcher) { mySend(loader()) }
+                    remoteDataScope.emit(null)
+                    job = launch(dispatcher) { remoteDataScope.block() }
                 }
             }
         }
@@ -78,4 +110,8 @@ fun <T> remoteData(
     awaitClose {
         onClose?.invoke(actionChannel)
     }
+}
+
+private fun interface RemoteDataScope<in T> {
+    suspend fun emit(value: Result<T>?)
 }

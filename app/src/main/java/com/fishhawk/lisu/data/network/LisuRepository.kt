@@ -330,10 +330,13 @@ class LisuRepository(
 
     // Download API
     fun listMangaDownloadTask(
-    ): Flow<Result<List<MangaDownloadTask>>?> =
+    ): Flow<RemoteData<List<MangaDownloadTask>>> =
         downloadDaoFlow.flatMapLatest {
-            flatten(it.map { dao -> dao.listMangaDownloadTask() })
-        }.catch { emit(Result.failure(it)) }
+            remoteDataFromFlow(
+                connectivity = connectivity,
+                loader = { it.map { dao -> dao.listMangaDownloadTask() } },
+            )
+        }
 
     suspend fun startAllTasks(
     ): Result<String> = downloadOneshot {

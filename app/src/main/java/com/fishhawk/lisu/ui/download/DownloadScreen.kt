@@ -77,6 +77,7 @@ private sealed interface DownloadAction {
         val chapterTask: ChapterDownloadTask,
     ) : DownloadAction
 
+    object Reload : DownloadAction
     object StartAll : DownloadAction
     object CancelAll : DownloadAction
 
@@ -102,7 +103,7 @@ private sealed interface DownloadAction {
 @Composable
 fun DownloadScreen(navController: NavHostController) {
     val viewModel by viewModel<DownloadViewModel>()
-    val tasksResult by viewModel.tasks.collectAsState()
+    val tasksResult by viewModel.tasksResult.collectAsState()
 
     val context = LocalContext.current
 
@@ -128,6 +129,8 @@ fun DownloadScreen(navController: NavHostController) {
                     chapterId = action.chapterTask.chapterId,
                 )
 
+            DownloadAction.Reload ->
+                viewModel.reload()
             DownloadAction.StartAll ->
                 viewModel.startAllTasks()
             DownloadAction.CancelAll ->
@@ -184,7 +187,7 @@ private fun DownloadScaffold(
             LisuTransition {
                 StateView(
                     result = tasksResult,
-                    onRetry = { },
+                    onRetry = { onAction(DownloadAction.Reload) },
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
