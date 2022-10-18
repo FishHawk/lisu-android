@@ -24,6 +24,8 @@ class PreferenceRepository(context: Context) {
 
     val lastUsedProvider by store.get("last_used_provider", "")
 
+    val enableAutoUpdates by store.get("enable_auto_updates", true)
+
     val theme by store.get("theme", Theme.Light)
     val secureMode by store.get("secure_mode", false)
 

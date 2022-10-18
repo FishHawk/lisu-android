@@ -240,6 +240,11 @@ fun AboutScreen(
         summary = githubUrl
     ) { context.openWebPage(githubUrl) }
 
+    SwitchPreference(
+        title = stringResource(R.string.about_enable_auto_updates),
+        preference = PR.enableAutoUpdates,
+    )
+
     TextPreference(
         title = stringResource(R.string.about_check_for_updates)
     ) {

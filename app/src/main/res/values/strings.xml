@@ -104,6 +104,7 @@
     <!-- about screen -->
     <string name="about_version">Version</string>
     <string name="about_github">GitHub</string>
+    <string name="about_enable_auto_updates">Enable auto updates</string>
     <string name="about_check_for_updates">Check for updates</string>
     <string name="about_whats_new">What\'s new</string>
     <string name="about_open_source_licenses">Open source licenses</string>

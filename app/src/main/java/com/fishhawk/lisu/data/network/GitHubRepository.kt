@@ -15,17 +15,19 @@ import io.ktor.resources.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import java.io.InputStream
 
 @Serializable
 @Resource("/repos/{owner}/{repo}/releases/latest")
-private data class GitHubLatestRepo(
+private data class GitHubLatestRelease(
     val owner: String,
     val repo: String,
 )
 
 class GitHubRepository {
     private val client: HttpClient = HttpClient(OkHttp) {
+        expectSuccess = true
         install(Resources)
         install(ContentNegotiation) { json(Json) }
     }
@@ -34,15 +36,10 @@ class GitHubRepository {
         owner: String,
         repo: String,
     ): Result<GitHubRelease> = runCatching {
-        client.get(
-            client.href(
-                GitHubLatestRepo(
-                    owner = owner,
-                    repo = repo,
-                ),
-                URLBuilder("https://api.github.com/"),
-            )
-        ) {
+        val builder = URLBuilder("https://api.github.com/")
+        client.href(GitHubLatestRelease(owner = owner, repo = repo), builder)
+        val url = builder.build()
+        client.get(url) {
             headers.append("Accept", "application/vnd.github.v3.full+json")
         }.body()
     }

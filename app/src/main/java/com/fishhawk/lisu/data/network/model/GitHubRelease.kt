@@ -6,10 +6,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GitHubRelease(
+    @SerialName("name") val name: String,
+    @SerialName("body") val body: String,
     @SerialName("tag_name") val version: String,
-    @SerialName("body") val info: String,
     @SerialName("html_url") val releaseLink: String,
-    @SerialName("assets") private val assets: List<Assets>
+    @SerialName("assets") private val assets: List<Assets>,
 ) {
     fun getDownloadLink(): String {
         val apkVariant = when (Build.SUPPORTED_ABIS[0]) {

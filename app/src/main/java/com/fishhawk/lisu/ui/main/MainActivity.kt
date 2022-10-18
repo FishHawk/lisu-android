@@ -110,10 +110,13 @@ private fun MainApp(
     }
 
     val lifecycleOwner = LocalLifecycleOwner.current
+    val autoCheckUpdate by PR.enableAutoUpdates.collectAsState()
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onResume(owner: LifecycleOwner) {
-                viewModel.checkForUpdate()
+                if (autoCheckUpdate) {
+                    viewModel.checkForUpdate()
+                }
             }
         })
     }
@@ -142,7 +145,7 @@ private fun MainApp(
                         viewModel.downloadApk(context.externalCacheDir, it.getDownloadLink())
                     },
                     onDismiss = { latestRelease = null },
-                    text = it.info,
+                    text = it.body,
                 )
             }
 
