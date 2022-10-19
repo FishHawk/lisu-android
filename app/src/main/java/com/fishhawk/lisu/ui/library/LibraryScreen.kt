@@ -104,7 +104,7 @@ private fun LibraryScaffold(
     var editing by remember { mutableStateOf(false) }
     val selectedMangaList = remember { mutableStateListOf<MangaKeyDto>() }
 
-    Scaffold(
+    LisuScaffold(
         topBar = {
             LisuToolBar(title = stringResource(R.string.label_library).let {
                 if (keywords.isBlank()) it else "$it - $keywords"

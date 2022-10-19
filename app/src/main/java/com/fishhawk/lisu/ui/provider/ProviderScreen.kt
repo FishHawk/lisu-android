@@ -153,7 +153,7 @@ private fun ProviderScaffold(
 
     var showAdvanceFilterList by remember { mutableStateOf(false) }
 
-    Scaffold(
+    LisuScaffold(
         topBar = {
             LisuToolBar(
                 title = keywords.ifBlank { providerId },

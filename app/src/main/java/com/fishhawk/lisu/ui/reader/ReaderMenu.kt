@@ -23,7 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowInsetsControllerCompat
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
 import com.fishhawk.lisu.data.datastore.Theme
@@ -73,13 +73,15 @@ internal fun BoxScope.ReaderMenu(
     onSnapToPage: suspend (Int) -> Unit,
     onAction: (ReaderAction) -> Unit,
 ) {
-    val systemUiController = rememberSystemUiController()
+    val controller = rememberSystemUiController()
     val theme by PR.theme.collectAsState()
-    val useDarkIcons = theme == Theme.Light
+    val useDarkIcons = theme == Theme.Light && !isOpened
+    LaunchedEffect(Unit) {
+        controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_BARS_BY_SWIPE
+    }
     LaunchedEffect(isOpened) {
-        systemUiController.setStatusBarColor(
-            Color.Transparent, darkIcons = useDarkIcons && !isOpened
-        )
+        controller.setSystemBarsColor(color = Color.Transparent, darkIcons = useDarkIcons, false)
+        controller.isNavigationBarVisible = isOpened
     }
 
     AnimatedVisibility(
@@ -161,7 +163,7 @@ private fun ReaderMenuBottom(
     onSnapToPage: suspend (Int) -> Unit,
     onAction: (ReaderAction) -> Unit,
 ) {
-    Column(modifier = Modifier.navigationBarsPadding()) {
+    Column {
         CompositionLocalProvider(
             LocalLayoutDirection provides
                     if (readerMode == ReaderMode.Rtl) LayoutDirection.Rtl
@@ -272,7 +274,9 @@ private fun ReaderMenuBottom(
 
         ReaderMenuSurface {
             Row(
-                modifier = Modifier.padding(top = 4.dp),
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .navigationBarsPadding(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(modifier = Modifier.weight(1f), onClick = {

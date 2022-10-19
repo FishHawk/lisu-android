@@ -18,6 +18,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
@@ -167,6 +168,9 @@ private fun MangaCover(
             .build()
     )
 
+    val backgroundColor = MaterialTheme.colorScheme.surface
+    val contentColor = contentColorFor(backgroundColor)
+    val placeholderColor = contentColor.copy(0.1f).compositeOver(backgroundColor)
     Image(
         painter = painter,
         contentDescription = null,
@@ -174,7 +178,8 @@ private fun MangaCover(
             .aspectRatio(0.75f)
             .placeholder(
                 visible = painter.state is AsyncImagePainter.State.Loading,
-                highlight = PlaceholderHighlight.fade()
+                color = placeholderColor,
+                highlight = PlaceholderHighlight.fade(),
             ),
         contentScale = ContentScale.Crop
     )

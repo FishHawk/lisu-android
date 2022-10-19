@@ -43,14 +43,14 @@ fun LisuTheme(content: @Composable () -> Unit) {
         LisuModalBottomSheetLayout {
             content()
         }
-    }
 
-    val systemUiController = rememberSystemUiController()
-    val useDarkIcons = theme == Theme.Light
-    SideEffect {
-        // hack, see https://github.com/google/accompanist/issues/683
-        systemUiController.setStatusBarColor(Color.Transparent, true)
-        systemUiController.setStatusBarColor(Color.Transparent, useDarkIcons)
+        val controller = rememberSystemUiController()
+        val isLight = theme == Theme.Light
+        SideEffect {
+            // hack, see https://github.com/google/accompanist/issues/683
+            controller.setSystemBarsColor(color = Color.Transparent, darkIcons = true)
+            controller.setSystemBarsColor(color = Color.Transparent, darkIcons = isLight)
+        }
     }
 }
 
@@ -80,8 +80,12 @@ private fun animateColors(colors: ColorScheme): ColorScheme {
 
     return colors.copy(
         primary = animateColor(colors.primary),
+        primaryContainer = animateColor(colors.primaryContainer),
         secondary = animateColor(colors.secondary),
+        secondaryContainer = animateColor(colors.secondaryContainer),
         background = animateColor(colors.background),
         surface = animateColor(colors.surface),
+        surfaceVariant = animateColor(colors.surfaceVariant),
+        surfaceTint = animateColor(colors.surfaceTint),
     )
 }

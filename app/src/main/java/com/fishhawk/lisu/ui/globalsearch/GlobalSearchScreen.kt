@@ -83,7 +83,7 @@ private fun GlobalSearchScaffold(
     var editing by remember { mutableStateOf(searchAndWaitInput) }
     var editingKeywords by remember { mutableStateOf(keywords) }
 
-    Scaffold(
+    LisuScaffold(
         topBar = {
             LisuToolBar(
                 title = keywords,

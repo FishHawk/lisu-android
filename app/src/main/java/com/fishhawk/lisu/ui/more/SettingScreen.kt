@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -25,6 +24,7 @@ import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.util.copyToClipboard
 import com.fishhawk.lisu.util.openWebPage
 import com.fishhawk.lisu.util.toast
+import com.fishhawk.lisu.widget.LisuScaffold
 import com.fishhawk.lisu.widget.LisuToolBar
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -36,7 +36,7 @@ private fun SettingScreen(
     navController: NavHostController,
     content: @Composable (NavHostController) -> Unit,
 ) {
-    Scaffold(
+    LisuScaffold(
         topBar = {
             LisuToolBar(
                 title = title,

@@ -86,7 +86,7 @@ private fun HistoryScaffold(
     histories: Map<LocalDate, List<ReadingHistory>>,
     onAction: (HistoryAction) -> Unit,
 ) {
-    Scaffold(
+    LisuScaffold(
         topBar = {
             LisuToolBar(title = stringResource(R.string.label_history)) {
                 var isOpen by remember { mutableStateOf(false) }

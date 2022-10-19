@@ -133,7 +133,7 @@ fun SuggestionList(
         }
 
         // Dismiss when click scrim
-        val scrimColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.32f)
+        val scrimColor = MaterialTheme.colorScheme.scrim
         Canvas(
             modifier = Modifier
                 .fillMaxSize()

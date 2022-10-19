@@ -23,6 +23,7 @@ import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.main.*
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.util.nsdManager
+import com.fishhawk.lisu.widget.LisuScaffold
 import com.fishhawk.lisu.widget.LisuToolBar
 import okhttp3.HttpUrl
 import org.koin.androidx.compose.koinViewModel
@@ -58,7 +59,7 @@ fun MoreScreen(
         }
     }
 
-    Scaffold(
+    LisuScaffold(
         topBar = { LisuToolBar(title = stringResource(R.string.label_more)) },
         content = { paddingValues ->
             LisuTransition {

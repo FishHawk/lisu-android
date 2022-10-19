@@ -32,6 +32,7 @@ import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.util.toast
+import com.fishhawk.lisu.widget.LisuScaffold
 import com.fishhawk.lisu.widget.LisuToolBar
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
@@ -122,7 +123,7 @@ private fun LoginWebsiteScaffold(
         return
     }
 
-    Scaffold(
+    LisuScaffold(
         topBar = {
             LisuToolBar(
                 title = {
@@ -201,7 +202,7 @@ private fun LoginCookiesScaffold(
         return
     }
 
-    Scaffold(
+    LisuScaffold(
         topBar = {
             LisuToolBar(
                 title = "${provider.id}-Login",
@@ -288,7 +289,7 @@ private fun LoginPasswordScaffold(
         }
     }
 
-    Scaffold(
+    LisuScaffold(
         topBar = {
             LisuToolBar(
                 title = "${provider.id}-Login",

@@ -102,7 +102,7 @@ private fun ExploreScaffold(
     lastUsedProvider: ProviderDto?,
     onAction: (ExploreAction) -> Unit,
 ) {
-    Scaffold(
+    LisuScaffold(
         topBar = {
             LisuToolBar(title = stringResource(R.string.label_explore)) {
                 IconButton(onClick = { onAction(ExploreAction.NavToGlobalSearch) }) {

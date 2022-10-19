@@ -26,6 +26,7 @@ import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.util.toast
+import com.fishhawk.lisu.widget.LisuScaffold
 import com.fishhawk.lisu.widget.LisuToolBar
 import com.google.accompanist.flowlayout.FlowRow
 import org.koin.androidx.compose.koinViewModel
@@ -90,7 +91,7 @@ private fun GalleryEditScaffold(
 ) {
     var metadata by remember { mutableStateOf(initMetadata) }
 
-    Scaffold(
+    LisuScaffold(
         topBar = {
             LisuToolBar(
                 title = stringResource(R.string.label_gallery_edit),

@@ -160,7 +160,7 @@ private fun DownloadScaffold(
     tasksResult: Result<List<MangaDownloadTask>>?,
     onAction: (DownloadAction) -> Unit,
 ) {
-    Scaffold(
+    LisuScaffold(
         topBar = {
             LisuToolBar(
                 title = stringResource(R.string.label_download),

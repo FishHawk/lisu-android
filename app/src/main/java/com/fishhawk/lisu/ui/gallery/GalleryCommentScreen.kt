@@ -65,7 +65,7 @@ private fun GalleryCommentScaffold(
     commentList: Result<PagedList<CommentDto>>?,
     onAction: (GalleryCommentAction) -> Unit,
 ) {
-    Scaffold(
+    LisuScaffold(
         topBar = {
             LisuToolBar(
                 title = "Comments",

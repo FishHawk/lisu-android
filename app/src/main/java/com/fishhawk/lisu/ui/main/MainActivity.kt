@@ -54,9 +54,6 @@ import com.fishhawk.lisu.ui.globalsearch.GlobalSearchScreen
 import com.fishhawk.lisu.ui.history.HistoryScreen
 import com.fishhawk.lisu.ui.library.LibraryScreen
 import com.fishhawk.lisu.ui.more.*
-import com.fishhawk.lisu.ui.more.SettingGeneralScreen
-import com.fishhawk.lisu.ui.more.SettingReaderScreen
-import com.fishhawk.lisu.ui.more.SettingAdvancedScreen
 import com.fishhawk.lisu.ui.provider.ProviderScreen
 import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.util.findActivity
@@ -64,7 +61,7 @@ import com.fishhawk.lisu.util.toUriCompat
 import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.LisuDialog
 import com.fishhawk.lisu.widget.LisuModalBottomSheetLayout
-import com.google.accompanist.insets.ui.Scaffold
+import com.fishhawk.lisu.widget.LisuScaffold
 import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : BaseActivity() {
@@ -74,6 +71,7 @@ class MainActivity : BaseActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainApp(
     viewModel: MainViewModel = koinViewModel(),
@@ -124,15 +122,13 @@ private fun MainApp(
     LisuTheme {
         LisuModalBottomSheetLayout {
             val navController = rememberNavController()
-            Scaffold(
-                modifier = Modifier.navigationBarsPadding(),
-                bottomBar = { BottomBar(navController) }
+            LisuScaffold(
+                bottomBar = { BottomBar(navController) },
+                contentWindowInsets = WindowInsets.ime.add(WindowInsets.navigationBars),
             ) { innerPadding ->
                 MainNavHost(
                     navController = navController,
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .imePadding(),
+                    modifier = Modifier.padding(innerPadding),
                 )
             }
 
@@ -236,14 +232,14 @@ sealed class Tab(val route: String, val labelResId: Int, val icon: ImageVector) 
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun BottomBar(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val bottomBarVisible = Tab.items.any { it.route == currentDestination?.route }
 
     AnimatedVisibility(
-        visible = (Tab.items.any { it.route == currentDestination?.route }) && !WindowInsets.isImeVisible,
+        visible = bottomBarVisible,
         enter = slideInVertically(initialOffsetY = { it }),
         exit = slideOutVertically(targetOffsetY = { it }),
     ) {

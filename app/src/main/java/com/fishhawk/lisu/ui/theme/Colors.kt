@@ -11,6 +11,7 @@ val ColorsLight = lightColorScheme(
     surface = MaterialColors.White,
     surfaceVariant = MaterialColors.White,
     surfaceTint = MaterialColors.White,
+    scrim = MaterialColors.Black.copy(0.32f),
 )
 
 val ColorsDark = darkColorScheme(
@@ -20,6 +21,7 @@ val ColorsDark = darkColorScheme(
     surface = Color(0xFF212121),
     surfaceVariant = Color(0xFF212121),
     surfaceTint = Color(0xFF212121),
+    scrim = MaterialColors.Black.copy(0.5f),
 )
 
 @Suppress("unused")
