@@ -3,6 +3,7 @@ package com.fishhawk.lisu.data.network.dao
 import com.fishhawk.lisu.data.network.model.MangaDto
 import com.fishhawk.lisu.data.network.model.MangaKeyDto
 import com.fishhawk.lisu.data.network.model.MangaMetadata
+import com.fishhawk.lisu.data.network.model.MangaPageDto
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.resources.*
@@ -20,7 +21,7 @@ private class Library {
     @Resource("/search")
     data class Search(
         val parent: Library = Library(),
-        val page: Int,
+        val key: String?,
         val keywords: String,
     )
 
@@ -64,24 +65,27 @@ private class Library {
 class LisuLibraryDao(private val client: HttpClient) {
 
     suspend fun search(
-        page: Int,
+        key: String?,
         keywords: String = "",
-    ): List<MangaDto> = client.get(
+    ): MangaPageDto = client.get(
         Library.Search(
-            page = page,
+            key = key,
             keywords = keywords,
         )
     ).run {
-        body<List<MangaDto>>().map {
-            it.copy(
-                cover = client.processCover(
-                    url = request.url,
-                    providerId = it.providerId,
-                    mangaId = it.id,
-                    imageId = it.cover,
+        val mangaPage = body<MangaPageDto>()
+        mangaPage.copy(
+            list = mangaPage.list.map {
+                it.copy(
+                    cover = client.processCover(
+                        url = request.url,
+                        providerId = it.providerId,
+                        mangaId = it.id,
+                        imageId = it.cover,
+                    )
                 )
-            )
-        }
+            }
+        )
     }
 
     suspend fun removeMultipleMangas(

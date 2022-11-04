@@ -1,5 +1,6 @@
 package com.fishhawk.lisu.data.network.dao
 
+import com.fishhawk.lisu.data.network.base.*
 import com.fishhawk.lisu.data.network.model.*
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -8,6 +9,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.resources.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -49,7 +51,7 @@ private class Provider {
         val parent: Provider = Provider(),
         val providerId: String,
         val boardId: BoardId,
-        val page: Int,
+        val key: String?,
         val keywords: String?,
     )
 
@@ -145,14 +147,14 @@ class LisuProviderDao(private val client: HttpClient) {
     suspend fun getBoard(
         providerId: String,
         boardId: BoardId,
-        page: Int,
+        key: String?,
         keywords: String?,
         filterValues: BoardFilterValue,
-    ): List<MangaDto> = client.get(
+    ): MangaPageDto = client.get(
         Provider.Board(
             providerId = providerId,
             boardId = boardId,
-            page = page,
+            key = key,
             keywords = keywords,
         )
     ) {
@@ -162,8 +164,9 @@ class LisuProviderDao(private val client: HttpClient) {
             parameter(it.key, str)
         }
     }.run {
-        body<List<MangaDto>>()
-            .map {
+        val mangaPage = body<MangaPageDto>()
+        mangaPage.copy(
+            list = mangaPage.list.map {
                 it.copy(
                     cover = client.processCover(
                         url = request.url,
@@ -173,6 +176,7 @@ class LisuProviderDao(private val client: HttpClient) {
                     )
                 )
             }
+        )
     }
 
     suspend fun getManga(

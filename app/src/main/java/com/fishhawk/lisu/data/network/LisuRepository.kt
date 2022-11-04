@@ -122,14 +122,13 @@ class LisuRepository(
         filterValues: BoardFilterValue,
         keywords: String? = null,
     ): Flow<RemoteList<MangaDto>> = providerDaoFlow.flatMapLatest {
-        remotePagingList(
-            connectivity = connectivity,
+        remotePagingMangaList(
             loader = { page ->
                 it.mapCatching { dao ->
                     dao.getBoard(
                         providerId = providerId,
                         boardId = boardId,
-                        page = page,
+                        key = page,
                         keywords = keywords,
                         filterValues = filterValues,
                     )
@@ -195,8 +194,7 @@ class LisuRepository(
     suspend fun searchFromLibrary(
         keywords: String,
     ): Flow<RemoteList<MangaDto>> = libraryDaoFlow.flatMapLatest {
-        remotePagingList(
-            connectivity = connectivity,
+        remotePagingMangaList(
             loader = { page -> it.mapCatching { dao -> dao.search(page, keywords) } },
             onStart = { libraryMangaListActionChannels.add(it) },
             onClose = { libraryMangaListActionChannels.remove(it) },
@@ -457,4 +455,23 @@ class LisuRepository(
             }
         }
     }
+
+    private fun remotePagingMangaList(
+        loader: suspend (String) -> Result<MangaPageDto>,
+        onStart: ((actionChannel: RemoteListActionChannel<MangaDto>) -> Unit)? = null,
+        onClose: ((actionChannel: RemoteListActionChannel<MangaDto>) -> Unit)? = null,
+    ): Flow<RemoteList<MangaDto>> = remotePagingList(
+        connectivity = connectivity,
+        startKey = "",
+        loader = { page ->
+            loader(page).map {
+                Page(
+                    it.list,
+                    if (it.list.isEmpty()) null else it.nextKey
+                )
+            }
+        },
+        onStart = onStart,
+        onClose = onClose,
+    )
 }

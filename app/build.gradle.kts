@@ -1,6 +1,6 @@
 plugins {
     kotlin("plugin.serialization") version "1.7.10"
-    id("com.android.application") version "7.4.0-beta02"
+    id("com.android.application") version "7.4.0-beta03"
     id("com.google.devtools.ksp") version "1.7.10-1.0.6"
     id("org.jetbrains.kotlin.android") version "1.7.10"
     id("org.jetbrains.kotlin.plugin.parcelize") version "1.7.0"
