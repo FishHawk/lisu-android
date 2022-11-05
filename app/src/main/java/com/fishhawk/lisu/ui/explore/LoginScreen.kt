@@ -2,6 +2,7 @@ package com.fishhawk.lisu.ui.explore
 
 import android.webkit.CookieManager
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -244,24 +245,16 @@ private fun LoginCookiesScaffold(
                         }
 
                         val cookies = remember { mutableStateMapOf<String, String>() }
-
-                        val state = rememberScrollState()
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                                .verticalScroll(state),
-                        ) {
-                            cookiesLogin.cookieNames.forEach { name ->
-                                OutlinedTextField(
-                                    value = cookies[name] ?: "",
-                                    onValueChange = { cookies[name] = it },
-                                    modifier = Modifier.fillMaxSize(),
-                                    singleLine = true,
-                                    label = { Text(text = name) },
-                                )
-                            }
+                        cookiesLogin.cookieNames.forEach { name ->
+                            OutlinedTextField(
+                                value = cookies[name] ?: "",
+                                onValueChange = { cookies[name] = it },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                                label = { Text(text = name) },
+                            )
                         }
+
                         Button(
                             onClick = { onAction(LoginAction.LoginByCookies(cookies)) },
                             modifier = Modifier.fillMaxWidth()
@@ -334,7 +327,7 @@ private fun LoginPasswordScaffold(
                         OutlinedTextField(
                             value = username,
                             onValueChange = { username = it },
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             label = { Text(text = "username") },
                         )
@@ -343,7 +336,7 @@ private fun LoginPasswordScaffold(
                         OutlinedTextField(
                             value = password,
                             onValueChange = { password = it },
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             label = { Text(text = "password") },
                             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
