@@ -12,7 +12,7 @@ object Notifications {
         createNotificationChannelsCompat(
             listOf(
                 buildNotificationChannel(AppUpdateNotification.channel, IMPORTANCE_DEFAULT) {
-                    setName(context.getString(R.string.channel_app_updates))
+                    setName("App updates")
                 }
             )
         )
@@ -21,7 +21,7 @@ object Notifications {
 
 private inline fun buildNotificationChannelGroup(
     channelId: String,
-    block: (NotificationChannelGroupCompat.Builder.() -> Unit)
+    block: (NotificationChannelGroupCompat.Builder.() -> Unit),
 ): NotificationChannelGroupCompat {
     val builder = NotificationChannelGroupCompat.Builder(channelId)
     builder.block()
@@ -31,7 +31,7 @@ private inline fun buildNotificationChannelGroup(
 private inline fun buildNotificationChannel(
     channelId: String,
     channelImportance: Int,
-    block: (NotificationChannelCompat.Builder.() -> Unit)
+    block: (NotificationChannelCompat.Builder.() -> Unit),
 ): NotificationChannelCompat {
     val builder = NotificationChannelCompat.Builder(channelId, channelImportance)
     builder.block()

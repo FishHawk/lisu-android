@@ -31,18 +31,18 @@
     <string name="explore_last_used">Last used</string>
 
     <!-- more screen -->
-    <string name="more_download">Download</string>
+    <string name="more_download" translatable="false">@string/label_download</string>
     <string name="more_setting_general">Setting general</string>
     <string name="more_setting_reader">Setting reader</string>
     <string name="more_setting_advanced">Setting advanced</string>
-    <string name="more_about">About</string>
+    <string name="more_about" translatable="false">@string/label_about</string>
 
 
     <!-- setting general screen -->
     <string name="settings_start_screen">Start screen</string>
-    <string name="settings_start_screen_library">@string/label_library</string>
-    <string name="settings_start_screen_history">@string/label_history</string>
-    <string name="settings_start_screen_explore">@string/label_explore</string>
+    <string name="settings_start_screen_library" translatable="false">@string/label_library</string>
+    <string name="settings_start_screen_history" translatable="false">@string/label_history</string>
+    <string name="settings_start_screen_explore" translatable="false">@string/label_explore</string>
 
     <string name="settings_theme">Theme</string>
     <string name="settings_theme_light">Light</string>
@@ -107,7 +107,7 @@
     <string name="about_enable_auto_updates">Enable auto updates</string>
     <string name="about_check_for_updates">Check for updates</string>
     <string name="about_whats_new">What\'s new</string>
-    <string name="about_open_source_licenses">Open source licenses</string>
+    <string name="about_open_source_licenses" translatable="false">@string/label_open_source_license</string>
 
     <string name="toast_version_copied">Copy version to clipboard.</string>
 
@@ -185,5 +185,4 @@
     <string name="no_next_chapter">Already at the end.</string>
 
     <string name="image_saved">Image saved.</string>
-    <string name="channel_app_updates">App updates</string>
 </resources>
