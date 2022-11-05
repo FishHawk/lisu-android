@@ -26,7 +26,15 @@ class LisuRepository(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private val urlState = urlFlow
-        .map { runCatching { URLBuilder(it).buildString() } }
+        .map { url ->
+            runCatching {
+                val completedUrl = url.trim().let {
+                    if (it.startsWith("http://") || it.startsWith("https://")) it
+                    else "http://$it"
+                }
+                URLBuilder(completedUrl).buildString()
+            }
+        }
         .stateIn(scope, SharingStarted.Eagerly, null)
 
     private val client: HttpClient = HttpClient(OkHttp) {
