@@ -65,3 +65,58 @@ fun LisuToolBar(
         ),
     )
 }
+
+@Composable
+fun LisuNonCenterAlignedToolBar(
+    modifier: Modifier = Modifier,
+    title: String? = null,
+    transparent: Boolean = false,
+    onNavUp: (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {},
+) {
+    LisuNonCenterAlignedToolBar(
+        title = {
+            title?.let {
+                Text(
+                    text = it,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        },
+        modifier = modifier,
+        transparent = transparent,
+        onNavUp = onNavUp,
+        actions = actions,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LisuNonCenterAlignedToolBar(
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    transparent: Boolean = false,
+    onNavUp: (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {},
+) {
+    TopAppBar(
+        title = title,
+        modifier = modifier,
+        navigationIcon = {
+            onNavUp?.let {
+                IconButton(onClick = { it() }) {
+                    Icon(Icons.Filled.ArrowBack, stringResource(R.string.action_back))
+                }
+            }
+        },
+        actions = actions,
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = if (transparent) {
+                Color.Transparent
+            } else {
+                MaterialTheme.colorScheme.surface
+            },
+        ),
+    )
+}

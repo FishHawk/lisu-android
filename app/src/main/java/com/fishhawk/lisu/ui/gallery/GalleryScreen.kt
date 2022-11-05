@@ -233,7 +233,7 @@ private fun ToolBar(
         enter = fadeIn(),
         exit = fadeOut(),
     ) {
-        LisuToolBar(
+        LisuNonCenterAlignedToolBar(
             title = title,
             onNavUp = { onAction(GalleryAction.NavUp) },
         ) {
