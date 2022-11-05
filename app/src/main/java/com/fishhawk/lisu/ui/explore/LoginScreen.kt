@@ -52,7 +52,8 @@ private fun LoginScreen(
     content: @Composable (ProviderDto, (LoginAction) -> Unit) -> Unit,
 ) {
     val context = LocalContext.current
-    val providerId = navController.currentBackStackEntry!!.arguments!!.getString("providerId")!!
+    val providerId =
+        navController.currentBackStackEntry?.arguments?.getString("providerId") ?: return
 
     val provider = remember {
         val providersResult = viewModel.providersLoadState.value
