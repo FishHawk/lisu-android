@@ -1,9 +1,9 @@
 plugins {
-    kotlin("plugin.serialization") version "1.7.10"
-    id("com.android.application") version "7.4.0-beta03"
-    id("com.google.devtools.ksp") version "1.7.10-1.0.6"
-    id("org.jetbrains.kotlin.android") version "1.7.10"
-    id("org.jetbrains.kotlin.plugin.parcelize") version "1.7.0"
+    kotlin("plugin.serialization") version "1.8.10"
+    id("com.android.application") version "8.0.0-beta04"
+    id("com.google.devtools.ksp") version "1.8.10-1.0.9"
+    id("org.jetbrains.kotlin.android") version "1.8.10"
+    id("org.jetbrains.kotlin.plugin.parcelize") version "1.8.0"
     id("com.mikepenz.aboutlibraries.plugin") version "10.3.0"
 }
 
@@ -60,22 +60,25 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    kotlin {
+        jvmToolchain(8)
+    }
     kotlinOptions {
         jvmTarget = "1.8"
         freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn"
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.1"
+        kotlinCompilerExtensionVersion = "1.4.3"
     }
 }
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
 
-    implementation("androidx.activity:activity-compose:1.7.0-alpha01")
+    implementation("androidx.activity:activity-compose:1.7.0-rc01")
 
-    val composeVersion = "1.3.0-rc01"
+    val composeVersion = "1.4.0-rc01"
     implementation("androidx.compose.ui:ui:$composeVersion")
     debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
@@ -86,11 +89,11 @@ dependencies {
 
     implementation("androidx.navigation:navigation-compose:2.5.2")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0-alpha02")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    val roomVersion = "2.5.0-beta01"
+    val roomVersion = "2.5.0"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
@@ -114,7 +117,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:$coilVersion")
     implementation("io.coil-kt:coil-gif:$coilVersion")
 
-    val ktorVersion = "2.1.2"
+    val ktorVersion = "2.2.4"
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
@@ -122,12 +125,12 @@ dependencies {
     implementation("io.ktor:ktor-client-resources:$ktorVersion")
 
     // Licenses
-    implementation("com.mikepenz:aboutlibraries-compose:10.5.1")
+    implementation("com.mikepenz:aboutlibraries-compose:10.6.1")
 
     // UI Tests
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.3")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.1.1")
 
     // implementation("com.quickbirdstudios:opencv:4.1.0")
