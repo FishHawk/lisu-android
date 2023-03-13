@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -29,10 +30,10 @@ import com.fishhawk.lisu.data.network.model.MangaState
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.widget.LisuToolBar
-import com.fishhawk.lisu.widget.LocalBottomSheetHelper
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MangaHeader(
     state: MangaState,
@@ -116,16 +117,24 @@ internal fun MangaHeader(
                     .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                val scope = rememberCoroutineScope()
-                val bottomSheetHelper = LocalBottomSheetHelper.current
                 val drawable = (painter.state as? AsyncImagePainter.State.Success)?.result?.drawable
+
+                var openBottomSheet by rememberSaveable { mutableStateOf(false) }
+                val bottomSheetState = rememberModalBottomSheetState()
+                if (openBottomSheet) {
+                    ModalBottomSheet(
+                        onDismissRequest = { openBottomSheet = false },
+                        sheetState = bottomSheetState,
+                        dragHandle = {},
+                    ) {
+                        GalleryCoverSheetContent(cover = drawable, onAction = onAction)
+                    }
+                }
+
                 Surface(
                     modifier = Modifier
                         .aspectRatio(0.75f)
-                        .clickable {
-                            val sheet = GalleryCoverSheet(drawable, onAction)
-                            scope.launch { bottomSheetHelper.open(sheet) }
-                        },
+                        .clickable { openBottomSheet = true },
                     shape = MaterialTheme.shapes.extraSmall,
                 ) {
                     Image(
@@ -256,6 +265,7 @@ private fun MangaActionButtons(
                     ) { onAction(GalleryAction.NavToEdit) }
                 }
             }
+
             MangaState.Remote -> {
                 MediumEmphasis {
                     MangaActionButton(
@@ -264,6 +274,7 @@ private fun MangaActionButtons(
                     ) { onAction(GalleryAction.AddToLibrary) }
                 }
             }
+
             MangaState.RemoteInLibrary -> {
                 CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.primary) {
                     MangaActionButton(

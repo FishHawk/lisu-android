@@ -130,14 +130,14 @@ private fun LoginWebsiteScaffold(
             LisuToolBar(
                 title = {
                     ListItem(
-                        headlineText = {
+                        headlineContent = {
                             Text(
                                 text = "${provider.id}-Login",
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
                         },
-                        supportingText = {
+                        supportingContent = {
                             Text(
                                 text = cookiesLogin.loginSite,
                                 maxLines = 1,

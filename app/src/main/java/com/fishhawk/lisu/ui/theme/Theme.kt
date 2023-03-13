@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.Color
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.Theme
 import com.fishhawk.lisu.data.datastore.collectAsState
-import com.fishhawk.lisu.widget.LisuModalBottomSheetLayout
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 val LisuIcons = Icons.Outlined
@@ -40,9 +39,7 @@ fun LisuTheme(content: @Composable () -> Unit) {
     }
 
     MaterialTheme(colorScheme = animateColors(colorScheme)) {
-        LisuModalBottomSheetLayout {
-            content()
-        }
+        content()
 
         val controller = rememberSystemUiController()
         val isLight = theme == Theme.Light

@@ -155,9 +155,9 @@ private fun ServerAddressSelector(
             DropdownMenuItem(
                 text = {
                     ListItem(
-                        headlineText = { Text(text = it.name) },
+                        headlineContent = { Text(text = it.name) },
                         modifier = Modifier.weight(1f),
-                        supportingText = { Text(text = it.address.toString()) }
+                        supportingContent = { Text(text = it.address.toString()) }
                     )
                 },
                 onClick = { address = it.address.toString() },
@@ -170,7 +170,7 @@ private fun ServerAddressSelector(
             DropdownMenuItem(
                 text = {
                     ListItem(
-                        headlineText = { Text(text = it) },
+                        headlineContent = { Text(text = it) },
                         modifier = Modifier.weight(1f),
                         trailingContent = {
                             IconButton(onClick = { onAction(MoreAction.DeleteSuggestion(it)) }) {

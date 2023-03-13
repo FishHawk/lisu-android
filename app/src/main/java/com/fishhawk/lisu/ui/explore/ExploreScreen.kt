@@ -154,14 +154,13 @@ private fun ProviderList(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProviderListItem(
     provider: ProviderDto,
     onAction: (ExploreAction) -> Unit,
 ) {
     ListItem(
-        headlineText = {
+        headlineContent = {
             Text(
                 text = provider.id,
                 maxLines = 1,
@@ -194,7 +193,7 @@ private fun ProviderListItem(
                 )
             }
         },
-        supportingText = {
+        supportingContent = {
             MediumEmphasis {
                 val textStyle = MaterialTheme.typography.bodyMedium
                 fun inlineTextContent(imageVector: ImageVector): InlineTextContent {

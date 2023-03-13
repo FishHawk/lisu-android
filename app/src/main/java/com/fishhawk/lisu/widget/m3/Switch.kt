@@ -131,9 +131,9 @@ fun LisuSwitch(
 
     Box(
         modifier
-            .then(
-                if (onCheckedChange != null) Modifier.minimumTouchTargetSize() else Modifier
-            )
+//            .then(
+//                if (onCheckedChange != null) Modifier.minimumTouchTargetSize() else Modifier
+//            )
             .then(toggleableModifier)
             .wrapContentSize(Alignment.Center)
             .requiredSize(SwitchWidth, SwitchHeight)

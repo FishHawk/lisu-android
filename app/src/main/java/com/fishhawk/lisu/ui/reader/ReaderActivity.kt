@@ -7,7 +7,6 @@ import androidx.lifecycle.lifecycleScope
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.ui.base.BaseActivity
 import com.fishhawk.lisu.ui.theme.LisuTheme
-import com.fishhawk.lisu.widget.LisuModalBottomSheetLayout
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -32,9 +31,7 @@ class ReaderActivity : BaseActivity() {
 
         setContent {
             LisuTheme {
-                LisuModalBottomSheetLayout {
-                    ReaderScreen()
-                }
+                ReaderScreen()
             }
         }
     }

@@ -23,12 +23,12 @@ fun BasePreference(
     trailing: @Composable (() -> Unit)? = null,
 ) {
     ListItem(
-        headlineText = { Text(text = title) },
+        headlineContent = { Text(text = title) },
         modifier = Modifier.clickable(onClick = { onClick() }),
         leadingContent = icon?.let {
             { Icon(it, contentDescription = "", tint = MaterialTheme.colorScheme.primary) }
         },
-        supportingText = summary?.let { { Text(text = it) } },
+        supportingContent = summary?.let { { Text(text = it) } },
         trailingContent = trailing
     )
 }

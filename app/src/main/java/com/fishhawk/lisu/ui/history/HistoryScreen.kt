@@ -25,10 +25,6 @@ import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.util.readableString
 import com.fishhawk.lisu.widget.*
-import com.fishhawk.lisu.widget.m2.DismissDirection
-import com.fishhawk.lisu.widget.m2.DismissValue
-import com.fishhawk.lisu.widget.m2.SwipeToDismiss
-import com.fishhawk.lisu.widget.m2.rememberDismissState
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -60,6 +56,7 @@ fun HistoryScreen(
                     authors = authors?.let { listOf(it) } ?: emptyList(),
                 ))
             }
+
             is HistoryAction.NavToReader -> with(action.history) {
                 context.navToReader(
                     providerId = providerId,
@@ -69,6 +66,7 @@ fun HistoryScreen(
                     page = page,
                 )
             }
+
             is HistoryAction.DeleteHistory -> viewModel.deleteHistory(action.history)
             HistoryAction.ClearHistory -> viewModel.clearHistory()
         }
@@ -80,7 +78,6 @@ fun HistoryScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HistoryScaffold(
     histories: Map<LocalDate, List<ReadingHistory>>,
@@ -147,6 +144,7 @@ private fun HistoryList(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HistoryListItem(
     history: ReadingHistory,
@@ -154,7 +152,7 @@ private fun HistoryListItem(
     modifier: Modifier = Modifier,
 ) {
     val dismissState = rememberDismissState(
-        confirmStateChange = {
+        confirmValueChange = {
             (it == DismissValue.DismissedToEnd).also { confirmed ->
                 if (confirmed) onAction(HistoryAction.DeleteHistory(history))
             }
@@ -170,53 +168,54 @@ private fun HistoryListItem(
                     .fillMaxSize()
                     .background(Color.LightGray),
             )
-        }
-    ) {
-        LisuListItem(
-            leadingContent = {
-                MangaCard(
-                    cover = history.cover,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .clickable { onAction(HistoryAction.NavToGallery(history)) },
-                )
-            },
-            headlineText = {
-                Text(
-                    text = history.title ?: history.mangaId,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 2,
-                )
-            },
-            modifier = Modifier.clickable {
-                onAction(HistoryAction.NavToReader(history))
-            },
-            overlineText = {
-                Text(
-                    text = history.providerId,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                )
-            },
-            supportingText = {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    val time = history.date.toLocalTime()
-                        .format(DateTimeFormatter.ofPattern(stringResource(R.string.history_time_format)))
-                    Text(text = time)
+        },
+        dismissContent = {
+            LisuListItem(
+                leadingContent = {
+                    MangaCard(
+                        cover = history.cover,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .clickable { onAction(HistoryAction.NavToGallery(history)) },
+                    )
+                },
+                headlineText = {
+                    Text(
+                        text = history.title ?: history.mangaId,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 2,
+                    )
+                },
+                modifier = Modifier.clickable {
+                    onAction(HistoryAction.NavToReader(history))
+                },
+                overlineText = {
+                    Text(
+                        text = history.providerId,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                    )
+                },
+                supportingText = {
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        val time = history.date.toLocalTime()
+                            .format(DateTimeFormatter.ofPattern(stringResource(R.string.history_time_format)))
+                        Text(text = time)
 
-                    val seen = listOf(
-                        history.collectionId,
-                        history.chapterName,
-                    ).filter { it.isNotBlank() }.joinToString(" ")
-                    if (seen.isNotBlank()) {
-                        Text(
-                            text = seen,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1,
-                        )
+                        val seen = listOf(
+                            history.collectionId,
+                            history.chapterName,
+                        ).filter { it.isNotBlank() }.joinToString(" ")
+                        if (seen.isNotBlank()) {
+                            Text(
+                                text = seen,
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                            )
+                        }
                     }
                 }
-            }
-        )
-    }
+            )
+        }
+    )
 }

@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,12 +31,10 @@ import com.fishhawk.lisu.data.datastore.Theme
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.util.findActivity
-import com.fishhawk.lisu.widget.LocalBottomSheetHelper
 import com.fishhawk.lisu.widget.m3.LisuSlider
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.launch
 
 @Composable
 internal fun BoxScope.ReaderInfoBar(
@@ -155,6 +154,7 @@ private fun ReaderMenuTop(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ReaderMenuBottom(
     readerMode: ReaderMode,
@@ -296,15 +296,31 @@ private fun ReaderMenuBottom(
                     Icon(Icons.Filled.ScreenRotation, "reader orientation")
                 }
 
-                val bottomSheetHelper = LocalBottomSheetHelper.current
-                val scope = rememberCoroutineScope()
-                IconButton(modifier = Modifier.weight(1f), onClick = {
-                    scope.launch { bottomSheetHelper.open(ReaderOverlaySheet) }
-                }) { Icon(Icons.Filled.BrightnessMedium, "color-filter") }
+                val bottomSheetState = rememberModalBottomSheetState()
+                var openBottomSheet by rememberSaveable { mutableStateOf(0) }
 
                 IconButton(modifier = Modifier.weight(1f), onClick = {
-                    scope.launch { bottomSheetHelper.open(ReaderSettingsSheet) }
+                    openBottomSheet = 1
+                }) { Icon(Icons.Filled.BrightnessMedium, "color-filter") }
+
+
+                IconButton(modifier = Modifier.weight(1f), onClick = {
+                    openBottomSheet = 2
                 }) { Icon(Icons.Filled.Settings, "setting") }
+
+                if (openBottomSheet > 0) {
+                    ModalBottomSheet(
+                        onDismissRequest = { openBottomSheet = 0 },
+                        sheetState = bottomSheetState,
+                        dragHandle = {},
+                    ) {
+                        if (openBottomSheet == 1) {
+                            ReaderSettingsSheetContent()
+                        } else {
+                            ReaderOverlaySheetContent()
+                        }
+                    }
+                }
             }
         }
     }

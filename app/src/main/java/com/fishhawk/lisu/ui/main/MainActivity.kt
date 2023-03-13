@@ -60,7 +60,6 @@ import com.fishhawk.lisu.util.findActivity
 import com.fishhawk.lisu.util.toUriCompat
 import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.LisuDialog
-import com.fishhawk.lisu.widget.LisuModalBottomSheetLayout
 import com.fishhawk.lisu.widget.LisuScaffold
 import org.koin.androidx.compose.koinViewModel
 
@@ -89,13 +88,16 @@ private fun MainApp(
             MainEvent.AlreadyDownloading -> context.toast("Already downloading apk.")
             MainEvent.NotifyDownloadStart ->
                 AppUpdateNotification.onDownloadStart(context)
+
             is MainEvent.NotifyDownloadProgress ->
                 AppUpdateNotification.onProgressChange(context, it.progress)
+
             is MainEvent.NotifyDownloadFinish ->
                 AppUpdateNotification.onDownloadFinished(
                     context,
                     it.file.toUriCompat(context)
                 )
+
             is MainEvent.NotifyDownloadError ->
                 AppUpdateNotification.onDownloadError(context, it.url)
         }
@@ -120,46 +122,44 @@ private fun MainApp(
     }
 
     LisuTheme {
-        LisuModalBottomSheetLayout {
-            val navController = rememberNavController()
-            LisuScaffold(
-                bottomBar = { BottomBar(navController) },
-                contentWindowInsets = WindowInsets.ime.add(WindowInsets.navigationBars),
-            ) { innerPadding ->
-                MainNavHost(
-                    navController = navController,
-                    modifier = Modifier.padding(innerPadding),
-                )
-            }
+        val navController = rememberNavController()
+        LisuScaffold(
+            bottomBar = { BottomBar(navController) },
+            contentWindowInsets = WindowInsets.ime.add(WindowInsets.navigationBars),
+        ) { innerPadding ->
+            MainNavHost(
+                navController = navController,
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
 
-            latestRelease?.let {
-                LisuDialog(
-                    title = stringResource(R.string.dialog_new_version_available),
-                    confirmText = stringResource(R.string.dialog_new_version_available_download),
-                    dismissText = stringResource(R.string.dialog_new_version_available_ignore),
-                    onConfirm = {
-                        viewModel.downloadApk(context.externalCacheDir, it.getDownloadLink())
-                    },
-                    onDismiss = { latestRelease = null },
-                    text = it.body,
-                )
-            }
+        latestRelease?.let {
+            LisuDialog(
+                title = stringResource(R.string.dialog_new_version_available),
+                confirmText = stringResource(R.string.dialog_new_version_available_download),
+                dismissText = stringResource(R.string.dialog_new_version_available_ignore),
+                onConfirm = {
+                    viewModel.downloadApk(context.externalCacheDir, it.getDownloadLink())
+                },
+                onDismiss = { latestRelease = null },
+                text = it.body,
+            )
+        }
 
-            var exitPressedOnce by remember { mutableStateOf(false) }
-            val isConfirmExitEnabled by PR.isConfirmExitEnabled.collectAsState()
-            BackHandler(
-                navController.backQueue.size <= 1
-                        && isConfirmExitEnabled
-            ) {
-                if (exitPressedOnce) {
-                    context.findActivity().finish()
-                } else {
-                    exitPressedOnce = true
-                    context.toast(R.string.confirm_exit)
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        exitPressedOnce = false
-                    }, 2000)
-                }
+        var exitPressedOnce by remember { mutableStateOf(false) }
+        val isConfirmExitEnabled by PR.isConfirmExitEnabled.collectAsState()
+        BackHandler(
+            navController.backQueue.size <= 1
+                    && isConfirmExitEnabled
+        ) {
+            if (exitPressedOnce) {
+                context.findActivity().finish()
+            } else {
+                exitPressedOnce = true
+                context.toast(R.string.confirm_exit)
+                Handler(Looper.getMainLooper()).postDelayed({
+                    exitPressedOnce = false
+                }, 2000)
             }
         }
     }

@@ -5,7 +5,10 @@ import android.graphics.Bitmap
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,7 +28,6 @@ import com.fishhawk.lisu.ui.reader.viewer.PagerViewer
 import com.fishhawk.lisu.ui.reader.viewer.ViewerState
 import com.fishhawk.lisu.ui.reader.viewer.WebtoonViewer
 import com.fishhawk.lisu.util.*
-import com.fishhawk.lisu.widget.LocalBottomSheetHelper
 import com.fishhawk.lisu.widget.StateView
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
@@ -81,15 +83,18 @@ fun ReaderScreen() {
                 action.bitmap,
                 "${mangaTitleResult?.getOrNull()!!}-${action.position}"
             )
+
             is ReaderAction.SharePage -> context.shareBitmap(
                 "Share page via",
                 action.bitmap,
                 "${mangaTitleResult?.getOrNull()!!}-${action.position}"
             )
+
             is ReaderAction.SaveGifPage -> context.saveGifFile(
                 action.file,
                 "${mangaTitleResult?.getOrNull()!!}-${action.position}"
             )
+
             is ReaderAction.ShareGifPage -> context.shareGifFile(
                 "Share page via",
                 action.file,
@@ -164,6 +169,7 @@ private fun Reader(
                             it.state.firstVisibleItemIndex,
                             it.state.firstVisibleItemScrollOffset
                         )
+
                         is ViewerState.Pager -> listOf(
                             1,
                             it.state.currentPage
@@ -181,6 +187,7 @@ private fun Reader(
                             requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
                             requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
                         )
+
                         else -> ViewerState.Pager(
                             state = PagerState(currentPage = it[1]),
                             isRtl = readerMode == ReaderMode.Rtl,
@@ -252,7 +259,7 @@ private fun Reader(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalCoilApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalCoilApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun ReaderPages(
     viewerState: ViewerState,
@@ -263,19 +270,39 @@ private fun ReaderPages(
 
     val scope = rememberCoroutineScope()
     val isLongTapDialogEnabled by PR.isLongTapDialogEnabled.collectAsState()
-    val bottomSheetHelper = LocalBottomSheetHelper.current
-    val onLongPress = { page: ReaderPage.Image ->
-        if (isLongTapDialogEnabled) {
+
+
+    val bottomSheetState = rememberModalBottomSheetState()
+    var bottomSheetPage by remember { mutableStateOf<ReaderPage.Image?>(null) }
+
+    bottomSheetPage?.let { page ->
+        ModalBottomSheet(
+            onDismissRequest = { bottomSheetPage = null },
+            sheetState = bottomSheetState,
+            dragHandle = {},
+        ) {
             context.imageLoader.memoryCache?.get(MemoryCache.Key(page.url))?.let {
                 // Image types other than gif
-                val sheet = ReaderPageSheet(it.bitmap, page.index + 1, onAction)
-                scope.launch { bottomSheetHelper.open(sheet) }
+                ReaderPageSheetContent(
+                    bitmap = it.bitmap,
+                    position = page.index + 1,
+                    onAction = onAction,
+                )
             } ?: context.imageLoader.diskCache?.get(page.url)?.use { snapshot ->
                 // Gif
                 val imageFile = snapshot.data.toFile()
-                val sheet = ReaderPageGifSheet(imageFile, page.index + 1, onAction)
-                scope.launch { bottomSheetHelper.open(sheet) }
+                ReaderPageGifSheetContent(
+                    file = imageFile,
+                    position = page.index + 1,
+                    onAction = onAction,
+                )
             }
+        }
+    }
+
+    val onLongPress = { page: ReaderPage.Image ->
+        if (isLongTapDialogEnabled) {
+            bottomSheetPage = page
         }
     }
 
@@ -293,6 +320,7 @@ private fun ReaderPages(
                             }
                             true
                         } else false
+
                     Key.VolumeDown ->
                         if (useVolumeKey && !isMenuOpened.value) {
                             scope.launch {
@@ -301,42 +329,52 @@ private fun ReaderPages(
                             }
                             true
                         } else false
+
                     else -> false
                 }
             }
+
             KeyEventType.KeyUp -> {
                 when (keyEvent.key) {
                     Key.Menu -> {
                         isMenuOpened.value = !isMenuOpened.value
                         true
                     }
+
                     Key.N -> {
                         viewerState.requestMoveToNextChapter()
                         true
                     }
+
                     Key.P -> {
                         viewerState.requestMoveToPrevChapter()
                         true
                     }
+
                     Key.DirectionUp, Key.PageUp -> {
                         scope.launch { viewerState.toPrev() }
                         true
                     }
+
                     Key.DirectionDown, Key.PageDown -> {
                         scope.launch { viewerState.toNext() }
                         true
                     }
+
                     Key.DirectionLeft -> {
                         scope.launch { viewerState.toLeft() }
                         true
                     }
+
                     Key.DirectionRight -> {
                         scope.launch { viewerState.toRight() }
                         true
                     }
+
                     else -> false
                 }
             }
+
             else -> false
         }
     }
@@ -353,6 +391,7 @@ private fun ReaderPages(
                 state = viewerState,
                 onLongPress = onLongPress,
             )
+
         is ViewerState.Webtoon ->
             WebtoonViewer(
                 modifier = modifier,

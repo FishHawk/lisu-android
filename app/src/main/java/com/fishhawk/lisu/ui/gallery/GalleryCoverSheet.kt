@@ -12,40 +12,28 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.theme.LisuIcons
-import com.fishhawk.lisu.widget.BottomSheet
-import com.fishhawk.lisu.widget.SheetListItem
 import com.fishhawk.lisu.util.toast
-
-internal class GalleryCoverSheet(
-    private val drawable: Drawable?,
-    private val onAction: (GalleryAction) -> Unit,
-) : BottomSheet() {
-    @Composable
-    override fun Content() {
-        GalleryCoverSheetContent(drawable, onAction)
-        BackHandler()
-    }
-}
+import com.fishhawk.lisu.widget.BottomSheetListItem
 
 @Composable
-private fun GalleryCoverSheetContent(
+internal fun GalleryCoverSheetContent(
     cover: Drawable?,
     onAction: (GalleryAction) -> Unit,
 ) {
     val context = LocalContext.current
     Column(modifier = Modifier.fillMaxWidth()) {
-        SheetListItem(
+        BottomSheetListItem(
             icon = LisuIcons.Refresh,
             title = stringResource(R.string.action_edit_cover),
         ) { onAction(GalleryAction.EditCover) }
-        SheetListItem(
+        BottomSheetListItem(
             icon = LisuIcons.SaveAlt,
             title = stringResource(R.string.action_save_cover),
         ) {
             if (cover == null) context.toast("There is no cover.")
             else onAction(GalleryAction.SaveCover(cover))
         }
-        SheetListItem(
+        BottomSheetListItem(
             icon = LisuIcons.Share,
             title = stringResource(R.string.action_share_cover),
         ) {

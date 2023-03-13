@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BrightnessHigh
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,7 +21,6 @@ import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.ui.more.ListPreference
 import com.fishhawk.lisu.ui.more.SwitchPreference
-import com.fishhawk.lisu.widget.BottomSheet
 import com.fishhawk.lisu.widget.m3.LisuSlider
 import kotlinx.coroutines.launch
 
@@ -58,20 +56,8 @@ fun ReaderColorFilterOverlay() {
     }
 }
 
-object ReaderOverlaySheet : BottomSheet() {
-    override val scrimColor: Color
-        @Composable
-        get() = Color.Transparent
-
-    @Composable
-    override fun Content() {
-        ReaderOverlaySheetContent()
-        BackHandler()
-    }
-}
-
 @Composable
-private fun ReaderOverlaySheetContent() {
+internal fun ReaderOverlaySheetContent() {
     Column(modifier = Modifier.padding(8.dp)) {
         val colorFilterEnabled by PR.enabledColorFilter.collectAsState()
         SwitchPreference(title = "Custom color filter", preference = PR.enabledColorFilter)
