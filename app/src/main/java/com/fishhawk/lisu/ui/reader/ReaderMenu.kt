@@ -31,7 +31,7 @@ import com.fishhawk.lisu.data.datastore.Theme
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.util.findActivity
-import com.fishhawk.lisu.widget.m3.LisuSlider
+import com.fishhawk.lisu.widget.LisuSlider
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapNotNull

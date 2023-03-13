@@ -21,7 +21,7 @@ import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.data.datastore.getBlocking
 import com.fishhawk.lisu.ui.more.ListPreference
 import com.fishhawk.lisu.ui.more.SwitchPreference
-import com.fishhawk.lisu.widget.m3.LisuSlider
+import com.fishhawk.lisu.widget.LisuSlider
 import kotlinx.coroutines.launch
 
 @Composable
