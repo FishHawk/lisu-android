@@ -315,9 +315,9 @@ private fun ReaderMenuBottom(
                         dragHandle = {},
                     ) {
                         if (openBottomSheet == 1) {
-                            ReaderSettingsSheetContent()
-                        } else {
                             ReaderOverlaySheetContent()
+                        } else {
+                            ReaderSettingsSheetContent()
                         }
                     }
                 }

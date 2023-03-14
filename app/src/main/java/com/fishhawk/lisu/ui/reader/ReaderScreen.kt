@@ -233,7 +233,6 @@ private fun Reader(
 
 @OptIn(
     ExperimentalComposeUiApi::class, ExperimentalCoilApi::class, ExperimentalMaterial3Api::class,
-    ExperimentalFoundationApi::class
 )
 @Composable
 private fun ReaderPages(
