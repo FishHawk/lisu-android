@@ -2,20 +2,32 @@ package com.fishhawk.lisu.ui.reader
 
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
 import coil.memory.MemoryCache
@@ -29,8 +41,6 @@ import com.fishhawk.lisu.ui.reader.viewer.ViewerState
 import com.fishhawk.lisu.ui.reader.viewer.WebtoonViewer
 import com.fishhawk.lisu.util.*
 import com.fishhawk.lisu.widget.StateView
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -149,8 +159,8 @@ fun ReaderScreen() {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-@OptIn(ExperimentalPagerApi::class)
 private fun Reader(
     pages: Result<List<ReaderPage>>?,
     startPage: Int,
@@ -161,61 +171,23 @@ private fun Reader(
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         val viewerStateResult = pages?.mapCatching { pages ->
-            rememberSaveable(pages, readerMode, saver = listSaver(
-                save = {
-                    when (it) {
-                        is ViewerState.Webtoon -> listOf(
-                            0,
-                            it.state.firstVisibleItemIndex,
-                            it.state.firstVisibleItemScrollOffset
-                        )
-
-                        is ViewerState.Pager -> listOf(
-                            1,
-                            it.state.currentPage
-                        )
-                    }
-                },
-                restore = {
-                    when (it[0]) {
-                        0 -> ViewerState.Webtoon(
-                            state = LazyListState(
-                                firstVisibleItemIndex = it[1],
-                                firstVisibleItemScrollOffset = it[2]
-                            ),
-                            pages = pages,
-                            requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
-                            requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
-                        )
-
-                        else -> ViewerState.Pager(
-                            state = PagerState(currentPage = it[1]),
-                            isRtl = readerMode == ReaderMode.Rtl,
-                            pages = pages,
-                            requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
-                            requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
-                        )
-                    }
-                }
-            )) {
-                val startPage = pages
-                    .filterIsInstance<ReaderPage.Image>()
-                    .let { it.getOrNull(startPage) ?: it.last() }
-                    .let { pages.indexOf(it) }
-                if (readerMode == ReaderMode.Continuous) ViewerState.Webtoon(
-                    state = LazyListState(firstVisibleItemIndex = startPage),
-                    pages = pages,
-                    requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
-                    requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
-                )
-                else ViewerState.Pager(
-                    state = PagerState(currentPage = startPage),
-                    isRtl = readerMode == ReaderMode.Rtl,
-                    pages = pages,
-                    requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
-                    requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
-                )
-            }
+            val startPage = pages
+                .filterIsInstance<ReaderPage.Image>()
+                .let { it.getOrNull(startPage) ?: it.last() }
+                .let { pages.indexOf(it) }
+            if (readerMode == ReaderMode.Continuous) ViewerState.Webtoon(
+                state = rememberLazyListState(initialFirstVisibleItemIndex = startPage),
+                pages = pages,
+                requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
+                requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
+            )
+            else ViewerState.Pager(
+                state = rememberPagerState(initialPage = startPage),
+                isRtl = readerMode == ReaderMode.Rtl,
+                pages = pages,
+                requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
+                requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
+            )
         }
 
         val isMenuOpened = rememberSaveable { mutableStateOf(false) }
@@ -259,7 +231,10 @@ private fun Reader(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalCoilApi::class, ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalComposeUiApi::class, ExperimentalCoilApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
 private fun ReaderPages(
     viewerState: ViewerState,

@@ -1,10 +1,10 @@
 package com.fishhawk.lisu.ui.reader.viewer
 
 import androidx.annotation.IntRange
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.pager.PagerState
 import com.fishhawk.lisu.ui.reader.ReaderPage
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.PagerState
 
 sealed class ViewerState(
     val pages: List<ReaderPage>,
@@ -39,7 +39,7 @@ sealed class ViewerState(
     suspend fun toLeft() = if (isRtl) toNext() else toPrev()
     suspend fun toRight() = if (isRtl) toPrev() else toNext()
 
-    @OptIn(ExperimentalPagerApi::class)
+    @OptIn(ExperimentalFoundationApi::class)
     class Pager(
         val state: PagerState,
         override val isRtl: Boolean,

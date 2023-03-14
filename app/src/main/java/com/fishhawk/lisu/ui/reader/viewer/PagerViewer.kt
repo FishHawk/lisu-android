@@ -3,10 +3,12 @@ package com.fishhawk.lisu.ui.reader.viewer
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.splineBasedDecay
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -30,13 +32,11 @@ import androidx.compose.ui.unit.*
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.collectAsState
 import com.fishhawk.lisu.ui.reader.ReaderPage
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.math.abs
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun PagerViewer(
     modifier: Modifier = Modifier,
@@ -83,7 +83,7 @@ internal fun PagerViewer(
         val layoutDirection = if (state.isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
         CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
             HorizontalPager(
-                count = state.pages.size,
+                pageCount = state.pages.size,
                 modifier = Modifier.fillMaxSize(),
                 state = state.state,
                 key = {
@@ -93,7 +93,7 @@ internal fun PagerViewer(
                         is ReaderPage.PrevChapterState -> state.pages.size
                     }
                 },
-                itemSpacing = if (isPageIntervalEnabled) 16.dp else 0.dp
+                pageSpacing = if (isPageIntervalEnabled) 16.dp else 0.dp
             ) { index ->
                 // hacky, see https://github.com/google/accompanist/issues/1249
                 Text("placeholder placeholder placeholder", color = Color.Transparent)
