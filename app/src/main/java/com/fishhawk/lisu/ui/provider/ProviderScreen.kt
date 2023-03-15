@@ -11,9 +11,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -78,27 +77,34 @@ fun ProviderScreen(
         when (action) {
             ProviderAction.NavUp ->
                 navController.navigateUp()
+
             is ProviderAction.NavToGallery ->
                 navController.navToGallery(action.manga)
 
             is ProviderAction.DeleteSuggestion ->
                 viewModel.deleteSuggestion(action.keywords)
+
             is ProviderAction.Search ->
                 viewModel.search(action.keywords)
+
             is ProviderAction.SetFilterValue ->
                 viewModel.updateFilterHistory(action.name, action.value)
+
             is ProviderAction.SetFilterValues ->
                 viewModel.updateFilterHistory(action.values)
 
             is ProviderAction.AddToLibrary ->
                 viewModel.addToLibrary(action.manga)
+
             is ProviderAction.RemoveFromLibrary ->
                 viewModel.removeFromLibrary(action.manga)
 
             ProviderAction.Reload ->
                 viewModel.reload()
+
             ProviderAction.Refresh ->
                 viewModel.refresh()
+
             ProviderAction.RequestNextPage ->
                 viewModel.requestNextPage()
         }
@@ -109,8 +115,10 @@ fun ProviderScreen(
         when (it) {
             is ProviderEvent.AddToLibraryFailure ->
                 context.toast(it.exception.localizedMessage ?: "")
+
             is ProviderEvent.RemoveFromLibraryFailure ->
                 context.toast(it.exception.localizedMessage ?: "")
+
             is ProviderEvent.RefreshFailure ->
                 context.toast(it.exception.localizedMessage ?: "")
         }
@@ -160,14 +168,18 @@ private fun ProviderScaffold(
                 onNavUp = { onAction(ProviderAction.NavUp) },
             ) {
                 if (hasSearchBar || boardId == BoardId.Search) {
-                    IconButton(onClick = { editing = true }) {
-                        Icon(Icons.Default.Search, stringResource(R.string.action_search))
-                    }
+                    TooltipIconButton(
+                        tooltip = stringResource(R.string.action_search),
+                        icon = LisuIcons.Search,
+                        onClick = { editing = true },
+                    )
                 }
                 if (hasAdvanceFilters && !showAdvanceFilterList) {
-                    IconButton(onClick = { showAdvanceFilterList = true }) {
-                        Icon(LisuIcons.Add, "toggle")
-                    }
+                    TooltipIconButton(
+                        tooltip = stringResource(R.string.action_advance_options),
+                        icon = LisuIcons.Add,
+                        onClick = { showAdvanceFilterList = true },
+                    )
                 }
             }
             LisuSearchToolBar(
@@ -273,6 +285,7 @@ private fun ProviderMangaList(
                 is FilterModel.Switch -> Unit
                 is FilterModel.Select ->
                     FilterSelectBase(name, model, filterValue.value as Int, onAction)
+
                 is FilterModel.MultipleSelect -> Unit
             }
         }
@@ -388,10 +401,13 @@ private fun FilterAdvance(
     when (model) {
         is FilterModel.Text ->
             FilterText(name, value as String, onValueChange)
+
         is FilterModel.Switch ->
             FilterSwitch(name, value as Boolean, onValueChange)
+
         is FilterModel.Select ->
             FilterSelectAdvance(name, model, value as Int, onValueChange)
+
         is FilterModel.MultipleSelect ->
             FilterMultipleSelectAdvance(name, model, value as Set<Int>, onValueChange)
     }

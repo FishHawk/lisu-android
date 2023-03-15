@@ -87,17 +87,19 @@ private fun HistoryScaffold(
         topBar = {
             LisuToolBar(title = stringResource(R.string.label_history)) {
                 var isOpen by remember { mutableStateOf(false) }
-                IconButton(onClick = { isOpen = true }) {
-                    Icon(LisuIcons.ClearAll, stringResource(R.string.action_clear_history))
-                    if (isOpen) {
-                        LisuDialog(
-                            title = stringResource(R.string.dialog_clear_history),
-                            confirmText = stringResource(R.string.action_clear),
-                            dismissText = stringResource(R.string.action_cancel),
-                            onConfirm = { onAction(HistoryAction.ClearHistory) },
-                            onDismiss = { isOpen = false },
-                        )
-                    }
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_clear_history),
+                    icon = LisuIcons.ClearAll,
+                    onClick = { isOpen = true },
+                )
+                if (isOpen) {
+                    LisuDialog(
+                        title = stringResource(R.string.dialog_clear_history),
+                        confirmText = stringResource(R.string.action_clear),
+                        dismissText = stringResource(R.string.action_cancel),
+                        onConfirm = { onAction(HistoryAction.ClearHistory) },
+                        onDismiss = { isOpen = false },
+                    )
                 }
             }
         },

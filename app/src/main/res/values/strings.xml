@@ -134,7 +134,14 @@
     <string name="action_search">Search</string>
     <string name="action_global_search">Global search</string>
     <string name="action_random_pick">Random pick</string>
+    <string name="action_login">Login</string>
+    <string name="action_upload">Upload</string>
 
+    <string name="action_resume_all">Resume all</string>
+    <string name="action_cancel_all">Cancel all</string>
+
+    <string name="action_comments">Comments</string>
+    <string name="action_advance_options">Advance options</string>
     <string name="action_edit_manga">Edit manga</string>
     <string name="action_share_manga">Share manga</string>
 
@@ -152,8 +159,17 @@
     <string name="action_share_cover">Share cover</string>
     <string name="action_save_cover">Save cover</string>
 
+    <string name="action_prev_chapter">Previous chapter</string>
+    <string name="action_next_chapter">Next chapter</string>
+
+    <string name="action_reader_mode">Mode</string>
+    <string name="action_reader_orientation">Orientation</string>
+    <string name="action_reader_color_filter">Color filter</string>
+    <string name="action_reader_setting">Setting</string>
+
     <!-- dialog -->
     <string name="dialog_clear_history">Clear all history?</string>
+    <string name="dialog_cancel_all_download_tasks">Cancel all download tasks?</string>
 
     <string name="dialog_new_version_available">New version available!</string>
     <string name="dialog_new_version_available_download">Download</string>

@@ -6,9 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Replay
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -28,6 +27,7 @@ import com.fishhawk.lisu.data.network.model.MangaDto
 import com.fishhawk.lisu.data.network.model.MangaState
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToReader
+import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.widget.*
@@ -113,6 +113,7 @@ fun DownloadScreen(
         when (action) {
             DownloadAction.NavUp ->
                 navController.navigateUp()
+
             is DownloadAction.NavToGallery ->
                 navController.navToGallery(
                     MangaDto(
@@ -123,6 +124,7 @@ fun DownloadScreen(
                         title = action.mangaTask.title,
                     )
                 )
+
             is DownloadAction.NavToReader ->
                 context.navToReader(
                     providerId = action.mangaTask.providerId,
@@ -133,16 +135,22 @@ fun DownloadScreen(
 
             DownloadAction.Reload ->
                 viewModel.reload()
+
             DownloadAction.StartAll ->
                 viewModel.startAllTasks()
+
             DownloadAction.CancelAll ->
                 viewModel.cancelAllTasks()
+
             is DownloadAction.StartMangaTask ->
                 viewModel.startMangaTask(action.mangaTask)
+
             is DownloadAction.CancelMangaTask ->
                 viewModel.cancelMangaTask(action.mangaTask)
+
             is DownloadAction.StartChapterTask ->
                 viewModel.startChapterTask(action.mangaTask, action.chapterTask)
+
             is DownloadAction.CancelChapterTask ->
                 viewModel.cancelChapterTask(action.mangaTask, action.chapterTask)
         }
@@ -166,22 +174,26 @@ private fun DownloadScaffold(
                 title = stringResource(R.string.label_download),
                 onNavUp = { onAction(DownloadAction.NavUp) },
             ) {
-                IconButton(onClick = { onAction(DownloadAction.StartAll) }) {
-                    Icon(Icons.Filled.Replay, "Recover all tasks")
-                }
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_resume_all),
+                    icon = LisuIcons.Replay,
+                    onClick = { onAction(DownloadAction.StartAll) },
+                )
 
                 var isOpen by remember { mutableStateOf(false) }
-                IconButton(onClick = { isOpen = true }) {
-                    Icon(Icons.Filled.Delete, "Cancel all tasks")
-                    if (isOpen) {
-                        LisuDialog(
-                            title = "Cancel all download tasks?",
-                            confirmText = stringResource(R.string.action_clear),
-                            dismissText = stringResource(R.string.action_cancel),
-                            onConfirm = { onAction(DownloadAction.CancelAll) },
-                            onDismiss = { isOpen = false },
-                        )
-                    }
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_cancel_all),
+                    icon = LisuIcons.Delete,
+                    onClick = { isOpen = true },
+                )
+                if (isOpen) {
+                    LisuDialog(
+                        title = stringResource(R.string.dialog_cancel_all_download_tasks),
+                        confirmText = stringResource(R.string.action_clear),
+                        dismissText = stringResource(R.string.action_cancel),
+                        onConfirm = { onAction(DownloadAction.CancelAll) },
+                        onDismiss = { isOpen = false },
+                    )
                 }
             }
         },
@@ -254,6 +266,7 @@ private fun DownloadTaskList(
                         modifier = Modifier.animateItemPlacement(),
                     )
                 }
+
                 is DownloadTaskListItem.Chapter -> {
                     ChapterDownloadTask(
                         mangaTask = it.mangaTask,
@@ -301,8 +314,10 @@ private fun MangaDownloadTask(
                 val stateHint = when (state) {
                     is ChapterDownloadTask.State.Downloading ->
                         "${state.downloadedPageNumber ?: "-"}/${state.totalPageNumber ?: "-"}(${size})"
+
                     ChapterDownloadTask.State.Waiting ->
                         "Waiting(${size})"
+
                     is ChapterDownloadTask.State.Failed ->
                         "Failed(${size})"
                 }
@@ -457,11 +472,13 @@ private fun DownloadScaffoldPreview() {
                     downloadedPageNumber = 20,
                     totalPageNumber = 100,
                 )
+
                 3 -> ChapterDownloadTask.State.Failed(
                     downloadedPageNumber = 20,
                     totalPageNumber = 100,
                     errorMessage = "Unknown error long long long long long long long."
                 )
+
                 else -> ChapterDownloadTask.State.Waiting
             }
             ChapterDownloadTask(

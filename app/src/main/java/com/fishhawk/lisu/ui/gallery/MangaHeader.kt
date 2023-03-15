@@ -24,12 +24,15 @@ import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.size.Size
+import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.database.model.ReadingHistory
+import com.fishhawk.lisu.data.datastore.setNext
 import com.fishhawk.lisu.data.network.model.MangaState
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.widget.LisuToolBar
+import com.fishhawk.lisu.widget.TooltipIconButton
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
@@ -100,16 +103,17 @@ internal fun MangaHeader(
                 transparent = true,
             ) {
                 if (state != MangaState.Local) {
-                    IconButton(onClick = { onAction(GalleryAction.NavToComment) }) {
-                        Icon(
-                            LisuIcons.Comment,
-                            "Comment"
-                        )
-                    }
+                    TooltipIconButton(
+                        tooltip = stringResource(R.string.action_comments),
+                        icon = LisuIcons.Comment,
+                        onClick = { onAction(GalleryAction.NavToComment) },
+                    )
                 }
-                IconButton(onClick = { onAction(GalleryAction.Share) }) {
-                    Icon(LisuIcons.Share, stringResource(R.string.action_share_manga))
-                }
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_share_manga),
+                    icon = LisuIcons.Share,
+                    onClick = { onAction(GalleryAction.Share) },
+                )
             }
             Row(
                 modifier = Modifier

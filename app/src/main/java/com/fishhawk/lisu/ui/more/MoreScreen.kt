@@ -10,6 +10,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -21,6 +22,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.navigation.NavHostController
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.ui.main.*
+import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.util.nsdManager
 import com.fishhawk.lisu.widget.LisuScaffold
@@ -122,7 +124,6 @@ private data class NsdService(
     val address: HttpUrl,
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ServerAddressSelector(
     initAddress: String,
@@ -174,7 +175,7 @@ private fun ServerAddressSelector(
                         modifier = Modifier.weight(1f),
                         trailingContent = {
                             IconButton(onClick = { onAction(MoreAction.DeleteSuggestion(it)) }) {
-                                Icon(Icons.Default.Close, null)
+                                Icon(LisuIcons.Close, null)
                             }
                         }
                     )
@@ -261,7 +262,7 @@ private fun TextFieldWithDropdownMenu(
             leadingIcon = leadingIcon,
             trailingIcon = {
                 if (expanded) IconButton(onClick = { onValueChange("") }) {
-                    Icon(Icons.Default.Close, null)
+                    Icon(LisuIcons.Close, null)
                 } else trailingIcon?.invoke()
             },
             keyboardOptions = keyboardOptions,

@@ -129,7 +129,14 @@
     <string name="action_search">搜索</string>
     <string name="action_global_search">全局搜索</string>
     <string name="action_random_pick">随机选择</string>
+    <string name="action_login">登录</string>
+    <string name="action_upload">上传</string>
 
+    <string name="action_resume_all">全部继续</string>
+    <string name="action_cancel_all">全部取消</string>
+
+    <string name="action_comments">评论</string>
+    <string name="action_advance_options">高级选项</string>
     <string name="action_edit_manga">编辑漫画</string>
     <string name="action_share_manga">分享漫画</string>
 
@@ -147,8 +154,17 @@
     <string name="action_share_cover">分享封面</string>
     <string name="action_save_cover">保存封面</string>
 
+    <string name="action_prev_chapter">上一章</string>
+    <string name="action_next_chapter">下一章</string>
+
+    <string name="action_reader_mode">模式</string>
+    <string name="action_reader_orientation">旋转</string>
+    <string name="action_reader_color_filter">滤镜</string>
+    <string name="action_reader_setting">设置</string>
+
     <!-- dialog -->
     <string name="dialog_clear_history">清除所有历史?</string>
+    <string name="dialog_cancel_all_download_tasks">取消所有下载任务?</string>
 
     <string name="dialog_new_version_available">新版本已推出!</string>
     <string name="dialog_new_version_available_download">下载</string>

@@ -107,24 +107,31 @@ fun GalleryScreen(
         when (action) {
             GalleryAction.NavUp ->
                 navController.navigateUp()
+
             GalleryAction.NavToEdit ->
                 navController.navToGalleryEdit()
+
             GalleryAction.NavToComment ->
                 navController.navToGalleryComment()
+
             is GalleryAction.NavToGlobalSearch ->
                 navController.navToGlobalSearch(action.keywords)
+
             is GalleryAction.NavToSearch ->
                 viewModel.searchBoardId?.let {
                     navController.navToProvider(providerId, it, action.keywords)
                 }
+
             is GalleryAction.NavToReader -> detail?.getOrNull()?.let {
                 context.navToReader(it, action.collectionId, action.chapterId, action.page)
             }
 
             is GalleryAction.SaveCover ->
                 context.saveDrawable(action.cover, "$title-cover")
+
             is GalleryAction.ShareCover ->
                 context.shareDrawable("Share cover via", action.cover, "$title-cover")
+
             GalleryAction.EditCover ->
                 newCoverSelectorLauncher.launch("image/*")
 
@@ -152,6 +159,7 @@ fun GalleryScreen(
                     }
                 }
             }
+
             GalleryAction.Reload -> viewModel.reloadManga()
             GalleryAction.Share -> context.shareText("Share manga via", title)
             GalleryAction.AddToLibrary -> viewModel.addToLibrary()
@@ -239,44 +247,41 @@ private fun ToolBar(
         ) {
             when (state) {
                 MangaState.Local -> {
-                    IconButton(onClick = { onAction(GalleryAction.NavToEdit) }) {
-                        Icon(
-                            imageVector = LisuIcons.Edit,
-                            contentDescription = stringResource(R.string.action_edit_manga)
-                        )
-                    }
+                    TooltipIconButton(
+                        tooltip = stringResource(R.string.action_edit_manga),
+                        icon = LisuIcons.Edit,
+                        onClick = { onAction(GalleryAction.NavToEdit) },
+                    )
                 }
+
                 MangaState.Remote -> {
-                    IconButton(onClick = { onAction(GalleryAction.AddToLibrary) }) {
-                        Icon(
-                            imageVector = LisuIcons.FavoriteBorder,
-                            contentDescription = stringResource(R.string.action_add_to_library)
-                        )
-                    }
+                    TooltipIconButton(
+                        tooltip = stringResource(R.string.action_add_to_library),
+                        icon = LisuIcons.FavoriteBorder,
+                        onClick = { onAction(GalleryAction.AddToLibrary) },
+                    )
                 }
+
                 MangaState.RemoteInLibrary -> {
-                    IconButton(onClick = { onAction(GalleryAction.RemoveFromLibrary) }) {
-                        Icon(
-                            imageVector = LisuIcons.Favorite,
-                            contentDescription = stringResource(R.string.action_remove_from_library)
-                        )
-                    }
-                }
-            }
-            if (state != MangaState.Local) {
-                IconButton(onClick = { onAction(GalleryAction.NavToComment) }) {
-                    Icon(
-                        imageVector = LisuIcons.Comment,
-                        contentDescription = "Comment"
+                    TooltipIconButton(
+                        tooltip = stringResource(R.string.action_remove_from_library),
+                        icon = LisuIcons.Favorite,
+                        onClick = { onAction(GalleryAction.RemoveFromLibrary) },
                     )
                 }
             }
-            IconButton(onClick = { onAction(GalleryAction.Share) }) {
-                Icon(
-                    imageVector = LisuIcons.Share,
-                    contentDescription = stringResource(R.string.action_share_manga),
+            if (state != MangaState.Local) {
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_comments),
+                    icon = LisuIcons.Comment,
+                    onClick = { onAction(GalleryAction.NavToComment) },
                 )
             }
+            TooltipIconButton(
+                tooltip = stringResource(R.string.action_share_manga),
+                icon = LisuIcons.Share,
+                onClick = { onAction(GalleryAction.Share) },
+            )
         }
     }
 }

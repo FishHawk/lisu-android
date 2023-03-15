@@ -6,8 +6,15 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.BrightnessMedium
+import androidx.compose.material.icons.outlined.Expand
+import androidx.compose.material.icons.outlined.ScreenRotation
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.SkipNext
+import androidx.compose.material.icons.outlined.SkipPrevious
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -20,17 +27,21 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowInsetsControllerCompat
 import com.fishhawk.lisu.PR
+import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.ReaderMode
 import com.fishhawk.lisu.data.datastore.Theme
 import com.fishhawk.lisu.data.datastore.collectAsState
+import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.util.findActivity
+import com.fishhawk.lisu.widget.TooltipIconButton
 import com.fishhawk.lisu.widget.LisuSlider
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.collectLatest
@@ -124,9 +135,11 @@ private fun ReaderMenuTop(
             verticalAlignment = Alignment.CenterVertically
         ) {
             val context = LocalContext.current
-            IconButton(onClick = { context.findActivity().finish() }) {
-                Icon(Icons.Filled.ArrowBack, "back")
-            }
+            TooltipIconButton(
+                tooltip = stringResource(R.string.action_back),
+                icon = LisuIcons.ArrowBack,
+                onClick = { context.findActivity().finish() },
+            )
 
             Column(
                 modifier = Modifier
@@ -178,16 +191,15 @@ private fun ReaderMenuBottom(
                     modifier = Modifier.size(48.dp),
                     shape = CircleShape,
                 ) {
-                    IconButton(onClick = { onAction(ReaderAction.OpenPrevChapter) }) {
-                        Icon(
-                            if (LocalLayoutDirection.current == LayoutDirection.Ltr) {
-                                Icons.Filled.SkipPrevious
-                            } else {
-                                Icons.Filled.SkipNext
-                            },
-                            "prev",
-                        )
-                    }
+                    TooltipIconButton(
+                        tooltip = stringResource(R.string.action_prev_chapter),
+                        icon = if (LocalLayoutDirection.current == LayoutDirection.Ltr) {
+                            LisuIcons.SkipPrevious
+                        } else {
+                            LisuIcons.SkipNext
+                        },
+                        onClick = { onAction(ReaderAction.OpenPrevChapter) },
+                    )
                 }
 
                 ReaderMenuSurface(
@@ -258,16 +270,15 @@ private fun ReaderMenuBottom(
                     modifier = Modifier.size(48.dp),
                     shape = CircleShape,
                 ) {
-                    IconButton(onClick = { onAction(ReaderAction.OpenNextChapter) }) {
-                        Icon(
-                            if (LocalLayoutDirection.current == LayoutDirection.Ltr) {
-                                Icons.Filled.SkipNext
-                            } else {
-                                Icons.Filled.SkipPrevious
-                            },
-                            "next",
-                        )
-                    }
+                    TooltipIconButton(
+                        tooltip = stringResource(R.string.action_next_chapter),
+                        icon = if (LocalLayoutDirection.current == LayoutDirection.Ltr) {
+                            LisuIcons.SkipNext
+                        } else {
+                            LisuIcons.SkipPrevious
+                        },
+                        onClick = { onAction(ReaderAction.OpenNextChapter) },
+                    )
                 }
             }
         }
@@ -279,34 +290,41 @@ private fun ReaderMenuBottom(
                     .navigationBarsPadding(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(modifier = Modifier.weight(1f), onClick = {
-                    onAction(ReaderAction.ToggleReaderMode)
-                }) {
-                    val icon = when (readerMode) {
-                        ReaderMode.Ltr -> Icons.Filled.ArrowForward
-                        ReaderMode.Rtl -> Icons.Filled.ArrowBack
-                        ReaderMode.Continuous -> Icons.Filled.Expand
-                    }
-                    Icon(icon, "reader mode")
-                }
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_reader_mode),
+                    icon = when (readerMode) {
+                        ReaderMode.Ltr -> LisuIcons.ArrowForward
+                        ReaderMode.Rtl -> LisuIcons.ArrowBack
+                        ReaderMode.Continuous -> LisuIcons.Expand
+                    },
+                    modifier = Modifier.weight(1f),
+                    onClick = { onAction(ReaderAction.ToggleReaderMode) },
+                )
 
-                IconButton(modifier = Modifier.weight(1f), onClick = {
-                    onAction(ReaderAction.ToggleReaderOrientation)
-                }) {
-                    Icon(Icons.Filled.ScreenRotation, "reader orientation")
-                }
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_reader_orientation),
+                    icon = LisuIcons.ScreenRotation,
+                    modifier = Modifier.weight(1f),
+                    onClick = { onAction(ReaderAction.ToggleReaderOrientation) },
+                )
 
                 val bottomSheetState = rememberModalBottomSheetState()
                 var openBottomSheet by rememberSaveable { mutableStateOf(0) }
 
-                IconButton(modifier = Modifier.weight(1f), onClick = {
-                    openBottomSheet = 1
-                }) { Icon(Icons.Filled.BrightnessMedium, "color-filter") }
 
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_reader_color_filter),
+                    icon = LisuIcons.BrightnessMedium,
+                    modifier = Modifier.weight(1f),
+                    onClick = { openBottomSheet = 1 },
+                )
 
-                IconButton(modifier = Modifier.weight(1f), onClick = {
-                    openBottomSheet = 2
-                }) { Icon(Icons.Filled.Settings, "setting") }
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_reader_setting),
+                    icon = LisuIcons.Settings,
+                    modifier = Modifier.weight(1f),
+                    onClick = { openBottomSheet = 2 },
+                )
 
                 if (openBottomSheet > 0) {
                     ModalBottomSheet(

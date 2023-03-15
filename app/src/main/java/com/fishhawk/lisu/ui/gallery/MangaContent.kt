@@ -42,6 +42,7 @@ import com.fishhawk.lisu.data.network.model.Chapter
 import com.fishhawk.lisu.data.network.model.MangaDetailDto
 import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.MediumEmphasis
+import com.fishhawk.lisu.widget.TooltipIconButton
 import com.fishhawk.lisu.widget.itemsVerticalGrid
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -208,6 +209,7 @@ private fun LazyListScope.mangaContentCollections(
                     )
                 }
             }
+
             ChapterDisplayMode.Linear -> {
                 items(orderedChapters) { chapter ->
                     ChapterLinear(
@@ -238,16 +240,20 @@ private fun MangaContentChapterHeader() {
 
         val mode by PR.chapterDisplayMode.collectAsState()
         val scope = rememberCoroutineScope()
-        IconButton(onClick = { scope.launch { PR.chapterDisplayOrder.setNext() } }) {
-            Icon(LisuIcons.Sort, stringResource(R.string.action_switch_display_mode))
-        }
-        IconButton(onClick = { scope.launch { PR.chapterDisplayMode.setNext() } }) {
-            val icon = when (mode) {
+
+        TooltipIconButton(
+            tooltip = stringResource(R.string.action_switch_sort_mode),
+            icon = LisuIcons.Sort,
+            onClick = { scope.launch { PR.chapterDisplayOrder.setNext() } },
+        )
+        TooltipIconButton(
+            tooltip = stringResource(R.string.action_switch_display_mode),
+            icon = when (mode) {
                 ChapterDisplayMode.Grid -> LisuIcons.ViewModule
                 ChapterDisplayMode.Linear -> LisuIcons.ViewList
-            }
-            Icon(icon, stringResource(R.string.action_switch_sort_mode))
-        }
+            },
+            onClick = { scope.launch { PR.chapterDisplayMode.setNext() } },
+        )
     }
 }
 

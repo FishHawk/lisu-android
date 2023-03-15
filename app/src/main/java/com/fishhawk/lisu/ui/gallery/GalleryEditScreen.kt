@@ -8,6 +8,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Publish
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Publish
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -26,6 +27,7 @@ import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.util.toast
+import com.fishhawk.lisu.widget.TooltipIconButton
 import com.fishhawk.lisu.widget.LisuScaffold
 import com.fishhawk.lisu.widget.LisuToolBar
 import com.google.accompanist.flowlayout.FlowRow
@@ -97,9 +99,11 @@ private fun GalleryEditScaffold(
                 title = stringResource(R.string.label_gallery_edit),
                 onNavUp = { onAction(GalleryEditAction.NavUp) },
             ) {
-                IconButton(onClick = { onAction(GalleryEditAction.Publish(metadata)) }) {
-                    Icon(Icons.Filled.Publish, contentDescription = "publish")
-                }
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_upload),
+                    icon = LisuIcons.Publish,
+                    onClick = { onAction(GalleryEditAction.Publish(metadata)) },
+                )
             }
         },
         content = { paddingValues ->

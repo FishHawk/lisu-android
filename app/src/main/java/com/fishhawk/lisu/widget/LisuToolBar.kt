@@ -1,8 +1,7 @@
 package com.fishhawk.lisu.widget
 
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -10,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.fishhawk.lisu.R
+import com.fishhawk.lisu.ui.theme.LisuIcons
 
 @Composable
 fun LisuToolBar(
@@ -50,9 +50,11 @@ fun LisuToolBar(
         modifier = modifier,
         navigationIcon = {
             onNavUp?.let {
-                IconButton(onClick = { it() }) {
-                    Icon(Icons.Filled.ArrowBack, stringResource(R.string.action_back))
-                }
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_back),
+                    icon = LisuIcons.ArrowBack,
+                    onClick = { it() },
+                )
             }
         },
         actions = actions,
@@ -105,9 +107,11 @@ fun LisuNonCenterAlignedToolBar(
         modifier = modifier,
         navigationIcon = {
             onNavUp?.let {
-                IconButton(onClick = { it() }) {
-                    Icon(Icons.Filled.ArrowBack, stringResource(R.string.action_back))
-                }
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_back),
+                    icon = LisuIcons.ArrowBack,
+                    onClick = { it() },
+                )
             }
         },
         actions = actions,

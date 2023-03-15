@@ -5,9 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +20,7 @@ import com.fishhawk.lisu.data.network.model.BoardId
 import com.fishhawk.lisu.data.network.model.MangaDto
 import com.fishhawk.lisu.ui.main.navToGallery
 import com.fishhawk.lisu.ui.main.navToProvider
+import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.widget.*
@@ -52,12 +52,16 @@ fun GlobalSearchScreen(
             GlobalSearchAction.NavUp -> navController.navigateUp()
             is GlobalSearchAction.NavToGallery ->
                 navController.navToGallery(action.manga)
+
             is GlobalSearchAction.NavToProvider ->
                 navController.navToProvider(action.providerId, action.boardId, keywords)
+
             is GlobalSearchAction.Search ->
                 viewModel.search(action.keywords)
+
             is GlobalSearchAction.Reload ->
                 viewModel.reload(action.providerId)
+
             GlobalSearchAction.ReloadProviders ->
                 viewModel.reloadProviders()
         }
@@ -89,9 +93,11 @@ private fun GlobalSearchScaffold(
                 title = keywords,
                 onNavUp = { onAction(GlobalSearchAction.NavUp) },
             ) {
-                IconButton(onClick = { editing = true }) {
-                    Icon(Icons.Default.Search, stringResource(R.string.action_search))
-                }
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_search),
+                    icon = LisuIcons.Search,
+                    onClick = { editing = true },
+                )
             }
             LisuSearchToolBar(
                 visible = editing,
@@ -150,7 +156,6 @@ private fun SearchRecordList(
 ) {
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(searchRecords) {
@@ -165,68 +170,78 @@ private fun SearchRecord(
     onAction: (GlobalSearchAction) -> Unit,
 ) {
     Column {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .clickable {
+                    onAction(
+                        GlobalSearchAction.NavToProvider(
+                            searchRecord.provider.id,
+                            searchRecord.provider.searchBoardId!!,
+                        )
+                    )
+                }
+                .padding(horizontal = 8.dp),
+        ) {
             Text(
                 text = searchRecord.provider.run { "$id($lang)" },
                 style = MaterialTheme.typography.bodyMedium,
             )
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = {
-                onAction(
-                    GlobalSearchAction.NavToProvider(
-                        searchRecord.provider.id,
-                        searchRecord.provider.searchBoardId!!,
-                    )
-                )
-            }) {
-                Icon(Icons.Filled.ArrowForward, null)
-            }
+            Icon(
+                imageVector = LisuIcons.ArrowForward,
+                contentDescription = null,
+            )
         }
 
-        searchRecord.remoteList.value?.onSuccess { mangaList ->
-            if (mangaList.list.isEmpty()) {
-                MediumEmphasis {
-                    Text(
-                        text = "No result found.",
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-            } else {
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    items(mangaList.list) { manga ->
-                        MangaCard(
-                            manga = manga,
-                            modifier = Modifier
-                                .width(104.dp)
-                                .clickable { onAction(GlobalSearchAction.NavToGallery(manga)) },
-                        )
-                    }
-                }
-            }
-        }?.onFailure { throwable ->
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Box(modifier = Modifier.weight(1f)) {
+        Box(modifier = Modifier.padding(horizontal = 8.dp)) {
+            searchRecord.remoteList.value?.onSuccess { mangaList ->
+                if (mangaList.list.isEmpty()) {
                     MediumEmphasis {
                         Text(
-                            text = throwable.localizedMessage
-                                ?: stringResource(R.string.unknown_error),
-                            style = MaterialTheme.typography.bodySmall,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis,
+                            text = "No result found.",
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
+                } else {
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        items(mangaList.list) { manga ->
+                            MangaCard(
+                                manga = manga,
+                                modifier = Modifier
+                                    .width(104.dp)
+                                    .clickable { onAction(GlobalSearchAction.NavToGallery(manga)) },
+                            )
+                        }
+                    }
                 }
-                TextButton(onClick = {
-                    onAction(GlobalSearchAction.Reload(searchRecord.provider.id))
-                }) {
-                    Text(text = stringResource(R.string.action_retry))
+            }?.onFailure { throwable ->
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        MediumEmphasis {
+                            Text(
+                                text = throwable.localizedMessage
+                                    ?: stringResource(R.string.unknown_error),
+                                style = MaterialTheme.typography.bodySmall,
+                                maxLines = 3,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
+                    TextButton(onClick = {
+                        onAction(GlobalSearchAction.Reload(searchRecord.provider.id))
+                    }) {
+                        Text(text = stringResource(R.string.action_retry))
+                    }
                 }
-            }
-        } ?: CircularProgressIndicator(modifier = Modifier.size(24.dp))
+            } ?: CircularProgressIndicator(modifier = Modifier.size(24.dp))
+        }
     }
 }

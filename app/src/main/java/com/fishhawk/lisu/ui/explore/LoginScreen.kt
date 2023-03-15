@@ -2,12 +2,9 @@ package com.fishhawk.lisu.ui.explore
 
 import android.webkit.CookieManager
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,6 +12,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -25,6 +23,7 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.LoremIpsum
 import com.fishhawk.lisu.data.network.model.CookiesLoginDto
 import com.fishhawk.lisu.data.network.model.ProviderDto
@@ -33,6 +32,7 @@ import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTheme
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.util.toast
+import com.fishhawk.lisu.widget.TooltipIconButton
 import com.fishhawk.lisu.widget.LisuScaffold
 import com.fishhawk.lisu.widget.LisuToolBar
 import com.google.accompanist.web.WebView
@@ -70,8 +70,10 @@ private fun LoginScreen(
         when (action) {
             LoginAction.NavUp ->
                 navController.navigateUp()
+
             is LoginAction.LoginByCookies ->
                 viewModel.loginByCookies(provider.id, action.cookies)
+
             is LoginAction.LoginByPassword ->
                 viewModel.loginByPassword(provider.id, action.username, action.password)
         }
@@ -148,19 +150,21 @@ private fun LoginWebsiteScaffold(
                 },
                 onNavUp = { onAction(LoginAction.NavUp) },
             ) {
-                IconButton(onClick = {
-                    val cookies = CookieManager.getInstance().getCookie(cookiesLogin.loginSite)
-                        .split(";")
-                        .associate {
-                            val name = it.substringBefore('=').trim()
-                            val value = it.substringAfter('=').trim()
-                            name to URLDecoder.decode(value, "UTF-8")
-                        }
-                        .filterKeys { it in cookiesLogin.cookieNames }
-                    onAction(LoginAction.LoginByCookies(cookies))
-                }) {
-                    Icon(LisuIcons.Login, "test")
-                }
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_login),
+                    icon = LisuIcons.Login,
+                    onClick = {
+                        val cookies = CookieManager.getInstance().getCookie(cookiesLogin.loginSite)
+                            .split(";")
+                            .associate {
+                                val name = it.substringBefore('=').trim()
+                                val value = it.substringAfter('=').trim()
+                                name to URLDecoder.decode(value, "UTF-8")
+                            }
+                            .filterKeys { it in cookiesLogin.cookieNames }
+                        onAction(LoginAction.LoginByCookies(cookies))
+                    },
+                )
             }
         },
         content = { paddingValues ->

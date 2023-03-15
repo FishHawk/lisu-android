@@ -45,7 +45,6 @@ import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.ui.theme.MediumEmphasis
 import com.fishhawk.lisu.widget.*
 import org.koin.androidx.compose.koinViewModel
-import org.koin.androidx.compose.viewModel
 import java.util.*
 
 private sealed interface ExploreAction {
@@ -73,12 +72,16 @@ fun ExploreScreen(
         when (action) {
             ExploreAction.NavToGlobalSearch ->
                 navController.navToGlobalSearch()
+
             is ExploreAction.NavToProvider ->
                 navController.navToProvider(action.providerId, action.boardId)
+
             is ExploreAction.NavToLoginWebsite ->
                 navController.navToLoginWebsite(action.providerId)
+
             is ExploreAction.NavToLoginCookies ->
                 navController.navToLoginCookies(action.providerId)
+
             is ExploreAction.NavToLoginPassword ->
                 navController.navToLoginPassword(action.providerId)
 
@@ -95,7 +98,6 @@ fun ExploreScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ExploreScaffold(
     providersResult: Result<Map<String, List<ProviderDto>>>?,
@@ -105,9 +107,11 @@ private fun ExploreScaffold(
     LisuScaffold(
         topBar = {
             LisuToolBar(title = stringResource(R.string.label_explore)) {
-                IconButton(onClick = { onAction(ExploreAction.NavToGlobalSearch) }) {
-                    Icon(LisuIcons.TravelExplore, stringResource(R.string.action_global_search))
-                }
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_global_search),
+                    icon = LisuIcons.TravelExplore,
+                    onClick = { onAction(ExploreAction.NavToGlobalSearch) },
+                )
             }
         },
         content = { paddingValues ->

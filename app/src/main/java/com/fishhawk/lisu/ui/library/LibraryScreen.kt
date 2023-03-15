@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.outlined.Casino
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Sort
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
@@ -25,6 +26,7 @@ import androidx.navigation.NavHostController
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.R
 import com.fishhawk.lisu.data.datastore.collectAsState
+import com.fishhawk.lisu.data.datastore.setNext
 import com.fishhawk.lisu.data.network.base.PagedList
 import com.fishhawk.lisu.data.network.model.MangaDto
 import com.fishhawk.lisu.data.network.model.MangaKeyDto
@@ -34,6 +36,7 @@ import com.fishhawk.lisu.ui.theme.LisuIcons
 import com.fishhawk.lisu.ui.theme.LisuTransition
 import com.fishhawk.lisu.util.toast
 import com.fishhawk.lisu.widget.*
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 private sealed interface LibraryAction {
@@ -73,10 +76,13 @@ fun LibraryScreen(
         when (it) {
             is LibraryEvent.GetRandomSuccess ->
                 navController.navToGallery(it.manga)
+
             is LibraryEvent.GetRandomFailure ->
                 context.toast(it.exception.localizedMessage ?: "")
+
             is LibraryEvent.DeleteMultipleFailure ->
                 context.toast(it.exception.localizedMessage ?: "")
+
             is LibraryEvent.RefreshFailure ->
                 context.toast(it.exception.localizedMessage ?: "")
         }
@@ -111,13 +117,17 @@ private fun LibraryScaffold(
             }) {
                 val isRandomButtonEnabled by PR.isRandomButtonEnabled.collectAsState()
                 if (isRandomButtonEnabled) {
-                    IconButton(onClick = { onAction(LibraryAction.Random) }) {
-                        Icon(LisuIcons.Casino, stringResource(R.string.action_random_pick))
-                    }
+                    TooltipIconButton(
+                        tooltip = stringResource(R.string.action_random_pick),
+                        icon = LisuIcons.Casino,
+                        onClick = { onAction(LibraryAction.Random) },
+                    )
                 }
-                IconButton(onClick = { editing = true }) {
-                    Icon(LisuIcons.Search, stringResource(R.string.action_search))
-                }
+                TooltipIconButton(
+                    tooltip = stringResource(R.string.action_search),
+                    icon = LisuIcons.Search,
+                    onClick = { editing = true },
+                )
             }
             LisuSearchToolBar(
                 visible = editing,
@@ -226,18 +236,6 @@ private fun SelectingToolBar(
     selectedMangaList: SnapshotStateList<MangaKeyDto>,
     onAction: (LibraryAction) -> Unit,
 ) {
-    var isOpen by remember { mutableStateOf(false) }
-    if (isOpen) {
-        LisuDialog(
-            title = stringResource(R.string.library_remove_n_mangas_from_library)
-                .format(selectedMangaList.size),
-            confirmText = stringResource(R.string.action_ok),
-            dismissText = stringResource(R.string.action_cancel),
-            onConfirm = { onAction(LibraryAction.RemoveFromLibrary(selectedMangaList.toList())) },
-            onDismiss = { isOpen = false },
-        )
-    }
-
     AnimatedVisibility(
         visible = selectedMangaList.isNotEmpty(),
         enter = fadeIn(),
@@ -247,8 +245,21 @@ private fun SelectingToolBar(
             title = stringResource(R.string.library_n_selected).format(selectedMangaList.size),
             onNavUp = { selectedMangaList.clear() }
         ) {
-            IconButton(onClick = { isOpen = true }) {
-                Icon(LisuIcons.Delete, stringResource(R.string.action_remove_from_library))
+            var isOpen by remember { mutableStateOf(false) }
+            TooltipIconButton(
+                tooltip = stringResource(R.string.action_remove_from_library),
+                icon = LisuIcons.Delete,
+                onClick = { isOpen = true },
+            )
+            if (isOpen) {
+                LisuDialog(
+                    title = stringResource(R.string.library_remove_n_mangas_from_library)
+                        .format(selectedMangaList.size),
+                    confirmText = stringResource(R.string.action_ok),
+                    dismissText = stringResource(R.string.action_cancel),
+                    onConfirm = { onAction(LibraryAction.RemoveFromLibrary(selectedMangaList.toList())) },
+                    onDismiss = { isOpen = false },
+                )
             }
         }
     }
