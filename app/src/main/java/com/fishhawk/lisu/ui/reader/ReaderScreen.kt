@@ -3,35 +3,23 @@ package com.fishhawk.lisu.ui.reader
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
 import coil.memory.MemoryCache
-import coil.request.ImageRequest
 import com.fishhawk.lisu.PR
 import com.fishhawk.lisu.data.datastore.ReaderMode
 import com.fishhawk.lisu.data.datastore.ReaderOrientation
@@ -42,6 +30,7 @@ import com.fishhawk.lisu.ui.reader.viewer.WebtoonViewer
 import com.fishhawk.lisu.util.*
 import com.fishhawk.lisu.widget.StateView
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -60,14 +49,12 @@ sealed interface ReaderAction {
     data class SaveGifPage(val file: File, val position: Int) : ReaderAction
     data class ShareGifPage(val file: File, val position: Int) : ReaderAction
 
+    data class NotifyCurrentPage(val page: ReaderPage.Image) : ReaderAction
     object OpenPrevChapter : ReaderAction
     object OpenNextChapter : ReaderAction
-    object MoveToPrevChapter : ReaderAction
-    object MoveToNextChapter : ReaderAction
 
     object ToggleReaderMode : ReaderAction
     object ToggleReaderOrientation : ReaderAction
-    data class UpdateHistory(val page: Int) : ReaderAction
 }
 
 @Composable
@@ -78,16 +65,17 @@ fun ReaderScreen() {
     }
 
     val mangaTitleResult by viewModel.mangaTitleResult.collectAsState()
-    val isOnlyOneChapter by viewModel.isOnlyOneChapter.collectAsState()
+//    val isOnlyOneChapter by viewModel.isOnlyOneChapter.collectAsState()
+    val isOnlyOneChapter = false
     val readerMode by viewModel.readerMode.collectAsState()
     val readerOrientation by viewModel.readerOrientation.collectAsState()
-    val pointer by viewModel.chapterPointer.collectAsState()
+    val pages by viewModel.pages.collectAsState()
 
     val onAction: (ReaderAction) -> Unit = { action ->
         when (action) {
             ReaderAction.NavUp -> context.findActivity().finish()
             ReaderAction.ReloadManga -> viewModel.reloadManga()
-            ReaderAction.ReloadChapter -> viewModel.loadChapterPointer()
+            ReaderAction.ReloadChapter -> viewModel.reloadChapter()
             is ReaderAction.SetAsCover -> viewModel.updateCover(action.bitmap)
             is ReaderAction.SavePage -> context.saveDrawable(
                 action.bitmap,
@@ -111,13 +99,11 @@ fun ReaderScreen() {
                 "${mangaTitleResult?.getOrNull()!!}-${action.position}"
             )
 
+            is ReaderAction.NotifyCurrentPage -> viewModel.notifyCurrentPage(action.page)
             ReaderAction.OpenPrevChapter -> viewModel.openPrevChapter()
             ReaderAction.OpenNextChapter -> viewModel.openNextChapter()
-            ReaderAction.MoveToPrevChapter -> viewModel.moveToPrevChapter()
-            ReaderAction.MoveToNextChapter -> viewModel.moveToNextChapter()
             is ReaderAction.ToggleReaderMode -> viewModel.toggleReaderMode()
             is ReaderAction.ToggleReaderOrientation -> viewModel.toggleReaderOrientation()
-            is ReaderAction.UpdateHistory -> viewModel.updateReadingHistory(action.page)
         }
     }
 
@@ -148,7 +134,7 @@ fun ReaderScreen() {
             modifier = Modifier.fillMaxSize(),
         ) { mangaTitle ->
             Reader(
-                pages = pointer?.pages,
+                pages = pages,
                 startPage = viewModel.startPage,
                 readerMode = readerMode ?: return@StateView,
                 mangaTitle = mangaTitle,
@@ -178,15 +164,11 @@ private fun Reader(
             if (readerMode == ReaderMode.Continuous) ViewerState.Webtoon(
                 state = rememberLazyListState(initialFirstVisibleItemIndex = startPage),
                 pages = pages,
-                requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
-                requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
             )
             else ViewerState.Pager(
                 state = rememberPagerState(initialPage = startPage),
                 isRtl = readerMode == ReaderMode.Rtl,
                 pages = pages,
-                requestMoveToPrevChapter = { onAction(ReaderAction.MoveToPrevChapter) },
-                requestMoveToNextChapter = { onAction(ReaderAction.MoveToNextChapter) },
             )
         }
 
@@ -316,12 +298,12 @@ private fun ReaderPages(
                     }
 
                     Key.N -> {
-                        viewerState.requestMoveToNextChapter()
+//                        viewerState.requestMoveToNextChapter()
                         true
                     }
 
                     Key.P -> {
-                        viewerState.requestMoveToPrevChapter()
+//                        viewerState.requestMoveToPrevChapter()
                         true
                     }
 
@@ -374,26 +356,27 @@ private fun ReaderPages(
                 onLongPress = onLongPress,
             )
     }
+
     LaunchedEffect(viewerState) {
-        snapshotFlow { viewerState.pages[viewerState.position] }
+        snapshotFlow { viewerState.pages.getOrNull(viewerState.position) }
+            .onEach { println(viewerState.position) }
             .filterIsInstance<ReaderPage.Image>()
             .collect { page ->
-                onAction(ReaderAction.UpdateHistory(page.index))
-
-                // Preload image
-                viewerState.pages
-                    .filterIsInstance<ReaderPage.Image>()
-                    .takeIf { it.isNotEmpty() }
-                    ?.slice(
-                        (page.index - 3).coerceAtLeast(0)..
-                                (page.index + 5).coerceIn(0, page.size - 1)
-                    )
-                    ?.forEach { adjacentPage ->
-                        val request = ImageRequest.Builder(context)
-                            .data(adjacentPage.url)
-                            .build()
-                        context.imageLoader.enqueue(request)
-                    }
+                onAction(ReaderAction.NotifyCurrentPage(page))
+//                // Preload image
+//                viewerState.pages
+//                    .filterIsInstance<ReaderPage.Image>()
+//                    .takeIf { it.isNotEmpty() }
+//                    ?.slice(
+//                        (page.index - 3).coerceAtLeast(0)..
+//                                (page.index + 5).coerceIn(0, page.size - 1)
+//                    )
+//                    ?.forEach { adjacentPage ->
+//                        val request = ImageRequest.Builder(context)
+//                            .data(adjacentPage.url)
+//                            .build()
+//                        context.imageLoader.enqueue(request)
+//                    }
             }
     }
 }

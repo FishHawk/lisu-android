@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -29,20 +28,10 @@ internal fun WebtoonViewer(
         focusRequester.requestFocus()
     }
 
-    val nestedScrollConnection = remember {
-        nestedScrollConnection(
-            requestMoveToPrevChapter = state.requestMoveToPrevChapter,
-            requestMoveToNextChapter = state.requestMoveToNextChapter,
-            isPrepareToPrev = { it.y > 10 },
-            isPrepareToNext = { it.y < -10 },
-        )
-    }
-
     Box(
         modifier = modifier
             .focusRequester(focusRequester)
             .focusable()
-            .nestedScroll(nestedScrollConnection)
             .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = { offset ->

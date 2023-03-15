@@ -8,8 +8,6 @@ import com.fishhawk.lisu.ui.reader.ReaderPage
 
 sealed class ViewerState(
     val pages: List<ReaderPage>,
-    val requestMoveToPrevChapter: () -> Unit,
-    val requestMoveToNextChapter: () -> Unit,
 ) {
     @get:IntRange(from = 0)
     abstract val position: Int
@@ -28,12 +26,10 @@ sealed class ViewerState(
 
     suspend fun toPrev() {
         if (position > 0) scrollToPage(position - 1)
-        else requestMoveToPrevChapter()
     }
 
     suspend fun toNext() {
         if (position < pages.size - 1) scrollToPage(position + 1)
-        else requestMoveToNextChapter()
     }
 
     suspend fun toLeft() = if (isRtl) toNext() else toPrev()
@@ -42,14 +38,9 @@ sealed class ViewerState(
     @OptIn(ExperimentalFoundationApi::class)
     class Pager(
         val state: PagerState,
-        override val isRtl: Boolean,
-        pages: List<ReaderPage>,
-        requestMoveToPrevChapter: () -> Unit,
-        requestMoveToNextChapter: () -> Unit,
+        override val isRtl: Boolean, pages: List<ReaderPage>,
     ) : ViewerState(
         pages = pages,
-        requestMoveToPrevChapter = requestMoveToPrevChapter,
-        requestMoveToNextChapter = requestMoveToNextChapter,
     ) {
         override val position: Int
             get() = state.currentPage
@@ -62,12 +53,8 @@ sealed class ViewerState(
     class Webtoon(
         val state: LazyListState,
         pages: List<ReaderPage>,
-        requestMoveToPrevChapter: () -> Unit,
-        requestMoveToNextChapter: () -> Unit,
     ) : ViewerState(
         pages = pages,
-        requestMoveToPrevChapter = requestMoveToPrevChapter,
-        requestMoveToNextChapter = requestMoveToNextChapter,
     ) {
         override val isRtl = false
 

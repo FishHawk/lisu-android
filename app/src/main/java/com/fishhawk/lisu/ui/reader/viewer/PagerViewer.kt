@@ -51,20 +51,10 @@ internal fun PagerViewer(
         focusRequester.requestFocus()
     }
 
-    val nestedScrollConnection = remember(state.isRtl) {
-        nestedScrollConnection(
-            requestMoveToPrevChapter = state.requestMoveToPrevChapter,
-            requestMoveToNextChapter = state.requestMoveToNextChapter,
-            isPrepareToPrev = { if (state.isRtl) it.x < -10 else it.x > 10 },
-            isPrepareToNext = { if (state.isRtl) it.x > 10 else it.x < -10 },
-        )
-    }
-
     Box(
         modifier = modifier
             .focusRequester(focusRequester)
             .focusable()
-            .nestedScroll(nestedScrollConnection),
     ) {
         fun onTap(offset: Offset, size: IntSize) {
             if (isMenuOpened.value) isMenuOpened.value = false
@@ -88,7 +78,7 @@ internal fun PagerViewer(
                 state = state.state,
                 key = {
                     when (val page = state.pages[it]) {
-                        is ReaderPage.Image -> page.index
+                        is ReaderPage.Image -> page.chapter.id + page.index
                         is ReaderPage.NextChapterState -> -1
                         is ReaderPage.PrevChapterState -> state.pages.size
                     }
@@ -121,8 +111,10 @@ internal fun PagerViewer(
                             )
                         }
                     }
+
                     is ReaderPage.NextChapterState ->
                         NextChapterStatePage(page = page, modifier = pageModifier)
+
                     is ReaderPage.PrevChapterState ->
                         PrevChapterStatePage(page = page, modifier = pageModifier)
                 }
