@@ -11,8 +11,6 @@ android {
     namespace = "com.fishhawk.lisu"
     compileSdk = 33
 
-    buildToolsVersion = "30.0.3"
-
     defaultConfig {
         applicationId = "com.fishhawk.lisu"
         minSdk = 21
@@ -63,9 +61,9 @@ android {
     kotlin {
         jvmToolchain(8)
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
-        freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn"
     }
 
     composeOptions {
@@ -76,22 +74,18 @@ android {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
 
-    implementation("androidx.activity:activity-compose:1.7.0-rc01")
+    implementation("androidx.activity:activity-compose:1.7.0")
 
     val composeVersion = "1.4.0-rc01"
     implementation("androidx.compose.ui:ui:$composeVersion")
-    debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
-    implementation("androidx.compose.foundation:foundation:$composeVersion")
-    implementation("androidx.compose.material:material-icons-core:$composeVersion")
     implementation("androidx.compose.material:material-icons-extended:$composeVersion")
     implementation("androidx.compose.material3:material3:1.1.0-alpha08")
-
-    implementation("androidx.navigation:navigation-compose:2.5.2")
-
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")
+    debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
 
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.lifecycle:lifecycle-view-model-compose:2.6.1")
+    implementation("androidx.navigation:navigation-compose:2.5.2")
 
     val roomVersion = "2.5.0"
     implementation("androidx.room:room-runtime:$roomVersion")
